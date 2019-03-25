@@ -1,0 +1,7 @@
+.sow-masonry-grid-item {
+  overflow: hidden;
+}
+.sow-masonry-grid-item img {
+  display: block;
+  max-width: inherit;
+}

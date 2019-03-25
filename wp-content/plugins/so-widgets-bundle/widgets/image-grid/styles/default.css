@@ -1,0 +1,14 @@
+.sow-image-grid-wrapper {
+  padding-top: default;
+  line-height: 0;
+  text-align: center;
+}
+.sow-image-grid-wrapper .sow-image-grid-image {
+  padding: 0 default default default;
+  display: inline-block;
+}
+.sow-image-grid-wrapper .sow-image-grid-image img {
+  display: none;
+  max-width: 100%;
+  height: auto;
+}
