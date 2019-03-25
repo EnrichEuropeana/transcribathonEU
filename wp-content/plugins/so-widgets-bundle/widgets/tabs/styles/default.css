@@ -1,0 +1,38 @@
+.sow-tabs .sow-tabs-tab-container {
+  background-color: default;
+  padding: 12px 10px 0px 10px;
+  text-align: default;
+}
+.sow-tabs .sow-tabs-tab-container .sow-tabs-tab {
+  display: inline-block;
+  cursor: pointer;
+  background-color: default;
+  padding: 16px 15px 16px 15px;
+  margin: 0px 5px 0px 5px;
+  color: default;
+  font-family: default;
+  font-weight: default;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+.sow-tabs .sow-tabs-tab-container .sow-tabs-tab.sow-tabs-tab-selected,
+.sow-tabs .sow-tabs-tab-container .sow-tabs-tab:hover {
+  background-color: default;
+  color: default;
+}
+.sow-tabs .sow-tabs-tab-container .sow-tabs-tab .sow-tabs-title {
+  line-height: 1;
+}
+.sow-tabs .sow-tabs-panel-container {
+  position: relative;
+  background-color: default;
+  color: default;
+}
+.sow-tabs .sow-tabs-panel-container .sow-tabs-panel {
+  padding: 30px 30px 30px 35px;
+}
+.sow-tabs .sow-tabs-panel-container .sow-tabs-panel .sow-tabs-panel-content {
+  font-family: default;
+  font-weight: default;
+  font-size: 16px;
+}

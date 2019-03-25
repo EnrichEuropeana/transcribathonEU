@@ -1,0 +1,8 @@
+.sow-icon {
+  text-align: center;
+}
+.sow-icon span,
+.sow-icon a span {
+  display: inline-block;
+  color: #000000 !important;
+}
