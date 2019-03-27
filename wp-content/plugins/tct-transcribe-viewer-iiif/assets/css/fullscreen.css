@@ -1,0 +1,80 @@
+@charset "utf-8";
+/* CSS Document */
+:-webkit-full-screen-document {
+  
+}
+/* A full-screen element that is not the root element should be stretched to cover the viewport. */
+:-webkit-full-screen:not(:root) {
+  width: 100% !important;
+  height: 100%;
+  float: none !important;
+}
+:-webkit-full-screen video {
+  width: 100%;
+}
+:-webkit-full-screen .tohide {
+  display: none;
+}
+:-moz-full-screen:not(:root) {
+  width: 90% !important;
+  float: none !important;
+}
+:-moz-full-screen #fs-inner {
+  display: table-cell;
+  vertical-align: middle;
+}
+:-moz-full-screen #fs {
+  width: 90%;
+  margin: auto;
+}
+:-moz-full-screen video {
+  width: 100%;
+}
+:-moz-full-screen .tohide {
+  display: none;
+}
+#fs-container:-moz-full-screen {
+  display: table;
+  margin: auto;
+  float: none;
+  width: 100%;
+  height: 100%;
+}
+#fs-container {
+  float: right;
+}
+#fs {
+  width: 400px;
+  background: -webkit-linear-gradient(white 20%, #eee);
+  background: -moz-linear-gradient(white 20%, #eee);
+  box-shadow: 0 0 10px #ccc inset;
+  border-radius: 10px;
+  text-align: center;
+  padding: 1em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  margin-left: 1em;
+}
+:-webkit-full-screen {
+	position: fixed;
+	width: 100%;
+	top: 0;
+	background: none;
+}
+:-ms-fullscreen {
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  background:#f00;
+}
+
+#filterContainer {
+	position: absolute;
+	top: 31px;
+	left: 0px;
+	z-index: 9;
+	background-color: white;
+	padding: 8px 16px;
+	opacity: 0.9;
+	display: none;
+}
