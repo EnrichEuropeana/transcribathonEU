@@ -41,7 +41,7 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 	echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
 	$i=1;
 	foreach($sites as $s){
-		echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i."\"><a href=\"https://".$s->domain."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
+		echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a href=\"https://".$s->domain."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
 		//get_blog_details($subsite_id)->blogname;
 		$i++;
 	}
