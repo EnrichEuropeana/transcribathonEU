@@ -28,14 +28,44 @@ function embedd_custom_javascripts_and_css() {
 /* SHORTCODES */
 // extract parameters for Document-View 
 function _TCT_extract_params( $atts ) {   
+    global $wp_query;
     $current_site = get_blog_details(get_current_blog_id());
     $params = array();
-    $params['doc'] = $_GET['d'];
+    $params['doc'] = $wp_query->query_vars;
     $params['page'] = $current_site;
 
     return "<pre>".print_r($params,true)."</pre>";
 }
 add_shortcode( 'get_doc_params', '_TCT_extract_params' );
+
+// get Document data from API
+function _TCT_get_document_data( $atts ) {   
+    // get page parameters
+    global $wp_query;
+    $current_site = get_blog_details(get_current_blog_id());
+    $params = array();
+    $params['doc'] = $wp_query->query_vars;
+    $params['page'] = $current_site;
+
+    // send API request
+    $documentId = $params['doc']['page'];
+    $json = file_get_contents("https://fresenia.man.poznan.pl/tp-api/Story/".$documentId);
+
+    return $json;
+}
+add_shortcode( 'get_document_data', '_TCT_get_document_data' );
+
+// get statistics for profile
+function _TCT_get_statistics( $atts ) {   
+    // get page parameters
+    
+
+    // send API request
+    $json = file_get_contents("https://fresenia.man.poznan.pl/tp-api/Score/1");
+
+    return $json;
+}
+add_shortcode( 'get_statistics', '_TCT_get_statistics' );
 
 /* Footer-Logos */
 function _TCT_footer_logos( $atts ) {   
