@@ -36,19 +36,35 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 		
     
 	echo "\n<ul id=\"_transcribathon_topmenu\" class=\"menu\">\n";
-	echo "<li id=\"projects\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children projects\">Projects\n";
-	$sites = get_sites(array('site__not_in'=>array('1'),'deleted'=>0));
-	echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
-	$i=1;
-	foreach($sites as $s){
-		echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a href=\"https://".$s->domain."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
-		//get_blog_details($subsite_id)->blogname;
-		$i++;
-	}
-	echo "</ul>\n";
-	echo "</li>\n";
-	echo "<li id=\"projects\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children projects\">\n";
-	echo "</li>\n";
+		echo "<li id=\"projects\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children projects\">Projects\n";
+			$sites = get_sites(array('site__not_in'=>array('1'),'deleted'=>0));
+			echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
+				$i=1;
+				foreach($sites as $s){
+					echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a href=\"https://".$s->domain."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
+					$i++;
+				}
+			echo "</ul>\n";
+		echo "</li>\n";
+		echo "<li id=\"projects\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children projects\">\n";
+		echo "</li>\n";
+		if (is_user_logged_in()){
+			echo "<li id=\"account-menu\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children\">".wp_get_current_user()->user_login."\n";
+				echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
+					echo "<li id=\"account\" class=\"menu-item menu-item-type-post_type menu-item-object-page account-menu-item\"><a href=\"".network_home_url()."/account\">Account</a></li>\n";
+					echo "<li id=\"profile\" class=\"menu-item menu-item-type-post_type menu-item-object-page account-menu-item\"><a href=\"".network_home_url()."/profile\">Profile</a></li>\n";
+					echo "<li id=\"logout\" class=\"menu-item menu-item-type-post_type menu-item-object-page account-menu-item\"><a href=\"".network_home_url()."/logout\">Logout</a></li>\n";
+				echo "</ul>\n";
+			echo "</li>\n";
+			}
+		else {
+			echo "<li id=\"register\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
+				echo "<a href=\"".network_home_url()."/register/ \">Register</a>";
+			echo "</li>\n";
+			echo "<li id=\"login\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
+				echo "<a href=\"".network_home_url()."/login/ \">Login</a>";
+			echo "</li>\n";
+		}
 	echo "</ul>\n";
      ?>
     </div>
