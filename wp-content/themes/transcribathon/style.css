@@ -216,3 +216,23 @@ ul.topusers li p span.milage{font-size:0.9em; font-weight:600;}
 ul.topusers li p span.milage:before{content:'\f11e'; font-family: 'Font Awesome 5 Pro'; padding-right:5px; font-weight:300;}
 ul.topusers li p span.chars{font-size:0.9em;}
 ul.topusers li h2 span.teammem{font-weight:300 !important; font-size:14px !important;}
+
+/* Item page */
+.item-modal {
+    max-width: 70% !important;
+    width: 70% !important;
+    margin-left: 20%;
+}
+
+.item-view-example {
+    color:red;
+}
+
+.item-view-property-headline {
+    color:#184999;
+    font-weight: bold;
+    margin-bottom: 0px !important;
+}
+.item-view-property-key {
+    font-weight: bold;
+}
