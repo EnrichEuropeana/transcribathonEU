@@ -102,6 +102,10 @@ ul#_transcribathon_topmenu{
     position:absolute;
 }
 
+.site-main {
+    padding: 0px 35px 0px 170px !important;
+}
+
 
 /* Projekt-spezifische Styles */
 nav[role=navigation]{
@@ -216,7 +220,7 @@ ul.topusers li p span.milage{font-size:0.9em; font-weight:600;}
 ul.topusers li p span.milage:before{content:'\f11e'; font-family: 'Font Awesome 5 Pro'; padding-right:5px; font-weight:300;}
 ul.topusers li p span.chars{font-size:0.9em;}
 ul.topusers li h2 span.teammem{font-weight:300 !important; font-size:14px !important;}
-
+        
 /* Item page */
 .item-modal {
     max-width: 70% !important;
@@ -227,6 +231,11 @@ ul.topusers li h2 span.teammem{font-weight:300 !important; font-size:14px !impor
 .item-view-example {
     color:red;
 }
+    /*scroll bar for the right panel*/
+div.panel-right-tab-menu {
+    height: calc(70vh - 60px);
+    overflow-y: auto;
+  }
 
 .item-view-property-headline {
     color:#184999;
@@ -235,4 +244,118 @@ ul.topusers li h2 span.teammem{font-weight:300 !important; font-size:14px !impor
 }
 .item-view-property-key {
     font-weight: bold;
+}
+
+.item-view-section-headline {
+    color:#184999;
+    color:#184999;
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 0px !important;
+}
+
+.panel-container {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid silver;
+    overflow: hidden;
+    height: 70vh;
+    /* avoid browser level touch actions */
+    xtouch-action: none;
+}
+  
+.panel-left {
+    flex: 0 0 auto;
+    /* only manually resize */
+    padding: 10px;
+    width: calc(100% - 400px);
+    min-width: 250px;
+    max-width: calc(100% - 350px);
+    white-space: nowrap;
+    background: #eee;
+    color: white;
+}
+  
+.splitter {
+    flex: 0 0 auto;
+    width: 18px;  
+    background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #535353;
+    min-height: 200px;
+    cursor: col-resize;  
+}
+  
+.panel-right {
+    flex: 1 1 auto;
+    /* resizable */
+    padding: 10px;
+    width: 400px;
+    background: #eee;
+}
+
+    /* Style the tab */
+.tab {
+    overflow: hidden;
+    background-color: inherit;
+}
+
+    /* Style the buttons inside the tab */
+.tab input {
+    background-color: #ddd;
+    margin: 0.65px;
+    float: left;
+    border: none;
+    outline: none;
+    padding: 16px 18px;
+    transition: 0.3s;
+}
+
+    /* Change background color of buttons on hover */
+.tab input:hover {
+  background-color: #ccc;
+}
+
+    /* Create an active/current tablink class */
+.tab input.active {
+  background-color: inherit;
+}
+
+/* Slick slider styling */
+.item-page-slider {
+	background-color: white;
+}
+
+.slick-slide {
+    margin-right: 7px;
+}
+
+.slick-dots {
+	display: flex;
+	justify-content: center;
+	margin: 0;
+	padding: 1rem 0;
+	
+	list-style-type: none;
+}
+	
+.slick-dots li {
+    margin: 0 0.25rem;
+    list-style: none;
+}
+	
+.slick-dots button {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    
+    border: none;
+    border-radius: 100%;
+    background-color: rgb(155, 153, 153);
+    background-image: none;
+    
+    text-indent: -9999px;
+}
+	
+.slick-dots li.slick-active button {
+    background-color: black;
 }
