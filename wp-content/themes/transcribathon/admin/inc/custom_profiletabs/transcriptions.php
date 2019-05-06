@@ -70,6 +70,53 @@ function _TCT_transcription_tab( $atts ) {
     echo "</div>\n";
 
     //$docs = $wpdb->get_results("SELECT crh.*,pst.post_title AS title,SUM(crh.amount) AS menge,MAX(crh.datum) as zeitpunkt FROM ".$wpdb->prefix."user_transcriptionprogress crh LEFT JOIN ".$wpdb->prefix."posts pst ON pst.ID = crh.docid WHERE crh.userid='".um_profile_id()."' GROUP BY crh.docid ORDER BY crh.datum DESC",ARRAY_A);
+		
+	echo "<h2>"._x('Transcribed Documents','Transcription-Tab on Profile', 'transcribathon'  )."</h2>\n";
+		echo "<div id=\"doc-results profile\">\n";
+            echo "<div class=\"tableholder\">\n";
+                echo "<div class=\"tablegrid\">\n";	
+                    echo "<div class=\"section group sepgroup tab\">\n";
+                        $i=0;
+                        /*Set request parameters*/
+                        $data = array(
+                            'WP_UserId' => get_current_user_id()
+                        );
+                        $url = network_home_url()."/tp-api/TranscriptionProfile/search;";
+                        $requestType = "POST";
+
+                        // Execude http request
+                        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+                        // Display data
+                        $data = json_decode($result, true);
+                        if ($data != null) {
+                            foreach ($data as $transcription){
+                                //var_dump($transcription);
+                                if($i>3){ echo "</div>\n<div class=\"section group sepgroup tab\">\n"; $i=0; }
+                                echo "<div class=\"column span_1_of_4 collection\">\n";
+                                    //$thumb_url = wp_get_attachment_image_src( get_post_thumbnail_id( $doc['docid'] ),'post-thumbnail');
+                                    //$c = get_post_custom($doc['docid']);
+                                        //echo "<a href=\"/".ICL_LANGUAGE_CODE."/documents/id-".$doc['storyid']."/item-".$doc['itemid']."\">";
+                                        echo "<div class=\"dcholder\" style=\"background-image: url(".$transcription['ItemImageLink']."); \"><img src=\"".$transcription['ItemImageLink']."\" alt=\"\" /></div>\n";
+                                        echo "<h3 id= \"nopadmod\" class=\"nopad\">".$transcription['ItemTitle']."</h3>\n";
+                                        echo "<p id= \"smalladinfo\" class=\"smallinfo\">"._x('Last time','Transcription-Tab on Profile','transcribathon').": ".date_i18n(get_option('date_format'),strtotime($transcription['Timestamp']))."<br />"._x('Amount of characters','Transcription-Tab on Profile','transcribathon').": ".strlen($transcription['Text'])."</p>\n";
+                                //echo "</a>\n";
+                                //echo "<div class=\"docstate ".$c['tct_transcription_status'][0]."\">".$c['tct_transcription_status'][0]."</div>\n";
+                                echo "</div>\n";
+                                $i++;
+                            }
+                        }
+                    echo "</div>\n";	
+                echo "</div>\n";
+            echo "</div>\n";
+		echo "</div>\n";
+	
+	if(is_user_logged_in() &&  get_current_user_id() === 1){	}
+			//$docs = $wpdb->get_results("SELECT *,SUM(amount) AS menge,MAX(datum) as zeitpunkt FROM ".$wpdb->prefix."user_transcriptionprogress WHERE userid='".um_profile_id()."' GROUP BY docid ORDER BY datum DESC",ARRAY_A);
+			/*$amt = $wpdb->get_results("SELECT SUM(amount) FROM ".$wpdb->prefix."user_transcriptionprogress WHERE userid='".um_profile_id()."' and datum >= '".date('Y-m-')."01' AND datum <= '".date('Y-m-t')."'",ARRAY_N);
+			echo "<pre>".print_r($amt,true)."</pre>";*/
+
+
 }
 add_shortcode( 'transcription_tab', '_TCT_transcription_tab' );
 ?>
