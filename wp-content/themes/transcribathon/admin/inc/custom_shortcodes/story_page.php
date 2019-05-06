@@ -6,9 +6,18 @@ function _TCT_get_document_data( $atts ) {
         // get Story Id from url parameter
         $storyId = $_GET['id'];
 
-        // get Story data from API
-        $json = file_get_contents(network_home_url()."/tp-api/Story/".$storyId);
-        $data = json_decode($json, true);
+        // Set request parameters
+        $data = array(
+            'key' => 'testKey'
+        );
+        $url = network_home_url()."/tp-api/Story/".$storyId;
+        $requestType = "POST";
+    
+        // Execude request
+        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+        // Display data
+        $data = json_decode($result, true);
         $data = $data[0];
 
         foreach ($data['Items'] as $item){
