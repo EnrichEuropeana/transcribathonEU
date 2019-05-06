@@ -6,7 +6,32 @@ echo "span._transcribathon_partnerlogo,a._transcribathon_partnerlogo{border-bott
 echo "nav[role=navigation] ul#menu-main-menu li a{color:".$theme_sets['vantage_general_link_color'].";}\n";
 echo "nav[role=navigation] ul#menu-main-menu li a:hover{background-color:".$theme_sets['vantage_general_link_hover_color']."; color:#fff;}\n";
 echo "h1{color:".$theme_sets['vantage_general_link_color']." !important;}\n";
+echo ".theme-color-hover:hover{
+    color: #fff !important;
+    background-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+}";
+echo ".theme-color-hover:hover .theme-hover-child{
+    color: #fff !important;
+    background-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+}";
 
+echo ".theme-color{
+    color: ".$theme_sets['vantage_general_link_color']." !important;
+}";
+
+echo ".theme-color-background{
+    color: #fff !important;
+    background-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+    background-image: none !important;
+}";
+
+echo "div.um-profile-nav div.um-profile-nav-item a:hover{
+    border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+}";
+
+echo "div.um-profile-nav div.um-profile-nav-item.active a{
+    border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+}";
 // Project-Navigation
 $sites = get_sites(array('site__not_in'=>array('1'),'deleted'=>0));
 foreach($sites as $s){
