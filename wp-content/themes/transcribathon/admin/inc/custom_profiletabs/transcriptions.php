@@ -55,6 +55,21 @@ function _TCT_transcription_tab( $atts ) {
             echo "</div>\n";
         echo "</div>\n";
     echo "</div>\n";
+
+
+    echo "<p>&nbsp;</p>\n<div id=\"personal_chart\">\n";
+        echo "<script type=\"text/javascript\">\n";
+            //echo "getTCTlinePersonalChart('days','".date('Y-m-d',strtotime("- 1 month",strtotime(date('Y-m-d'))))."','".date('Y-m-d')."','personal_chart','".um_profile_id()."');\n";	
+            //$amt = $wpdb->get_results("SELECT SUM(amount) FROM ".$wpdb->prefix."user_transcriptionprogress WHERE userid='".um_profile_id()."' and datum >= '".date('Y-m-')."01' AND datum <= '".date('Y-m-t')."'",ARRAY_N);
+            if(trim($amt[0][0]) != "" && (int)$amt[0][0] > 0){
+                echo "getTCTlinePersonalChart('days','".date('Y-m-')."01','".date('Y-m-t')."','personal_chart','".um_profile_id()."');\n";
+            }else{
+                echo "getTCTlinePersonalChart('months','".date('Y-')."01-01','".date('Y-m-t',strtotime(date('Y').'-12-01'))."','personal_chart','".um_profile_id()."');\n";
+            }
+        echo "</script>\n";
+    echo "</div>\n";
+
+    //$docs = $wpdb->get_results("SELECT crh.*,pst.post_title AS title,SUM(crh.amount) AS menge,MAX(crh.datum) as zeitpunkt FROM ".$wpdb->prefix."user_transcriptionprogress crh LEFT JOIN ".$wpdb->prefix."posts pst ON pst.ID = crh.docid WHERE crh.userid='".um_profile_id()."' GROUP BY crh.docid ORDER BY crh.datum DESC",ARRAY_A);
 }
 add_shortcode( 'transcription_tab', '_TCT_transcription_tab' );
 ?>
