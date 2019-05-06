@@ -14,19 +14,56 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/get_stories.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/news_section.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
+
 
 // Embedd custom Javascripts and CSS
 function embedd_custom_javascripts_and_css() {
     global $post;
      if (!is_admin() && $GLOBALS['pagenow'] != 'wp-login.php') {
-        /* 
-        wp_deregister_script( 'custom-js' );
-        wp_register_script( 'custom-js', CHILD_TEMPLATE_DIR.'/js/custom.js', array('jquery'));
-        wp_enqueue_script( 'custom-js' );
-        */
-         wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
-         wp_enqueue_style( 'custom-css' ); 
+        /* jQuery */
+        wp_enqueue_script( 'jquery' );
+        
+        /* Bootstrap CSS */
+        wp_enqueue_style( 'bootstrap', CHILD_TEMPLATE_DIR . '/css/bootstrap.min.css');
+        /* Bootstrap JS */
+        wp_enqueue_script('bootstrap', CHILD_TEMPLATE_DIR . '/js/bootstrap.min.js');
+    
+        /* splitjs CSS*/
+        wp_enqueue_style( 'split', CHILD_TEMPLATE_DIR . '/css/splitjs.css');
+        /* splitjs JS*/
+        wp_enqueue_script( 'split', CHILD_TEMPLATE_DIR . '/js/split.js');
+    
+        /* resizable JS*/
+        wp_enqueue_script( 'resizable', CHILD_TEMPLATE_DIR . '/js/jquery-resizable.js');
+    
+        /* slick CSS*/
+        wp_enqueue_style( 'slick', CHILD_TEMPLATE_DIR . '/css/slick.css');
+        /* slick JS*/
+        wp_enqueue_script( 'slick', CHILD_TEMPLATE_DIR . '/js/slick.min.js');
+    
+        /* Scroller CSS*/
+        wp_enqueue_style( 'owl-carousel', CHILD_TEMPLATE_DIR . '/css/scroller.min.css');
+        /* Scroller JS*/
+        wp_enqueue_script( 'owl-carousel', CHILD_TEMPLATE_DIR . '/js/scroller.min.js');
+    
+        /* Font Awesome CSS */
+        wp_enqueue_style( 'font-awesome', CHILD_TEMPLATE_DIR . '/css/all.min.css');
+    
+    
+        /* diff-match-patch (Transcription text comparison) JS*/
+        wp_enqueue_script( 'diff-match-patch', CHILD_TEMPLATE_DIR . '/js/diff-match-patch.js');
+    
+        /* custom JS and CSS*/
+        wp_enqueue_script( 'custom', CHILD_TEMPLATE_DIR . '/js/custom.js');
+        wp_enqueue_style('child-style', get_stylesheet_directory_uri() .'/style.css', array('parent-style'));
+        
+        /* custom.php containing theme color CSS */
+        wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
+        wp_enqueue_style( 'custom-css' ); 
      }
  }
  add_action('init', 'embedd_custom_javascripts_and_css');
@@ -73,30 +110,3 @@ add_filter('siteorigin_widgets_widget_folders', 'add_custom_widget_collection');
 
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-top-transcribers/tct-top-transcribers-widget.php'); // Adds the top-transcribers-widget
 
-function add_scripts() {
-    /* jQuery */
-    wp_enqueue_script( 'jquery' );
-
-    /* Bootstrap CSS */
-    wp_enqueue_style( 'bootstrap', CHILD_TEMPLATE_DIR . '/css/bootstrap.min.css');
-    /* Bootstrap JS */
-    wp_enqueue_script('bootstrap', CHILD_TEMPLATE_DIR . '/js/bootstrap.min.js');
-
-    /* splitjs CSS*/
-    wp_enqueue_style( 'split', CHILD_TEMPLATE_DIR . '/css/splitjs.css');
-    /* splitjs JS*/
-    wp_enqueue_script( 'split', CHILD_TEMPLATE_DIR . '/js/split.js');
-
-    /* resizable JS*/
-    wp_enqueue_script( 'resizable', CHILD_TEMPLATE_DIR . '/js/jquery-resizable.js');
-
-    /* slick CSS*/
-    wp_enqueue_style( 'slick', CHILD_TEMPLATE_DIR . '/css/slick.css');
-    /* slick JS*/
-    wp_enqueue_script( 'slick', CHILD_TEMPLATE_DIR . '/js/slick.js');
-
-    /* custom JS*/
-    wp_enqueue_script( 'custom', CHILD_TEMPLATE_DIR . '/js/custom.js');
-    wp_enqueue_style('child-style', get_stylesheet_directory_uri() .'/style.css', array('parent-style'));
-}
-add_action( 'wp_enqueue_scripts', 'add_scripts' );
