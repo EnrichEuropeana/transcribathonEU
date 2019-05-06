@@ -9,149 +9,482 @@ include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
 function _TCT_item_page( $atts ) {  
     if (isset($_GET['id']) && $_GET['id'] != "") {
-        // get Item data from API
-        $json = file_get_contents(get_home_url()."/tp-api/Item/".$_GET['id']);
-        $data = json_decode($json, true);
+        // Set request parameters
+        $data = array(
+            'key' => 'testKey'
+        );
+        $url = network_home_url()."/tp-api/Item/".$_GET['id'];
+        $requestType = "POST";
+    
+        // Execude http request
+        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+        // Display data
+        $data = json_decode($result, true);
         $data = $data[0];
 
-        // build Item page content
+        // Build Item page content
         $content = "";
-        $content .= "<div class='panel-container'>";
+        
+        // Image viewer
+        $imageViewer = "";
+            $imageViewer .= "<img src='".$data['ImageLink']."'>";
+
+        // Editor tab
+        $editorTab = "";
+            // Transcription status switcher
+            $s = "edit";
+            $statusList = array("not-yet", "edit", "review", "complete");
+                $editorTab .= "<select class=\"stateEditor\">";
+                foreach ($statusList as $status) {
+                    if ($s !== $status) { 
+                        $editorTab .= "<option value=".$status.">".$status."</option>";
+                    } else { 
+                        $editorTab .= "<option selected value=".$status.">".$status."</option>";
+                    }
+                }
+                $editorTab .= "</select>\n";
+
+            // Current transcription
+            $editorTab .= "<h4 class='theme-color item-page-section-headline'>TRANSCRIPTION</h4>";
+            
+            $currentTranscription = "";
+            $transcriptionList = [];
+            foreach ($data["Transcriptions"] as $transcription) {
+                if ($transcription['CurrentVersion'] == "1") {
+                    $currentTranscription = $transcription['Text'];
+                }
+                else {
+                    array_push($transcriptionList, $transcription);
+                }
+            }
+            $editorTab .= '<p id="item-page-current-transcription">';
+            $editorTab .= $currentTranscription;
+            $editorTab .= '</p>';
+
+            // Description
+            $editorTab .= "<h5 class='theme-color item-page-section-headline'>";
+                $editorTab .= "Description";
+            $editorTab .= "</h5>";
+            $editorTab .= '<textarea id="item-page-description-text" rows="4">';
+                $editorTab .= $data['Description'];
+            $editorTab .= '</textarea>';
+
+            // Transcription history
+            $editorTab .= '<h4 class="theme-color item-page-section-headline">TRANSCRIPTION HISTORY</h4></br>';
+            $i = 0;
+            foreach ($transcriptionList as $transcription) {
+                $editorTab .= '<button type="button" class="trancription-toggle" data-toggle="collapse" data-target="#transcription-'.$i.'">';
+                    $editorTab .= $transcription["Timestamp"];
+                $editorTab .= '</button>';
+                    $editorTab .= '<div id="transcription-'.$i.'" class="collapse transcription-history-collapse-content">';
+                        $editorTab .= '<p id="item-page-current-transcription">';
+                            $editorTab .= $transcription['Text'];
+                        $editorTab .= '</p>';
+                        $editorTab .= '<input class="transcription-comparison-button" type="button" 
+                                            onClick="compareTranscription(\''.$transcriptionList[$i]['Text'].'\', \''.$currentTranscription.'\','.$i.')" 
+                                            value="Compare to current transcription">';
+                        $editorTab .= '<p id="transcription-comparison-output-'.$i.'" class="transcription-comparison-output">';
+                        $editorTab .= '</p>';
+                    $editorTab .= '</div>';
+                $i++;
+            }
+
+
+        // Image settings tab
+        $imageSettingsTab = "";
+            $imageSettingsTab .= "<p class='theme-color item-page-section-headline'>ADVANCED IMAGE SETTINGS</p>"; 
+
+        // Info tab
+        $infoTab = "";
+            $infoTab .= "<h4 class='theme-color item-page-section-headline'>";
+                $infoTab .= "Title: ".$data['Title'];
+            $infoTab .= "</h4>";
+            $infoTab .= "<p class='item-page-property-value'>";
+                $infoTab .= $data['Description'];
+            $infoTab .= "</p>";
+
+            $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
+                $infoTab .= "People";
+            $infoTab .= "</h5>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Contributor: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['Contributor'];
+                $infoTab .= "</span>";
+            $infoTab .= "</p>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Subject: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['StoryPlaceName'];
+                $infoTab .= "</span>";
+            $infoTab .= "</p>";
+
+            $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
+                $infoTab .= "Classifications";
+            $infoTab .= "</h5>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Type: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['Title'];
+                $infoTab .= "</span>";
+            $infoTab .= "</p>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Subject: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['StoryPlaceName'];
+                $infoTab .= "</span>";
+            $infoTab .= "</p>";
+
+            $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
+                $infoTab .= "PROPERTIES";
+            $infoTab .= "</h5>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Language: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['Languauges'][0];
+                $infoTab .= "</span>";
+            $infoTab .= "</p>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Keyword: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['SearchText'];
+                $infoTab .= "</span></br>";
+            $infoTab .= "</p>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Link: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['Link'];
+                $infoTab .= "</span></br>";
+            $infoTab .= "</p>";
+            $infoTab .= "<p class='item-page-property'>";
+                $infoTab .= "<span class='item-page-property-key'>";
+                    $infoTab .= "Category: ";
+                $infoTab .= "</span>";
+                $infoTab .= "<span class='item-page-property-value'>";
+                    $infoTab .= $data['Title'];
+                $infoTab .= "</span></br>";
+            $infoTab .= "</p>";
+
+            // Just filler content for now, to make the size realistic
+            $infoTab .= "<p class='theme-color item-page-property-headline'>Time</p>";
+            $infoTab .= "<span class='item-page-property-key'>Creation date: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Timestamp']."</span></br>";
+            
+            $infoTab .= "<p class='theme-color item-page-property-headline'>Provenanace</p>";
+            $infoTab .= "<span class='item-page-property-key'>Source: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Provenance: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Identifier: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Institution: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Provider: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Providing country: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>First published in Europeana: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['DateStart']."</span></br>";
+            $infoTab .= "<span class='item-page-property-key'>Last updated in Europeana: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['DateEnd']."</span></br>";
+            
+            $infoTab .= "<p class='theme-color item-page-property-headline'>References and relations</p>";
+            $infoTab .= "<span class='item-page-property-key'>Location: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['TranscriptionId']."</span></br>";
+
+            $infoTab .= "<p class='theme-color item-page-property-headline'>Location</p>";
+            $infoTab .= "<span class='item-page-property-key'>Dataset: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['PlaceId']."</span></br>";
+
+            $infoTab .= "<p class='theme-color item-page-property-headline'>Entities</p>";
+            $infoTab .= "<span class='item-page-property-key'>Concept term: </span>";
+            $infoTab .= "<span class='item-page-property-value'>".$data['ImageLink']."</span></br>";
+
+        // Tagging tab
+        $taggingTab = "";
+            $taggingTab .= "<p>test... tags tab</p>";     
+
+        // Help tab
+        $helpTab = "";
+            $helpTab .= "<p>test... help tab</p>";          
+
+        // Automatic enrichment tab
+        $autoEnrichmentTab = "";
+            $autoEnrichmentTab .= "<p>test... automatic enrichment tab</p>"; 
+        
+        // Comment section
+        $commentSection = "";
+            $commentSection .= "<h2 class=\"theme-color-background comments-head\">";
+                $commentSection .= "Notes and questions";
+            $commentSection .= "</h2>";
+            $commentSection .= "<div id=\"single-comments-wrapper\">";
+                $commentSection .= "<div id=\"comments\" class=\"comments-area\">";
+                    $commentSection .= "<div id=\"respond\" class=\"comment-respond\">";
+                        $commentSection .= "<h3 id=\"reply-title\" class=\"comment-reply-title\">";	
+                            $commentSection .= "Leave a note or a question";
+                            $commentSection .= "<small><a rel=\"nofollow\" id=\"cancel-comment-reply-link\" href=\"/en/documents/id-19044/item-223349/#respond\" style=\"display:none;\">";
+                                $commentSection .= "Cancel reply";
+                            $commentSection .= "</a></small>";	
+                        $commentSection .= "</h3>";		
+                        $commentSection .= "<form action=\"https://transcribathon.com/wp-comments-post.php\" method=\"post\" id=\"commentform\" class=\"comment-form\">";
+                            $commentSection .= "<p class=\"logged-in-as\">";
+                                $commentSection .= "<a href=\"https://transcribathon.com/wp-admin/profile.php\" aria-label=\"Logged in as ".wp_get_current_user()->display_name.". Edit your profile.\">";
+                                    $commentSection .= "Logged in as ".wp_get_current_user()->display_name."";
+                                $commentSection .= "</a>.";
+                                $commentSection .= "<a href=\"".wp_logout_url(network_home_url())."\">";
+                                    $commentSection .= "Log out?";
+                                $commentSection .= "</a>";
+                            $commentSection .= "</p>";
+                            $commentSection .= "<textarea id=\"comment\" name=\"comment\" aria-required=\"true\">";
+                            $commentSection .= "</textarea>";
+                            $commentSection .= "<input name=\"wpml_language_code\" type=\"hidden\" value=\"en\" />";
+                            $commentSection .= "<p class=\"form-submit\">";
+                                $commentSection .= "<input name=\"submit\" type=\"submit\" id=\"submit\" class=\"submit\" value=\"Save note\" />";
+                                $commentSection .= "<input type='hidden' name='comment_post_ID' value='296152' id='comment_post_ID' />";
+                                $commentSection .= "<input type='hidden' name='comment_parent' id='comment_parent' value='0' />";
+                            $commentSection .= "</p>";
+                            $commentSection .= "<input type=\"hidden\" id=\"_wp_unfiltered_html_comment_disabled\" name=\"_wp_unfiltered_html_comment_disabled\" value=\"1f491b0ac2\" />";
+                            $commentSection .= "<script>
+                                                    (function() {
+                                                        if(window===window.parent){
+                                                            document.getElementById('_wp_unfiltered_html_comment_disabled').name='_wp_unfiltered_html_comment';
+                                                        }
+                                                    }) ();
+                                                </script>";
+                        $commentSection .= "</form>";
+                    $commentSection .= "</div><!-- #respond -->";
+                $commentSection .= "</div><!-- #comments .comments-area -->";
+            $commentSection .= "</div>";
+
+        // View switcher button
+        $content .= "<button id='item-page-switcher' onclick='switchItemPageView()'>switch</button>";
+
+        // <<< FULL VIEW >>> //
+
+        $content .= "<div id='full-view-container'>";
+            // Top image slider 
+            $content .= "<div class='item-page-slider'>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='".$data['ImageLink']."'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258365.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258366.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258367.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258368.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>
+        </div>";
+
+// Image slider JavaScript
+$content .= "<script>
+            jQuery(document).ready(function(){
+                jQuery('.item-page-slider').slick({
+                    dots: true,
+                    infinite: true,
+                    arrows: false,
+                    speed: 300,
+                    slidesToShow: 6,
+                    slidesToScroll: 6,
+                    lazyLoad: 'ondemand',
+                    responsive: [
+                        {
+                            breakpoint: 1024,
+                            settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: true
+                            }
+                        },
+                        {
+                            breakpoint: 600,
+                            settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                            }
+                        },
+                        {
+                            breakpoint: 480,
+                            settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                            }
+                        }
+                    ]
+                });
+            });
+        </script>";
+            
+            $content .= "<div id='full-view-left'>";
+                $content .= $imageViewer;
+                $content .= "<div id='full-view-editor'>";
+                    $content .= $editorTab;
+                $content .= "</div>";
+            $content .= "</div>";
+            $content .= "<div id='full-view-right'>";
+                $content .= "<div id='full-view-tagging'>";
+                    $content .= $taggingTab;
+                $content .= "</div>";
+                $content .= "<hr>";
+                $content .= '<div class="panel panel-default">';
+                    $content .= '<div class="panel-heading clickable" data-toggle="collapse" href="#info-collapsable">';
+                        $content .= '<h4 id="info-collapse-heading" class="theme-color item-page-section-headline panel-title">';  
+                            $content .= 'DOCUMENT META DATA';
+                        $content .= '</h4>';
+                        $content .= '<i class="fa fa-angle-down" style="font-size: 20px; float:right;"></i>';
+                    $content .= '</div>';
+                    $content .= '<div id="info-collapsable" class="panel-body panel-collapse collapse">';
+                        $content .= "<div id='full-view-info'>";
+                            $content .= $infoTab;
+                        $content .= "</div>";
+                    $content .= "</div>";
+                $content .= "</div>";
+                $content .= "<hr>";
+                $content .= "<div id='full-view-help'>";
+                    $content .= $helpTab;
+                $content .= "</div>";
+                $content .= "<hr>";
+                $content .= "<div id='full-view-autoEnrichment'>";
+                    $content .= $autoEnrichmentTab;
+                $content .= "</div>";
+                $content .= "<hr>";
+                $content .= "<div id='full-view-comment'>";
+                    $content .= $commentSection;
+                $content .= "</div>";
+            $content .= "</div>";
+        $content .= "</div>";
+
+
+        // Splitscreen container
+        $content .= "<div id='image-view-container' class='panel-container-horizontal' style='display:none'>";
             
             // Image section
-            $content .= "<div class='panel-left'>
+            $content .= "<div id='item-image-section' class='panel-left'>
                             <img src='".$data['ImageLink']."'>
                         </div>";
 
             // Resize slider
-            $content .= "<div class='splitter'>
+            $content .= "<div id='item-splitter' class='splitter-vertical'>
                         </div>";
 
             // Info/Transcription section
-            $content .= "<div class='panel-right'>";
-                $content .= '<div class="tab">';
-                    $content .= '<input id="editor-icon" type="image" width="58" height="58" class="tablinks active"
-                            onclick="switchTab(event, \'editor-tab\')"
-                                src="http://simpleicon.com/wp-content/uploads/pencil.svg" alt="Editor">';
-                    $content .= '<input id="settings-icon" type="image" width="58" height="58" class="tablinks"
-                            onclick="switchTab(event, \'settings-tab\')"
-                                src="http://simpleicon.com/wp-content/uploads/equalizer.svg" alt="Settings">';
-                    $content .= '<input id="info-icon" type="image" width="58" height="58" class="tablinks"
-                            onclick="switchTab(event, \'info-tab\')"            
-                                src="https://cdn.onlinewebfonts.com/svg/img_180137.svg" alt="Info">';
-                    $content .= '<input id="tags-icon" type="image" width="58" height="58" class="tablinks"
-                            onclick="switchTab(event, \'tags-tab\')"
-                                src="http://simpleicon.com/wp-content/uploads/tag2.svg" alt="Tags">';
-                    $content .= '<input id="help-icon" type="image" width="58" height="58" class="tablinks"
-                            onclick="switchTab(event, \'help-tab\')"            
-                                src="http://simpleicon.com/wp-content/uploads/question_mark_1.svg" alt="Help">';
-                $content .= '</div>';
+            $content .= "<div id='item-data-section' class='panel-right'>";
+                $content .= "<div id='item-data-header'>";
+                    // Tab menu
+                    $content .= '<ul id="item-tab-list" class="tab-list">';
+                        $content .= "<li>";
+                            $content .= '<i class="far fa-pencil theme-color theme-color-hover tablinks active"
+                                        onclick="switchItemTab(event, \'editor-tab\')"></i>';
+                        $content .= "</li>";
+                            
+                        $content .= "<li>";
+                            $content .= '<i class="far fa-sliders-h theme-color theme-color-hover tablinks"
+                                        onclick="switchItemTab(event, \'settings-tab\')"></i>';
+                        $content .= "</li>";
 
+                        $content .= "<li>";
+                            $content .= '<i class="far fa-info-circle theme-color theme-color-hover tablinks"
+                                        onclick="switchItemTab(event, \'info-tab\')"></i>';
+                        $content .= "</li>";
+
+                        $content .= "<li>";
+                            $content .= '<i class="far fa-globe theme-color theme-color-hover tablinks"
+                                        onclick="switchItemTab(event, \'tagging-tab\')"></i>';
+                        $content .= "</li>";
+
+                        $content .= "<li>";
+                            $content .= '<i class="far fa-question-circle theme-color-hover theme-color tablinks"
+                                        onclick="switchItemTab(event, \'help-tab\')"></i>';
+                        $content .= "</li>";
+
+                        $content .= "<li>";
+                            $content .= '<i id="item-tab-laptop" class="far fa-laptop theme-color theme-color-hover tablinks"
+                                        onclick="switchItemTab(event, \'autoEnrichment-tab\')"></i>';
+                        $content .= "</li>";
+                    $content .= '</ul>';
+
+                    // View switcher
+                    $content .= '<div class="view-switcher">';
+                        $content .= '<input id="horizontal-split" type="image" class="view-switcher-button active"
+                                        onclick="switchItemView(event, \'horizontal\')"
+                                        src="'.CHILD_TEMPLATE_DIR.'/images/split-left.png" alt="Editor">';
+                        $content .= '<input id="vertical-split" type="image" class="view-switcher-button"
+                                        onclick="switchItemView(event, \'vertical\')"
+                                        src="'.CHILD_TEMPLATE_DIR.'/images/split-top.png" alt="Settings">';
+                        $content .= '<input id="popout" type="image" class="view-switcher-button"
+                                        onclick="switchItemView(event, \'popout\')"            
+                                        src="'.CHILD_TEMPLATE_DIR.'/images/popout.png" alt="Info">';
+                    $content .= '</div>';
+                $content .= "</div>";
                 
-                $content .= "<div id='panel-right-content' class='panel-right-tab-menu'>";
+                // Tab content
+                $content .= "<div id='item-data-content' class='panel-right-tab-menu'>";
                     
-                    $content .= "<div id='editor-tab' class='tabcontent' style='dislay:none;'>";
-                        $content .= "<p class='item-view-section-headline'>TRANSCRIPTION</p>";                 
+                    // Editor tab
+                    $content .= "<div id='editor-tab' class='tabcontent'>";
+                        // Content will be added here in switchItemPageView function
                     $content .= "</div>";
 
+                    // Image settings tab
                     $content .= "<div id='settings-tab' class='tabcontent' style='display:none;'>";
-                        $content .= "<p class='item-view-section-headline'>ADVANCED IMAGE SETTINGS</p>"; 
+                        $content .= $imageSettingsTab;
                     $content .= "</div>";    
 
+                    // Info tab
                     $content .= "<div id='info-tab' class='tabcontent' style='display:none;'>";
-
-                        $content .= "<p class='item-view-section-headline'>DOCUMENT META DATA</p>";
-                        $content .= "<p class='item-view-section-headline'>Personal War Diary</p>";
-                        $content .= "<p class='item-view-property-sideline'><strong>HMS Comet</strong></p></br>";
-                        $content .= "<span class='item-view-property-value'>".$data['Description']."</span></br>";
-
-                        $content .= "<p class='item-view-property-headline'>People</p>";
-                        $content .= "<span class='item-view-property-key'>Contributor: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Subject: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['StoryPlaceName']."</span></br>";
-
-                        $content .= "<p class='item-view-property-headline'>Classifications</p>";
-                        $content .= "<span class='item-view-property-key'>Type: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Subject: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['StoryPlaceName']."</span></br>";
-
-                        $content .= "<p class='item-view-section-headline'>EXTENDED INFORMATION</p>";
-
-                        $content .= "<p class='item-view-property-headline'>Properties</p>";
-                        $content .= "<span class='item-view-property-key'>Language: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-
-                        $content .= "<p class='item-view-property-headline'>Time</p>";
-                        $content .= "<span class='item-view-property-key'>Creation date: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        
-                        $content .= "<p class='item-view-property-headline'>Provenanace</p>";
-                        $content .= "<span class='item-view-property-key'>Source: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Provenance: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Identifier: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Institution: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Provider: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Providing country: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>First published in Europeana: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        $content .= "<span class='item-view-property-key'>Last updated in Europeana: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['Title']."</span></br>";
-                        
-                        $content .= "<p class='item-view-property-headline'>References and relations</p>";
-                        $content .= "<span class='item-view-property-key'>Location: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['TranscriptionId']."</span></br>";
-
-                        $content .= "<p class='item-view-property-headline'>Location</p>";
-                        $content .= "<span class='item-view-property-key'>Dataset: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['PlaceId']."</span></br>";
-
-                        $content .= "<p class='item-view-property-headline'>Entities</p>";
-                        $content .= "<span class='item-view-property-key'>Concept term: </span>";
-                        $content .= "<span class='item-view-property-value'>".$data['ImageLink']."</span></br>";
+                        $content .= "<p class='theme-color item-page-section-headline'>DOCUMENT META DATA</p>";
+                        // Content will be added here in switchItemPageView function
                     $content .= "</div>";
 
-                    $content .= "<div id='tags-tab' class='tabcontent' style='display:none;'>";
-                        $content .= "<p>test... tags tab</p>";                    
+                    // Tagging tab
+                    $content .= "<div id='tagging-tab' class='tabcontent' style='display:none;'>";
+                        // Content will be added here in switchItemPageView function
                     $content .= "</div>";
 
+                    // Help tab
                     $content .= "<div id='help-tab' class='tabcontent' style='display:none;'>";
-                        $content .= "<p>test... help tab</p>";                    
+                        // Content will be added here in switchItemPageView function
+                    $content .= "</div>";
+
+                    // Automatic enrichment tab
+                    $content .= "<div id='autoEnrichment-tab' class='tabcontent' style='display:none;'>";
+                        // Content will be added here in switchItemPageView function
                     $content .= "</div>";
 
                 $content .= "</div>";
             $content .= '</div>
                     </div>';
+        
+        // Split screen JavaScript
         $content .= '<script>
-                        jQuery(".panel-left").resizable({
-                            handleSelector: ".splitter",
+                        jQuery("#item-image-section").resizable({
+                            handleSelector: "#item-splitter",
                             resizeHeight: false
                         });
                     </script>';
 
-        foreach ($data as $key => $value){
-            if (is_array($value)){
-                $content .= "</br>";
-                $content .= $key.": ";
-                $content .= "</br>";
-                foreach ($value as $element){
-                    foreach ($element as $innerKey => $innerValue){
-                        $content .= "{$innerKey} => {$innerValue} </br>";
-                    }
-                    $content .= "</br>";
-                }
-            }
-            else {
-                $content .= "{$key} => {$value} </br>";
-            }
-        }
         $content .= "</div> 
                 </div>";
         echo $content;
