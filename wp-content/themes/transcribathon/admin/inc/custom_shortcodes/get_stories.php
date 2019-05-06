@@ -5,9 +5,16 @@ Description: Gets stories from the API and displays them
 */
 function _TCT_get_stories( $atts ) {   
     global $wp;
-    // get Stories from the API
-    $json = file_get_contents(network_home_url()."tp-api/Story/all");
-    $stories = json_decode($json, true);
+    // Set Post content
+    $data = array(
+        'key' => 'testKey'
+    );
+    $url = network_home_url()."tp-api/Story/all";
+    $requestType = "POST";
+
+    include dirname(__FILE__) . '/../custom_scripts/send_api_request.php';
+
+    $stories = json_decode($result, true);
     $content = "";
     foreach ($stories as $story){
         $content .= "<a href='".home_url( $wp->request )."/story?id=".$story['StoryId']."'>".$story['dcTitle']."</a></br>";
