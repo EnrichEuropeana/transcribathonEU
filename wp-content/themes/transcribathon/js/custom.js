@@ -21,5 +21,28 @@ function switchTab(event, tabName) {
 
     jQuery('#' + tab + '-tab').css('display', 'block');
     */
+function getTCTlinePersonalChart(what,start,ende,holder,uid){
+	"use strict";
+  jQuery.post("/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/linechart-script.php",
+  {
+    'q':'get-ln-chart',
+    'kind':what,
+    'start':start,
+    'ende':ende,
+    'uid':uid,
+    'holder':holder
+  }, 
+  function(res) {	
+    if(res.status === "ok"){
+      jQuery('#'+holder).fadeTo(1,0.01,function(){
+        jQuery('#'+holder).html(res.content).fadeTo(400,1);
+      });
+      
+    }else{
+      alert(res.content);	
+    }
+	});
+}
+
     
 }
