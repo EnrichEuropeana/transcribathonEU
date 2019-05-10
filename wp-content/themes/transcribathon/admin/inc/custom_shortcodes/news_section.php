@@ -5,9 +5,6 @@ Description: Gets news information and builds the news section for front page
 */
 
 
-add_action( 'wp_enqueue_scripts', 'enqueue_news_section', 11 );
-function enqueue_news_section() {
-}
 // include required files
 include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
@@ -31,6 +28,8 @@ $content .= "<section id='frontpage-top'>";
     $content .= "<div id='frontpage-top-links'>";
         $content .= "<ul id='frontpage-top-link-list'>";
             $content .= "<li>";
+            /*$content .= "<a href='' class='frontpage-top-link'>";
+            $content .= "<div class='frontpage-top-link-div theme-color-hover' style='height: 100%;'>";*/
             $content .= "<h5 class='theme-color'><i style='font-style:normal' class='far fa-pen' style='font-size: 10px;'></i> TRANSCRIBE NOW</h5>";
             $content .= "</li>";
 
@@ -168,7 +167,7 @@ $content .= "<script>
                         $content .= "<a href=''>READ MORE</a>";
                 $content .= "</div>";
             $content .= "</div>";
-            $content .= "<div class='news-navigation'><button class='slick-prev' id='prev-news' style='float:left;'>Previous</button><button class='slick-next' id='next-news' style='float:right;'>Next</button>";
+            $content .= "<div class='news-navigation'><button class='theme-color slick-prev' id='prev-news' style='float:left;'>Previous</button><button class='theme-color slick-next' id='next-news' style='float:right;'>Next</button>";
 
         // Image slider JavaScript
         $content .= "<script>
