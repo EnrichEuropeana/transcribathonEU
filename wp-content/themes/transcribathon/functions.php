@@ -15,6 +15,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/news_section.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
@@ -37,22 +38,31 @@ function embedd_custom_javascripts_and_css() {
         /* splitjs JS*/
         wp_enqueue_script( 'split', CHILD_TEMPLATE_DIR . '/js/split.js');
     
-        /* resizable JS*/
-        wp_enqueue_script( 'resizable', CHILD_TEMPLATE_DIR . '/js/jquery-resizable.js');
-    
         /* slick CSS*/
         wp_enqueue_style( 'slick', CHILD_TEMPLATE_DIR . '/css/slick.css');
         /* slick JS*/
         wp_enqueue_script( 'slick', CHILD_TEMPLATE_DIR . '/js/slick.min.js');
     
-        /* Scroller CSS*/
-        wp_enqueue_style( 'owl-carousel', CHILD_TEMPLATE_DIR . '/css/scroller.min.css');
-        /* Scroller JS*/
-        wp_enqueue_script( 'owl-carousel', CHILD_TEMPLATE_DIR . '/js/scroller.min.js');
+        /* jQuery UI CSS*/
+        wp_enqueue_style( 'jQuery-UI', CHILD_TEMPLATE_DIR . '/css/jquery-ui.min.css');
+        /* jQuery UI JS*/
+        wp_register_script( 'jQuery-UI', CHILD_TEMPLATE_DIR . '/js/jquery-ui.min.js');
+        /* jQuery UI JS*/
+        wp_enqueue_script( 'jQuery-UI' );
+
+	/* Openseadragon */
+	wp_enqueue_script( 'osd', CHILD_TEMPLATE_DIR . '/js/openseadragon.js');
+
+	/* iiif viewer */
+	wp_enqueue_script( 'viewer', CHILD_TEMPLATE_DIR . '/js/tct-image-viewer.js');
+	wp_enqueue_style( 'viewer', CHILD_TEMPLATE_DIR . '/css/viewer.css');
+
+        /* resizable JS*/
+        wp_register_script( 'resizable', CHILD_TEMPLATE_DIR . '/js/jquery-resizable.js', array( 'jQuery-UI' ) );
+        wp_enqueue_script( 'resizable' );
     
         /* Font Awesome CSS */
         wp_enqueue_style( 'font-awesome', CHILD_TEMPLATE_DIR . '/css/all.min.css');
-    
     
         /* diff-match-patch (Transcription text comparison) JS*/
         wp_enqueue_script( 'diff-match-patch', CHILD_TEMPLATE_DIR . '/js/diff-match-patch.js');
@@ -66,7 +76,7 @@ function embedd_custom_javascripts_and_css() {
         wp_enqueue_style( 'custom-css' ); 
      }
  }
- add_action('init', 'embedd_custom_javascripts_and_css');
+ add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
 
 
 /* SHORTCODES */
@@ -110,3 +120,17 @@ add_filter('siteorigin_widgets_widget_folders', 'add_custom_widget_collection');
 
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-top-transcribers/tct-top-transcribers-widget.php'); // Adds the top-transcribers-widget
 
+
+// ### HOOKS ### //
+add_action( 'um_profile_header_cover_area', 'my_profile_header_cover_area', 10, 1 );
+function my_profile_header_cover_area( $args ) {
+    echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
+    $acs = [];
+    if(sizeof($acs)>0){
+        echo "<div class=\"achievments\">\n"; 
+        foreach($acs as $ac){
+            echo "<div title=\"".$ac['campaign_title']."\"class=\"".$ac['badge']."\"></div>\n";
+        }
+        echo "</div>\n";
+    }
+}
