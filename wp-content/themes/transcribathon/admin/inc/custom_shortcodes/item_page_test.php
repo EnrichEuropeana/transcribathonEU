@@ -7,10 +7,10 @@ Description: Gets item data and builds the item page
 // include required files
 include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
-function _TCT_item_page_test( $atts ) {
+function _TCT_item_page_test( $atts ) { 
     if (isset($_GET['id']) && $_GET['id'] != "") {
-        // Set request parameters
-        $data = array(
+        // Set request parameters for image data
+        $requestData = array(
             'key' => 'testKey'
         );
         $url = network_home_url()."/tp-api/Item/".$_GET['id'];
@@ -19,43 +19,90 @@ function _TCT_item_page_test( $atts ) {
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
-        // Display data
-        $data = json_decode($result, true);
-        $data = $data[0];
+        // Save image data
+        $imageData = json_decode($result, true);
+        $imageData = $imageData[0];
+        // Set request parameters for story data
+        $requestData = array(
+            'key' => 'testKey'
+        );
+        $url = network_home_url()."/tp-api/Story/".$imageData['StoryId'];
+        $requestType = "POST";
+    
+        // Execude http request
+        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+        // Save story data
+        $storyData = json_decode($result, true);
+        $storyData = $storyData[0];
 
         // Build Item page content
         $content = "";
-
+        
         // Image viewer
         $imageViewer = "";
-            $imageViewer .= "<img src='".$data['ImageLink']."'>";
-
+            $imageViewer .= "<img src='".$imageData['ImageLink']."'>";
         // Editor tab
         $editorTab = "";
+            // Transcription status switcher
+            $currentStatus = $imageData['CompletionStatusId'];
+            $editorTab .= "<div id='status-editor'>";
+                $editorTab .= "<select id='status-selection'>";
+                    $statusList = array(
+                                    1 => "Not Started",
+                                    2 => "Edit",
+                                    3 => "Review",
+                                    4 => "Complete"
+                                );
+                    foreach ($statusList as $statusId => $statusName) {
+                        if ($currentStatus != $statusId) { 
+                            $editorTab .= "<option value=".$statusId.">".$statusName."</option>";
+                        } else { 
+                            $editorTab .= "<option selected value=".$statusId.">".$statusName."</option>";
+                        }
+                    }
+                $editorTab .= "</select>\n";
+                $editorTab .= "<button id='status-update-button' onClick='updateItemStatus(".$imageData['ItemId'].")'>";
+                    $editorTab .= "Change status";
+                $editorTab .= "</button>";
+                $editorTab .= "<span id='status-update-message'>";
+                $editorTab .= "</span>";
+            $editorTab .= "</div>";
+            $editorTab .= "<script>
+                            </script>";
+
             // Current transcription
-            $editorTab .= "<p class='theme-color item-page-section-headline'>TRANSCRIPTION</p>";
+            $editorTab .= "<h4 class='theme-color item-page-section-headline'>TRANSCRIPTION</h4>";
+            
             $currentTranscription = "";
             $transcriptionList = [];
-            foreach ($data["Transcriptions"] as $transcription) {
+            foreach ($imageData["Transcriptions"] as $transcription) {
                 if ($transcription['CurrentVersion'] == "1") {
-                    $currentTranscription = $transcription;
+                    $currentTranscription = $transcription['Text'];
                 }
                 else {
                     array_push($transcriptionList, $transcription);
                 }
             }
-            $editorTab .= '<p id="item-page-current-transcription">'.$currentTranscription['Text'].'</p>';
+            $editorTab .= '<p id="item-page-current-transcription">';
+            $editorTab .= $currentTranscription;
+            $editorTab .= '</p>';
 
             // Description
-            $editorTab .= "<p class='theme-color item-page-section-headline'>";
-                $editorTab .= "<Description";
-            $editorTab .= "<</p>";
+            $editorTab .= "<h5 class='theme-color item-page-section-headline'>";
+                $editorTab .= "Description";
+            $editorTab .= "</h5>";
             $editorTab .= '<textarea id="item-page-description-text" rows="4">';
-                $editorTab .= $data['Description'];
+                $editorTab .= $imageData['Description'];
             $editorTab .= '</textarea>';
+            $editorTab .= "<button id='description-update-button' onClick='updateItemDescription(".$imageData['ItemId'].")'>";
+                $editorTab .= "Save description";
+            $editorTab .= "</button>";
+            $editorTab .= "<span id='description-update-message'>";
+            $editorTab .= "</span>";
 
             // Transcription history
-            $editorTab .= '<p class="theme-color item-page-section-headline">TRANSCRIPTION History</p></br>';
+            $editorTab .= '<h4 class="theme-color item-page-section-headline">TRANSCRIPTION HISTORY</h4></br>';
             $i = 0;
             foreach ($transcriptionList as $transcription) {
                 $editorTab .= '<button type="button" class="trancription-toggle" data-toggle="collapse" data-target="#transcription-'.$i.'">';
@@ -66,7 +113,7 @@ function _TCT_item_page_test( $atts ) {
                             $editorTab .= $transcription['Text'];
                         $editorTab .= '</p>';
                         $editorTab .= '<input class="transcription-comparison-button" type="button" 
-                                            onClick="compareTranscription(\''.$transcriptionList[0]['Text'].'\', \''.$currentTranscription['Text'].'\','.$i.')" 
+                                            onClick="compareTranscription(\''.$transcriptionList[$i]['Text'].'\', \''.$currentTranscription.'\','.$i.')" 
                                             value="Compare to current transcription">';
                         $editorTab .= '<p id="transcription-comparison-output-'.$i.'" class="transcription-comparison-output">';
                         $editorTab .= '</p>';
@@ -82,10 +129,10 @@ function _TCT_item_page_test( $atts ) {
         // Info tab
         $infoTab = "";
             $infoTab .= "<h4 class='theme-color item-page-section-headline'>";
-                $infoTab .= "Title: ".$data['Title'];
+                $infoTab .= "Title: ".$imageData['Title'];
             $infoTab .= "</h4>";
             $infoTab .= "<p class='item-page-property-value'>";
-                $infoTab .= $data['Description'];
+                $infoTab .= $imageData['Description'];
             $infoTab .= "</p>";
 
             $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
@@ -96,7 +143,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Contributor: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['Contributor'];
+                    $infoTab .= $imageData['Contributor'];
                 $infoTab .= "</span>";
             $infoTab .= "</p>";
             $infoTab .= "<p class='item-page-property'>";
@@ -104,7 +151,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Subject: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['StoryPlaceName'];
+                    $infoTab .= $imageData['StoryPlaceName'];
                 $infoTab .= "</span>";
             $infoTab .= "</p>";
 
@@ -116,7 +163,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Type: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['Title'];
+                    $infoTab .= $imageData['Title'];
                 $infoTab .= "</span>";
             $infoTab .= "</p>";
             $infoTab .= "<p class='item-page-property'>";
@@ -124,7 +171,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Subject: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['StoryPlaceName'];
+                    $infoTab .= $imageData['StoryPlaceName'];
                 $infoTab .= "</span>";
             $infoTab .= "</p>";
 
@@ -136,7 +183,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Language: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['Languauges'][0];
+                    $infoTab .= $imageData['Languauges'][0];
                 $infoTab .= "</span>";
             $infoTab .= "</p>";
             $infoTab .= "<p class='item-page-property'>";
@@ -144,7 +191,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Keyword: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['SearchText'];
+                    $infoTab .= $imageData['SearchText'];
                 $infoTab .= "</span></br>";
             $infoTab .= "</p>";
             $infoTab .= "<p class='item-page-property'>";
@@ -152,7 +199,7 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Link: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['Link'];
+                    $infoTab .= $imageData['Link'];
                 $infoTab .= "</span></br>";
             $infoTab .= "</p>";
             $infoTab .= "<p class='item-page-property'>";
@@ -160,44 +207,44 @@ function _TCT_item_page_test( $atts ) {
                     $infoTab .= "Category: ";
                 $infoTab .= "</span>";
                 $infoTab .= "<span class='item-page-property-value'>";
-                    $infoTab .= $data['Title'];
+                    $infoTab .= $imageData['Title'];
                 $infoTab .= "</span></br>";
             $infoTab .= "</p>";
 
             // Just filler content for now, to make the size realistic
             $infoTab .= "<p class='theme-color item-page-property-headline'>Time</p>";
             $infoTab .= "<span class='item-page-property-key'>Creation date: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Timestamp']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Timestamp']."</span></br>";
             
             $infoTab .= "<p class='theme-color item-page-property-headline'>Provenanace</p>";
             $infoTab .= "<span class='item-page-property-key'>Source: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Provenance: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Identifier: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Institution: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Provider: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Providing country: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['Title']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['Title']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>First published in Europeana: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['DateStart']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['DateStart']."</span></br>";
             $infoTab .= "<span class='item-page-property-key'>Last updated in Europeana: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['DateEnd']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['DateEnd']."</span></br>";
             
             $infoTab .= "<p class='theme-color item-page-property-headline'>References and relations</p>";
             $infoTab .= "<span class='item-page-property-key'>Location: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['TranscriptionId']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['TranscriptionId']."</span></br>";
 
             $infoTab .= "<p class='theme-color item-page-property-headline'>Location</p>";
             $infoTab .= "<span class='item-page-property-key'>Dataset: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['PlaceId']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['PlaceId']."</span></br>";
 
             $infoTab .= "<p class='theme-color item-page-property-headline'>Entities</p>";
             $infoTab .= "<span class='item-page-property-key'>Concept term: </span>";
-            $infoTab .= "<span class='item-page-property-value'>".$data['ImageLink']."</span></br>";
+            $infoTab .= "<span class='item-page-property-value'>".$imageData['ImageLink']."</span></br>";
 
         // Tagging tab
         $taggingTab = "";
@@ -260,66 +307,62 @@ function _TCT_item_page_test( $atts ) {
 
         // <<< FULL VIEW >>> //
 
-        $content .= "<div id='full-view-container' style='display:block'>";
+        $content .= "<div id='full-view-container'>";
             // Top image slider 
-            $content .= "<div class='item-page-slider'>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='".$data['ImageLink']."'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258365.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258366.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258367.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258368.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
-                            <div><img src='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>
-                        </div>";
+            $content .= "<div class='item-page-slider'>";
+            foreach ($storyData['Items'] as $item) {
+                $content .= "<div><img data-lazy='".$item['ImageLink']."'></div>";
+            }
+            $content .= "<div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258365.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258366.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258367.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258368.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>";
+            $content .= "</div>";
 
-            // Image slider JavaScript
-            $content .= "<script>
-                            jQuery(document).ready(function(){
-                                jQuery('.item-page-slider').slick({
-                                    dots: true,
-                                    infinite: true,
-                                    arrows: false,
-                                    speed: 300,
-                                    slidesToShow: 6,
-                                    slidesToScroll: 6,
-                                    lazyLoad: 'ondemand',
-                                    responsive: [
-                                        {
-                                            breakpoint: 1024,
-                                            settings: {
-                                            slidesToShow: 3,
-                                            slidesToScroll: 3,
-                                            infinite: true,
-                                            dots: true
-                                            }
-                                        },
-                                        {
-                                            breakpoint: 600,
-                                            settings: {
-                                            slidesToShow: 2,
-                                            slidesToScroll: 2
-                                            }
-                                        },
-                                        {
-                                            breakpoint: 480,
-                                            settings: {
-                                            slidesToShow: 1,
-                                            slidesToScroll: 1
-                                            }
-                                        }
-                                    ]
-                                });
-                            });
-                        </script>";
+// Image slider JavaScript
+$content .= "<script>
+            jQuery(document).ready(function(){
+                jQuery('.item-page-slider').slick({
+                    dots: true,
+                    infinite: true,
+                    arrows: false,
+                    speed: 300,
+                    slidesToShow: 6,
+                    slidesToScroll: 6,
+                    lazyLoad: 'ondemand',
+                    responsive: [
+                        {
+                            breakpoint: 1024,
+                            settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: true
+                            }
+                        },
+                        {
+                            breakpoint: 600,
+                            settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                            }
+                        },
+                        {
+                            breakpoint: 480,
+                            settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                            }
+                        }
+                    ]
+                });
+            });
+        </script>";
             
             $content .= "<div id='full-view-left'>";
                 $content .= $imageViewer;
@@ -337,9 +380,7 @@ function _TCT_item_page_test( $atts ) {
                         $content .= '<h4 id="info-collapse-heading" class="theme-color item-page-section-headline panel-title">';  
                             $content .= 'DOCUMENT META DATA';
                         $content .= '</h4>';
-                        $content .= '<span class="pull-right">';
-                            $content .= '<i class="fa fa-angle-down" style="font-size: 20px;"></i>';
-                        $content .= '</span>';
+                        $content .= '<i class="fa fa-angle-down" style="font-size: 20px; float:right;"></i>';
                     $content .= '</div>';
                     $content .= '<div id="info-collapsable" class="panel-body panel-collapse collapse">';
                         $content .= "<div id='full-view-info'>";
@@ -368,7 +409,7 @@ function _TCT_item_page_test( $atts ) {
             
             // Image section
             $content .= "<div id='item-image-section' class='panel-left'>
-                            <img src='".$data['ImageLink']."'>
+                            <img src='".$imageData['ImageLink']."'>
                         </div>";
 
             // Resize slider
@@ -379,37 +420,59 @@ function _TCT_item_page_test( $atts ) {
             $content .= "<div id='item-data-section' class='panel-right'>";
                 $content .= "<div id='item-data-header'>";
                     // Tab menu
-                    $content .= '<div id="item-tab-menu" class="tab-menu">';
-                        $content .= '<i class="fa fa-pencil tablinks active"
-                                        onclick="switchItemTab(event, \'editor-tab\')"></i>';
-                            
-                        $content .= '<i class="fa fa-sliders tablinks"
-                                        onclick="switchItemTab(event, \'settings-tab\')"></i>';
+                    $content .= '<ul id="item-tab-list" class="tab-list">';
+                    $content .= "<li>";
+                        $content .= '<i class="far fa-pencil theme-color theme-color-hover tablinks active"
+                                    onclick="switchItemTab(event, \'editor-tab\')"></i>';
+                    $content .= "</li>";
 
-                        $content .= '<i class="fa fa-info-circle tablinks"
-                                        onclick="switchItemTab(event, \'info-tab\')"></i>';
+                    $content .= "<li>";
+                        $content .= '<i class="far fa-globe theme-color theme-color-hover tablinks"
+                                    onclick="switchItemTab(event, \'tagging-tab\')"></i>';
+                    $content .= "</li>";
 
-                        $content .= '<i class="fa fa-globe tablinks"
-                                        onclick="switchItemTab(event, \'tagging-tab\')"></i>';
+                    $content .= "<li>";
+                        $content .= '<i class="far fa-info-circle theme-color theme-color-hover tablinks"
+                                    onclick="switchItemTab(event, \'info-tab\')"></i>';
+                    $content .= "</li>";
+                        
+                    $content .= "<li>";
+                        $content .= '<i id="item-tab-laptop" class="far fa-laptop theme-color theme-color-hover tablinks"
+                                    onclick="switchItemTab(event, \'autoEnrichment-tab\')"></i>';
+                    $content .= "</li>";
 
-                        $content .= '<i class="fa fa-question-circle tablinks"
-                                        onclick="switchItemTab(event, \'help-tab\')"></i>';
+                    $content .= "<li>";
+                        $content .= '<i class="far fa-sliders-h theme-color theme-color-hover tablinks"
+                                    onclick="switchItemTab(event, \'settings-tab\')"></i>';
+                    $content .= "</li>";
 
-                        $content .= '<i class="fa fa-laptop tablinks"
-                                        onclick="switchItemTab(event, \'autoEnrichment-tab\')"></i>';
-                    $content .= '</div>';
+                    $content .= "<li>";
+                        $content .= '<i class="far fa-question-circle theme-color-hover theme-color tablinks"
+                                    onclick="switchItemTab(event, \'help-tab\')"></i>';
+                    $content .= "</li>";
+                    
+                    $content .= '</ul>';
 
                     // View switcher
                     $content .= '<div class="view-switcher">';
-                        $content .= '<input id="horizontal-split" type="image" class="view-switcher-button active"
-                                        onclick="switchItemView(event, \'horizontal\')"
-                                        src="'.CHILD_TEMPLATE_DIR.'/images/split-left.png" alt="Editor">';
-                        $content .= '<input id="vertical-split" type="image" class="view-switcher-button"
-                                        onclick="switchItemView(event, \'vertical\')"
-                                        src="'.CHILD_TEMPLATE_DIR.'/images/split-top.png" alt="Settings">';
-                        $content .= '<input id="popout" type="image" class="view-switcher-button"
-                                        onclick="switchItemView(event, \'popout\')"            
-                                        src="'.CHILD_TEMPLATE_DIR.'/images/popout.png" alt="Info">';
+                        $content .= '<ul id="item-switch-list" class="switch-list">';
+
+                            $content .= "<li>";
+                                $content .= '<i id="horizontal-split" class="fas fa-window-maximize fa-rotate-270 theme-color-hover theme-color view-switcher-icons active"
+                            onclick="switchItemView(event, \'horizontal\')"></i>';
+                            $content .= "</li>";
+
+                            $content .= "<li>";
+                                $content .= '<i id="vertical-split" class="fas fa-window-maximize theme-color-hover theme-color view-switcher-icons"
+                            onclick="switchItemView(event, \'vertical\')"></i>';
+                            $content .= "</li>";
+
+                            $content .= "<li>";
+                                $content .= '<i id="popout" class="far fa-expand-arrows theme-color-hover theme-color view-switcher-icons"
+                            onclick="switchItemView(event, \'popout\')"></i>';
+                            $content .= "</li>";
+                            
+                        $content .= '</ul>';
                     $content .= '</div>';
                 $content .= "</div>";
                 
