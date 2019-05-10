@@ -2,12 +2,12 @@
 // get Document data from API
 function _TCT_get_document_data( $atts ) {   
     $content = "";
-    if (isset($_GET['id']) && $_GET['id'] != "") {
+    if (isset($_GET['story']) && $_GET['story'] != "") {
         // get Story Id from url parameter
-        $storyId = $_GET['id'];
+        $storyId = $_GET['story'];
 
         // Set request parameters
-        $data = array(
+        $requestData = array(
             'key' => 'testKey'
         );
         $url = network_home_url()."/tp-api/Story/".$storyId;
@@ -17,13 +17,77 @@ function _TCT_get_document_data( $atts ) {
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
         // Display data
-        $data = json_decode($result, true);
-        $data = $data[0];
+        $storyData = json_decode($result, true);
+        $storyData = $storyData[0];
 
-        foreach ($data['Items'] as $item){
-            // create links to items
-            $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?id=".$item['ItemId']."' class='story-page-item-link'>".$item['Title']."</a></br>";
-        }
+        // Top image slider 
+        $content .= "<div class='story-page-slider'>";
+            foreach ($storyData['Items'] as $item) {
+                $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'><img data-lazy='".$item['ImageLink']."'></a>";
+            }
+            $content .= "<div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258365.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258366.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258367.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258368.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
+                            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
+                        <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>";
+        $content .= "</div>";
+
+        // Image slider JavaScript
+        $content .= "<script>
+            jQuery(document).ready(function(){
+                jQuery('.story-page-slider').slick({
+                    dots: true,
+                    arrows: false,
+                    speed: 300,
+                    slidesToShow: 4,
+                    slidesToScroll: 4,
+                    lazyLoad: 'ondemand',
+                    responsive: [
+                        {
+                            breakpoint: 1200,
+                            settings: {
+                            slidesToShow: 3,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: true
+                            }
+                        },
+                        {
+                            breakpoint: 800,
+                            settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                            }
+                        },
+                        {
+                            breakpoint: 600,
+                            settings: {
+                            slidesToShow: 1,
+                            slidesToScroll: 1
+                            }
+                        }
+                    ]
+                })
+            });
+        </script>";
+
+
+
+
+
+
+
+
+foreach ($storyData['Items'] as $item){
+    // create links to items
+    $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' class='story-page-item-link'>".$item['Title']."</a></br>";
+}
+
+
         /* POPUP modal code for items. Not in use for now
         // build page content
         foreach ($data['Items'] as $item){
