@@ -7,10 +7,24 @@ Description: Gets item data and builds the item page
 // include required files
 include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
+
 function _TCT_item_page( $atts ) {  
-    if (isset($_GET['id']) && $_GET['id'] != "") {
-        // Set request parameters
-        $data = array(
+    if (isset($_GET['item']) && $_GET['item'] != "") {
+        // Set request parameters for image data
+        $requestData = array(
+            'key' => 'testKey'
+        );
+        $url = network_home_url()."/tp-api/Item/".$_GET['item'];
+        $requestType = "POST";
+    
+        // Execude http request
+        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+        // Save image data
+        $imageData = json_decode($result, true);
+        $imageData = $imageData[0];
+        // Set request parameters for story data
+        $requestData = array(
             'key' => 'testKey'
         );
         $url = network_home_url()."/tp-api/Item/".$_GET['id'];
