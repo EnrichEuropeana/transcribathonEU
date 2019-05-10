@@ -1,6 +1,6 @@
 <?php
 /* 
-Shortcode: item_page
+Shortcode: item_page_test_iiif
 Description: Gets item data and builds the item page
 */
 
@@ -8,13 +8,13 @@ Description: Gets item data and builds the item page
 include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
 
-function _TCT_item_page( $atts ) {  
-    if (isset($_GET['item']) && $_GET['item'] != "") {
+function _TCT_item_page_test_iiif( $atts ) {  
+    if (isset($_GET['id']) && $_GET['id'] != "") {
         // Set request parameters for image data
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/Item/".$_GET['item'];
+        $url = network_home_url()."/tp-api/Item/".$_GET['id'];
         $requestType = "POST";
     
         // Execude http request
@@ -42,8 +42,8 @@ function _TCT_item_page( $atts ) {
         
         // Image viewer
         $imageViewer = "";
-            $imageViewer .= "<img src='".$imageData['ImageLink']."'>";
-
+            $imageViewer .= '<div id="openseadragon"></div>';
+ 
         // Editor tab
         $editorTab = "";
             // Transcription status switcher
@@ -328,20 +328,14 @@ function _TCT_item_page( $atts ) {
         // View switcher button
         $content .= "<button id='item-page-switcher' onclick='switchItemPageView()'>switch</button>";
 
-        // <<< FULL VIEW >>> //
+
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< FULL VIEW >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> //
 
         $content .= "<div id='full-view-container'>";
             // Top image slider 
             $content .= "<div class='item-page-slider'>";
-            $i = 1;
                 foreach ($storyData['Items'] as $item) {
-                    $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'><img data-lazy='".$item['ImageLink']."'></a>";
-                    if ($initialSlide == null && $item['ItemId'] == $_GET['item']){
-                        $initialSlide = $i;
-                    }
-                    else {
-                        $i++;
-                    }
+                    $content .= "<div><img data-lazy='".$item['ImageLink']."'></div>";
                 }
                 $content .= "<div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
                                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
@@ -365,7 +359,6 @@ $content .= "<script>
                     slidesToShow: 6,
                     slidesToScroll: 6,
                     lazyLoad: 'ondemand',
-                    initialSlide: ".$initialSlide.",
                     responsive: [
                         {
                             breakpoint: 1024,
@@ -396,7 +389,9 @@ $content .= "<script>
         </script>";
             
             $content .= "<div id='full-view-left'>";
-                $content .= $imageViewer;
+                $content .= "<div id='full-view-image'>";
+                    $content .= $imageViewer;
+                $content .= "</div>";
                 $content .= "<div id='full-view-editor'>";
                     $content .= $editorTab;
                 $content .= "</div>";
@@ -445,9 +440,8 @@ $content .= "<script>
         $content .= "<div id='image-view-container' class='panel-container-horizontal' style='display:none'>";
             
             // Image section
-            $content .= "<div id='item-image-section' class='panel-left'>
-                            <img src='".$imageData['ImageLink']."'>
-                        </div>";
+            $content .= "<div id='item-image-section' class='panel-left'>";
+            $content .= "</div>";
 
             // Resize slider
             $content .= "<div id='item-splitter' class='splitter-vertical'>
@@ -565,5 +559,5 @@ $content .= "<script>
         echo $content;
     }
 }
-add_shortcode( 'item_page', '_TCT_item_page' );
+add_shortcode( 'item_page_test_iiif', '_TCT_item_page_test_iiif' );
 ?>
