@@ -1,7 +1,8 @@
 <?php
     global $wp;
     // Set Post content
-    $postContent = json_encode($requestData);
+    $postContent = json_encode($data);
+    
     // Prepare new cURL resource
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
