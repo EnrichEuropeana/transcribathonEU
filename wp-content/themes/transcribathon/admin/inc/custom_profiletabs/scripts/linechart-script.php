@@ -4,7 +4,6 @@ $theme_sets = get_theme_mods();
 $theme_link_color = "".$theme_sets['vantage_general_link_color'];
 
 if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
-			//{'q':'get-ln-chart','kind':what,'start':start,'ende':ende}
 			$content = "";
 			$hoursallowed = 0;
 			if(is_user_logged_in()){	
@@ -13,7 +12,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 				}else{
 					um_fetch_user(get_current_user_id());
 					$role = um_user('role');
-					if($role === 'admin' || $role === 'mentor'){
+					if($role === 'administrator' || $role === 'mentor'){
 						$hoursallowed ++;
 					}
 				}
@@ -39,7 +38,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 				case 'years':
 					for($i=0; $i<10; $i++){
 						if(strtotime("+".$i." year", strtotime($c_min))<=strtotime($c_max)){
-							if($db_min == ""){$db_min = date("Y-m-d", strtotime("+".$i." year", strtotime($c_min)));}
+							if ($db_min == "") {
+								$db_min = date("Y-m-d", strtotime("+".$i." year", strtotime($c_min)));
+							}
 							array_push($c_steps,date("Y", strtotime("+".$i." year", strtotime($c_min))));
 							$d = new DateTime( date("Y-m-d", strtotime("+".$i." year", strtotime($c_min))));
 							$db_max =  $d->format( 'Y-m-t' );
@@ -49,7 +50,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 				case 'months':
 					for($i=0; $i<12; $i++){
 						if(strtotime("+".$i." month", strtotime($c_min))<=strtotime($c_max)){
-							if($db_min == ""){$db_min = date("Y-m-d", strtotime("+".$i." month", strtotime($c_min)));}
+							if ($db_min == "") {
+								$db_min = date("Y-m-d", strtotime("+".$i." month", strtotime($c_min)));
+							}
 							array_push($c_steps,date("Ym", strtotime("+".$i." month", strtotime($c_min))));
 							$d = new DateTime( date("Y-m-d", strtotime("+".$i." month", strtotime($c_min))));
 							$db_max =  $d->format( 'Y-m-t' );
@@ -61,7 +64,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 					//$max =  (int)$d->format( 't' );
 					for($i=0; $i<60; $i++){
 						if(strtotime("+".$i." day", strtotime($c_min))<=strtotime($c_max)){
-							if($db_min == ""){$db_min = date("Y-m-d", strtotime("+".$i." day", strtotime($c_min)));}
+							if ($db_min == "") {
+								$db_min = date("Y-m-d", strtotime("+".$i." day", strtotime($c_min)));
+							}
 							array_push($c_steps,date("Ymd", strtotime("+".$i." day", strtotime($c_min))));
 							$db_max =  date("Y-m-d", strtotime("+".$i." day", strtotime($c_min)));
 						}
@@ -70,7 +75,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 				case 'hours':
 					for($i=0; $i<25; $i++){
 						if(strtotime("+".$i." hour", strtotime($c_min))<=strtotime($c_max)){
-							if($db_min == ""){$db_min = date("Y-m-d H:i:s", strtotime("+".$i." hour", strtotime($c_min)));}
+							if ($db_min == "") {
+								$db_min = date("Y-m-d H:i:s", strtotime("+".$i." hour", strtotime($c_min)));
+							}
 							array_push($c_steps,date("YmdH", strtotime("+".$i." hour", strtotime($c_min))));
 							$db_max =  date("Y-m-d  H:i:s", strtotime("+".$i." hour", strtotime($c_min)));
 						}
@@ -83,6 +90,20 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			//$query = "SELECT * FROM ".$wpdb->prefix."user_transcriptionprogress WHERE userid='".$_POST['uid']."' AND datum >= '".$db_min."' AND datum <= '".$db_max."' ORDER BY datum ASC";
 			//$chars = $wpdb->get_results($query);
 			//$content .=  $query;
+
+			// Set request parameters
+			$requestData = array(
+				'WP_UserId' => 5
+			);
+			$url = network_home_url()."/tp-api/Transcription/search";
+			$requestType = "POST";
+
+			// Execude http request
+			include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+
+			// Display data
+			$transcriptions = json_decode($result, true);
+			$chars = $transcriptions;
 			$hours = array();
 			$days = array();
 			$months = array();
@@ -91,20 +112,20 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			$d = array();
 			$m = array();
             $y = array();
-            /*
 			foreach($chars as $char){
-				$years[date('Y',strtotime($char->datum))] += (int)$char->amount;
-				$months[date('Ym',strtotime($char->datum))] += (int)$char->amount;
-				$days[date('Ymd',strtotime($char->datum))] += (int)$char->amount;
-				$hours[date('YmdH',strtotime($char->datum))] += (int)$char->amount;
+				$years[date('Y',strtotime($char['Timestamp']))] += strlen($char['Text']);
+				$months[date('Ym',strtotime($char['Timestamp']))] += strlen($char['Text']);
+				$days[date('Ymd',strtotime($char['Timestamp']))] += strlen($char['Text']);
+				$hours[date('YmdH',strtotime($char['Timestamp']))] += strlen($char['Text']);
 				
             }
-            */
 			
 			// highest ermitteln
 			$highest = 0;
 			for($i=0; $i<sizeof($c_steps); $i++){
-				if(isset(${$c_kind}[$c_steps[$i]]) && (int)${$c_kind}[$c_steps[$i]] > $highest){ $highest=${$c_kind}[$c_steps[$i]]; }
+				if (isset(${$c_kind}[$c_steps[$i]]) && (int)${$c_kind}[$c_steps[$i]] > $highest) {
+					$highest=${$c_kind}[$c_steps[$i]]; 
+				}
 			}
 			
 			// Einteilungen ermitteln und hoehe ggf anpassen
@@ -170,7 +191,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							
 							$polyflaeche .= $xoffset1.",".($charinnerheight-$bh+$yoffset1)." ";
 							for($i=0; $i<sizeof($c_steps); $i++){
-								if($i>0){ $t=" "; }else{ $t = ""; }
+								if ($i>0) {
+									$t=" "; }else{ $t = ""; 
+								}
 								if(isset(${$c_kind}[$c_steps[$i]]) && (int)${$c_kind}[$c_steps[$i]] > 0){ 
 									$bh = (${$c_kind}[$c_steps[$i]]*$f);
 								}else{
@@ -181,8 +204,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 								$vraster .= "<line x1=\"".($x+$xoffset1)."\" y1=\"".$yoffset1."\" x2=\"".($x+$xoffset1)."\" y2=\"".($charinnerheight+$yoffset1)."\" style=\"stroke:#ddd;stroke-width:1\" />";
 								$text = date('Y',strtotime(substr($c_steps[$i],0,4)."-01-01"));
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
-								//$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" class=\"but\" onclick=\"getTCTlineChart('wholeyear','".$c_steps[$i]."','');\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
-								$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+								//$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" class=\"but\" onclick=\"getTCTlineChart('wholeyear','".$c_steps[$i]."','');\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
+								$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 								$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 								$x += $xstep;
 							}
@@ -201,8 +224,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
@@ -233,7 +256,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+32)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".(int)${$c_kind}[$c_steps[$i]]."</text>";
 								if(date('Ym',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))<= date('Ym')){
-									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlinePersonalChart('days','".date('Y-m-d',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".date('Y-m-t',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".$_POST['holder']."','".$_POST['uid']."');\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlinePersonalChart('days','".date('Y-m-d',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".date('Y-m-t',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".$_POST['holder']."','".$_POST['uid']."');\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
 								}
@@ -256,8 +279,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;
@@ -296,9 +319,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+45)."\" style=\"fill:#999; font-size:5px !important; \" text-anchor=\"middle\">".$text3."</text>";
 								if(date('Ymd',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-".substr($c_steps[$i],6,2)))<= date('Ymd')){
 									if($hoursallowed > 0){
-										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlinePersonalChart('hours','".$mydate." 00:00:00','".date('Y-m-d',strtotime("+1 day",strtotime($mydate)))." 00:00:00','".$_POST['holder']."','".$_POST['uid']."');\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlinePersonalChart('hours','".$mydate." 00:00:00','".date('Y-m-d',strtotime("+1 day",strtotime($mydate)))." 00:00:00','".$_POST['holder']."','".$_POST['uid']."');\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									}else{
-										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									}
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px;\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
@@ -323,8 +346,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
@@ -357,7 +380,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+35)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".(int)${$c_kind}[$c_steps[$i]]."</text>";
 								if(date('Ymd H:i:s',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-".substr($c_steps[$i],6,2)." ".substr($c_steps[$i],8,2).":00:00"))<= date('Ymd H:i:s')){
-									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
 								}
@@ -381,8 +404,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
@@ -570,8 +593,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 								$vraster .= "<line x1=\"".($x+$xoffset1)."\" y1=\"".$yoffset1."\" x2=\"".($x+$xoffset1)."\" y2=\"".($charinnerheight+$yoffset1)."\" style=\"stroke:#ddd;stroke-width:1\" />";
 								$text = date('Y',strtotime(substr($c_steps[$i],0,4)."-01-01"));
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
-								//$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" class=\"but\" onclick=\"getTCTlineChart('wholeyear','".$c_steps[$i]."','');\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
-								$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+								//$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" class=\"but\" onclick=\"getTCTlineChart('wholeyear','".$c_steps[$i]."','');\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
+								$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" title=\"moinsen\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 								$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 								$x += $xstep;
 							}
@@ -590,8 +613,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
@@ -622,7 +645,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+32)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".(int)${$c_kind}[$c_steps[$i]]."</text>";
 								if(date('Ym',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))<= date('Ym')){
-									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlineTeamChart('days','".date('Y-m-d',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".date('Y-m-t',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".$_POST['holder']."','".$_POST['tid']."');\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlineTeamChart('days','".date('Y-m-d',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".date('Y-m-t',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-01"))."','".$_POST['holder']."','".$_POST['tid']."');\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
 								}
@@ -645,8 +668,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;
@@ -685,9 +708,9 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+45)."\" style=\"fill:#999; font-size:5px !important; \" text-anchor=\"middle\">".$text3."</text>";
 								if(date('Ymd',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-".substr($c_steps[$i],6,2)))<= date('Ymd')){
 									if($hoursallowed > 0){
-										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlineTeamChart('hours','".$mydate." 00:00:00','".date('Y-m-d',strtotime("+1 day",strtotime($mydate)))." 00:00:00','".$_POST['holder']."','".$_POST['tid']."');\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" class=\"but\" onclick=\"getTCTlineTeamChart('hours','".$mydate." 00:00:00','".date('Y-m-d',strtotime("+1 day",strtotime($mydate)))." 00:00:00','".$_POST['holder']."','".$_POST['tid']."');\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									}else{
-										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+										$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									}
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px;\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
@@ -712,8 +735,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
@@ -746,7 +769,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 								$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+20)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".$text."</text>";
 								//$vraster .= "<text x=\"".($x+$xoffset1)."\" y=\"".(($charinnerheight+$yoffset1)+35)."\" style=\"fill:#999; font-size:11px\" text-anchor=\"middle\">".(int)${$c_kind}[$c_steps[$i]]."</text>";
 								if(date('Ymd H:i:s',strtotime(substr($c_steps[$i],0,4)."-".substr($c_steps[$i],4,2)."-".substr($c_steps[$i],6,2)." ".substr($c_steps[$i],8,2).":00:00"))<= date('Ymd H:i:s')){
-									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=\"#DED2DD\" />";
+									$polydots .= "<circle cx=\"".($x+$xoffset1)."\" cy=\"".($charinnerheight-$bh+$yoffset1)."\" r=\"4\" stroke=\"".$theme_link_color."\" stroke-width=\"2\" fill=".$theme_link_color." fill-opacity=0.6 />";
 									$polydots .= "<g class=\"tooltip css\" transform=\"translate(".($x+$xoffset1).",".($charinnerheight-$bh+$yoffset1).")\"><rect x=\"-3em\" y=\"-30\" width=\"6em\" height=\"15px\"/><text y=\"-30\" dy=\"1em\" text-anchor=\"middle\" style=\"fill:#fff; font-size:11px\">".number_format_i18n((int)${$c_kind}[$c_steps[$i]])."</text></g>";
 									$lastx = ($x+$xoffset1);
 								}
@@ -770,8 +793,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:rgba(201,181,200,0.6);stroke:#daccd9;stroke-width:1\" />\n";
-							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
 					break;	
