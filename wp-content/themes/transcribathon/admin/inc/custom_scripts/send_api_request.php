@@ -9,15 +9,17 @@
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $requestType);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postContent);
     
-    // Set HTTP Header for POST request 
+    // Set HTTP Header for request 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json',
         'Content-Length: ' . strlen($postContent))
     );
     
-    // Submit the POST request
+    // Submit the request
     $result = curl_exec($ch);
-    
+
     // Close cURL session handle
     curl_close($ch);
+    
+
 ?>

@@ -19,6 +19,10 @@ echo ".theme-color{
     color: ".$theme_sets['vantage_general_link_color']." !important;
 }";
 
+echo ".widget_headline-widget h3{
+    color: ".$theme_sets['vantage_general_link_color']." !important;
+}";
+
 echo ".theme-color-background{
     color: #fff !important;
     background-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
@@ -28,7 +32,9 @@ echo ".theme-color-background{
 echo "div.um-profile-nav div.um-profile-nav-item a:hover{
     border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
 }";
-
+echo ".theme-color-border{
+    border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+}";
 echo "div.um-profile-nav div.um-profile-nav-item.active a{
     border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
 }";

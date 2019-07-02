@@ -9,10 +9,10 @@ Author URI: https://plugin-planet.com/
 Donate link: https://monzillamedia.com/donate.html
 Contributors: specialk
 Requires at least: 4.9
-Tested up to: 5.1
-Stable tag: 1.7
-Version: 1.7
-Requires PHP: 5.2.4
+Tested up to: 5.2
+Stable tag: 1.8.1
+Version: 1.8.1
+Requires PHP: 5.6.20
 Text Domain: disable-gutenberg
 Domain Path: /languages
 License: GPL v2 or later
@@ -289,6 +289,18 @@ Thank you to everyone for using Disable Gutenberg and for all the [awesome 5-sta
 
 Version 1.5 brings some great new features and improvements. Note that better Multisite support is being developed for a future release. If you have any feedback or suggestions to make this plugin the absolute best it can be, and/or would like to help with development, please reach me via my [contact form](https://perishablepress.com/contact/) at Perishable Press.
 
+
+**1.8.1 (2019/04/29)**
+
+* Fixes PHP Notice: "Trying to get property ID of non-object"
+* Tests on WordPress 5.2
+
+**1.8 (2019/04/28)**
+
+* Bumps [minimum PHP version](https://codex.wordpress.org/Template:Server_requirements) to 5.6.20
+* Fixes bug with block stylesheets and whitelisted posts
+* Updates default translation template
+* Tests on WordPress 5.2
 
 **1.7 (2019/03/06)**
 

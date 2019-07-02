@@ -2,7 +2,7 @@
 /*
 jquery-resizable
 Version 0.32 - 5/5/2018
-© 2015-2018 Rick Strahl, West Wind Technologies
+ï¿½ 2015-2018 Rick Strahl, West Wind Technologies
 www.west-wind.com
 Licensed under MIT License
 */
@@ -19,10 +19,10 @@ Licensed under MIT License
 	}
 }(function($, undefined) {
     
-    if ($.fn.resizable)
+    if ($.fn.resizable_split)
         return;
 
-    $.fn.resizable = function fnResizable(options) {
+    $.fn.resizable_split = function resizable_split(options) {
         var defaultOptions = {
             // selector for handle that starts dragging
             handleSelector: null,

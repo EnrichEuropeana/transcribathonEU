@@ -469,7 +469,6 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 	}
 	//Create loading wheel
 	echo '<div id="loadingGif_'.$subject.'" style="display:none; float:right; height:50px; width:50px"><img src="/wp-content/themes/transcribathon/images/spinner.gif"></div>';
-	
 	echo "</div>\n"; // #ttnav_...
 	
 	//Show own rank below ranking

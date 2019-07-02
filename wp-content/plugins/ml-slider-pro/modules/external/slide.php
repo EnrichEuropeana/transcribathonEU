@@ -310,7 +310,7 @@ class MetaExternalSlide extends MetaSlide {
     private function get_nivo_slider_markup($slide) {
         $attributes = array(
             'src' => $slide['thumb'],
-            'data-title' => htmlentities($slide['caption_raw'], ENT_QUOTES, 'UTF-8'),
+            'data-caption' => htmlentities($slide['caption_raw'], ENT_QUOTES, 'UTF-8'),
             'data-thumb' => $slide['data-thumb'],
             'alt' => $slide['alt'],
             'rel' => $slide['rel'],

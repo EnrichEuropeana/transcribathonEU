@@ -1,13 +1,18 @@
 === MetaSlider Pro ===
 
 Requires at least: 3.5
-Tested up to: 5.1
-Stable tag: 2.13.1
+Tested up to: 5.2
+Stable tag: 2.13.2
 Requires PHP: 5.2
 
 Extends MetaSlider, allowing slides to be opened in a lightbox.
 
 == Changelog ==
+
+= 2.13.2 - 2019/Mar/21 =
+
+* FIX: Fixes a bug where Nivo Slider captions disappear
+* TWEAK: Removed some ancient code for compatibility with PHP < 5.1
 
 = 2.13.1 - 2019/Mar/20 =
 
@@ -315,4 +320,4 @@ Layer Slide scaling JS extracted to it's own jQuery plugin
 - Initial Version
 
 == Upgrade Notice ==
-* 2.13.1 : Update now if you see an error notice regarding Youtube
+* 2.13.2 : Update now if you are using NivoSlider and your captions disappeared

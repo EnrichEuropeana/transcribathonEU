@@ -17,15 +17,15 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/ml-slider-pro.php:223
+#: src/ml-slider-pro.php:201
 msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be installed. You may download it by clicking <a href='%s'>here</a>."
 msgstr ""
 
-#: src/ml-slider-pro.php:229
+#: src/ml-slider-pro.php:207
 msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be activated. You may activate it by clicking <a href='%s'>here</a>."
 msgstr ""
 
-#: src/ml-slider-pro.php:235
+#: src/ml-slider-pro.php:213
 msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be at least version %s. You may update it by clicking <a href='%s'>here</a>."
 msgstr ""
 
@@ -474,7 +474,7 @@ msgstr ""
 msgid "Schedule"
 msgstr ""
 
-#: src/modules/schedule/schedule.php:242, src/modules/schedule/schedule.php:242
+#: src/modules/schedule/schedule.php:242
 msgid "Hide slide"
 msgstr ""
 

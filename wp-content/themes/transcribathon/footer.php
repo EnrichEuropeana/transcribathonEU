@@ -9,7 +9,6 @@
 	<?php get_template_part( 'parts/footer', apply_filters( 'vantage_footer_type', siteorigin_setting( 'layout_footer' ) ) ); ?>
 
 	<?php do_action( 'vantage_after_footer' ); ?>
-
 </div><!-- #page-wrapper -->
 
 <?php do_action('vantage_after_page_wrapper') ?>

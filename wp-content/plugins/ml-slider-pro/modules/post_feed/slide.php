@@ -931,7 +931,7 @@ class MetaPostFeedSlide extends MetaSlide {
                 'src' => $slide['thumb'],
                 'height' => $slide['height'],
                 'width' => $slide['width'],
-                'data-title' => htmlentities( $slide['caption_raw'], ENT_QUOTES, 'UTF-8' ),
+                'data-caption' => htmlentities( $slide['caption_raw'], ENT_QUOTES, 'UTF-8' ),
                 'title' => $slide['title'],
                 'alt' => $slide['alt'],
                 'class' => $slide['class'],

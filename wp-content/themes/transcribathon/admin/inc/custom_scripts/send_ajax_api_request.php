@@ -3,12 +3,14 @@ include(str_repeat("../",(sizeof(explode("/",substr((string)getcwd(),strrpos((st
 require_once( $_SERVER["DOCUMENT_ROOT"].'/wp-admin/includes/post.php' );
 
 
-if(isset($_POST['type']) && isset($_POST['url']) &&isset($_POST['data'])){
+if(isset($_POST['type']) && isset($_POST['url'])){
     // Set Post content
     $data = array(
     );
-    foreach ($_POST['data'] as $key => $value) {
-        $data[$key] = $value;
+    if (isset($_POST['data']) && $_POST['data'] != null) {
+        foreach ($_POST['data'] as $key => $value) {
+            $data[$key] = $value;
+        }
     }
     $postContent = json_encode($data);
     
@@ -19,19 +21,24 @@ if(isset($_POST['type']) && isset($_POST['url']) &&isset($_POST['data'])){
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $_POST['type']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postContent);
     
-    // Set HTTP Header for POST request 
+    // Set HTTP Header for request 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json',
         'Content-Length: ' . strlen($postContent))
     );
     
-    // Submit the POST request
+    // Submit the request
     $result = curl_exec($ch);
 
     // Get response code
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     
-    // Close cURL session handle and return response code
+    // Close cURL session handle 
     curl_close($ch);
-    echo trim(json_encode($httpcode));
+
+    // return response
+    $response = array ();
+    $response['content'] = "".$result;
+    $response['code'] = "".$httpcode;
+    echo json_encode($response);
 }

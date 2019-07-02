@@ -7,14 +7,16 @@ Description: Gets item data and builds the item page
 // include required files
 include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 
+
+
 function _TCT_item_page_test( $atts ) { 
-    if (isset($_GET['id']) && $_GET['id'] != "") {
+    if (isset($_GET['item']) && $_GET['item'] != "") {
         // Set request parameters for image data
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/Item/".$_GET['id'];
-        $requestType = "POST";
+        $url = network_home_url()."/tp-api/items/?ItemId=".$_GET['item'];
+        $requestType = "GET";
     
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
@@ -23,11 +25,8 @@ function _TCT_item_page_test( $atts ) {
         $imageData = json_decode($result, true);
         $imageData = $imageData[0];
         // Set request parameters for story data
-        $requestData = array(
-            'key' => 'testKey'
-        );
-        $url = network_home_url()."/tp-api/Story/".$imageData['StoryId'];
-        $requestType = "POST";
+        $url = network_home_url()."/tp-api/stories/".$imageData['StoryId'];
+        $requestType = "GET";
     
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
@@ -44,6 +43,27 @@ function _TCT_item_page_test( $atts ) {
             $imageViewer .= "<img src='".$imageData['ImageLink']."'>";
         // Editor tab
         $editorTab = "";
+            $currentStatus = $imageData['CompletionStatusId'];
+            $statusList = array(
+                            1 => "Not Started",
+                            2 => "Edit",
+                            3 => "Review",
+                            4 => "Complete"
+                        );
+            $editorTab .=     '<div class="dropdown">';
+            $editorTab .= '<i class="fal fa-shield-check theme-color-background theme-color-hover tablinks dropbtn"
+            onclick="document.getElementById(\'myDropdown\').classList.toggle(\'show\')"></i>';
+                $editorTab .=     '<div id="myDropdown" class="submenu dropdown-content">';
+                    foreach ($statusList as $statusId => $statusName) {
+                        if ($currentStatus != $statusId) { 
+                            $editorTab .= "<a href=''><i class='far fa-circle icon-str'></i>".$statusName."</a>";
+                        } else { 
+                            $editorTab .= "<a href=''><i class='far fa-circle icon-str'></i>".$statusName."</a>";
+                        }
+                    }
+                $editorTab .=     '</div>';
+            $editorTab .=     '</div>';
+
             // Transcription status switcher
             $currentStatus = $imageData['CompletionStatusId'];
             $editorTab .= "<div id='status-editor'>";
@@ -68,8 +88,6 @@ function _TCT_item_page_test( $atts ) {
                 $editorTab .= "<span id='status-update-message'>";
                 $editorTab .= "</span>";
             $editorTab .= "</div>";
-            $editorTab .= "<script>
-                            </script>";
 
             // Current transcription
             $editorTab .= "<h4 class='theme-color item-page-section-headline'>TRANSCRIPTION</h4>";
@@ -92,6 +110,7 @@ function _TCT_item_page_test( $atts ) {
             $editorTab .= "<h5 class='theme-color item-page-section-headline'>";
                 $editorTab .= "Description";
             $editorTab .= "</h5>";
+            $editorTab .= do_shortcode('[ultimatemember form_id="38"]')."test";
             $editorTab .= '<textarea id="item-page-description-text" rows="4">';
                 $editorTab .= $imageData['Description'];
             $editorTab .= '</textarea>';
@@ -310,6 +329,7 @@ function _TCT_item_page_test( $atts ) {
         $content .= "<div id='full-view-container'>";
             // Top image slider 
             $content .= "<div class='item-page-slider'>";
+            
             foreach ($storyData['Items'] as $item) {
                 $content .= "<div><img data-lazy='".$item['ImageLink']."'></div>";
             }
@@ -321,7 +341,24 @@ function _TCT_item_page_test( $atts ) {
             <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258368.full-150x150.jpg'></div>
             <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
             <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
-            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>";
+            <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>
+            
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
+            <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>";
             $content .= "</div>";
 
 // Image slider JavaScript
@@ -332,33 +369,38 @@ $content .= "<script>
                     infinite: true,
                     arrows: false,
                     speed: 300,
-                    slidesToShow: 6,
-                    slidesToScroll: 6,
+                    slidesToShow: 10,
+                    slidesToScroll: 10,
                     lazyLoad: 'ondemand',
                     responsive: [
                         {
-                            breakpoint: 1024,
-                            settings: {
-                            slidesToShow: 3,
-                            slidesToScroll: 3,
-                            infinite: true,
-                            dots: true
-                            }
+                            breakpoint: 1420,
+                            settings: { slidesToShow: 9, slidesToScroll: 9, }
                         },
                         {
-                            breakpoint: 600,
-                            settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 2
-                            }
+                            breakpoint: 1270,
+                            settings: { slidesToShow: 8, slidesToScroll: 8, }
                         },
                         {
-                            breakpoint: 480,
-                            settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1
-                            }
-                        }
+                            breakpoint: 1120,
+                            settings: { slidesToShow: 7, slidesToScroll: 7, }
+                        },
+                        {
+                            breakpoint: 970,
+                            settings: { slidesToShow: 6, slidesToScroll: 6, }
+                        },
+                        {
+                            breakpoint: 820,
+                            settings: { slidesToShow: 5, slidesToScroll: 5, }
+                        },
+                        {
+                            breakpoint: 670,
+                            settings: { slidesToShow: 4, slidesToScroll: 4, }
+                        },
+                        {
+                            breakpoint: 520,
+                            settings: { slidesToShow: 3, slidesToScroll: 3, }
+                        },
                     ]
                 });
             });
