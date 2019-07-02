@@ -4,7 +4,7 @@
  * Plugin Name: MetaSlider - Pro Add-on Pack
  * Plugin URI: https://www.metaslider.com
  * Description: This Add-on pack unlocks the power of video slides, layer slides, post type slides as well as many other features.
- * Version: 2.13.1
+ * Version: 2.13.2
  * Author: Team Updraft
  * Author URI: https://www.metaslider.com
  * Copyright: 2017- Simba Hosting Ltd
@@ -31,7 +31,7 @@ class MetaSliderPro {
 	 *
 	 * @var string $version
 	 */
-	public $version = '2.13.1';
+	public $version = '2.13.2';
 
 	/**
 	 * Minimum required version
@@ -124,29 +124,7 @@ class MetaSliderPro {
 	 * Load required classes
 	 */
 	private function includes() {
-
-		$autoload_is_disabled = defined('METASLIDER_AUTOLOAD_CLASSES') && METASLIDER_AUTOLOAD_CLASSES === false;
-
-		if ( function_exists( "spl_autoload_register" ) && ! ( $autoload_is_disabled ) ) {
-
-			// >= PHP 5.2 - Use auto loading
-			if ( function_exists( "__autoload" ) ) {
-				spl_autoload_register( "__autoload" );
-			}
-
-			spl_autoload_register( array( $this, 'autoload' ) );
-
-		} else {
-
-			// < PHP5.2 - Require all classes
-			foreach ( $this->plugin_classes() as $id => $path ) {
-				if ( is_readable( $path ) && ! class_exists( $id ) ) {
-				    require_once( $path );
-				}
-			}
-
-		}
-
+		spl_autoload_register( array( $this, 'autoload' ) );
 	}
 
 	/**

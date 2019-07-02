@@ -60,8 +60,30 @@ $content .= "<script>
                 window.onload = test;
             </script>";
 
+    // Get all news posts
+    $args = array( 
+        'post_type'		=> 'news', // or 'post', 'page'
+        );
+
+    $newsPosts = get_posts($args);
+    global $_wp_additional_image_sizes;
+
     $content .= "<section class='news-container'>";
             $content .= "<div class='news-slider'>";
+                foreach ($newsPosts as $newsPost) {
+                    $content .= "<div class='news-article'>";
+                        $content .= "<div class='news-image'>";
+                            $content .= '<img data-lazy="'.wp_get_attachment_image_src(get_post_meta($newsPost->ID, "_thumbnail_id")[0], 
+                                            array($_wp_additional_image_sizes['news-image']['width'],$_wp_additional_image_sizes['news-image']['height']))[0].'" alt=""/>';
+                        $content .= "</div>";
+                        $content .= "<div class='news-text'>";
+                            $content .= "<h2 class='theme-color news-headline'>".$newsPost->title."</h2>";
+                            $content .= "<p class='theme-color news-subline'>".get_post_meta($newsPost->ID, "tct_news_subheadline")[0]."</p>";
+                            $content .= "<p id='news-article-1-text' class='news-description'>".get_post_meta($newsPost->ID, "tct_news_excerpt")[0]."</p>";
+                        $content .= "</div>";
+                        $content .= "<a href=''>READ MORE</a>";
+                    $content .= "</div>";
+                }
                 $content .= "<div class='news-article'>";
                     $content .= "<div class='news-image'>";
                         $content .= '<img data-lazy="https://transcribathon.com/wp-content/uploads/PB281692c-2-436x272.jpg" alt=""/>';
@@ -174,6 +196,7 @@ $content .= "<script>
                         jQuery(document).ready(function(){
                             jQuery('.news-slider').slick({
                                 draggable:false,
+                                swipe:false,
                                 infinite:false,
                                 speed: 300,
                                 slidesToShow: 3,
@@ -200,9 +223,7 @@ $content .= "<script>
                             });
                         });
                 </script>";
-$content .= "</section>";
-
-//$content .= '<i style="font-style:normal" class="far fa-users" style="font-size: 20px;"></i>';
+    $content .= "</section>";
 
 
 $content .= "<section id='frontpage-bottom'>";

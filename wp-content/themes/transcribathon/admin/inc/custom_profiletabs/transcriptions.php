@@ -75,11 +75,8 @@ function _TCT_transcription_tab( $atts ) {
     //$docs = $wpdb->get_results("SELECT crh.*,pst.post_title AS title,SUM(crh.amount) AS menge,MAX(crh.datum) as zeitpunkt FROM ".$wpdb->prefix."user_transcriptionprogress crh LEFT JOIN ".$wpdb->prefix."posts pst ON pst.ID = crh.docid WHERE crh.userid='".um_profile_id()."' GROUP BY crh.docid ORDER BY crh.datum DESC",ARRAY_A);
 		
     /*Set request parameters*/
-    $requestData = array(
-        'WP_UserId' => um_profile_id()
-    );
-    $url = network_home_url()."/tp-api/TranscriptionProfile/search";
-    $requestType = "POST";
+    $url = network_home_url()."/tp-api/transcriptionProfile?WP_UserId=".um_profile_id();
+    $requestType = "GET";
 
     // Execude http request
     include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
@@ -100,14 +97,25 @@ function _TCT_transcription_tab( $atts ) {
                                 echo "<div class=\"column span_1_of_4 collection\">\n";
                                     //$thumb_url = wp_get_attachment_image_src( get_post_thumbnail_id( $doc['docid'] ),'post-thumbnail');
                                     //$c = get_post_custom($doc['docid']);
-                                        //echo "<a href=\"/".ICL_LANGUAGE_CODE."/documents/id-".$doc['storyid']."/item-".$doc['itemid']."\">";
+                                        echo "<a href=\"https://europeana.fresenia.man.poznan.pl/documents/story/item?item=".$document['ItemId']."\">";
                                         echo "<div class=\"dcholder\" style=\"background-image: url(".$document['ItemImageLink']."); \"><img src=\"".$document['ItemImageLink']."\" alt=\"\" /></div>\n";
                                         echo "<h3 id= \"nopadmod\" class=\"nopad\">".$document['ItemTitle']."</h3>\n";
                                         echo "<p id= \"smalladinfo\" class=\"smallinfo\">";
                                         echo "Last time: ".date_i18n(get_option('date_format'),strtotime($document['Timestamp']))."<br />";
-                                        echo "Amount of characters: ".$document['Amount']."</p>\n";
-                                //echo "</a>\n";
-                                //echo "<div class=\"docstate ".$c['tct_transcription_status'][0]."\">".$c['tct_transcription_status'][0]."</div>\n";
+                                        switch ($document['ScoreType']) {
+                                            case "Transcription":
+                                                echo "Characters: ".$document['Amount']."</p>\n";
+                                                break;
+                                            case "Location":
+                                                echo "Locations: ".$document['Amount']."</p>\n";
+                                                break;
+                                            case "Enrichment":
+                                                echo "Enrichments: ".$document['Amount']."</p>\n";
+                                                break;
+                                        }
+
+                                echo "</a>\n";
+                                echo "<div class=\"docstate ".$document['CompletionStatus']."\">".$document['CompletionStatus']."</div>\n";
                                 echo "</div>\n";
                                 $i++;
                             }

@@ -92,11 +92,8 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			//$content .=  $query;
 
 			// Set request parameters
-			$requestData = array(
-				'WP_UserId' => 5
-			);
-			$url = network_home_url()."/tp-api/Transcription/search";
-			$requestType = "POST";
+			$url = network_home_url()."/tp-api/transcriptions?WP_UserId=".$_POST['uid']."";
+			$requestType = "GET";
 
 			// Execude http request
 			include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";

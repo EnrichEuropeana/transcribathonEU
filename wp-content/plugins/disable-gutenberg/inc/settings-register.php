@@ -2,16 +2,6 @@
 
 if (!defined('ABSPATH')) exit;
 
-function disable_gutenberg_get_options() {
-	
-	global $DisableGutenberg;
-	
-	$default = $DisableGutenberg->options();
-	
-	return get_option('disable_gutenberg_options', $default);
-	
-}
-
 function disable_gutenberg_register_settings() {
 	
 	// register_setting( $option_group, $option_name, $sanitize_callback );
