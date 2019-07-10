@@ -224,3 +224,26 @@
 	color: #fff;
 	cursor: pointer;
 }
+
+/* fix for fullscreen inline editor */
+body > div.tox.tox-tinymce.tox-tinymce-inline.tox-toolbar-dock-transition.tox-toolbar-dock-fadein {
+  z-index: 999999;
+}
+
+body > div.tox.tox-silver-sink.tox-tinymce-aux {
+  z-index: 999999;
+}
+
+/*tinymce styles*/
+.tct_unclear{ background:#EDD1D1; color:#900; padding:3px 10px; font-size:0.9em; /*border-bottom:1px dashed #900*/ -moz-border-radius:4px;-o-border-radius:4px; -webkit-border-radius:4px; border-radius:4px;}
+.tct_note{font-style:italic; background:#eee; color:#666; padding:3px 10px; font-size:0.8em; border:1px solid #ccc; -moz-border-radius:4px;-o-border-radius:4px; -webkit-border-radius:4px; border-radius:4px;}
+
+.left{text-align:left;}
+.center{text-align:center;}
+.right{text-align:right;}
+.full{text-align:justify;}
+.bold{font-weight:700;}
+.italic{font-style:italic;}
+.underline{text-decoration:underline;}
+del{text-decoration:line-through;}
+.tct_missing:before{content:'\f063 ... \f063'; font-family:'FontAwesome'; color:#c00;}
