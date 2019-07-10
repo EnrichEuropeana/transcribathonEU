@@ -18,7 +18,7 @@ function switchItemTab(event, tabName) {
 
   // Show clicked tab content and make icon active
   document.getElementById(tabName).style.display = "block";
-  event.currentTarget.className += " active";    
+  event.currentTarget.className += " active";
 }
 
 // Switches between different views within the item page image view
@@ -30,10 +30,10 @@ function switchItemView(event, viewName) {
   }
 
   // Make icon active
-  event.currentTarget.className += " active";    
+  event.currentTarget.className += " active";
   switch(viewName) {
     case 'horizontal':
-      
+
       jQuery("#item-image-section").css("width", '')
       jQuery("#item-image-section").css("height", '')
       jQuery("#image-view-container").removeClass("panel-container-vertical")
@@ -52,7 +52,7 @@ function switchItemView(event, viewName) {
       jQuery( "#item-data-section" ).resizable('disable')
       jQuery( "#item-data-section" ).removeClass("ui-resizable")
       jQuery( ".ui-resizable-handle" ).css("display", "none")
-      
+
       jQuery("#item-image-section").resizable_split({
           handleSelector: "#item-splitter",
           resizeHeight: false,
@@ -62,7 +62,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").css("left", "")
       break;
     case 'vertical':
-    
+
       jQuery("#item-image-section").css("width", '')
       jQuery("#item-image-section").css("height", '')
       jQuery("#image-view-container").removeClass("panel-container-horizontal")
@@ -81,7 +81,7 @@ function switchItemView(event, viewName) {
       jQuery( "#item-data-section" ).resizable('disable')
       jQuery( "#item-data-section" ).removeClass("ui-resizable")
       jQuery( ".ui-resizable-handle" ).css("display", "none")
-      
+
       jQuery("#item-image-section").resizable_split({
           handleSelector: "#item-splitter",
           resizeHeight: true,
@@ -91,11 +91,11 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").css("left", "")
       break;
     case 'popout':
- 
+
       jQuery("#item-image-section").css("width", '')
       jQuery("#item-image-section").css("height", '')
       jQuery("#item-image-section").addClass("image-popout")
-      jQuery("#item-data-section").addClass("data-popout") 
+      jQuery("#item-data-section").addClass("data-popout")
       jQuery("#image-view-container").removeClass("panel-container-horizontal")
       jQuery("#image-view-container").removeClass("panel-container-vertical")
       jQuery("#item-image-section").removeClass("panel-left")
@@ -125,15 +125,15 @@ function getTCTlinePersonalChart(what,start,ende,holder,uid){
     'ende':ende,
     'uid':uid,
     'holder':holder
-  }, 
-  function(res) {	
+  },
+  function(res) {
     if(res.status === "ok"){
       jQuery('#'+holder).fadeTo(1,0.01,function(){
         jQuery('#'+holder).html(res.content).fadeTo(400,1);
       });
-      
+
     }else{
-      alert(res.content);	
+      alert(res.content);
     }
 	});
 }
@@ -143,10 +143,10 @@ function compareTranscription(oldTranscription, newTranscription, index) {
   var dmp = new diff_match_patch();
   var text1 = oldTranscription;
   var text2 = newTranscription;
-  
+
   // Compare transcriptions
   var d = dmp.diff_main(text1, text2);
-  
+
   // Highlight changes
   dmp.diff_cleanupSemantic(d);
   var ds = dmp.diff_prettyHtml(d);
@@ -156,6 +156,7 @@ function compareTranscription(oldTranscription, newTranscription, index) {
 // Switches between image view and full view on the item page
 function switchItemPageView() {
   if (jQuery('#full-view-container').css('display') == 'block') {
+    tinymce.remove();
     //switch to image view
     jQuery('.site-footer').css('display', 'none')
     jQuery('#full-view-container').css('display', 'none')
@@ -193,11 +194,26 @@ function switchItemPageView() {
     jQuery('#automatic-enrichment-collapse-icon').css( 'display', 'none')
     jQuery('#automaticEnrichment-collapse-headline').css( 'pointer-events', 'none' )
     jQuery('#enrichment-collapsable').addClass('show')
- 
+
     // move help content
     jQuery('#editor-help').html(jQuery('#full-view-help').html())
     jQuery('#full-view-help').html('')
+
+    // reinitialize tinyMCE instances
+    initTinyWithConfig('#editor-tab #item-page-transcription-text');
+    initTinyWithConfig('#editor-tab #item-page-description-text');
+    /*
+    tinymce.init({
+      selector: '#editor-tab #item-page-transcription-text',
+      inline: true
+    });
+    tinymce.init({
+      selector: '#editor-tab #item-page-description-text',
+      inline: true
+    });
+    */
   } else {
+    tinymce.remove();
     //switch to full view
     jQuery('.site-footer').css('display', 'block')
     jQuery('#full-view-container').css('display', 'block')
@@ -205,7 +221,7 @@ function switchItemPageView() {
     jQuery('.full-container').css('position', 'relative')
     jQuery('._tct_footer').css('display', 'block')
     jQuery('#item-progress-section').css('display', 'block')
-    
+
     // move image content
     //jQuery('#full-view-image').html(jQuery('#item-image-section').html())
     //jQuery('#item-image-section').html('')
@@ -213,24 +229,38 @@ function switchItemPageView() {
     // move editor content
     jQuery('#full-view-editor').html(jQuery('#editor-tab').html())
     jQuery('#editor-tab').html('')
-    
+
     // move tagging content
     jQuery('#full-view-tagging').html(jQuery('#tagging-tab').html())
     jQuery('#tagging-tab').html('')
-    
+
     // move info content
     jQuery('#full-view-info').html(jQuery('#info-tab').html())
     jQuery('#info-tab').html('')
     jQuery('#info-collapse-icon').css( 'display', 'block')
     jQuery('#info-collapse-headline-container').css( 'pointer-events', 'all' )
     jQuery('#info-collapsable').removeClass('show')
-    
+
     // move autoEnrichment content
     jQuery('#full-view-autoEnrichment').html(jQuery('#autoEnrichment-tab').html())
     jQuery('#autoEnrichment-tab').html('')
     jQuery('#automatic-enrichment-collapse-icon').css( 'display', 'block')
     jQuery('#automaticEnrichment-collapse-headline').css( 'pointer-events', 'all' )
     jQuery('#enrichment-collapsable').removeClass('show')
+
+    // reinitialize tinyMCE instances
+    initTinyWithConfig('#full-view-editor #item-page-transcription-text');
+    initTinyWithConfig('#full-view-editor #item-page-description-text');
+    /*
+    tinymce.init({
+      selector: '#full-view-editor #item-page-transcription-text',
+      inline: true
+    });
+    tinymce.init({
+      selector: '#full-view-editor #item-page-description-text',
+      inline: true
+    });
+    */
   }
 }
 
@@ -249,9 +279,9 @@ function updateItemProperty(itemId, fieldName, value) {
       'type': 'POST',
       'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
       'data': data
-  }, 
+  },
   // Check success and create confirmation message
-  function(response) {	
+  function(response) {
     var response = JSON.parse(response);
     if (response.code == "200") {
       return 1;
@@ -266,7 +296,7 @@ function updateItemProperty(itemId, fieldName, value) {
 function updateItemDescription(itemId) {
   // Clear confirmation message
   jQuery('#description-update-message').html("")
-  
+
   // Update description via API
   data = {
             Description: jQuery('#item-page-description-text').val()
@@ -276,46 +306,15 @@ function updateItemDescription(itemId) {
       'type': 'POST',
       'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
       'data': data
-  }, 
+  },
   // Check success and create confirmation message
-  function(response) {	
+  function(response) {
     var response = JSON.parse(response);
     if (response.code == "200") {
       jQuery('#description-update-message').html("Description saved")
     }
     else {
       jQuery('#description-update-message').html("Description couldn't be saved")
-    }
-  });
-}
-
-// Updates the item transcription
-function updateItemTranscription(itemId, userId) {
-  // Clear confirmation message
-  jQuery('#transcription-update-message').html("")
-  
-  // Update transcription via API
-  data = {
-            Text: jQuery('#item-page-transcription-text').val(),
-            UserId: userId,
-            ItemId: itemId,
-            CurrentVersion: '1'
-          }
-  var dataString= JSON.stringify(data);
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
-      'type': 'POST',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/transcriptions',
-      'data': data
-  }, 
-  // Check success and create confirmation message
-  function(response) {	
-    var response = JSON.parse(response);
-    if (response.code == "200") {
-      jQuery('#transcription-update-message').html("Transcription saved")
-      jQuery('#item-page-current-transcription').html(jQuery('#item-page-transcription-text').val())
-    }
-    else {
-      jQuery('#transcription-update-message').html("Transcription couldn't be saved")
     }
   });
 }
@@ -329,40 +328,27 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
     jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
       'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
-    }, 
+    },
     // Check success and create confirmation message
-    function(response) {	
+    function(response) {
       var response = JSON.parse(response);
       if (response.code == "200") {
         var content = JSON.parse(response.content);
 
         var oldStatus = content[0][fieldName.replace("Id", "Name")];
 
-        // Add "-"" to "Not Started"
         var oldProgress = 'progress-bar-' + oldStatus.replace(" ", "-") + '-section';
-        var oldProgressOverlay = 'progress-bar-overlay-' + oldStatus.replace(" ", "-") + '-section';
-        var oldProgressOverlayDoughnut = 'progress-doughnut-overlay-' + oldStatus.replace(" ", "-") + '-section';
         var oldProgressWidth = jQuery('#' + oldProgress).html();
         oldProgressWidth = (parseInt(oldProgressWidth.replace("%", "")) - (100 / statusCount));
         jQuery('#' + oldProgress).css('width', oldProgressWidth + "%");
         if (oldProgressWidth == 0) {
           jQuery('#' + oldProgress).html("");
-          jQuery('#' + oldProgressOverlay).html("0%");
-          //jQuery('#' + oldProgressOverlay).closest('li').css("display", "none");
-          jQuery('#' + oldProgressOverlayDoughnut).html("0%");
-          //jQuery('#' + oldProgressOverlayDoughnut).closest('li').css("display", "none");
         }
         else {
           jQuery('#' + oldProgress).html(oldProgressWidth + "%");
-          jQuery('#' + oldProgressOverlay).html(oldProgressWidth + "%");
-          //jQuery('#' + oldProgressOverlay).closest('li').css("display", "list-item");
-          jQuery('#' + oldProgressOverlayDoughnut).html(oldProgressWidth + "%");
-          //jQuery('#' + oldProgressOverlayDoughnut).closest('li').css("display", "list-item");
         }
 
         var newProgress = 'progress-bar-' + newStatus.replace(" ", "-") + '-section';
-        var newProgressOverlay = 'progress-bar-overlay-' + newStatus.replace(" ", "-") + '-section';
-        var newProgressOverlayDoughnut = 'progress-doughnut-overlay-' + newStatus.replace(" ", "-") + '-section';
         var newProgressWidth = jQuery('#' + newProgress).html();
         if (newProgressWidth == ""){
           newProgressWidth =  100 / statusCount;
@@ -373,13 +359,8 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
 
         jQuery('#' + newProgress).css('width', newProgressWidth + "%");
         jQuery('#' + newProgress).html(newProgressWidth + "%");
-        jQuery('#' + newProgressOverlay).html(newProgressWidth + "%");
-        //jQuery('#' + newProgressOverlay).closest('li').css("display", "list-item");
-        jQuery('#' + newProgressOverlayDoughnut).html(newProgressWidth + "%");
-        //jQuery('#' + newProgressOverlayDoughnut).closest('li').css("display", "list-item");
 
         updateItemProperty(itemId , fieldName, value);
-        updateDoughnutStatus(oldStatus, newStatus);
       }
       else {
         alert(response.content);
@@ -392,4 +373,64 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
   }
 }
 
-
+function initTinyWithConfig(selector) {
+  tinymce.init({
+    selector: selector,
+    inline: true,
+    height:120,
+    plugins: ['charmap','paste'],
+    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure position-in-doc',
+    menubar: true,
+    browser_spellcheck: true,
+    paste_auto_cleanup_on_paste : true,
+    body_id: 'htranscriptor',
+    setup: function (editor) {
+      console.log('in setup');
+      editor.ui.registry.addButton('missbut', {
+        title: 'Insert an indicator for missing text',
+        text: '',
+        icon: 'missing',
+        onAction: function () {
+          editor.insertContent('<span style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\"> MISSING </span>');
+        }
+      });
+      editor.ui.registry.addButton('unsure', {
+        title: 'Mark selected as unclear',
+        text: '',
+        icon: 'unsure',
+        onAction: function () {
+          if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
+            editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
+          }else{
+            if (editor.selection.getStart().className == "tct-uncertain") {
+              var node = editor.selection.getStart();
+              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+            }
+            else if (editor.selection.getEnd().className == "tct-uncertain"){
+              var node = editor.selection.getEnd();
+              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+            }
+            else{
+              editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
+            }
+          }
+        }
+      });
+    },
+    style_formats: [
+    {title: 'unclear, please review', inline: 'span', classes: 'tct_unclear'},
+    {title: 'Note', inline: 'span', classes: 'tct_note'},
+    {title: 'Badge', inline: 'span', styles: { display: 'inline-block', border: '1px solid #2276d2', 'border-radius': '5px', padding: '2px 5px', margin: '0 2px', color: '#2276d2' }}
+    ],
+    formats: {
+    alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'left' },
+    aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
+    alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'right' },
+    alignfull: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'full' },
+    bold: { inline: 'span', 'classes': 'bold' },
+    italic: { inline: 'span', 'classes': 'italic' },
+    underline: { inline: 'span', 'classes': 'underline', exact: true },
+    strikethrough: { inline: 'del' },
+    },
+  })
+}

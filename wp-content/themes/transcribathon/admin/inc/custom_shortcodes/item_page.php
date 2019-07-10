@@ -286,9 +286,19 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '<p id="item-page-current-transcription">';
                     $editorTab .= htmlspecialchars($currentTranscription);
                 $editorTab .= '</p>';
-                $editorTab .= '<textarea id="item-page-transcription-text" rows="4">';
+                $editorTab .= '<div id="item-page-transcription-text">';
                     $editorTab .= $currentTranscription;
-                $editorTab .= '</textarea>';
+                $editorTab .= '</div>';
+                /*
+                $editorTab .= '<div id="item-page-transcription-text-test"">';
+                    $editorTab .= $currentTranscription;
+                $editorTab .= '</div>';
+                $editorTab .= "<script>
+                                tinymce.init({
+                                    selector: '#item-page-transcription-text-test',
+                                    inline: true
+                                });
+                               </script>";*/
                 $editorTab .= "<button class='save-transcription theme-color-background' id='transcription-update-button' style='float: right;' onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id().")'>";
                     $editorTab .= "SAVE TRANSCRIPTION";
                     $editorTab .= '<script>
@@ -335,14 +345,15 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '</div>';
                 $editorTab .= '<div style="clear: both;"></div>';
                     $editorTab .= "<div id=\"description-area\" class=\"transcription-history-area collapse show\">";
-                        $editorTab .= '<label class="container">Letter<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
-                        $editorTab .= '<label class="container">Diary<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-                        $editorTab .= '<label class="container">Post card<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-                        $editorTab .= '<label class="container">Picture<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-
-                        $editorTab .= '<textarea id="item-page-description-text" rows="4">';
+                        $editorTab .= '<div id="description-label-wrapper">';
+                            $editorTab .= '<label class="container">Letter<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
+                            $editorTab .= '<label class="container">Diary<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
+                            $editorTab .= '<label class="container">Post card<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
+                            $editorTab .= '<label class="container">Picture<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
+                        $editorTab .= '</div>';
+                        $editorTab .= '<div id="item-page-description-text">';
                             $editorTab .= $itemData['Description'];
-                        $editorTab .= '</textarea>';
+                        $editorTab .= '</div>';
                         $editorTab .= "<button class='theme-color-background' id='description-update-button' style='float: right;' onClick='updateItemDescription(".$itemData['ItemId'].")'>";
                             $editorTab .= "SAVE DESCRIPTION";
                         $editorTab .= "</button>";
@@ -735,28 +746,23 @@ function _TCT_item_page( $atts ) {
             $i = 1;
                 foreach ($storyData['Items'] as $item) {
                     $image = json_decode($item['ImageLink'], true);
-                    $link = explode("/", $image["@id"]);
-                    $link[sizeof($link) - 3] = "150,150";
+                    $imageLink = $image['service']['@id'];
                     if ($image["width"] <= $image["height"]) {
-                        $link[sizeof($link) - 4] = "0,0,".$image["width"].",".$image["width"];
+                        $imageLink .= "/0,0,".$image["width"].",".$image["width"];
                     }
                     else {
-                        $link[sizeof($link) - 4] = "0,0,".$image["height"].",".$image["height"];
+                        $imageLink .= "/0,0,".$image["height"].",".$image["height"];
                     }
-                    $item['ImageLink'] = "";
-                    foreach ($link as $text) {
-                        $item['ImageLink'] .= $text .= "/";
-                    }
-                    $item['ImageLink'] = substr($item['ImageLink'], 0, -1);
+                    $imageLink .= "/150,150/0/default.jpg";
                     if ($initialSlide == null && $item['ItemId'] == $_GET['item']){
                         $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' style='border: 4px #949494 solid'>";
-                            $content .= "<img data-lazy='".$item['ImageLink']."'>";
+                            $content .= "<img data-lazy='".$imageLink."'>";
                         $content .= "</a>";
                         $initialSlide = $i;
                     }
                     else {
                         $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
-                            $content .= "<img data-lazy='".$item['ImageLink']."'>";
+                            $content .= "<img data-lazy='".$imageLink."'>";
                         $content .= "</a>";
                         $i++;
                     }

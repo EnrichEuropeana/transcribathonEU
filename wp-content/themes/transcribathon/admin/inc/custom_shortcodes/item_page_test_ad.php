@@ -16,7 +16,7 @@ function _TCT_item_page_test_ad( $atts ) {
         );
         $url = network_home_url()."/tp-api/items/".$_GET['item'];
         $requestType = "GET";
-
+    
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
@@ -27,10 +27,10 @@ function _TCT_item_page_test_ad( $atts ) {
         // Set request parameters for story data
         $url = network_home_url()."/tp-api/stories/".$itemData['StoryId'];
         $requestType = "GET";
-
+    
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
+        
         // Save story data
         $storyData = json_decode($result, true);
         $storyData = $storyData[0];
@@ -43,7 +43,7 @@ function _TCT_item_page_test_ad( $atts ) {
 
                 .transcription-toggle a{
                     color: inherit;
-                    text-decoration: none;
+                    text-decoration: none; 
                 }
                 .transcription-toggle:hover {
                      color: #000;
@@ -55,9 +55,15 @@ function _TCT_item_page_test_ad( $atts ) {
                 }
 
                     </style>";
-
+        
         $content .= '<script>
                         window.onclick = function(event) {
+                            if (event.target.id != "item-status-indicator") {
+                                var dropdown = document.getElementById("item-status-dropdown");
+                                if (dropdown.classList.contains("show")) {
+                                    dropdown.classList.remove("show");
+                                }
+                            }
                             if (event.target.id != "transcription-status-indicator") {
                                 var dropdown = document.getElementById("transcription-status-dropdown");
                                 if (dropdown.classList.contains("show")) {
@@ -92,23 +98,14 @@ function _TCT_item_page_test_ad( $atts ) {
                     </script>';
         // Image viewer
         $imageViewer = "";
-            $imageViewer .= '<div id="openseadragon">  <div class="buttons" id="buttons">';
-            $imageViewer .= '<div id="zoom-in"><i class="far fa-plus"></i></div>';
-            $imageViewer .= '<div id="zoom-out"><i class="far fa-minus"></i></div>';
-            $imageViewer .= '<div id="home"><i class="far fa-home"></i></div>';
-            $imageViewer .= '<div id="full-width"><i class="far fa-arrows-alt-h"></i></div>';
-            $imageViewer .= '<div id="rotate-right"><i class="far fa-redo"></i></div>';
-            $imageViewer .= '<div id="rotate-left"><i class="far fa-undo"></i></div>';
-            $imageViewer .= '<div id="filterButton"><i class="far fa-sliders-h"></i></div>';
-            $imageViewer .= '<div id="full-page"><i class="far fa-expand-arrows-alt"></i></div>';
-            $imageViewer .= '</div></div>';
+            $imageViewer .= "<img src='".$itemData['ImageLink']."'>";
 
         // Editor tab
         $editorTab = "";
             // Set request parameters for status data
             $url = network_home_url()."/tp-api/completionStatus";
             $requestType = "GET";
-
+        
             // Execude http request
             include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
@@ -129,30 +126,30 @@ function _TCT_item_page_test_ad( $atts ) {
                             'Completed' => 0
                         );
             foreach ($progressData as $status) {
-                $progressCount[$status] += 1;
+            $progressCount[$status] += 1;
             }
-
+            
             $editorTab .= '<div id="item-progress-section">';
                /* $editorTab .= '<div id="item-status-changer" class="status-changer">';
-                    $editorTab .= '<i id="item-status-indicator" class="fal fa-circle status-indicator"
+                    $editorTab .= '<i id="item-status-indicator" class="fal fa-circle status-indicator" 
                                         style="color: '.$itemData['CompletionStatusColorCode'].'; background-color:'.$itemData['CompletionStatusColorCode'].';"
                                         onclick="document.getElementById(\'item-status-dropdown\').classList.toggle(\'show\')"></i>';
                     $editorTab .= '<div id="item-status-dropdown" class="status-dropdown-content">';
                         foreach ($statusTypes as $statusType) {
-                            if ($itemData['CompletionStatusId'] == $statusType['CompletionStatusId']) {
-                                $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                            if ($itemData['CompletionStatusId'] == $statusType['CompletionStatusId']) { 
+                                $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                     onclick=\"changeStatus(".$_GET['item'].", '".$statusType['Name']."', 'CompletionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                            } else {
-                                $editorTab .= "<div class='status-dropdown-option'
+                            } else { 
+                                $editorTab .= "<div class='status-dropdown-option' 
                                                     onclick=\"changeStatus(".$_GET['item'].", '".$statusType['Name']."', 'CompletionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                             }
                         }
                     $editorTab .= '</div>';
                 $editorTab .= '</div>';*/
-
-
+                
+            
                 $editorTab .= '<div id="item-progress-bar">';
                     $editorTab .= '<div class="statusinfo-on-hover">';
                         $editorTab .= '<ul class="on-hover-displayer">';
@@ -166,18 +163,17 @@ function _TCT_item_page_test_ad( $atts ) {
                             foreach ($statusTypes as $statusType) {
                                 $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
                                 if ($percentage != 0) {
-                                    $editorTab .= '<li><span class="users-num" style="background-color:'.$statusType['ColorCode'].'"></span><span id="progress-bar-overlay-'.str_replace(" ", "-", $statusType['Name']).'-section" class="amount" style="width: 20%;">'.$percentage.'%</span><span class="pieces">'.$statusType['Name'].'</span></li>';
+                                    $editorTab .= '<li><span class="users-num" style="background-color:'.$statusType['ColorCode'].'"></span><span class="amount" style="width: '.$percentage.'%;">'.$percentage.'%</span><span class="pieces">'.$statusType['Name'].'</span></li>';
                                     /*
-                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section"
+                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section" 
                                                         style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
                                         $editorTab .= $percentage.'%';
                                     $editorTab .= '</div>';
                                     */
                                 }
                                 else {
-                                    $editorTab .= '<li><span class="users-num" style="background-color:'.$statusType['ColorCode'].'"></span><span id="progress-bar-overlay-'.str_replace(" ", "-", $statusType['Name']).'-section" class="amount" style="width: 20%;">'.$percentage.'%</span><span class="pieces">'.$statusType['Name'].'</span></li>';
                                     /*
-                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section"
+                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section" 
                                                         style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
                                     $editorTab .= '</div>';
                                     */
@@ -188,70 +184,24 @@ function _TCT_item_page_test_ad( $atts ) {
                     foreach ($statusTypes as $statusType) {
                         $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
                         if ($percentage != 0) {
-                            switch ($statusType['Name']) {
-                                case "Completed":
-                                    $CompletedBar .= '<div id="progress-bar-Completed-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                        $CompletedBar .= $percentage.'%';
-                                    $CompletedBar .= '</div>';
-                                    break;
-                                case "Review":
-                                    $ReviewBar .= '<div id="progress-bar-Review-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                        $ReviewBar .= $percentage.'%';
-                                    $ReviewBar .= '</div>';
-                                    break;
-                                case "Edit":
-                                    $EditBar .= '<div id="progress-bar-Edit-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                        $EditBar .= $percentage.'%';
-                                    $EditBar .= '</div>';
-                                    break;
-                                case "Not Started":
-                                    $NotStartedBar .= '<div id="progress-bar-Not-Started-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                        $NotStartedBar .= $percentage.'%';
-                                    $NotStartedBar .= '</div>';
-                                    break;
-                            }
-
+                            $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section" 
+                                                style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
+                                $editorTab .= $percentage.'%';
+                            $editorTab .= '</div>';
                         }
                         else {
-                            switch ($statusType['Name']) {
-                                case "Completed":
-                                    $CompletedBar .= '<div id="progress-bar-Completed-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                    $CompletedBar .= '</div>';
-                                    break;
-                                case "Review":
-                                    $ReviewBar .= '<div id="progress-bar-Review-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                    $ReviewBar .= '</div>';
-                                    break;
-                                case "Edit":
-                                    $EditBar .= '<div id="progress-bar-Edit-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                    $EditBar .= '</div>';
-                                    break;
-                                case "Not Started":
-                                    $NotStartedBar .= '<div id="progress-bar-Not-Started-section" class="progress-bar progress-bar-section"
-                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';pointer-events: none;">';
-                                    $NotStartedBar .= '</div>';
-                                    break;
-                            }
+                            $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section" 
+                                                style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
+                            $editorTab .= '</div>';
                         }
                     }
-                        $editorTab .= $CompletedBar;
-                        $editorTab .= $ReviewBar;
-                        $editorTab .= $EditBar;
-                        $editorTab .= $NotStartedBar;
                 $editorTab .= '</div>';
                 /*$editorTab .= '<div class="prog-refer">';
-                    $editorTab .= '<ul>';
+                    $editorTab .= '<ul>'; 
                         foreach ($statusTypes as $statusType) {
-                            $editorTab .= '<li><span class="colorbox" style="background-color: '.$statusType['ColorCode'].';"></span> '.$statusType['Name'].'</li>';
+                            $editorTab .= '<li><span class="colorbox" style="background-color: '.$statusType['ColorCode'].';"></span> '.$statusType['Name'].'</li>'; 
                         }
-                    $editorTab .= '</ul>';
+                    $editorTab .= '</ul>';    
                 $editorTab .= '</div>'; */
             $editorTab .= '</div>';
 
@@ -264,17 +214,17 @@ function _TCT_item_page_test_ad( $atts ) {
                     $editorTab .= do_shortcode('[ultimatemember form_id="38"]');
                     $editorTab .= "<div class='item-page-section-headline-right-site'>";
                         $editorTab .= '<div id="transcription-status-changer" class="status-changer section-status-changer">';
-                            $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
+                            $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator" 
                                                 style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';"
                                                 onclick="document.getElementById(\'transcription-status-dropdown\').classList.toggle(\'show\')"></i>';
                             $editorTab .= '<div id="transcription-status-dropdown" class="sub-status status-dropdown-content">';
                                 foreach ($statusTypes as $statusType) {
-                                    if ($itemData['TranscriptionStatusId'] == $statusType['CompletionStatusId']) {
-                                        $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                    if ($itemData['TranscriptionStatusId'] == $statusType['CompletionStatusId']) { 
+                                        $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                             onclick=\"changeStatus(".$_GET['item'].",'".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                                    } else {
-                                        $editorTab .= "<div class='status-dropdown-option'
+                                    } else { 
+                                        $editorTab .= "<div class='status-dropdown-option' 
                                                             onclick=\"changeStatus(".$_GET['item'].", '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                                     }
@@ -284,7 +234,7 @@ function _TCT_item_page_test_ad( $atts ) {
                     $editorTab .= '</div>';
                 $editorTab .= '</div>';
                 $editorTab .= '<div style="clear: both;"></div>';
-
+                
                 $currentTranscription = "";
                 $transcriptionList = [];
                 foreach ($itemData["Transcriptions"] as $transcription) {
@@ -298,23 +248,18 @@ function _TCT_item_page_test_ad( $atts ) {
                 $editorTab .= '<p id="item-page-current-transcription">';
                     $editorTab .= $currentTranscription;
                 $editorTab .= '</p>';
-                        $editorTab .= '<textarea id="item-page-transcription-text" rows="4">';
-                            $editorTab .= $currentTranscription;
+                $editorTab .= '<textarea id="item-page-transcription-text" rows="4">';
+                            $editorTab .= $itemData['Transcriptions'];
                         $editorTab .= '</textarea>';
-                        $editorTab .= "<button class='save-transcription theme-color-background' id='transcription-update-button' style='float: right;' onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id().")'>";
+                        $editorTab .= "<button class='theme-color-background' id='transcription-update-button' style='float: right;' onClick='updateItemDescription(".$itemData['ItemId'].")'>";
                             $editorTab .= "SAVE TRANSCRIPTION";
-                            $editorTab .= '<script>
-                                            function onButtonClick(){
-                                                document.getElementById("textInput").className="show";
-                                            }
-                                        </script>';
                         $editorTab .= "</button>";
                         $editorTab .= "<div style='clear:both'>";
                         $editorTab .= "</div>";
                         $editorTab .= "<span id='transcription-update-message'>";
                         $editorTab .= "</span>";
             $editorTab .= '</div>';
-
+            
             //$editorTab .= "<hr>";
 
             // Description
@@ -322,23 +267,23 @@ function _TCT_item_page_test_ad( $atts ) {
                 $editorTab .= '<div class="item-page-section-headline-container collapse-headline  item-page-section-collapse-headline collapse-controller" data-toggle="collapse" href="#description-area"
                 onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
                 jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';
-                    $editorTab .= '<h4 id="description-collapse-heading" class="theme-color item-page-section-headline">';
+                    $editorTab .= '<h4 id="description-collapse-heading" class="theme-color item-page-section-headline">';  
                         $editorTab .= "DESCRIPTION";
                     $editorTab .= '</h4>';
                     $editorTab .= '<i class="far fa-caret-circle-up collapse-icon theme-color" style="font-size: 17px; float:left; margin-right: 8px; margin-top: 9px;"></i>';
                 $editorTab .= '</div>';
                 $editorTab .= '<div id="description-status-changer" class="status-changer section-status-changer">';
-                    $editorTab .= '<i id="description-status-indicator" class="fal fa-circle status-indicator"
+                    $editorTab .= '<i id="description-status-indicator" class="fal fa-circle status-indicator" 
                                         style="color: '.$itemData['DescriptionStatusColorCode'].'; background-color:'.$itemData['DescriptionStatusColorCode'].';"
                                         onclick="document.getElementById(\'description-status-dropdown\').classList.toggle(\'show\')"></i>';
                     $editorTab .= '<div id="description-status-dropdown" class="sub-status status-dropdown-content">';
                         foreach ($statusTypes as $statusType) {
-                            if ($itemData['DescriptionStatusId'] == $statusType['CompletionStatusId']) {
-                                $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                            if ($itemData['DescriptionStatusId'] == $statusType['CompletionStatusId']) { 
+                                $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                     onclick=\"changeStatus(".$_GET['item'].", '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                            } else {
-                                $editorTab .= "<div class='status-dropdown-option'
+                            } else { 
+                                $editorTab .= "<div class='status-dropdown-option' 
                                                     onclick=\"changeStatus(".$_GET['item'].", '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $editorTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                             }
@@ -349,14 +294,14 @@ function _TCT_item_page_test_ad( $atts ) {
                     $editorTab .= "<div id=\"description-area\" class=\"transcription-history-area collapse show\">";
                         $editorTab .= '<label class="container">Letter<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
                         $editorTab .= '<label class="container">Diary<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-                        $editorTab .= '<label class="container">Post card<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
+                        $editorTab .= '<label class="container">Post card<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';                        
                         $editorTab .= '<label class="container">Picture<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-
+                        
                         $editorTab .= '<textarea id="item-page-description-text" rows="4">';
                             $editorTab .= $itemData['Description'];
                         $editorTab .= '</textarea>';
                         $editorTab .= "<button class='theme-color-background' id='description-update-button' style='float: right;' onClick='updateItemDescription(".$itemData['ItemId'].")'>";
-                            $editorTab .= "SAVE";
+                            $editorTab .= "SAVE DESCRIPTION";
                         $editorTab .= "</button>";
                         $editorTab .= "<div style='clear:both'>";
                         $editorTab .= "</div>";
@@ -372,7 +317,7 @@ function _TCT_item_page_test_ad( $atts ) {
                 $editorTab .= '<div class="item-page-section-headline-container collapse-headline item-page-section-collapse-headline collapse-controller" data-toggle="collapse" href="#transcription-history"
                 onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
                 jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                    $editorTab .= '<h4 id="transcription-history-collapse-heading" class="theme-color item-page-section-headline">';
+                    $editorTab .= '<h4 id="transcription-history-collapse-heading" class="theme-color item-page-section-headline">';  
                         $editorTab .= "TRANSCRIPTION HISTORY";
                     $editorTab .= '</h4>';
                     $editorTab .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:left; margin-right: 8px; margin-top: 9px;"></i>';
@@ -380,29 +325,34 @@ function _TCT_item_page_test_ad( $atts ) {
                 $editorTab .= '<div style="clear: both;"></div>';
                 $editorTab .= "<div id=\"transcription-history\" class=\"collapse\">";
                 $i = 0;
-                foreach ($transcriptionList as $transcription) {
+                foreach ($transcriptionList as $transcription) { 
                     $editorTab .= '<div class="transcription-toggle" data-toggle="collapse" data-target="#transcription-'.$i.'">';
                         $editorTab .='<i class="fas fa-calendar-day" style= "margin-right: 6px;"></i>';
                         $date = strtotime($transcription["Timestamp"]);
+                        echo date('M d, Y', $date); 
                         $editorTab .= '<span class="day-n-time">'.$transcription["Timestamp"].'</span>';
-                        $editorTab .= '<i class="fas fa-user-alt" style= "margin: 0 6px;"></i>';
-                        $editorTab .= '<span class="day-n-time"><a href="#"> USER-NAME</a></span>';
+                        $editorTab .= '<i class="fas fa-user-alt" style= "margin: 0 6px;"></i>';  
+                        $editorTab .= '<span class="day-n-time"><a href="#"> USER-NAME</a></span>'; 
                         $editorTab .= '<i class="fas fa-angle-down" style= "float:right;"></i>';
                         //$content .= "<dd>".$custom['tct_story_id'][0]."</dd>\n";
 
                         //<span class="usr"><a href="/en/user/red-mini/">Red-Mini </a></span>
                                 // $editorTab .= $transcription["Timestamp"];
+                            
                     $editorTab .= '</div>';
                         $editorTab .= '<div id="transcription-'.$i.'" class="collapse transcription-history-collapse-content">';
                             $editorTab .= '<p id="item-page-current-transcription">';
                                 $editorTab .= $transcription['Text'];
                             $editorTab .= '</p>';
-                            $editorTab .= '<input class="transcription-comparison-button" type="button"
-                                                onClick="compareTranscription(\''.$transcriptionList[$i]['Text'].'\', \''.$currentTranscription.'\','.$i.')"
+                            $editorTab .= '<input class="transcription-comparison-button" type="button" 
+                                                onClick="compareTranscription(\''.$transcriptionList[$i]['Text'].'\', \''.$currentTranscription.'\','.$i.')" 
                                                 value="Compare to current transcription">';
+                            $editorTab .= '<a class="transcription-comparison-button" 
+                                                href onClick="compareTranscription(\''.$transcriptionList[$i]['Text'].'\', \''.$currentTranscription.'\','.$i.')"
+                                                >Compare to current transcription</a>';                    
                             $editorTab .= '<p id="transcription-comparison-output-'.$i.'" class="transcription-comparison-output">';
                             $editorTab .= '</p>';
-
+                        
                         $editorTab .= '</div>';
                     $i++;
                 }
@@ -412,19 +362,21 @@ function _TCT_item_page_test_ad( $atts ) {
 
         // Image settings tab
         $imageSettingsTab = "";
-            $imageSettingsTab .= "<p class='theme-color item-page-section-headline'>ADVANCED IMAGE SETTINGS</p>";
+            $imageSettingsTab .= "<p class='theme-color item-page-section-headline'>ADVANCED IMAGE SETTINGS</p>"; 
 
         // Info tab
         $infoTab = "";
-            $infoTab .= '<div id="info-collapse-headline-container" class="item-page-section-headline-container">';
-                $infoTab .= '<h4 id="info-collapse-heading" class="theme-color item-page-section-headline">';
-                    $infoTab .= 'Additional Information';
+            $infoTab .= '<div id="info-collapse-headline-container" class="item-page-section-headline-container collapse-headline item-page-section-collapse-headline collapse-controller" data-toggle="collapse" href="#info-collapsable"
+            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
+                $infoTab .= '<h4 id="info-collapse-heading" class="theme-color item-page-section-headline">';  
+                    $infoTab .= 'DOCUMENT META DATA';
                 $infoTab .= '</h4>';
-                $infoTab .= '<i class="fal fa-info-square theme-color" style="font-size: 17px; float:left;  margin-right: 8px; margin-top: 9.6px;"></i>';
+                $infoTab .= '<i id="info-collapse-icon" class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:left;  margin-right: 8px; margin-top: 9px;"></i>';
             $infoTab .= '</div>';
             $infoTab .= '<div style="clear: both;"></div>';
 
-            $infoTab .= '<div>';
+            $infoTab .= '<div id="info-collapsable" class="collapse">';
                 $infoTab .= "<h4 class='theme-color item-page-section-headline'>";
                     $infoTab .= "Title: ".$itemData['Title'];
                 $infoTab .= "</h4>";
@@ -512,47 +464,46 @@ function _TCT_item_page_test_ad( $atts ) {
                 $infoTab .= "<p class='theme-color item-page-property-headline'>Time</p>";
                 $infoTab .= "<span class='item-page-property-key'>Creation date: </span>";
                 $infoTab .= "<span class='item-page-property-value'>".$itemData['Timestamp']."</span></br>";
-
-                /*
-                $infoTab .= "<div class='provenance-metadata'>";
+                
+                $infoTab .= "<div class='provenance-metadata'>"; 
                     $infoTab .= "<p class='theme-color item-page-property-headline'>Provenance</p>";
                     $infoTab .= "<table>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Source:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Source:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provenance:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provenance:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Identifier:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Identifier:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Institution:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Institution:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provider:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provider:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Providing country:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Providing country:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "First published in Europeana:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "First published in Europeana:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Last updated in Europeana:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
+                        $infoTab .= "<tr>"; 
+                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Last updated in Europeana:"; $infoTab .= "</td>";   
+                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";               
                         $infoTab .= "</tr>";
                     $infoTab .= "</table>";
                 $infoTab .= "</div>";
-*/
 
+                
                 $infoTab .= "<p class='theme-color item-page-property-headline'>Provenance</p>";
                 $infoTab .= "<span class='item-page-property-key'>Source: </span>";
                 $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
@@ -570,7 +521,7 @@ function _TCT_item_page_test_ad( $atts ) {
                 $infoTab .= "<span class='item-page-property-value'>".$itemData['DateStart']."</span></br>";
                 $infoTab .= "<span class='item-page-property-key'>Last updated in Europeana: </span>";
                 $infoTab .= "<span class='item-page-property-value'>".$itemData['DateEnd']."</span></br>";
-
+                
                 $infoTab .= "<p class='theme-color item-page-property-headline'>References and relations</p>";
                 $infoTab .= "<span class='item-page-property-key'>Location: </span>";
                 $infoTab .= "<span class='item-page-property-value'>".$itemData['TranscriptionId']."</span></br>";
@@ -590,79 +541,24 @@ function _TCT_item_page_test_ad( $atts ) {
                 $taggingTab .= "<div class='item-page-section-headline-container'>";
                     $taggingTab .= "<div id='full-view-map'>";
                         $taggingTab .= '<iframe src="https://www.google.com/maps/embed?pb=" width="800" height="350" frameborder="0" style="border:0" allowfullscreen></iframe>';
-                    $taggingTab .= "</div>";
+                    $taggingTab .= "</div>"; 
                     $taggingTab .= "<div class='add-location-button'>";
-                    $taggingTab .= '<i class="fal fa-map-marker-alt theme-color" style="padding-right: 3px; font-size: 17px; margin-right:8px;"></i>';
-                    // Trigger/Open The Modal
-                    $taggingTab .= '<a id="adding-location-here" href="#" style="text-decoration: none;">Location</a>';
-                  // The Modal 
-                    $taggingTab .= '<div id="myModal" class="modal">';
-                    //Modal content
-                        $taggingTab .= '<form action="/action_page.php">';
-                            $taggingTab .= '<div class="modal-content">';
-                                $taggingTab .= '<span class="close">&times;</span>';
-                                $taggingTab .= "<p>Add main location to</p>";
-                                $taggingTab .= '<label for="fname">First Name</label>';
-                                $taggingTab .= '<input type="text" id="fname" name="firstname" placeholder="Your name..">';
-
-                                $taggingTab .=    '<label for="lname">Last Name</label>';
-                                $taggingTab .=    '<input type="text" id="lname" name="lastname" placeholder="Your last name..">';
-
-                                $taggingTab .=    '<label for="lname">Last Name</label>';
-                                $taggingTab .=    '<input type="text" id="lname" name="lastname" placeholder="Your last name..">';
-
-                                $taggingTab .=    '<label for="lname">Last Name</label>';
-                                $taggingTab .=    '<input type="text" id="lname" name="lastname" placeholder="Your last name..">';
-                                $taggingTab .=   '<input type="submit" value="Submit">';
-
-                                $taggingTab .= "<div id=''>";
-                                    $taggingTab .= '<iframe src="https://www.google.com/maps/embed?pb=" width="800" height="350" frameborder="0" style="border:0" allowfullscreen></iframe>';
-                                $taggingTab .= "</div>";
-                            $taggingTab .=    "</div>";
-                        $taggingTab .= '</form>';
-                    $taggingTab .= "</div>";
-                            // popup script
-                            $taggingTab .= '<script>
-                                            // Get the modal
-                                            var modal = document.getElementById("myModal");
-                                            
-                                            // Get the button that opens the modal
-                                            var btn = document.getElementById("adding-location-here");
-                                            
-                                            // Get the <span> element that closes the modal
-                                            var span = document.getElementsByClassName("close")[0];
-                                            
-                                            // When the user clicks the button, open the modal 
-                                            btn.onclick = function() {
-                                            modal.style.display = "block";
-                                            }
-                                            
-                                            // When the user clicks on <span> (x), close the modal
-                                            span.onclick = function() {
-                                            modal.style.display = "none";
-                                            }
-                                            
-                                            // When the user clicks anywhere outside of the modal, close it
-                                            window.onclick = function(event) {
-                                            if (event.target == modal) {
-                                                modal.style.display = "none";
-                                            }
-                                            }
-                                            </script>';
+                    $taggingTab .= '<i class="fal fa-plus-circle theme-color" style="padding-right: 3px;"></i>';
+                        $taggingTab .= '<a href="" style="text-decoration: none;">Add location</a>';
                     $taggingTab .= "</div>";
                     $taggingTab .= "<div class='item-page-section-headline-right-site'>";
                         $taggingTab .= '<div id="location-status-changer" class="status-changer section-status-changer">';
-                            $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator"
+                            $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator" 
                                                 style="color: '.$itemData['LocationStatusColorCode'].'; background-color:'.$itemData['LocationStatusColorCode'].';"
                                                 onclick="document.getElementById(\'location-status-dropdown\').classList.toggle(\'show\')"></i>';
                             $taggingTab .= '<div id="location-status-dropdown" class="sub-status status-dropdown-content">';
                                 foreach ($statusTypes as $statusType) {
-                                    if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) {
-                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                    if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) { 
+                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                             onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $taggingTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                                    } else {
-                                        $taggingTab .= "<div class='status-dropdown-option'
+                                    } else { 
+                                        $taggingTab .= "<div class='status-dropdown-option' 
                                                             onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $taggingTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                                     }
@@ -670,28 +566,28 @@ function _TCT_item_page_test_ad( $atts ) {
                             $taggingTab .= '</div>';
                         $taggingTab .= '</div>';
                     $taggingTab .= '</div>';
-
+                    
                 $taggingTab .= '</div>';
                 $taggingTab .= '<div style="clear: both;"></div>';
             $taggingTab .= '</div>';
             $taggingTab .= "<div id='tagging-section' class='item-page-section'>";
                 $taggingTab .= "<div class='item-page-section-headline-container'>";
-                    $taggingTab .= "<i class='fal fa-tag theme-color' style='font-size: 17px; margin-right:8px;'></i><h4 class='theme-color item-page-section-headline'>";
-                        $taggingTab .= "Tagging";
+                    $taggingTab .= "<h4 class='theme-color item-page-section-headline'>";
+                        $taggingTab .= "TAGGING";
                     $taggingTab .= "</h4>";
                     $taggingTab .= "<div class='item-page-section-headline-right-site'>";
                         $taggingTab .= '<div id="tagging-status-changer" class="status-changer section-status-changer">';
-                            $taggingTab .= '<i id="tagging-status-indicator" class="fal fa-circle status-indicator"
+                            $taggingTab .= '<i id="tagging-status-indicator" class="fal fa-circle status-indicator" 
                                                 style="color: '.$itemData['TaggingStatusColorCode'].'; background-color:'.$itemData['TaggingStatusColorCode'].';"
                                                 onclick="document.getElementById(\'tagging-status-dropdown\').classList.toggle(\'show\')"></i>';
                             $taggingTab .= '<div id="tagging-status-dropdown" class="sub-status status-dropdown-content">';
                                 foreach ($statusTypes as $statusType) {
-                                    if ($itemData['TaggingStatusId'] == $statusType['CompletionStatusId']) {
-                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                    if ($itemData['TaggingStatusId'] == $statusType['CompletionStatusId']) { 
+                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                             onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'TaggingtatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $taggingTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                                    } else {
-                                        $taggingTab .= "<div class='status-dropdown-option'
+                                    } else { 
+                                        $taggingTab .= "<div class='status-dropdown-option' 
                                                             onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'TaggingStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $taggingTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                                     }
@@ -705,7 +601,7 @@ function _TCT_item_page_test_ad( $atts ) {
 
         // Help tab
         $helpTab = "";
-            $helpTab .= "<p>test... help tab</p>";
+            $helpTab .= "<p>test... help tab</p>";          
 
         // Automatic enrichment tab
         $autoEnrichmentTab = "";
@@ -713,23 +609,23 @@ function _TCT_item_page_test_ad( $atts ) {
                 $autoEnrichmentTab .= '<div id="automaticEnrichment-collapse-headline" class="item-page-section-headline-container collapse-headline item-page-section-collapse-headline collapse-controller" data-toggle="collapse" href="#enrichment-collapsable"
                 onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
                 jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                    $autoEnrichmentTab .= '<h4 id="automaticEnrichment-collapse-heading" class="theme-color item-page-section-headline">';
+                    $autoEnrichmentTab .= '<h4 id="automaticEnrichment-collapse-heading" class="theme-color item-page-section-headline">'; 
                             $autoEnrichmentTab .= 'AUTOMATIC ENRICHMENTS';
                         $autoEnrichmentTab .= '</h4>';
                     $autoEnrichmentTab .= '<i id="automatic-enrichment-collapse-icon" class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:left;  margin-right: 8px; margin-top: 9px;"></i>';
                 $autoEnrichmentTab .= '</div>';
                 $autoEnrichmentTab .= '<div id="description-status-changer" class="status-changer section-status-changer">';
-                    $autoEnrichmentTab .= '<i id="automaticEnrichment-status-indicator" class="fal fa-circle status-indicator"
+                    $autoEnrichmentTab .= '<i id="automaticEnrichment-status-indicator" class="fal fa-circle status-indicator" 
                                         style="color: '.$itemData['AutomaticEnrichmentStatusColorCode'].'; background-color:'.$itemData['AutomaticEnrichmentStatusColorCode'].';"
                                         onclick="document.getElementById(\'automaticEnrichment-status-dropdown\').classList.toggle(\'show\')"></i>';
                     $autoEnrichmentTab .= '<div id="automaticEnrichment-status-dropdown" class="sub-status status-dropdown-content">';
                         foreach ($statusTypes as $statusType) {
-                            if ($itemData['AutomaticEnrichmentStatusId'] == $statusType['CompletionStatusId']) {
-                                $autoEnrichmentTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                            if ($itemData['AutomaticEnrichmentStatusId'] == $statusType['CompletionStatusId']) { 
+                                $autoEnrichmentTab .= "<div class='status-dropdown-option status-dropdown-option-current' 
                                                     onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'AutomaticEnrichmentStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $autoEnrichmentTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
-                            } else {
-                                $autoEnrichmentTab .= "<div class='status-dropdown-option'
+                            } else { 
+                                $autoEnrichmentTab .= "<div class='status-dropdown-option' 
                                                     onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'AutomaticEnrichmentStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                 $autoEnrichmentTab .= "<i class='fal fa-circle' style='color: ".$statusType['ColorCode']."; background-color:".$statusType['ColorCode'].";'></i>".$statusType['Name']."</div>";
                             }
@@ -738,10 +634,10 @@ function _TCT_item_page_test_ad( $atts ) {
                 $autoEnrichmentTab .= '</div>';
                 $autoEnrichmentTab .= '<div style="clear: both;"></div>';
                 $autoEnrichmentTab .= "<div id='enrichment-collapsable' class='collapse'>";
-                    $autoEnrichmentTab .= "<p>test... automatic enrichment tab</p>";
+                    $autoEnrichmentTab .= "<p>test... automatic enrichment tab</p>"; 
                 $autoEnrichmentTab .= "</div>";
             $autoEnrichmentTab .= "</div>";
-
+        
         // Comment section
         $commentSection = "";
         $commentSection .= '<div class="item-page-section">';
@@ -749,7 +645,7 @@ function _TCT_item_page_test_ad( $atts ) {
                     onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
                         jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')"
                         >';
-                $commentSection .= '<h4 id="comments-collapse-heading" class="theme-color item-page-section-headline">';
+                $commentSection .= '<h4 id="comments-collapse-heading" class="theme-color item-page-section-headline">';  
                     $commentSection .= "NOTES AND QUESTIONS";
                 $commentSection .= '</h4>';
                 $commentSection .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:left; margin-right: 8px; margin-top: 9px;"></i>';
@@ -757,12 +653,12 @@ function _TCT_item_page_test_ad( $atts ) {
             $commentSection .= '<div style="clear: both;"></div>';
             $commentSection .= "<div id=\"comments\" class=\"comments-area collapse\">";
                 $commentSection .= "<div id=\"respond\" class=\"comment-respond\">";
-                    $commentSection .= "<h3 id=\"reply-title\" class=\"comment-reply-title\">";
+                    $commentSection .= "<h3 id=\"reply-title\" class=\"comment-reply-title\">";	
                         $commentSection .= "Leave a note or a question";
                         $commentSection .= "<small><a rel=\"nofollow\" id=\"cancel-comment-reply-link\" href=\"/en/documents/id-19044/item-223349/#respond\" style=\"display:none;\">";
                             $commentSection .= "Cancel reply";
-                        $commentSection .= "</a></small>";
-                    $commentSection .= "</h3>";
+                        $commentSection .= "</a></small>";	
+                    $commentSection .= "</h3>";		
                     $commentSection .= "<form action=\"https://transcribathon.com/wp-comments-post.php\" method=\"post\" id=\"commentform\" class=\"comment-form\">";
                         $commentSection .= "<p class=\"logged-in-as\">";
                             $commentSection .= "<a href=\"https://transcribathon.com/wp-admin/profile.php\" aria-label=\"Logged in as ".wp_get_current_user()->display_name.". Edit your profile.\">";
@@ -776,7 +672,7 @@ function _TCT_item_page_test_ad( $atts ) {
                         $commentSection .= "</textarea>";
                         $commentSection .= "<input name=\"wpml_language_code\" type=\"hidden\" value=\"en\" />";
                         $commentSection .= "<p class=\"form-submit\">";
-                            $commentSection .= "<input name=\"submit\" type=\"submit\" id=\"submit\" class=\"submit theme-color-background\" value=\"SAVE\" />";
+                            $commentSection .= "<input name=\"submit\" type=\"submit\" id=\"submit\" class=\"submit theme-color-background\" value=\"SAVE NOTE\" />";
                             $commentSection .= "<input type='hidden' name='comment_post_ID' value='296152' id='comment_post_ID' />";
                             $commentSection .= "<input type='hidden' name='comment_parent' id='comment_parent' value='0' />";
                         $commentSection .= "</p>";
@@ -791,7 +687,7 @@ function _TCT_item_page_test_ad( $atts ) {
                     $commentSection .= "</form>";
                 $commentSection .= "</div><!-- #respond -->";
             $commentSection .= "</div><!-- #comments .comments-area -->";
-        $commentSection .= '</div>';
+        $commentSection .= "</div>";
 
         // View switcher button
         $content .= "<button id='item-page-switcher' onclick='switchItemPageView()'>switch</button>";
@@ -799,38 +695,20 @@ function _TCT_item_page_test_ad( $atts ) {
         // <<< FULL VIEW >>> //
 
         $content .= "<div id='full-view-container'>";
-            // Top image slider
+            // Top image slider 
             $content .= "<div class='item-page-slider full-width-header'>";
             $i = 1;
                 foreach ($storyData['Items'] as $item) {
-                    $image = json_decode($item['ImageLink'], true);
-                    $link = explode("/", $image["@id"]);
-                    $link[sizeof($link) - 3] = "150,150";
-                    if ($image["width"] <= $image["height"]) {
-                        $link[sizeof($link) - 4] = "0,0,".$image["width"].",".$image["width"];
-                    }
-                    else {
-                        $link[sizeof($link) - 4] = "0,0,".$image["height"].",".$image["height"];
-                    }
-                    $item['ImageLink'] = "";
-                    foreach ($link as $text) {
-                        $item['ImageLink'] .= $text .= "/";
-                    }
-                    $item['ImageLink'] = substr($item['ImageLink'], 0, -1);
+                    $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
+                        $content .= "<img data-lazy='".$item['ImageLink']."'>";
+                    $content .= "</a>";
                     if ($initialSlide == null && $item['ItemId'] == $_GET['item']){
-                        $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' style='border: 4px #949494 solid'>";
-                            $content .= "<img data-lazy='".$item['ImageLink']."'>";
-                        $content .= "</a>";
                         $initialSlide = $i;
                     }
                     else {
-                        $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
-                            $content .= "<img data-lazy='".$item['ImageLink']."'>";
-                        $content .= "</a>";
                         $i++;
                     }
                 }
-                /*
                 $content .= "<div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258363.full-150x150.jpg'></div>
                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258364.full-150x150.jpg'></div>
                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258365.full-150x150.jpg'></div>
@@ -840,7 +718,7 @@ function _TCT_item_page_test_ad( $atts ) {
                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258369.full-150x150.jpg'></div>
                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258370.full-150x150.jpg'></div>
                 <div><img data-lazy='https://transcribathon.com/wp-content/uploads/document-images/21795.258371.full-150x150.jpg'></div>
-
+                
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
@@ -856,8 +734,8 @@ function _TCT_item_page_test_ad( $atts ) {
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
                 <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>
-                <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>";*/
-
+                <div><img data-lazy='https://iiif.onb.ac.at/images/ANNO/fug15840321/z116567901_00000162/square/150,150/0/default.jpg'></div>";
+    
             $content .= "</div>";
 
 // Image slider JavaScript
@@ -868,20 +746,11 @@ $content .= "<script>
                     infinite: true,
                     arrows: false,
                     speed: 300,
-                    slidesToShow: 12,
-                    slidesToScroll: 12,
+                    slidesToShow: 10,
+                    slidesToScroll: 10,
                     lazyLoad: 'ondemand',
-                    centerMode: true,
                     initialSlide: ".$initialSlide.",
                     responsive: [
-                        {
-                            breakpoint: 1720,
-                            settings: { slidesToShow: 11, slidesToScroll: 11, }
-                        },
-                        {
-                            breakpoint: 1570,
-                            settings: { slidesToShow: 10, slidesToScroll: 10, }
-                        },
                         {
                             breakpoint: 1420,
                             settings: { slidesToShow: 9, slidesToScroll: 9, }
@@ -914,8 +783,8 @@ $content .= "<script>
                 });
             });
         </script>";
-
-                $content .= "<div id='primary-full-width'>";
+        
+            $content .= "<div id='primary-full-width'>";
                 $content .= "<div id='full-view-left'>";
                     $content .= $imageViewer;
 
@@ -929,9 +798,8 @@ $content .= "<script>
                         $content .= $commentSection;
                     $content .= "</div>";
                 $content .= "</div>";
-                
                 $content .= "<div id='full-view-right'>";
-
+                      
                     $content .= "<div id='full-view-tagging'>";
                         $content .= $taggingTab;
                     $content .= "</div>";
@@ -956,20 +824,11 @@ $content .= "<script>
 
         // Splitscreen container
         $content .= "<div id='image-view-container' class='panel-container-horizontal' style='display:none'>";
-
+            
             // Image section
-            $content .= "<div id='item-image-section' class='panel-left'>";
-            $content .= '<div id="openseadragonFS">  <div class="buttons" id="buttonsFS">';
-            $content .= '<div id="zoom-inFS"><i class="far fa-plus"></i></div>';
-            $content .= '<div id="zoom-outFS"><i class="far fa-minus"></i></div>';
-            $content .= '<div id="homeFS"><i class="far fa-home"></i></div>';
-            $content .= '<div id="full-widthFS"><i class="far fa-arrows-alt-h"></i></div>';
-            $content .= '<div id="rotate-rightFS"><i class="far fa-redo"></i></div>';
-            $content .= '<div id="rotate-leftFS"><i class="far fa-undo"></i></div>';
-            $content .= '<div id="filterButtonFS"><i class="far fa-sliders-h"></i></div>';
-            $content .= '<div id="full-pageFS"><i class="far fa-compress-arrows-alt"></i></div>';
-            $content .= '</div></div>';
-            $content .= "</div>";
+            $content .= "<div id='item-image-section' class='panel-left'>
+                            <img src='".$itemData['ImageLink']."'>
+                        </div>";
 
             // Resize slider
             $content .= '<div id="item-splitter" class="splitter-vertical">
@@ -995,12 +854,12 @@ $content .= "<script>
                             $content .= "</div>";
                         $content .= "</li>";
 
-                        /*$content .= "<li>";
+                        $content .= "<li>";
                             $content .= "<div class='theme-color theme-color-hover tablinks'
                                             onclick='switchItemTab(event, \"autoEnrichment-tab\")'>";
                                 $content .= '<i class="fal fa-laptop" style="margin-left: -3px;"></i>';
                             $content .= "</div>";
-                        $content .= "</li>";*/
+                        $content .= "</li>";
 
                         $content .= "<li>";
                             $content .= "<div class='theme-color theme-color-hover tablinks'
@@ -1009,12 +868,12 @@ $content .= "<script>
                             $content .= "</div>";
                         $content .= "</li>";
 
-                        /*$content .= "<li>";
+                        $content .= "<li>";
                             $content .= "<div class='theme-color theme-color-hover tablinks'
                                             onclick='switchItemTab(event, \"settings-tab\")'>";
                                 $content .= '<i class="fal fa-sliders-h"></i>';
                             $content .= "</div>";
-                        $content .= "</li>";*/
+                        $content .= "</li>";
 
                         $content .= "<li>";
                             $content .= "<div class='theme-color theme-color-hover tablinks'
@@ -1023,166 +882,145 @@ $content .= "<script>
                             $content .= "</div>";
                         $content .= "</li>";
                     $content .= '</ul>';
-                    //////////////////////////////////////////////////////////////////////////////////////
-                    //Status Chart
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        //Status Chart
+                    $content .= "<div id='mini-status-chart' class='mini-status-icon'>";
 
-                    // Set request parameters for status data
-                    $url = network_home_url()."/tp-api/completionStatus";
-                    $requestType = "GET";
+                        $content .= '<ul id="item-tab-list" class="tab-list">';
+                            $content .= "<li>";
 
-                    // Execude http request
-                    include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+                                    // Set request parameters for status data
+                                    $url = network_home_url()."/tp-api/completionStatus";
+                                    $requestType = "GET";
 
-                    // Save status data
-                    $statusTypes = json_decode($result, true);
+                                    // Execude http request
+                                    include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
-                    // Save status data
-                    $statusTypes = json_decode($result, true);
+                                    // Save status data
+                                    $statusTypes = json_decode($result, true);
 
-                    $progressData = array(
-                        $itemData['TranscriptionStatusName'],
-                        $itemData['DescriptionStatusName'],
-                        $itemData['LocationStatusName'],
-                        $itemData['TaggingStatusName'],
-                        $itemData['AutomaticEnrichmentStatusName'],
-                    );
-                    $progressCount = array (
-                                    'Not Started' => 0,
-                                    'Edit' => 0,
-                                    'Review' => 0,
-                                    'Completed' => 0
-                                );
-                    foreach ($progressData as $status) {
-                        $progressCount[$status] += 1;
-                    }
+                                    $statusCount = array(
+                                                        "Not Started" => 0,
+                                                        "Edit" => 0,
+                                                        "Review" => 0,
+                                                        "Completed" => 0
+                                                    );
+                                    $itemCount = 0;
+                                    foreach ($storyData['Items'] as $item) {
+                                        //var_dump($item['CompletionStatusName']);
+                                        switch ($item['CompletionStatusName']){
+                                            case 'Not Started':
+                                                $statusCount['Not Started'] += 1; 
+                                                break;
+                                            case 'Edit':
+                                                $statusCount['Edit'] += 1;
+                                                break;
+                                            case 'Review':
+                                                $statusCount['Review'] += 1;
+                                                break;
+                                            case 'Completed':
+                                                $statusCount['Completed'] += 1;
+                                                break;
+                                        }
+                                        
+                                        $itemCount += 1;
+                                    }
+                                    echo $statusCount['Not-Started'];
 
-                    $statusCount = array(
-                                        "Not Started" => 0,
-                                        "Edit" => 0,
-                                        "Review" => 0,
-                                        "Completed" => 0
-                                    );
-                    $itemCount = 0;
-                    foreach ($storyData['Items'] as $item) {
-                        //var_dump($item['CompletionStatusName']);
-                        switch ($item['CompletionStatusName']){
-                            case 'Not Started':
-                                $statusCount['Not Started'] += 1;
-                                break;
-                            case 'Edit':
-                                $statusCount['Edit'] += 1;
-                                break;
-                            case 'Review':
-                                $statusCount['Review'] += 1;
-                                break;
-                            case 'Completed':
-                                $statusCount['Completed'] += 1;
-                                break;
-                        }
-
-                        $itemCount += 1;
-                    }
-
-                                $content .= "<div class='mini-mini-chart'>";
-                                    $content .= "<canvas id='statusChart' class='status-mini-chart' style='display:inline;' width='38' height='38'>";
-                                    $content .= "</canvas>";
-                                    $content .= '<div class="statusinfo-hover">';
-                                        $content .= '<ul class="hover-displayer">';
-
-                                            foreach ($statusTypes as $statusType) {
-                                                $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
-                                                if ($percentage != 0) {
-                                                    $content .= '<li><span class="users-num" style="background-color:'.$statusType['ColorCode'].'"></span><span class="amount" style="width: 20%;">'.$percentage.'%</span><span class="pieces">'.$statusType['Name'].'</span></li>';
-                                                    /*
-                                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section"
-                                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
-                                                        $editorTab .= $percentage.'%';
-                                                    $editorTab .= '</div>';
-                                                    */
-                                                }
-                                                else {
-                                                    /*
-                                                    $editorTab .= '<div id="progress-bar-'.str_replace(' ', '-', $statusType['Name']).'-section" class="progress-bar progress-bar-section"
-                                                                        style="width: '.$percentage.'%; background-color:'.$statusType['ColorCode'].'">';
-                                                    $editorTab .= '</div>';
-                                                    */
-                                                }
-                                            }
-                                        $content .= '</ul>';
-                                    $content .= '</div>';
-                                $content .= "</div>";
-
-                                $content .= "<script>
-                                                var ctx = document.getElementById('statusChart');
-                                                var myDoughnutChart = new Chart(ctx, {
-                                                    type: 'doughnut',
-                                                    data: {
-                                                        labels :['Not Started','Edit','Review','Completed'],
-                                                        datasets: [{
-                                                            data: [".$statusCount['Not Started'].", ".$statusCount['Edit'].", ".$statusCount['Review'].", ".$statusCount['Completed']."],
-                                                            backgroundColor: [";
-                                                                foreach ($statusTypes as $statusType) {
-                                                                    $content .= '"'.$statusType['ColorCode'].'", ';
+                                    $content .= "<div class='mini-mini-chart'><canvas id='statusChart' class='status-mini-chart' style='display:inline;' width='38' height='38'>";
+                                                        $$editorTab .= '<div class="statusinfo-hover">';
+                                                        $editorTab .= '<ul class="hover-displayer">';
+                                                       
+                                                            foreach ($statusTypes as $statusType) {
+                                                                $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
+                                                                if ($percentage != 0) {
+                                                                    $editorTab .= '<li><span class="users-num">'.$statusType['ColorCode'].'</span><span class="amount"></span><span class="pieces">'.$percentage.'%</span>'.$statusType['Name'].'</li>';
+                                                                    
                                                                 }
-                                $content .=                 "],
-                                                            borderWidth: 0
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        cutoutPercentage: 26,
-                                                        borderWidth: 4,
-                                                        borderColor: '#000',
-                                                        tooltips: {enabled: false},
-                                                        hover: {mode: null},
-                                                        legend : {
-                                                                    display: false
-                                                                },
-                                                        responsive: false,
-                                                        segmentShowStroke: false
-                                                    },
-                                                });
-                                            </script>";
+                                                                else {
+                                                                   
+                                                                }
+                                                            }
+                                                        $editorTab .= '</ul>';
+                                                    $editorTab .= '</div>';
+                                        $content .= "</canvas>";
+                                        $content .= "</div>";
 
-                                            $statusPercentage = array(
-                                                "Not Started" => intval(($statusCount['Not Started']*100)/$itemCount),
-                                                "Edit" => intval(($statusCount['Edit']*100)/$itemCount),
-                                                "Review" => intval(($statusCount['Review']*100)/$itemCount),
-                                                "Completed" => intval(($statusCount['Completed']*100)/$itemCount)
-                                            );
+                                    $content .= "<script>
+                                                    var ctx = document.getElementById('statusChart');
+                                                    var myDoughnutChart = new Chart(ctx, {
+                                                        type: 'doughnut',
+                                                        data: {
+                                                            labels :['Not Started','Edit','Review','Completed'],
+                                                            datasets: [{
+                                                                data: [".$statusCount['Not Started'].", ".$statusCount['Edit'].", ".$statusCount['Review'].", ".$statusCount['Completed']."],
+                                                                backgroundColor: [";
+                                                                    foreach ($statusTypes as $statusType) {
+                                                                        $content .= '"'.$statusType['ColorCode'].'", ';
+                                                                    }
+                                    $content .=                 "],
+                                                                borderWidth: 0
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            cutoutPercentage: 26,
+                                                            borderWidth: 4,
+                                                            borderColor: '#000',
+                                                            tooltips: {enabled: false},
+                                                            hover: {mode: null},
+                                                            legend : {
+                                                                        display: false
+                                                                    },
+                                                            responsive: false,
+                                                            segmentShowStroke: false
+                                                        },
+                                                    });
+                                                </script>";
+                                                
+                                                $statusPercentage = array(
+                                                    "Not Started" => intval(($statusCount['Not Started']*100)/$itemCount),
+                                                    "Edit" => intval(($statusCount['Edit']*100)/$itemCount),
+                                                    "Review" => intval(($statusCount['Review']*100)/$itemCount),
+                                                    "Completed" => intval(($statusCount['Completed']*100)/$itemCount)
+                                                );
 
-
+                                
+                            $content .= "</li>";
+                        $content .= '</ul>';
+                    $content .= "</div>";
+                    $editorTab .= '<div style="clear: both;"></div>';
                     //////////////////////////////////////////////////////////////////////////////////////
                     // View switcher
                     $content .= '<div class="view-switcher">';
                         $content .= '<ul id="item-switch-list" class="switch-list">';
 
                             $content .= "<li>";
-                                $content .= '<i id="horizontal-split" class="far fa-window-maximize fa-rotate-90 theme-color-hover theme-color view-switcher-icons active"
+                                $content .= '<i id="horizontal-split" class="far fa-window-maximize fa-rotate-270 theme-color-hover theme-color view-switcher-icons active"
                             onclick="switchItemView(event, \'horizontal\')"></i>';
                             $content .= "</li>";
 
                             $content .= "<li>";
-                                $content .= '<i id="vertical-split" class="far fa-window-maximize fa-rotate-180 theme-color-hover theme-color view-switcher-icons"
+                                $content .= '<i id="vertical-split" class="far fa-window-maximize theme-color-hover theme-color view-switcher-icons"
                             onclick="switchItemView(event, \'vertical\')"></i>';
                             $content .= "</li>";
 
                             $content .= "<li>";
-                                $content .= '<i id="popout" class="far fa-window-restore fa-rotate-180 theme-color-hover theme-color view-switcher-icons"
+                                $content .= '<i id="popout" class="far fa-expand-arrows theme-color-hover theme-color view-switcher-icons"
                             onclick="switchItemView(event, \'popout\')"></i>';
                             $content .= "</li>";
 
-                            $content .= "<li>";
-                                $content .= '<i id="horizontal-split" class="far fa-times-circle theme-color-hover theme-color view-switcher-icons"
+                            /*$content .= "<li>";
+                                $content .= '<i id="horizontal-split" class="fal fa-window-close theme-color-hover theme-color view-switcher-icons"
                             onclick="switchItemView(event, \'horizontal\')"></i>';
-                            $content .= "</li>";
-
+                            $content .= "</li>";*/
+                            
                         $content .= '</ul>';
                     $content .= '</div>';
                 $content .= "</div>";
-
+                
                 // Tab content
                 $content .= "<div id='item-data-content' class='panel-right-tab-menu'>";
-
+                    
                     // Editor tab
                     $content .= "<div id='editor-tab' class='tabcontent'>";
                         // Content will be added here in switchItemPageView function
@@ -1191,11 +1029,11 @@ $content .= "<script>
                     // Image settings tab
                     $content .= "<div id='settings-tab' class='tabcontent' style='display:none;'>";
                         $content .= $imageSettingsTab;
-                    $content .= "</div>";
+                    $content .= "</div>";    
 
                     // Info tab
                     $content .= "<div id='info-tab' class='tabcontent' style='display:none;'>";
-                        $content .= "<p class='theme-color item-page-section-headline'>Additional Information</p>";
+                        $content .= "<p class='theme-color item-page-section-headline'>DOCUMENT META DATA</p>";
                         // Content will be added here in switchItemPageView function
                     $content .= "</div>";
 
@@ -1216,7 +1054,7 @@ $content .= "<script>
 
                 $content .= "</div>";
             $content .= '</div>';
-
+        
         // Split screen JavaScript
         $content .= '<script>
                         jQuery("#item-image-section").resizable_split({
@@ -1225,7 +1063,7 @@ $content .= "<script>
                         });
                     </script>';
 
-        $content .= "</div>
+        $content .= "</div> 
                 </div>";
         echo $content;
     }
