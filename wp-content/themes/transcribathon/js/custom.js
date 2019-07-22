@@ -543,45 +543,46 @@ function initTinyWithConfig(selector) {
     selector: selector,
     inline: true,
     height:120,
-    plugins: ['charmap','paste'],
-    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure position-in-doc',
-    menubar: true,
+    plugins: ['charmap','paste', 'autoresize'],
+    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure position-in-doc | charmap | table',
+    menubar: false,
+    resize: true,
     browser_spellcheck: true,
     paste_auto_cleanup_on_paste : true,
     body_id: 'htranscriptor',
     setup: function (editor) {
-      console.log('in setup');
-      editor.ui.registry.addButton('missbut', {
-        title: 'Insert an indicator for missing text',
-        text: '',
-        icon: 'missing',
-        onAction: function () {
-          editor.insertContent('<span style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\"> MISSING </span>');
+  console.log('in setup');
+  editor.ui.registry.addButton('missbut', {
+    title: 'Insert an indicator for missing text',
+    text: '',
+    icon: 'missing',
+    onAction: function () {
+      editor.insertContent('<img src="" style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\" />');
+    }
+  });
+  editor.ui.registry.addButton('unsure', {
+    title: 'Mark selected as unclear',
+    text: '',
+    icon: 'unsure',
+    onAction: function () {
+      if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
+        editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
+      }else{
+        if (editor.selection.getStart().className == "tct-uncertain") {
+          var node = editor.selection.getStart();
+          node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
         }
-      });
-      editor.ui.registry.addButton('unsure', {
-        title: 'Mark selected as unclear',
-        text: '',
-        icon: 'unsure',
-        onAction: function () {
-          if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
-            editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
-          }else{
-            if (editor.selection.getStart().className == "tct-uncertain") {
-              var node = editor.selection.getStart();
-              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-            }
-            else if (editor.selection.getEnd().className == "tct-uncertain"){
-              var node = editor.selection.getEnd();
-              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-            }
-            else{
-              editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
-            }
-          }
+        else if (editor.selection.getEnd().className == "tct-uncertain"){
+          var node = editor.selection.getEnd();
+          node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
         }
-      });
-    },
+        else{
+          editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
+        }
+      }
+    }
+  });
+},
     style_formats: [
     {title: 'unclear, please review', inline: 'span', classes: 'tct_unclear'},
     {title: 'Note', inline: 'span', classes: 'tct_note'},

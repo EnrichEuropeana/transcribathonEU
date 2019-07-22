@@ -365,16 +365,33 @@ ul.topusers li h2 span.teammem{font-weight:300 !important; font-size:14px !impor
     /*padding: 20px;*/
 }
 
-.location-detail-entry{float: left; width: 33.33%;}
-.location-detail-entry input{outline: none;}
-
-.location-detail-intro-line p{display: inline-block;}
-
-.gsearch-form {width: 89%; outline: none;}
-.gsearch-press{margin-left: 4px;}
-.geosearch-form {width: 44%; outline: none; margin-right: 4px;}
-.geosearch-press{margin-left: 4px;}
-
+#location-input-section-top div {
+    float: left;
+    margin-right: 4px;
+}
+.location-input-container {
+    width: 100%;
+}
+.location-input-container input {
+    width: 100%;
+}
+.location-input-container textarea {
+    width: 100%;
+}
+#location-coordinates-container{
+    width: 120px;
+}
+#location-name-container {
+    width: calc(100% - 128px);
+}
+.location-search-container a {
+    font-size: 10px;  
+    position: absolute;
+    right: 12px;  
+}
+.location-search-container input {
+    padding-right: 15px;
+}
 
 #adding-new-link{color: inherit; text-decoration: none;}
 .person-info-area{}
@@ -2027,15 +2044,19 @@ div.docstate{border:13px solid; border-color:#eee  transparent transparent #eee;
 .category-checkbox-container {
     display: block;
     position: relative;
-    padding-left: 35px;
-    margin-bottom: 12px;
+    padding-left: 30px;
+    margin-right: 50px;
     cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    width: 25%;
+    width: 100px;
     float: left;
+}
+
+#category-checkboxes {
+    padding: 5px 0px;
 }
 
   /* Hide the browser's default checkbox */
