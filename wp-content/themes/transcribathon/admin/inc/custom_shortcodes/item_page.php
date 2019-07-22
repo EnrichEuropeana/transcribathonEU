@@ -376,33 +376,35 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '</div>';
                 $editorTab .= '<div style="clear: both;"></div>';
                     $editorTab .= "<div id=\"description-area\" class=\"description-save collapse show\">";
+                        $editorTab .= "<div id=\"category-checkboxes\">";
+                            // Set request parameters for category data
+                            $url = network_home_url()."/tp-api/properties?PropertyType='Category'";
+                            $requestType = "GET";
 
-                        // Set request parameters for category data
-                        $url = network_home_url()."/tp-api/properties?PropertyType='Category'";
-                        $requestType = "GET";
+                            // Execude http request
+                            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
-                        // Execude http request
-                        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+                            // Save category data
+                            $categories = json_decode($result, true);
 
-                        // Save category data
-                        $categories = json_decode($result, true);
-
-                        foreach ($categories as $category) {
-                            $checked = "";
-                            foreach ($itemData['Properties'] as $itemProperty) {
-                                if ($itemProperty['PropertyId'] == $category['PropertyId']) {
-                                    $checked = "checked";
-                                    break;
+                            foreach ($categories as $category) {
+                                $checked = "";
+                                foreach ($itemData['Properties'] as $itemProperty) {
+                                    if ($itemProperty['PropertyId'] == $category['PropertyId']) {
+                                        $checked = "checked";
+                                        break;
+                                    }
                                 }
+                                $editorTab .= '<label class="category-checkbox-container">';
+                                    $editorTab .= $category['PropertyValue'];
+                                    $editorTab .= '<input class="category-checkbox" id="type-'.$category['PropertyValue'].'-checkbox" type="checkbox" '.$checked.' 
+                                                        name="'.$category['PropertyValue'].'"value="'.$category['PropertyId'].'"
+                                                        onClick="addItemProperty('.$_GET['item'].', this)">';
+                                    $editorTab .= '<span  class="theme-color-background checkmark"></span>';
+                                $editorTab .= '</label>';
                             }
-                            $editorTab .= '<label class="category-checkbox-container">';
-                                $editorTab .= $category['PropertyValue'];
-                                $editorTab .= '<input class="category-checkbox" id="type-'.$category['PropertyValue'].'-checkbox" type="checkbox" '.$checked.' 
-                                                    name="'.$category['PropertyValue'].'"value="'.$category['PropertyId'].'"
-                                                    onClick="addItemProperty('.$_GET['item'].', this)">';
-                                $editorTab .= '<span  class="theme-color-background checkmark"></span>';
-                            $editorTab .= '</label>';
-                        }
+                            $editorTab .= '<div style="clear: both;"></div>';
+                        $editorTab .= '</div>';
 
                         $editorTab .= '<textarea id="item-page-description-text" rows="4">';
                             if ($itemData['Description'] != null) {
@@ -494,311 +496,155 @@ function _TCT_item_page( $atts ) {
                     $infoTab .= $itemData['Description'];
                 $infoTab .= "</p>";
 
-                $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
-                    $infoTab .= "People";
-                $infoTab .= "</h5>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Contributor: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['Contributor'];
-                    $infoTab .= "</span>";
-                $infoTab .= "</p>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Subject: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['StoryPlaceName'];
-                    $infoTab .= "</span>";
-                $infoTab .= "</p>";
+                // Set request parameters
+                $url = network_home_url()."/tp-api/fieldMappings";
+                $requestType = "GET";
 
-                $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
-                    $infoTab .= "Classifications";
-                $infoTab .= "</h5>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Type: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['Title'];
-                    $infoTab .= "</span>";
-                $infoTab .= "</p>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Subject: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['StoryPlaceName'];
-                    $infoTab .= "</span>";
-                $infoTab .= "</p>";
+                // Execude request
+                include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
 
-                $infoTab .= "<h5 class='theme-color item-page-property-headline'>";
-                    $infoTab .= "Properties";
-                $infoTab .= "</h5>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Language: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['Languauges'][0];
-                    $infoTab .= "</span>";
-                $infoTab .= "</p>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Keyword: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['SearchText'];
-                    $infoTab .= "</span></br>";
-                $infoTab .= "</p>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Link: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['Link'];
-                    $infoTab .= "</span></br>";
-                $infoTab .= "</p>";
-                $infoTab .= "<p class='item-page-property'>";
-                    $infoTab .= "<span class='item-page-property-key'>";
-                        $infoTab .= "Category: ";
-                    $infoTab .= "</span>";
-                    $infoTab .= "<span class='item-page-property-value'>";
-                        $infoTab .= $itemData['Title'];
-                    $infoTab .= "</span></br>";
-                $infoTab .= "</p>";
+                // Display data
+                $fieldMappings = json_decode($result, true);
 
-                // Just filler content for now, to make the size realistic
-                $infoTab .= "<p class='theme-color item-page-property-headline'>Time</p>";
-                $infoTab .= "<span class='item-page-property-key'>Creation date: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Timestamp']."</span></br>";
-
-                /*
-                $infoTab .= "<div class='provenance-metadata'>";
-                    $infoTab .= "<p class='theme-color item-page-property-headline'>Provenance</p>";
-                    $infoTab .= "<table>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Source:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provenance:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Identifier:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Institution:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Provider:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Providing country:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "First published in Europeana:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                        $infoTab .= "<tr>";
-                        $infoTab .= "<td class='item-page-property-key'>"; $infoTab .= "Last updated in Europeana:"; $infoTab .= "</td>";
-                        $infoTab .= "<td class='item-page-property-value'>"; $infoTab .= "DA-Plakate Ehrliche Arbeit und Wolfgang Schnur"; $infoTab .= "</td>";
-                        $infoTab .= "</tr>";
-                    $infoTab .= "</table>";
-                $infoTab .= "</div>";
-*/
-
-                $infoTab .= "<p class='theme-color item-page-property-headline'>Provenance</p>";
-                $infoTab .= "<span class='item-page-property-key'>Source: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Provenance: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Identifier: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Institution: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Provider: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Providing country: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['Title']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>First published in Europeana: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['DateStart']."</span></br>";
-                $infoTab .= "<span class='item-page-property-key'>Last updated in Europeana: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['DateEnd']."</span></br>";
-
-                $infoTab .= "<p class='theme-color item-page-property-headline'>References and relations</p>";
-                $infoTab .= "<span class='item-page-property-key'>Location: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['TranscriptionId']."</span></br>";
-
-                $infoTab .= "<p class='theme-color item-page-property-headline'>Location</p>";
-                $infoTab .= "<span class='item-page-property-key'>Dataset: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['PlaceId']."</span></br>";
-
-                $infoTab .= "<p class='theme-color item-page-property-headline'>Entities</p>";
-                $infoTab .= "<span class='item-page-property-key'>Concept term: </span>";
-                $infoTab .= "<span class='item-page-property-value'>".$itemData['ImageLink']."</span></br>";
+                $fields = array();
+                foreach ($fieldMappings as $fieldMapping) {
+                    $fields[$fieldMapping['Name']] = $fieldMapping['DisplayName'];
+                }
+                foreach ($storyData as $key => $value) {
+                    if ($fields[$key] != null && $fields[$key] != "") {
+                        $infoTab .= "<p class='item-page-property'>";
+                            $infoTab .= "<span class='item-page-property-key'>";
+                                $infoTab .= $fields[$key].": ";
+                            $infoTab .= "</span>";
+                            $infoTab .= "<span class='item-page-property-value'>";
+                                $infoTab .= $value;
+                            $infoTab .= "</span></br>";
+                        $infoTab .= "</p>";
+                    }
+                }
             $infoTab .= "</div>";
 
         // Tagging tab
         $taggingTab = "";
-                    $taggingTab .= "<div id='full-view-map'>";
-                        $taggingTab .= '<iframe src="https://www.google.com/maps/embed?pb=" width="800" height="350" frameborder="0" style="border:0" allowfullscreen></iframe>';
-                    $taggingTab .= "</div>";
+            // Location section
+            $taggingTab .= "<div id='full-view-map'>";
+                $taggingTab .= '<iframe src="https://www.google.com/maps/embed?pb=" width="800" height="350" frameborder="0" style="border:0" allowfullscreen></iframe>';
+            $taggingTab .= "</div>";
+            $taggingTab .= "<div id='location-section' class='item-page-section'>";
                 $taggingTab .= "<div class='item-page-section-headline-container'>";
-                            // Location section
-                    $taggingTab .= "<div id='location-section' class='item-page-section'>";
-                        $taggingTab .= "<i class='fal fa-map-marker-alt theme-color' style='padding-right: 3px; font-size: 17px; margin-right:8px;'></i>";
-                        $taggingTab .= "<h4 class='theme-color item-page-section-headline'>";
-                            $taggingTab .= "Location";
-                        $taggingTab .= "</h4>";
-                            //status-changer
-                        $taggingTab .= "<div class='item-page-section-headline-right-site'>";
-                            $taggingTab .= '<div id="location-status-changer" class="status-changer section-status-changer">';
-                                $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator"
-                                                    style="color: '.$itemData['LocationStatusColorCode'].'; background-color:'.$itemData['LocationStatusColorCode'].';"
-                                                    onclick="document.getElementById(\'location-status-dropdown\').classList.toggle(\'show\')"></i>';
-                                $taggingTab .= '<div id="location-status-dropdown" class="sub-status status-dropdown-content">';
-                                    foreach ($statusTypes as $statusType) {
-                                        if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) {
-                                            $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
-                                                                onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                            $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                                        } else {
-                                            $taggingTab .= "<div class='status-dropdown-option'
-                                                                onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                            $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                                        }
+                    $taggingTab .= "<i class='fal fa-map-marker-alt theme-color' style='padding-right: 3px; font-size: 17px; margin-right:8px;'></i>";
+                    $taggingTab .= "<h4 class='theme-color item-page-section-headline'>";
+                        $taggingTab .= "Location";
+                    $taggingTab .= "</h4>";
+
+                    //status-changer
+                    $taggingTab .= "<div class='item-page-section-headline-right-site'>";
+                        $taggingTab .= '<div id="location-status-changer" class="status-changer section-status-changer">';
+                            $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator"
+                                                style="color: '.$itemData['LocationStatusColorCode'].'; background-color:'.$itemData['LocationStatusColorCode'].';"
+                                                onclick="document.getElementById(\'location-status-dropdown\').classList.toggle(\'show\')"></i>';
+                            $taggingTab .= '<div id="location-status-dropdown" class="sub-status status-dropdown-content">';
+                                foreach ($statusTypes as $statusType) {
+                                    if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) {
+                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                                            onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                    } else {
+                                        $taggingTab .= "<div class='status-dropdown-option'
+                                                            onclick=\"changeStatus(".$_GET['item'].",  '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
                                     }
-                                $taggingTab .= '</div>';
+                                }
                             $taggingTab .= '</div>';
                         $taggingTab .= '</div>';
-                    $taggingTab .= "</div>";
+                    $taggingTab .= '</div>';
+                $taggingTab .= "</div>";
 
-                    
-
-
-                    $taggingTab .= '<div class="add-location-button">';
-                        $taggingTab .= '<div class= "collapse-headline collapse-controller collapsed" data-toggle="collapse" href="#modalocation"
-                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
-                                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';
-                        // Trigger/Open The Modal
+                    $taggingTab .= '<div class= "add-location-button collapse-headline collapse-controller collapsed" data-toggle="collapse" href="#modalocation"
+                                        onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
+                                        jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';
                         $taggingTab .= '<span id="adding-location-here" class="theme-color" href="#">';
-                        $taggingTab .= '<i class="far fa-plus-circle" style="margin-right:4px;"></i>';
-                        $taggingTab .= 'add Location';
+                            $taggingTab .= '<i class="far fa-plus-circle" style="margin-right:4px;"></i>';
+                            $taggingTab .= 'add Location';
                         $taggingTab .= '</span>';
+                    $taggingTab .= '</div>';
+
+                    $taggingTab .= '<div id="location-input-section collapse">';
+                        $taggingTab .= '<div id="location-input-section-top">';
+                            $taggingTab .= '<div id="location-name-container" class="location-input-container">';
+                                $taggingTab .= '<label>Location name:</label><br/>';
+                                $taggingTab .= '<input type="text" name="" placeholder="">';
+                            $taggingTab .= '</div>';
+                            $taggingTab .= '<div id="location-coordinates-container" class="location-input-container">';
+                                $taggingTab .=    '<label>Coordinates:</label><br/>';
+                                $taggingTab .=    '<input type="text" name="" placeholder="">';
+                            $taggingTab .= '</div>';
+                            $taggingTab .= "<div style='clear:both;'></div>";
                         $taggingTab .= '</div>';
-                                // The Modal 
-                                    $taggingTab .= '<div class="modalocation-content item-map-modal" id="modalocation">';
-                                        $taggingTab .= '<form action="/action_page.php">';
-                                        
-                                            $taggingTab .= '<div class="location-common location-detail-intro-line">';
-                                                $taggingTab .= "<p>Add main location to</p>";
-                                                /*$taggingTab .= '<span class="close">&times;</span>';*/
-                                            $taggingTab .= '</div>';
 
-                                            $taggingTab .= '<div class="location-detil-entry">';
-                                            $taggingTab .= '<label for="location-detail">Location name:</label><br/>';
-                                            $taggingTab .= '<input type="text" id="location-detail" name="" placeholder="">';
-                                        $taggingTab .= '</div>';
+                        $taggingTab .= '<div id="location-description-container" class="location-input-container">';
+                            $taggingTab .= '<label>Description (enter here):</label><br/>';
+                            $taggingTab .= '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc" placeholder="" name=""></textarea>';
+                        $taggingTab .= '</div>';
 
-                                            $taggingTab .= '<div class="location-common">';
-                                            
-                                                $taggingTab .= '<div class="location-detail-entry" style="margin-right:4em;">';
-                                                    $taggingTab .=    '<label for="co-ordinate">Coordinates:</label><br/>';
-                                                    $taggingTab .=    '<input type="text" id="co-ordinate" name="" placeholder="">';
-                                                $taggingTab .= '</div>';
+                        $taggingTab .= '<div id="location-geonames-search-container" class="location-input-container location-search-container">';
+                            $taggingTab .= '<label>Search Geonames (enter address):</label><br/>';
+                            $taggingTab .= '<input type="text" id="lgns" placeholder="" name="">';
+                            $taggingTab .= '<a id="geonames-search-button" href="">';
+                                $taggingTab .= '<i class="far fa-search"></i>';
+                            $taggingTab .= '</a>';
+                        $taggingTab .= '</div>';
+                        $taggingTab .= '<div id="location-google-search-container" class="location-input-container location-search-container">';
+                            $taggingTab .= '<label>Search Google (enter address):</label><br/>';
+                            $taggingTab .= '<input type="text" id="lgs" placeholder="" name="">';
+                            $taggingTab .= '<a id="google-search-button" href="" theme-color-background">';
+                                $taggingTab .= '<i class="far fa-search"></i>';
+                            $taggingTab .= '</a>';
+                        $taggingTab .= '</div>';
 
-                                                $taggingTab .= '<div class="location-detail-entry">';
-                                                    $taggingTab .=    '<label for="zommer">Zoom:</label><br/>';
-                                                    $taggingTab .=    '<input type="text" id="zoomer" name="" placeholder="">';
-                                                $taggingTab .= '</div>';
-                                            $taggingTab .= '</div>';
-
-                                            $taggingTab .= '<div class="location-common location-description-look">';
-                                                $taggingTab .= '<form class="location-desc" action="/action_page.php">';
-                                                    $taggingTab .=    '<label for="ldsc">Description (enter here):</label><br/>';
-                                                    $taggingTab .= '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc" placeholder="" name="">';
-                                                    $taggingTab .= '</textarea>';
-                                                    $taggingTab .= '<a class="gsearch-press" href="" theme-color-background"><i class="far fa-search" style="font-size: 10px;"></i></a>';
-                                                $taggingTab .= '</form>';
-                                            $taggingTab .= '</div>';
-
-                                            $taggingTab .= '<div class="location-common location-geo-names">';
-                                                $taggingTab .= '<form class="location-gn" action="/action_page.php">';
-                                                    $taggingTab .=    '<label for="lgns">Search Geonames (enter details):</label><br/>';
-                                                    $taggingTab .= '<input class="geosearch-form" type="text" id="lgns" placeholder="" name="">';
-                                                    $taggingTab .= '<select class="geosearch-form" style="padding: 2px; outline:none;" name=""title="">
-                                                                            <option value="0">all countries</option>
-                                                                            <option value="1">Deutschland</option>
-                                                                            <option value="2">France</option>
-                                                                            <option value="3">spain</option>
-                                                                            <option value="4">Italy</option>
-                                                                            <option value="5">Other</option>
-                                                                        </select>';
-                                                    $taggingTab .= '<a class="geosearch-press" href=""><i class="far fa-search" style="font-size: 10px;"></i></a>';
-                                                $taggingTab .= '</form>';
-                                            $taggingTab .= '</div>';
-
-                                            $taggingTab .= '<div class="location-common location-google-search">';
-                                                $taggingTab .= '<form class="location-gs" action="/action_page.php">';
-                                                    $taggingTab .=    '<label for="lgs">Search Google (enter address):</label><br/>';
-                                                    $taggingTab .= '<input class="gsearch-form" type="text" id="lgs" placeholder="" name="">';
-                                                    $taggingTab .= '<a class="gsearch-press" href="" theme-color-background"><i class="far fa-search" style="font-size: 10px;"></i></a>';
-                                                $taggingTab .= '</form>';
-                                            $taggingTab .= '</div>';
-
-                                            $taggingTab .= "<div>";
-                                                    $taggingTab .= "<button class='save-transcription theme-color-background' id='location-update-button' style='float: right;' onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id().")'>";
-                                                    $taggingTab .= "SAVE LOCATION";
-                                                    $taggingTab .= '<script>
-                                                                    function onButtonClick(){
-                                                                        document.getElementById("textInput").className="show";
-                                                                    }
-                                                                </script>';
-                                                $taggingTab .= "</button>";
-                                            $taggingTab .= "</div>";
-                                            $taggingTab .= "<div style='clear:both;'></div>";
-                                            
-                                        $taggingTab .= '</form>';
-                                    $taggingTab .=    "</div>";
-                                        // popup script
-                                        
-                                        /*$taggingTab .= '<script>
-                                                        // Get the modal
-                                                        var modal = document.getElementById("mylocationhere");
-                                                        
-                                                        // Get the button that opens the modal
-                                                        var btn = document.getElementById("adding-location-here");
-                                                        
-                                                        // Get the <span> element that closes the modal
-                                                        var span = document.getElementsByClassName("close")[0];
-                                                        
-                                                        // When the user clicks the button, open the modal 
-                                                        btn.onclick = function() {
-                                                        modal.style.display = "block";
-                                                        }
-                                                        
-                                                        // When the user clicks on <span> (x), close the modal
-                                                        span.onclick = function() {
-                                                        modal.style.display = "none";
-                                                        }
-                                                        
+                        $taggingTab .= "<div>";
+                                $taggingTab .= "<button class='save-transcription theme-color-background' id='location-update-button' style='float: right;' onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id().")'>";
+                                $taggingTab .= "SAVE LOCATION";
+                                $taggingTab .= '<script>
+                                                function onButtonClick(){
+                                                    document.getElementById("textInput").className="show";
+                                                }
+                                            </script>';
+                            $taggingTab .= "</button>";
+                        $taggingTab .= "</div>";
+                        $taggingTab .= "<div style='clear:both;'></div>";
+                        
+                    $taggingTab .=    "</div>";
+                                    // popup script
+                                    
+                                    /*$taggingTab .= '<script>
+                                                    // Get the modal
+                                                    var modal = document.getElementById("mylocationhere");
                                                     
-                                                        jQuery("#modalocation").draggable({
-                                                            handle: ".location-detail-intro-line"
-                                                        });
-                                                        jQuery( "#modalocation" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
+                                                    // Get the button that opens the modal
+                                                    var btn = document.getElementById("adding-location-here");
+                                                    
+                                                    // Get the <span> element that closes the modal
+                                                    var span = document.getElementsByClassName("close")[0];
+                                                    
+                                                    // When the user clicks the button, open the modal 
+                                                    btn.onclick = function() {
+                                                    modal.style.display = "block";
+                                                    }
+                                                    
+                                                    // When the user clicks on <span> (x), close the modal
+                                                    span.onclick = function() {
+                                                    modal.style.display = "none";
+                                                    }
+                                                    
+                                                
+                                                    jQuery("#modalocation").draggable({
+                                                        handle: ".location-detail-intro-line"
+                                                    });
+                                                    jQuery( "#modalocation" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
 
-                                                        </script>';*/
-                    $taggingTab .= "</div>";
-                $taggingTab .= '</div>';
+                                                    </script>';*/
+            $taggingTab .= '</div>';
 
             //Tagging section
             $taggingTab .= "<div id='tagging-section' class='item-page-section'>";
