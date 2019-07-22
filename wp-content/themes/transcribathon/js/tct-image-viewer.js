@@ -55,6 +55,17 @@ var tct_viewer = (function($, document, window) {
 		jQuery('#filterButtonFS').click(function() {
 			openFilterOverlay('FS');
 		});
+
+		jQuery('#transcribe').click(function() {
+			if(!this[0].hasClass('locked')) {
+				toggleFS();
+				//TODO maximize
+			}
+		})
+
+		jQuery('#transcribeFS').click(function() {
+			//TODO maximize
+		})
 	},
 	addImageFilter = function() {
 		jQuery("#openseadragon").append(sliderHtml);
@@ -325,7 +336,6 @@ var tct_viewer = (function($, document, window) {
 	initTiny = function() {
 		//none fs ones
 		initTinyWithConfig('#full-view-editor #item-page-transcription-text');
-		initTinyWithConfig('#full-view-editor #item-page-description-text');
 	},
 	getUrlParameter = function(sParam) {
 		var sPageURL = window.location.search.substring(1),

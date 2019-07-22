@@ -52,6 +52,7 @@ function switchItemView(event, viewName) {
       jQuery( "#item-data-section" ).resizable('disable')
       jQuery( "#item-data-section" ).removeClass("ui-resizable")
       jQuery( ".ui-resizable-handle" ).css("display", "none")
+      jQuery("#location-common-map").addClass("full-map-container")
 
       jQuery("#item-image-section").resizable_split({
           handleSelector: "#item-splitter",
@@ -60,6 +61,7 @@ function switchItemView(event, viewName) {
       });
       jQuery("#item-data-section").css("top", "")
       jQuery("#item-data-section").css("left", "")
+      jQuery("#item-data-section").css("position", "relative")
       break;
     case 'vertical':
 
@@ -89,11 +91,12 @@ function switchItemView(event, viewName) {
       });
       jQuery("#item-data-section").css("top", "")
       jQuery("#item-data-section").css("left", "")
+      jQuery("#item-data-section").css("position", "relative")
       break;
     case 'popout':
 
-      jQuery("#item-image-section").css("width", '')
-      jQuery("#item-image-section").css("height", '')
+      jQuery("#item-image-section").css("width", '100%')
+      jQuery("#item-image-section").css("height", '100%')
       jQuery("#item-image-section").addClass("image-popout")
       jQuery("#item-data-section").addClass("data-popout")
       jQuery("#image-view-container").removeClass("panel-container-horizontal")
@@ -109,9 +112,8 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").draggable('enable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('enable')
-
-break;
-}
+      break;
+    }
 }
 
 // Calls script to draw linechart on the profile page
@@ -156,6 +158,14 @@ function compareTranscription(oldTranscription, newTranscription, index) {
 // Switches between image view and full view on the item page
 function switchItemPageView() {
   if (jQuery('#full-view-container').css('display') == 'block') {
+    var startDate = jQuery("#startdateentry").val();
+    var endDate = jQuery("#enddateentry").val();
+    jQuery("#startdateentry").datepicker("destroy");
+    jQuery("#enddateentry").datepicker("destroy");
+    var dobDate = jQuery("#dob-entry").val();
+    var dodDate = jQuery("#dod-entry").val();
+    jQuery("#dob-entry").datepicker("destroy");
+    jQuery("#dod-entry").datepicker("destroy");
     tinymce.remove();
     //switch to image view
     jQuery('.site-footer').css('display', 'none')
@@ -201,7 +211,7 @@ function switchItemPageView() {
 
     // reinitialize tinyMCE instances
     initTinyWithConfig('#editor-tab #item-page-transcription-text');
-    initTinyWithConfig('#editor-tab #item-page-description-text');
+    //initTinyWithConfig('#editor-tab #item-page-description-text');
     /*
     tinymce.init({
       selector: '#editor-tab #item-page-transcription-text',
@@ -212,7 +222,45 @@ function switchItemPageView() {
       inline: true
     });
     */
+   
+    jQuery('#no-text-checkbox').change(function() {
+      if(this.checked) {
+        jQuery('#no-text-label').addClass('theme-color-background');
+        jQuery('#no-text-label').removeClass('theme-color');
+      }
+      else {
+        jQuery('#no-text-label').removeClass('theme-color-background');
+        jQuery('#no-text-label').addClass('theme-color');
+      }
+    });
+
+    jQuery( "#startdateentry, #enddateentry" ).datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1000:2019"
+    });
+    jQuery("#startdateentry").val(startDate);
+    jQuery("#enddateentry").val(endDate);
+
+    jQuery( "#dob-entry, #dod-entry" ).datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1000:2019"
+    });
+    jQuery("#dob-entry").val(dobDate);
+    jQuery("#dod-entry").val(dodDate);
+
   } else {
+    var startDate = jQuery("#startdateentry").val();
+    var endDate = jQuery("#enddateentry").val();
+    jQuery("#startdateentry").datepicker("destroy");
+    jQuery("#enddateentry").datepicker("destroy");
+    var dobDate = jQuery("#dob-entry").val();
+    var dodDate = jQuery("#dod-entry").val();
+    jQuery("#dob-entry").datepicker("destroy");
+    jQuery("#dod-entry").datepicker("destroy");
     tinymce.remove();
     //switch to full view
     jQuery('.site-footer').css('display', 'block')
@@ -250,7 +298,7 @@ function switchItemPageView() {
 
     // reinitialize tinyMCE instances
     initTinyWithConfig('#full-view-editor #item-page-transcription-text');
-    initTinyWithConfig('#full-view-editor #item-page-description-text');
+    //initTinyWithConfig('#full-view-editor #item-page-description-text');
     /*
     tinymce.init({
       selector: '#full-view-editor #item-page-transcription-text',
@@ -261,15 +309,40 @@ function switchItemPageView() {
       inline: true
     });
     */
+   
+   jQuery('#no-text-checkbox').change(function() {
+      if(this.checked) {
+        jQuery('#no-text-label').addClass('theme-color-background');
+        jQuery('#no-text-label').removeClass('theme-color');
+      }
+      else {
+        jQuery('#no-text-label').removeClass('theme-color-background');
+        jQuery('#no-text-label').addClass('theme-color');
+      }
+    });
+
+    jQuery( "#startdateentry, #enddateentry" ).datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1000:2019"
+    });
+    jQuery("#startdateentry").val(startDate);
+    jQuery("#enddateentry").val(endDate);
+    jQuery( "#dob-entry, #dod-entry" ).datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1000:2019"
+    });
+    jQuery("#dob-entry").val(dobDate);
+    jQuery("#dod-entry").val(dodDate);
   }
 }
 
-// Updates the item status
-function updateItemProperty(itemId, fieldName, value) {
-  // Clear confirmation message
-  jQuery('#status-update-message').html("")
-
-  // Update status via API
+// Updates specified data over the API
+function updateDataProperty(dataType, id, fieldName, value) {
+  // Prepare data and send API request
   data = {
           };
   data[fieldName] = value;
@@ -277,7 +350,7 @@ function updateItemProperty(itemId, fieldName, value) {
   var dataString= JSON.stringify(data);
   jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'POST',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
+      'url': 'http://fresenia.man.poznan.pl/tp-api/' + dataType + '/' + id,
       'data': data
   },
   // Check success and create confirmation message
@@ -297,9 +370,9 @@ function updateItemDescription(itemId) {
   // Clear confirmation message
   jQuery('#description-update-message').html("")
 
-  // Update description via API
+  // Prepare data and send API requestI
   data = {
-            Description: jQuery('#item-page-description-text').val()
+            Description: jQuery('#item-page-description-text').html()
           }
   var dataString= JSON.stringify(data);
   jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
@@ -319,6 +392,80 @@ function updateItemDescription(itemId) {
   });
 }
 
+// Updates the item description
+function updateItemTranscription(itemId, userId) {
+  // Clear confirmation message
+  jQuery('#transcription-update-message').html("")
+  // Prepare data and send API request
+  data = {
+            Text: jQuery('#item-page-transcription-text').html(),
+            UserId: userId,
+            ItemId: itemId,
+            CurrentVersion: 1
+          }
+  var dataString= JSON.stringify(data);
+  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      'type': 'POST',
+      'url': 'http://fresenia.man.poznan.pl/tp-api/transcriptions',
+      'data': data
+  },
+  // Check success and create confirmation message
+  function(response) {
+    var response = JSON.parse(response);
+    if (response.code == "200") {
+      jQuery('#transcription-update-message').html("Transcription saved")
+    }
+    else {
+      jQuery('#transcription-update-message').html("Transcription couldn't be saved")
+    }
+  });
+}
+
+// Adds an Item Property
+function addItemProperty(itemId, e) {
+  // Prepare data and send API request
+  propertyId = e.value;
+  data = {
+            ItemId: itemId,
+            PropertyId: propertyId,
+            UserGenerated: 1
+          }
+  var dataString= JSON.stringify(data);
+  if (e.checked) {
+    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        'type': 'POST',
+        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties/add',
+        'data': data
+    },
+    // Check success and create confirmation message
+    function(response) {
+    });
+  }
+  else {
+    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        'type': 'GET',
+        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties?ItemId=' + itemId + '&PropertyId=' + propertyId,
+    },
+    // Check success and create confirmation message
+    function(response) {
+      var response = JSON.parse(response);
+      if (response.code == "200") {
+        var itemPropertyId = JSON.parse(response.content)[0]['ItemPropertyId'];
+        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+          'type': 'DELETE',
+          'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties/' + itemPropertyId
+        },
+        // Check success and create confirmation message
+        function(response) {
+        });
+      }
+      else {
+        alert(response.content);
+      }
+    });
+  }
+}
+
 // Change progress status
 function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, e) {
   jQuery(e).parent().siblings(".status-indicator").css("color", color)
@@ -328,27 +475,40 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
     jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
       'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
-    },
+    }, 
     // Check success and create confirmation message
-    function(response) {
+    function(response) {	
       var response = JSON.parse(response);
       if (response.code == "200") {
         var content = JSON.parse(response.content);
 
         var oldStatus = content[0][fieldName.replace("Id", "Name")];
 
+        // Add "-"" to "Not Started"
         var oldProgress = 'progress-bar-' + oldStatus.replace(" ", "-") + '-section';
+        var oldProgressOverlay = 'progress-bar-overlay-' + oldStatus.replace(" ", "-") + '-section';
+        var oldProgressOverlayDoughnut = 'progress-doughnut-overlay-' + oldStatus.replace(" ", "-") + '-section';
         var oldProgressWidth = jQuery('#' + oldProgress).html();
         oldProgressWidth = (parseInt(oldProgressWidth.replace("%", "")) - (100 / statusCount));
         jQuery('#' + oldProgress).css('width', oldProgressWidth + "%");
         if (oldProgressWidth == 0) {
           jQuery('#' + oldProgress).html("");
+          jQuery('#' + oldProgressOverlay).html("0%");
+          //jQuery('#' + oldProgressOverlay).closest('li').css("display", "none");
+          jQuery('#' + oldProgressOverlayDoughnut).html("0%");
+          //jQuery('#' + oldProgressOverlayDoughnut).closest('li').css("display", "none");
         }
         else {
           jQuery('#' + oldProgress).html(oldProgressWidth + "%");
+          jQuery('#' + oldProgressOverlay).html(oldProgressWidth + "%");
+          //jQuery('#' + oldProgressOverlay).closest('li').css("display", "list-item");
+          jQuery('#' + oldProgressOverlayDoughnut).html(oldProgressWidth + "%");
+          //jQuery('#' + oldProgressOverlayDoughnut).closest('li').css("display", "list-item");
         }
 
         var newProgress = 'progress-bar-' + newStatus.replace(" ", "-") + '-section';
+        var newProgressOverlay = 'progress-bar-overlay-' + newStatus.replace(" ", "-") + '-section';
+        var newProgressOverlayDoughnut = 'progress-doughnut-overlay-' + newStatus.replace(" ", "-") + '-section';
         var newProgressWidth = jQuery('#' + newProgress).html();
         if (newProgressWidth == ""){
           newProgressWidth =  100 / statusCount;
@@ -359,8 +519,13 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
 
         jQuery('#' + newProgress).css('width', newProgressWidth + "%");
         jQuery('#' + newProgress).html(newProgressWidth + "%");
+        jQuery('#' + newProgressOverlay).html(newProgressWidth + "%");
+        //jQuery('#' + newProgressOverlay).closest('li').css("display", "list-item");
+        jQuery('#' + newProgressOverlayDoughnut).html(newProgressWidth + "%");
+        //jQuery('#' + newProgressOverlayDoughnut).closest('li').css("display", "list-item");
 
-        updateItemProperty(itemId , fieldName, value);
+        updateDataProperty("items", itemId , fieldName, value);
+        updateDoughnutStatus(oldStatus, newStatus);
       }
       else {
         alert(response.content);
@@ -369,7 +534,7 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
     });
   }
   else {
-    updateItemProperty(itemId , fieldName, value);
+    updateDataProperty("items", itemId , fieldName, value);
   }
 }
 
