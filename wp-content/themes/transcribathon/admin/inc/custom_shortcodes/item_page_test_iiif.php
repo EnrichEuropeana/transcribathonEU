@@ -910,8 +910,8 @@ $content .= "<script>
                                     echo $statusCount['Not-Started'];
 
                                     $content .= "<div class='mini-mini-chart'><canvas id='statusChart' class='status-mini-chart' style='display:inline;' width='38' height='38'>";
-                                                        $$editorTab .= '<div class="statusinfo-hover">';
-                                                        $editorTab .= '<ul class="hover-displayer">';
+                                                        $$editorTab .= '<div class="minidoughnut-hover">';
+                                                        $editorTab .= '<ul class="minidoughnut-hover-displayer">';
 
                                                             foreach ($statusTypes as $statusType) {
                                                                 $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;

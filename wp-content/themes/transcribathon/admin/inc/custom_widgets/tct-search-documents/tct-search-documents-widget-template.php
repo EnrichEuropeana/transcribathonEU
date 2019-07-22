@@ -48,44 +48,44 @@ $theme_sets = get_theme_mods();
              </style>";
 
 $content .= '<section id="full-width-header" class="temp-back">';
- $content .= '<div class="searchable">';
- $content .= '<form class="search-bar" action="/action_page.php">';
- $content .= '<div class="theme-color"><input type="text" placeholder="Add a search item" name="search"></div>';
- $content .= '<button type="submit" class="theme-color-background"><i class="far fa-search" style="font-size: 20px; float:right;"></i></button>';
- $content .= '</form>';
- $content .= '</div>';
+$content .= '<div class="searchable">';
+$content .= '<form class="search-bar" action="/action_page.php">';
+$content .= '<div class="theme-color"><input type="text" placeholder="Add a search item" name="search"></div>';
+$content .= '<button type="submit" class="theme-color-background"><i class="far fa-search" style="font-size: 20px; float:right;"></i></button>';
+$content .= '</form>';
+$content .= '</div>';
 
 $content .= '</section>';
 
 $content .= "<div id='primary-full-width'>";
- $content .= '<section class="complete-search-content">';
+$content .= '<section class="complete-search-content">';
 
 
-     $content .= '<div class="search-content-right">';
-         $content .= '<div class="search-content-right-header">';
-                 $content .= '<div class="search-content-results-headline search-headline">';
-                 $content .= '00 - 25 of 99999999 results';
-                 $content .= '</div>';
+    $content .= '<div class="search-content-right">';
+        $content .= '<div class="search-content-right-header">';
+                $content .= '<div class="search-content-results-headline search-headline">';
+                $content .= '00 - 25 of 99999999 results';
+                $content .= '</div>';
                
-                 $content .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
+                $content .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
                             
-                         $content .=    '<div class="result-viewtype">';
-                             $content .=    '<ul class="content-view-bar">';
-                                 $content .=    '<li class="content-view-grid">';
-                                 $content .=        '<a href="" class="content-view-button">';
-                                 $content .= '<i class="far fa-th-large theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
-                                 $content .=            'Grid';
-                                 $content .=        '</a>';
-                                 $content .=    '</li>';
-                                 $content .=   '<li class="content-view-list">';
-                                 $content .=       '<a href="" class="content-view-button">';
-                                 $content .= '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
-                                 $content .=           'List';
-                                 $content .=       '</a>';
-                                 $content .=   '</li>';
-                             $content .=   '</ul>';
-                         $content .=   '</div>';
-                 $content .= '</div>';
+                        $content .=    '<div class="result-viewtype">';
+                            $content .=    '<ul class="content-view-bar">';
+                                $content .=    '<li class="content-view-grid">';
+                                $content .=        '<a href="" class="content-view-button">';
+                                $content .= '<i class="far fa-th-large theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
+                                $content .=            'Grid';
+                                $content .=        '</a>';
+                                $content .=    '</li>';
+                                $content .=   '<li class="content-view-list">';
+                                $content .=       '<a href="" class="content-view-button">';
+                                $content .= '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
+                                $content .=           'List';
+                                $content .=       '</a>';
+                                $content .=   '</li>';
+                            $content .=   '</ul>';
+                        $content .=   '</div>';
+                $content .= '</div>';
 
              /*    $content .= '<div class="search-content-results-headline search-division-detail">';
                      $content .= '<div class="">';
@@ -108,15 +108,11 @@ $content .= "<div id='primary-full-width'>";
                  $content .= '</div>';*/
          $content .= '</div>';
          $content .= '<div class="search-content-right-items">';
+         
          foreach ($stories as $story){
              $content .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>".$story['dcTitle']."</a></br>";
          }
          
-         $options = array
-         (
-             'hostname' => SOLR_SERVER_HOSTNAME,
-             'port'     => SOLR_SERVER_PORT,
-         );
      
          $content .= "<br><div style='font-size:25px;'><a href='".home_url()."/item_page_test_iiif/?item=3549'>IIIF example</a></div>";
      $content .= '</div>';

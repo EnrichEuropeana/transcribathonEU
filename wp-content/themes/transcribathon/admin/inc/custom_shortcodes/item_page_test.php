@@ -362,11 +362,17 @@ function _TCT_item_page_test( $atts ) {
             $content .= "</div>";
 
 // Image slider JavaScript
+$infinite = "true";
+var_dump(sizeof($storyData['Items']));
+if (sizeof($storyData['Items']) > 100) {
+    $infinite = "false";
+}
+
 $content .= "<script>
             jQuery(document).ready(function(){
                 jQuery('.item-page-slider').slick({
                     dots: true,
-                    infinite: true,
+                    infinite: ".$infinite.",
                     arrows: false,
                     speed: 300,
                     slidesToShow: 10,
