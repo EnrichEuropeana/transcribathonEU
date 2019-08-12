@@ -218,8 +218,17 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                                 foreach ($storyData as $key => $value) {
                                     if ($fields[$key] != null && $fields[$key] != "") {
                                         $content .= "<dl>\n";
-                                        $content .= "<dt>".$fields[$key]."</dt>\n";
-                                        $content .= "<dd>".$value."</dd>\n";
+                                            $content .= "<dt>";
+                                                $content .= $fields[$key];
+                                            $content .= "</dt>\n";
+                                            $content .= "<dd>";
+                                                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                                                    $content .= "<a href=\"".$value."\">".$value."</a>";
+                                                }
+                                                else {
+                                                    $content .= $value;
+                                                }
+                                            $content .= "</dd>\n";
                                         $content .= "</dl>\n";
                                     }
                                 }

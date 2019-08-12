@@ -1,5 +1,133 @@
 jQuery ( document ).ready(function() {
+  installEventListeners()
 });
+
+function uninstallEventListeners() {
+  jQuery("#startdateentry").datepicker("destroy");
+  jQuery("#enddateentry").datepicker("destroy");
+  jQuery("#person-birthDate-input").datepicker("destroy");
+  jQuery("#person-deathDate-input").datepicker("destroy");
+  tinymce.remove();
+}
+
+function installEventListeners() {    
+  jQuery('#startdateentry, #enddateentry').on("change paste keyup", function() {
+    var dateText = jQuery(this).val();
+    if(dateText.length > 0) {
+      jQuery('#item-date-save-button').css('display','block');
+    }
+    else {
+      jQuery('#item-date-save-button').css('display','none');
+    }
+  })
+
+  // New transcription langauge selected
+  jQuery('#transcription-language-selector select').change(function(){
+    jQuery('#transcription-selected-languages ul').append(
+            '<li onClick="removeTranscriptionLanguage(' + jQuery('#transcription-language-selector option:selected').val() + ', this)">' 
+              + jQuery('#transcription-language-selector option:selected').text() 
+            + '</li>');
+    jQuery('#transcription-language-selector option:selected').prop("disabled", true);   
+    var transcriptionText = jQuery('#item-page-transcription-text').text();     
+    if(transcriptionText.length != 0) {
+      jQuery('#transcription-update-button').css('display','block');
+    }
+  })
+  
+  jQuery('.notes-questions').keyup(function() {
+  var block_data = jQuery(this).val();
+          if(block_data.length==0){
+          jQuery('.notes-questions-submit').css('display','none');
+          }else{
+      jQuery('.notes-questions-submit').css('display','block');
+      }
+  });
+  
+  jQuery('.description-save textarea').keyup(function() {
+    var block_data = jQuery(this).val();
+            if(block_data.length==0){
+            jQuery('#description-update-button').css('display','none');
+            }else{
+        jQuery('#description-update-button').css('display','block');
+        }
+    });
+
+  // Show/Hide Transcription Save button                             
+  jQuery('#item-page-transcription-text').keyup(function() {
+    var transcriptionText = jQuery('#item-page-transcription-text').text();
+    var languages = jQuery('#transcription-selected-languages ul').children().length;
+    if(transcriptionText.length != 0 && languages > 0) {
+      jQuery('#transcription-update-button').css('display','block');
+    }
+    else {
+      jQuery('#transcription-update-button').css('display','none');
+    }
+  });
+  
+  jQuery('#no-text-selector input').change(function() {
+    var checked = this.checked;
+    var transcriptionText = jQuery(this).text();
+    if (checked == true) {
+      if(transcriptionText.length == 0) {
+        jQuery('#transcription-language-selector select').attr("disabled", "disabled");
+        jQuery('#transcription-language-selector select').addClass("disabled-dropdown");
+        tinymce.remove();
+        jQuery('#transcription-update-button').css('display','block');
+      }
+      else {
+        alert("Please remove the transcription text first, if the document has nothing to transcribe");
+      }
+    }
+    else {
+      jQuery('#transcription-language-selector select').removeAttr("disabled");
+      jQuery('#transcription-language-selector select').removeClass("disabled-dropdown");
+      tct_viewer.initTinyWithConfig('#item-page-transcription-text');
+    }
+  })
+
+  /*
+  jQuery('#no-text-checkbox').change(function() {
+    if(this.checked) {
+      jQuery('#no-text-label').addClass('theme-color-background');
+      jQuery('#no-text-label').removeClass('theme-color');
+    }
+    else {
+      jQuery('#no-text-label').removeClass('theme-color-background');
+      jQuery('#no-text-label').addClass('theme-color');
+    }
+  });*/
+
+  var startDate = jQuery("#startdateentry").val();
+  var endDate = jQuery("#enddateentry").val();
+  var birthDate = jQuery("#person-birthDate-input").val();
+  var deathDate = jQuery("#person-deathDate-input").val();
+
+  jQuery( "#startdateentry, #enddateentry" ).datepicker({
+    dateFormat: "dd/mm/yy",
+    changeMonth: true,
+    changeYear: true,
+    yearRange: "1000:2019",
+    showOn: "button",
+    buttonText: "<i class=\'far fa-calendar-edit datepick-calendar-size\'></i>"
+  });
+   
+  jQuery("#startdateentry").val(startDate);
+  jQuery("#enddateentry").val(endDate);
+
+  jQuery( "#person-birthDate-input, #person-deathDate-input" ).datepicker({
+    dateFormat: "dd/mm/yy",
+    changeMonth: true,
+    changeYear: true,
+    yearRange: "1000:2019",
+    showOn: "button",
+    buttonText: "<i class=\'far fa-calendar-edit datepick-calendar-size\'></i>"
+  });
+  jQuery("#person-birthDate-input").val(birthDate);
+  jQuery("#person-deathDate-input").val(deathDate);
+
+
+  tct_viewer.initTinyWithConfig('#item-page-transcription-text');
+}
 
 // Switches between different tabs within the item page image view
 function switchItemTab(event, tabName) {
@@ -157,16 +285,9 @@ function compareTranscription(oldTranscription, newTranscription, index) {
 
 // Switches between image view and full view on the item page
 function switchItemPageView() {
+  uninstallEventListeners();
+
   if (jQuery('#full-view-container').css('display') == 'block') {
-    var startDate = jQuery("#startdateentry").val();
-    var endDate = jQuery("#enddateentry").val();
-    jQuery("#startdateentry").datepicker("destroy");
-    jQuery("#enddateentry").datepicker("destroy");
-    var dobDate = jQuery("#dob-entry").val();
-    var dodDate = jQuery("#dod-entry").val();
-    jQuery("#dob-entry").datepicker("destroy");
-    jQuery("#dod-entry").datepicker("destroy");
-    tinymce.remove();
     //switch to image view
     jQuery('.site-footer').css('display', 'none')
     jQuery('#full-view-container').css('display', 'none')
@@ -210,7 +331,6 @@ function switchItemPageView() {
     jQuery('#full-view-help').html('')
 
     // reinitialize tinyMCE instances
-    initTinyWithConfig('#editor-tab #item-page-transcription-text');
     //initTinyWithConfig('#editor-tab #item-page-description-text');
     /*
     tinymce.init({
@@ -222,46 +342,20 @@ function switchItemPageView() {
       inline: true
     });
     */
-   
-    jQuery('#no-text-checkbox').change(function() {
-      if(this.checked) {
-        jQuery('#no-text-label').addClass('theme-color-background');
-        jQuery('#no-text-label').removeClass('theme-color');
-      }
-      else {
-        jQuery('#no-text-label').removeClass('theme-color-background');
-        jQuery('#no-text-label').addClass('theme-color');
-      }
-    });
 
-    jQuery( "#startdateentry, #enddateentry" ).datepicker({
-      dateFormat: "dd/mm/yy",
-      changeMonth: true,
-      changeYear: true,
-      yearRange: "1000:2019"
-    });
-    jQuery("#startdateentry").val(startDate);
-    jQuery("#enddateentry").val(endDate);
-
-    jQuery( "#dob-entry, #dod-entry" ).datepicker({
-      dateFormat: "dd/mm/yy",
-      changeMonth: true,
-      changeYear: true,
-      yearRange: "1000:2019"
-    });
-    jQuery("#dob-entry").val(dobDate);
-    jQuery("#dod-entry").val(dodDate);
+/*
+    // LOGIN MODAL WINDOW //
+    // When the user clicks the button, open the modal 
+      jQuery('#sign-log-form').css('display', 'block');
+    jQuery('#lock-login').click(function() {
+      jQuery('#sign-log-form').css('display', 'block');
+    })
+    // When the user clicks on <span> (x), close the modal
+    jQuery('.close').click(function() {
+      jQuery('#sign-log-form').css('display', 'none');
+    })*/
 
   } else {
-    var startDate = jQuery("#startdateentry").val();
-    var endDate = jQuery("#enddateentry").val();
-    jQuery("#startdateentry").datepicker("destroy");
-    jQuery("#enddateentry").datepicker("destroy");
-    var dobDate = jQuery("#dob-entry").val();
-    var dodDate = jQuery("#dod-entry").val();
-    jQuery("#dob-entry").datepicker("destroy");
-    jQuery("#dod-entry").datepicker("destroy");
-    tinymce.remove();
     //switch to full view
     jQuery('.site-footer').css('display', 'block')
     jQuery('#full-view-container').css('display', 'block')
@@ -296,8 +390,6 @@ function switchItemPageView() {
     jQuery('#automaticEnrichment-collapse-headline').css( 'pointer-events', 'all' )
     jQuery('#enrichment-collapsable').removeClass('show')
 
-    // reinitialize tinyMCE instances
-    initTinyWithConfig('#full-view-editor #item-page-transcription-text');
     //initTinyWithConfig('#full-view-editor #item-page-description-text');
     /*
     tinymce.init({
@@ -309,35 +401,8 @@ function switchItemPageView() {
       inline: true
     });
     */
-   
-   jQuery('#no-text-checkbox').change(function() {
-      if(this.checked) {
-        jQuery('#no-text-label').addClass('theme-color-background');
-        jQuery('#no-text-label').removeClass('theme-color');
-      }
-      else {
-        jQuery('#no-text-label').removeClass('theme-color-background');
-        jQuery('#no-text-label').addClass('theme-color');
-      }
-    });
-
-    jQuery( "#startdateentry, #enddateentry" ).datepicker({
-      dateFormat: "dd/mm/yy",
-      changeMonth: true,
-      changeYear: true,
-      yearRange: "1000:2019"
-    });
-    jQuery("#startdateentry").val(startDate);
-    jQuery("#enddateentry").val(endDate);
-    jQuery( "#dob-entry, #dod-entry" ).datepicker({
-      dateFormat: "dd/mm/yy",
-      changeMonth: true,
-      changeYear: true,
-      yearRange: "1000:2019"
-    });
-    jQuery("#dob-entry").val(dobDate);
-    jQuery("#dod-entry").val(dodDate);
   }
+  installEventListeners();
 }
 
 // Updates specified data over the API
@@ -396,12 +461,24 @@ function updateItemDescription(itemId) {
 function updateItemTranscription(itemId, userId) {
   // Clear confirmation message
   jQuery('#transcription-update-message').html("")
+
+  // Get languages
+  var transcriptionLanguages = [];
+  jQuery("#transcription-language-selector option").each(function() {
+    var nextLanguage = {};
+    if (jQuery(this).prop('disabled') == true && jQuery(this).val() != "") {
+      nextLanguage.LanguageId = jQuery(this).val();
+      transcriptionLanguages.push(nextLanguage);
+    }
+  });
+
   // Prepare data and send API request
   data = {
             Text: jQuery('#item-page-transcription-text').html(),
             UserId: userId,
             ItemId: itemId,
-            CurrentVersion: 1
+            CurrentVersion: 1,
+            Languages: transcriptionLanguages,
           }
   var dataString= JSON.stringify(data);
   jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
@@ -419,6 +496,24 @@ function updateItemTranscription(itemId, userId) {
       jQuery('#transcription-update-message').html("Transcription couldn't be saved")
     }
   });
+  
+  /*
+  for (var i = 0; i < transcriptionLanguages.length; i++) {
+    // Prepare data and send API request
+    data = {
+      ItemId: itemId,
+      LanguageId: transcriptionLanguages[i]
+    }
+    var dataString= JSON.stringify(data);
+    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    'type': 'POST',
+    'url': 'http://fresenia.man.poznan.pl/tp-api/transcriptionLanguages',
+    'data': data
+    },
+    // Check success and create confirmation message
+    function(response) {
+    });
+  }*/
 }
 
 // Adds an Item Property
@@ -434,7 +529,7 @@ function addItemProperty(itemId, e) {
   if (e.checked) {
     jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'POST',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties/add',
+        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties',
         'data': data
     },
     // Check success and create confirmation message
@@ -475,9 +570,9 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
     jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
       'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
-    }, 
+    },
     // Check success and create confirmation message
-    function(response) {	
+    function(response) {
       var response = JSON.parse(response);
       if (response.code == "200") {
         var content = JSON.parse(response.content);
@@ -538,64 +633,171 @@ function changeStatus (itemId, newStatus, fieldName, value, color, statusCount, 
   }
 }
 
-function initTinyWithConfig(selector) {
-  tinymce.init({
-    selector: selector,
-    inline: true,
-    height:120,
-    plugins: ['charmap','paste'],
-    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure position-in-doc',
-    menubar: true,
-    browser_spellcheck: true,
-    paste_auto_cleanup_on_paste : true,
-    body_id: 'htranscriptor',
-    setup: function (editor) {
-      console.log('in setup');
-      editor.ui.registry.addButton('missbut', {
-        title: 'Insert an indicator for missing text',
-        text: '',
-        icon: 'missing',
-        onAction: function () {
-          editor.insertContent('<span style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\"> MISSING </span>');
-        }
-      });
-      editor.ui.registry.addButton('unsure', {
-        title: 'Mark selected as unclear',
-        text: '',
-        icon: 'unsure',
-        onAction: function () {
-          if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
-            editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
-          }else{
-            if (editor.selection.getStart().className == "tct-uncertain") {
-              var node = editor.selection.getStart();
-              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-            }
-            else if (editor.selection.getEnd().className == "tct-uncertain"){
-              var node = editor.selection.getEnd();
-              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-            }
-            else{
-              editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
-            }
+function removeTranscriptionLanguage(languageId, e) {
+  jQuery("#transcription-language-selector option[value='" + languageId + "']").prop("disabled", false)  
+  jQuery("#transcription-language-selector select").val("") 
+  jQuery(e).remove()
+  var transcriptionText = jQuery('#item-page-transcription-text').text();  
+  var languages = jQuery('#transcription-selected-languages ul').children().length;   
+  if(transcriptionText.length != 0 && languages > 0) {
+    jQuery('#transcription-update-button').css('display','block');
+  }
+  else {
+    jQuery('#transcription-update-button').css('display','none');
+  }
+}
+
+function saveItemLocation(itemId, userId) {
+  // Prepare data and send API request
+  locationName = jQuery('#location-input-name-container input').val();
+  [latitude, longitude] = jQuery('#location-input-coordinates-container input').val().split(',');
+  description = jQuery('#location-input-description-container input').val();
+  data = {
+            Name: locationName,
+            Latitude: latitude,
+            Longitude: longitude,
+            ItemId: itemId,
+            Link: "",
+            Zoom: 10,
+            Comment: description,
+            UserId: userId,
+            UserGenerated: 1
           }
-        }
-      });
+  var dataString= JSON.stringify(data);
+  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      'type': 'POST',
+      'url': 'http://fresenia.man.poznan.pl/tp-api/places',
+      'data': data
+  },
+  // Check success and create confirmation message
+  function(response) {
+    var response = JSON.parse(response);
+    if (response.code == "200") {
+      jQuery('#item-location-list ul').append(
+        '<li>' + jQuery('#location-input-name-container input').val() + '</li>'       
+      )
+    }
+  });
+}
+
+function saveItemDate(itemId) {
+  // Prepare data and send API request
+  data = {
+  }
+  startDate = jQuery('#startdateentry').val().split('/');
+  if (!isNaN(startDate[2]) && !isNaN(startDate[1]) && !isNaN(startDate[0])) {
+    data['DateStart'] = startDate[2] + "-" + startDate[1] + "-" + startDate[0];
+  }
+  endDate = jQuery('#enddateentry').val().split('/');
+  if (!isNaN(endDate[2]) && !isNaN(endDate[1]) && !isNaN(endDate[0])) {
+    data['DateEnd'] = endDate[2] + "-" + endDate[1] + "-" + endDate[0];
+  }
+  
+  var dataString= JSON.stringify(data);
+  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      'type': 'POST',
+      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
+      'data': data
+  },
+  // Check success and create confirmation message
+  function(response) {
+  });
+}
+
+
+function savePerson(itemId) {
+  
+  firstName = jQuery('#person-firstName-input').val();
+  lastName = jQuery('#person-lastName-input').val();
+  birthPlace = jQuery('#person-birthPlace-input').val();
+  birthDate = jQuery('#person-birthDate-input').val().split('/');
+  deathPlace = jQuery('#person-deathPlace-input').val();
+  deathDate = jQuery('#person-deathDate-input').val().split('/');
+  description = jQuery('#person-description-input').val();
+
+
+  // Prepare data and send API request
+  data = {
+    FirstName: firstName,
+    LastName: lastName,
+    BirthPlace: birthPlace,
+    DeathPlace: deathPlace,
+    Link: null,
+    Description: description,
+    ItemId: itemId
+  }
+  if (!isNaN(birthDate[2]) && !isNaN(birthDate[1]) && !isNaN(birthDate[0])) {
+    data['BirthDate'] = birthDate[2] + "-" + birthDate[1] + "-" + birthDate[0];
+  }
+  else {
+    data['BirthDate'] = null;
+  }
+  if (!isNaN(deathDate[2]) && !isNaN(deathDate[1]) && !isNaN(deathDate[0])) {
+    data['DeathDate'] = deathDate[2] + "-" + deathDate[1] + "-" + deathDate[0];
+  }
+  else {
+    data['DeathDate'] = null;
+  }
+  
+  for (var key in data) {
+    if (data[key] == "") {
+      data[key] = null;
+    }
+  }
+  
+  var dataString= JSON.stringify(data);
+  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      'type': 'POST',
+      'url': 'http://fresenia.man.poznan.pl/tp-api/persons',
+      'data': data
+  },
+  // Check success and create confirmation message
+  function(response) {
+  });
+}
+
+function saveKeyword(itemId) {
+  value = jQuery('#keyword-input').val();
+
+  if (value != "" && value != null) {
+    // Prepare data and send API request
+    data = {
+      PropertyValue: value,
+      PropertyType: "Keyword"
+    }
+
+    var dataString= JSON.stringify(data);
+    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        'type': 'POST',
+        'url': 'http://fresenia.man.poznan.pl/tp-api/properties?ItemId=' + itemId,
+        'data': data
     },
-    style_formats: [
-    {title: 'unclear, please review', inline: 'span', classes: 'tct_unclear'},
-    {title: 'Note', inline: 'span', classes: 'tct_note'},
-    {title: 'Badge', inline: 'span', styles: { display: 'inline-block', border: '1px solid #2276d2', 'border-radius': '5px', padding: '2px 5px', margin: '0 2px', color: '#2276d2' }}
-    ],
-    formats: {
-    alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'left' },
-    aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
-    alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'right' },
-    alignfull: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'full' },
-    bold: { inline: 'span', 'classes': 'bold' },
-    italic: { inline: 'span', 'classes': 'italic' },
-    underline: { inline: 'span', 'classes': 'underline', exact: true },
-    strikethrough: { inline: 'del' },
+    // Check success and create confirmation message
+    function(response) {
+    });
+  }
+}
+
+function saveLink(itemId) {
+  url = jQuery('#link-url-input input').val();
+  description = jQuery('#link-description-input textarea').val();
+
+  if (url != "" && url != null) {
+    // Prepare data and send API request
+    data = {
+      PropertyValue: url,
+      PropertyDescription: description,
+      PropertyType: "Link"
+    }
+    console.log(data);
+    var dataString= JSON.stringify(data);
+    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        'type': 'POST',
+        'url': 'http://fresenia.man.poznan.pl/tp-api/properties?ItemId=' + itemId,
+        'data': data
     },
-  })
+    // Check success and create confirmation message
+    function(response) {
+    });
+  }
 }
