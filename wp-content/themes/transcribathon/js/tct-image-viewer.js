@@ -6,6 +6,7 @@ var tct_viewer = (function($, document, window) {
 			imageHeight,
 			imageWidth,
 			sliderHtml = '<div class="sliderContainer" id="filterContainer"> ' +
+										'  <div id="closeFilterContainer">x</div>' +
 								    '  <div class="slidecontainer">' +
 								    '    <div id="brightnessIcon" class="sliderIcon"></div>' +
 								    '    <input type="range" min="-100" max="100" value="0" class="iiifSlider" id="brightnessRange">' +
@@ -43,6 +44,10 @@ var tct_viewer = (function($, document, window) {
 		jQuery('#filterButton').click(function() {
 			openFilterOverlay('');
 		});
+
+		jQuery('#closeFilterContainer').click(function() {
+			jQuery('#filterContainer').hide();
+		})
 
 		jQuery('#full-pageFS').click(function() {
 			toggleFS();
@@ -421,7 +426,7 @@ var tct_viewer = (function($, document, window) {
 								node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
 							}
 							else{
-								editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
+								editor.insertContent('&nbsp;<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>&nbsp;');
 							}
 						}
 					}
@@ -445,7 +450,7 @@ var tct_viewer = (function($, document, window) {
                 node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
               }
               else{
-                editor.insertContent(' ' + '<span class=\"pos-in-text\">'+editor.selection.getContent({format : 'html'})+'</span> '+' ');
+                editor.insertContent('&nbsp;<span class=\"pos-in-text\">'+editor.selection.getContent({format : 'html'})+'</span>&nbsp;');
               editor.insertContent(' ');
               }
             }

@@ -20,6 +20,7 @@ if(isset($instance['tct-top-transcribers-subject']) && trim($instance['tct-top-t
 if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\n","<br />",$instance['tct-top-transcribers-headline'])."</h1>\n"; }
 
 	if($kind === "campaign"){
+		/*
 		if($subject === "teams"){ // team
 			$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.teamid) AS total FROM ".$wpdb->prefix."campaign_transcriptionprogress prg JOIN ".$wpdb->prefix."teams t ON t.team_id=prg.teamid WHERE prg.campaignid='".$cp."'",ARRAY_A );
 			if((int)$alltops[0]['total'] <= $base){
@@ -333,8 +334,10 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 			
 			$topusrs = $wpdb->get_results($query,ARRAY_A);
 		}
+		*/
 	}else{
 		if($subject === "teams"){  // team
+			/*
 			$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.teamid) AS total FROM ".$wpdb->prefix."team_transcriptionprogress prg JOIN ".$wpdb->prefix."teams t ON t.team_id=prg.teamid",ARRAY_A );
 			if((int)$alltops[0]['total'] <= $base){
 				$base = (floor(((int)$alltops[0]['total']-1) / $limit)) * $limit;
@@ -350,33 +353,31 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					ORDER BY relamount DESC 
 					LIMIT ".$base.",".$limit;
 			$topusrs = $wpdb->get_results($query,ARRAY_A);
+			*/
 		}else{ // Invdl
-			$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.userid) AS total FROM ".$wpdb->prefix."user_transcriptionprogress prg JOIN ".$wpdb->prefix."users usr ON usr.ID=prg.userid ",ARRAY_A );
-			if((int)$alltops[0]['total'] <= $base){
-				$base = (floor(((int)$alltops[0]['total']-1) / $limit)) * $limit;
+			
+			// Set request parameters for image data
+			$url = network_home_url()."/tp-api/rankings/userCount";
+			$requestType = "GET";
+
+			// Execude http request
+			include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+
+			// Save image data
+			$alltops = json_decode($result, true);
+			if((int)$alltops <= $base){
+				$base = (floor(((int)$alltops-1) / $limit)) * $limit;
 			}
-			$query = "SELECT prg.userid,
-						(
-						SELECT GROUP_CONCAT(tShort) AS shortname 
-						FROM ".$wpdb->prefix."teams t 
-						JOIN ".$wpdb->prefix."user_teams ut 
-						ON t.team_id = ut.team_id WHERE ut.user_id = prg.userid
-						) AS teams,SUM(prg.amount)AS useramnt,
-						usr.display_name,
-						(
-						SELECT(SUM(mm.miles_account)+SUM(mm.miles_chars)+SUM(mm.miles_review)+SUM(mm.miles_complete)+SUM(mm.miles_sharing)+SUM(mm.miles_message)+SUM(miles_locations)+SUM(miles_enrichements))  
-						FROM ".$wpdb->prefix."user_miles mm 
-						WHERE mm.userid=prg.userid
-						) AS umiles 
-						FROM ".$wpdb->prefix."user_transcriptionprogress prg 
-						JOIN ".$wpdb->prefix."users usr 
-						ON usr.ID=prg.userid 
-						WHERE prg.userid != 1802
-						GROUP BY prg.userid 
-						ORDER BY umiles
-						DESC
-						LIMIT ".$base.",".$limit;
-			$topusrs = $wpdb->get_results($query,ARRAY_A);
+			
+			// Set request parameters for image data
+			$url = network_home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
+			$requestType = "GET";
+
+			// Execude http request
+			include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+
+			// Save image data
+			$topusrs = json_decode($result, true);
 		}
 	}
 	
@@ -384,6 +385,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 		if(sizeof($topusrs)>0){
 			echo "<ul class=\"topusers\">\n";
 			if($subject === "teams"){
+				/*
 				$i=1;	
 				foreach($topusrs as $team){
 					echo "<li class=\"p".$i."\">";
@@ -404,14 +406,15 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 						echo "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/".$team['post_type']."/".$team['post_name']."\">".$team['post_title']."</a></h2><p>".$miles." | ".$chars."</p></li>\n";
 					}
 					$i++;
-				}
+				}*/
 			}else{
 				$i=1;	
 				foreach($topusrs as $usr){
-					$aut = get_user_by('ID',$usr['userid']);
-					um_fetch_user( $usr['userid']);
+					$aut = get_user_by('ID',$usr['UserId']);
+					um_fetch_user( $usr['UserId']);
 					echo "<li class=\"p".$i."\">";
 					echo "<div class=\"tct-user-banner ".um_user('role')."\">".ucfirst(um_user('role'))."</div>\n"; 
+					/*
 					$acs = $wpdb->get_results("SELECT ac.*,uc.campaign_title,CASE ac.placing WHEN '1' then uc.campaign_badge_1 WHEN '2' then uc.campaign_badge_2 WHEN '3' then uc.campaign_badge_3 END AS badge FROM ".$wpdb->prefix."user_achievments ac LEFT JOIN ".$wpdb->prefix."user_campaigns uc ON uc.id=ac.campaign WHERE ac.userid='".$usr['userid']."'",ARRAY_A);
 					if(sizeof($acs)>0){
 						echo "<div class=\"tct_tt-achievments\">\n"; 
@@ -420,17 +423,25 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 						}
 						echo "</div>\n";
 					}
+					*/
 					if($kind === "campaign"){
+						/*
 						if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile in this campaign', '%s Miles in this campaign', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
 						$charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</strong></span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['totalchars'], 'transcribathon'  ) ), number_format_i18n((int)$usr['totalchars']))."</span>\n";
 						echo "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$charsc."</p><p><p>".$miles." | ".$chars."</p></p></li>\n";
+					*/
 					}else{
 						if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
+						if ($aut != null) {
+							echo "<span class=\"rang\">".$i."</span><h2><a href=\"/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						}
+						else {
+							echo "<span class=\"rang\">".$i."</span><h2><a href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						}
 					}
 					$i++;
 				}
@@ -452,7 +463,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 		$prev = "";
 	}
 	
-	if((int)$alltops[0]['total'] > ($base+$limit)){
+	if((int)$alltops > ($base+$limit)){
 		$menu .= "<li class=\"ttnext\" style='float:right'><a href=\"\" onclick=\"getMoreTops('".$myid."','".((int)$base+(int)$limit)."','".$limit."','".$kind."','".$cp."','".$subject."','".(int)trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams'])."'); return false;\">"._x('Next', 'Top-Transcribers-Slider-Widget (frontentd)','transcribathon')."</a></li>\n";
 		$showttmenu++;
 	}else{
@@ -468,7 +479,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 		echo $menu."</ul>\n";
 	}
 	//Create loading wheel
-	echo '<div id="loadingGif_'.$subject.'" style="display:none; float:right; height:50px; width:50px"><img src="/wp-content/themes/transcribathon/images/spinner.gif"></div>';
+	echo '<div id="top-transcribers-spinner" class="spinner" style="float:right; display:none;"></div>';
 	echo "</div>\n"; // #ttnav_...
 	
 	//Show own rank below ranking

@@ -1,7 +1,24 @@
 <?php
 // get Document data from API
 function _TCT_get_document_data( $atts ) {   
+    //include theme directory for text hovering
+    $theme_sets = get_theme_mods();
+
+    // Build Story page content
     $content = "";
+    $content = "<style>
+                  
+                .story-page-slider button.slick-prev.slick-arrow:hover {
+                    background: ".$theme_sets['vantage_general_link_color']." !important;
+                    color: #ffffff;
+                }
+                
+                .story-page-slider button.slick-next.slick-arrow:hover {
+                    background: ".$theme_sets['vantage_general_link_color']." !important;
+                    color: #ffffff;
+                }
+
+            </style>";
     if (isset($_GET['story']) && $_GET['story'] != "") {
         // get Story Id from url parameter
         $storyId = $_GET['story'];
@@ -31,8 +48,10 @@ function _TCT_get_document_data( $atts ) {
                 }
                 $imageLink .= "/250,250/0/default.jpg";
                 $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'><img data-lazy='".$imageLink."'></a>";
-                
+                //$content .= '<div class="label shad"></div>';
+                //$content .= '<div class="label complete"></div>';
             }
+                
         $content .= "</div>";
 
         // Image slider JavaScript
@@ -46,8 +65,8 @@ function _TCT_get_document_data( $atts ) {
             jQuery(document).ready(function(){
                 jQuery('.story-page-slider').slick({
                     dots: true,
-                    arrows: false,
                     infinite: ".$infinite.",
+                    arrows: true,
                     speed: 300,
                     slidesToShow: 8,
                     slidesToScroll: 8,
@@ -100,6 +119,19 @@ function _TCT_get_document_data( $atts ) {
             });
         </script>";
 
+        $content .= '<div class="story-navigation-area">';
+            $content .= '<ul class="story-navigation-content-container left" style="">';
+                $content .= '<li><a href="/documents/" style="text-decoration: none;">Stories</a></li>';
+                $content .= '<li><i class="fal fa-angle-right"></i></li>';
+                $content .= '<li>';
+                $content .= $storyData['dcTitle'];
+                $content .= '</li>';
+            $content .= '</ul>';
+                $content .= '<ul class="story-navigation-content-container right" style="">
+                            <li class="rgt"><a title="next" href=""><i class="fal fa-angle-right" style="font-size: 20px;"></i></a></li>
+                        </ul>';
+        $content .= '</div>';
+
 $content .= "<div id='total-storypg' class='storypg-container'>";
     $content .= "<div class='main-storypg'>";
                 $content .= "<div class='storypg-info'>";
@@ -107,7 +139,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                         $content .= $storyData['dcTitle'];
                     $content .= "</h1>";
                     $content .= "<strong>Description</strong>";
-                    $content .= "<div>";
+                    $content .= "<div class='story-page-description-paragraph'>";
                         $content .= $storyData['dcDescription']; 
                     $content .= "</div>";
                 $content .= "</div>";
@@ -235,7 +267,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                             $content .= "</div>\n";
 
             $content .= "</div>";
-            $content .= "<div class='size'></div>";
+            $content .= "<div style='clear:both;'></div>";
     $content .= "</div>";
 $content .= "</div>";
 

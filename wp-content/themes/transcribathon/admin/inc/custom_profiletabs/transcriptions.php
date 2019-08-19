@@ -9,8 +9,8 @@ function _TCT_transcription_tab( $atts ) {
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/ProfileStatistics/".get_current_user_id();
-        $requestType = "POST";
+        $url = network_home_url()."/tp-api/profileStatistics/".get_current_user_id();
+        $requestType = "GET";
 
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
@@ -30,7 +30,7 @@ function _TCT_transcription_tab( $atts ) {
         echo "<div class=\"column-rgs span_1_of_5 alg_c\">\n";				
             echo "<div class=\"number-ball\">\n";
                 echo "<div class=\"theme-color-background number-ball-content\">\n";
-                    echo "<p>".number_format_i18n($profileStatistics['Characters'])."</p>";
+                    echo "<p>".number_format_i18n($profileStatistics['TranscriptionCharacters'])."</p>";
                     echo "<span>"._x('characters', 'Transcription-Tab on Profile', 'transcribathon'  )."</span>";
                 echo "</div>\n";
             echo "</div>\n";	

@@ -102,6 +102,12 @@
 	width: 205px;
 }
 
+#closeFilterContainer {
+  color: #666666;
+  text-align: right;
+  cursor: pointer;
+}
+
 .slidecontainer > * {
 	display: inline-block;
 }

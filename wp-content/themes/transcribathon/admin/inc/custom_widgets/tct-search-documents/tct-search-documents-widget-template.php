@@ -169,43 +169,43 @@ $content .= '</div>';
             
             $content .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
                         
-                    $content .=    '<div class="result-viewtype">';
+                    $content .=    '<div class="result-viewtype" id="btnContainer">';
                         $content .=    '<ul class="content-view-bar">';
-                            $content .=    '<li class="content-view-grid">';
-                            $content .=        '<a href="" class="content-view-button">';
-                            $content .= '<i class="far fa-th-large theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
-                            $content .=            'Grid';
-                            $content .=        '</a>';
-                            $content .=    '</li>';
                             $content .=   '<li class="content-view-list">';
-                            $content .=       '<a href="" class="content-view-button">';
+                            $content .=       '<button class="content-view-button view-btn" id="list">';
                             $content .= '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
                             $content .=           'List';
-                            $content .=       '</a>';
+                            $content .=       '</button>';
                             $content .=   '</li>';
+                            $content .= '<li class="content-view-grid" id="grid">';
+                            $content .= '<button class="content-view-button view-btn">';
+                            $content .= '<i class="far fa-th-large theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
+                            $content .=            'Grid';
+                            $content .=        '</button>';
+                            $content .=    '</li>';
                         $content .=   '</ul>';
                     $content .=   '</div>';
             $content .= '</div>';
-
+        
              /*    $content .= '<div class="search-content-results-headline search-division-detail">';
-                     $content .= '<div class="">';
-                         $content .= '<span class="">Per page</span>';
-                             $content .= '<div class="">';
-                                 $content .= '<a class="" href="#" data-dropdown="">';
-                                 $content .= '12';
-                                 $content .= '</a>';
-                                 $content .= '<div id="" class="">';
-                                 $content .= '<ul class="">';
-                                     $content .= '<li class="active"><a href="/portal/en/search?locale=en&amp;per_page=12&amp;q=" >12</a></li>';
-                                     $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=24&amp;q=" >24</a></li>';
-                                     $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=36&amp;q=" >36</a></li>';
-                                     $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=48&amp;q=" >48</a></li>';
-                                     $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=72&amp;q=" >72</a></li>';
-                                     $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=96&amp;q=" >96</a></li>';
-                                 $content .= '</ul>';
-                             $content .= '</div>';
-                     $content .= '</div>';
-                 $content .= '</div>';*/
+                        $content .= '<div class="">';
+                            $content .= '<span class="">Per page</span>';
+                                $content .= '<div class="">';
+                                    $content .= '<a class="" href="#" data-dropdown="">';
+                                    $content .= '12';
+                                    $content .= '</a>';
+                                    $content .= '<div id="" class="">';
+                                    $content .= '<ul class="">';
+                                        $content .= '<li class="active"><a href="/portal/en/search?locale=en&amp;per_page=12&amp;q=" >12</a></li>';
+                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=24&amp;q=" >24</a></li>';
+                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=36&amp;q=" >36</a></li>';
+                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=48&amp;q=" >48</a></li>';
+                                        $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=72&amp;q=" >72</a></li>';
+                                        $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=96&amp;q=" >96</a></li>';
+                                    $content .= '</ul>';
+                                $content .= '</div>';
+                        $content .= '</div>';
+                    $content .= '</div>';*/
          $content .= '</div>';
          
         // Search result pagination
@@ -213,27 +213,27 @@ $content .= '</div>';
         $pagination .= '<div class="story-search-pagination">';
             // Left arrows
             if ($page > 1) {
-                $pagination .= '<a class="theme-color-hover" href='.home_url( $wp->request ).'?pa=1>';
+                $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa=1>';
                     $pagination .= '&laquo;';
                 $pagination .= '</a>';
             }
 
             // Previous page
              if ($page != null && is_numeric($page) && $page > 1) {
-                 $pagination .= '<a class="theme-color-hover" href='.home_url( $wp->request ).'?pa='.($page - 1).'>';
+                 $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.($page - 1).'>';
                      $pagination .= ($page - 1);
                  $pagination .= '</a>';
              }
 
             // Current page
-             $pagination .= '<a class="theme-color-background" style="pointer-events: none; cursor: default;">';
+             $pagination .= '<a class="theme-color-background" style="outline: none; pointer-events: none; cursor: default;">';
                  $pagination .= $page;
              $pagination .= '</a>';
 
             // 3 next pages
             for ($i = 1; $i <= 3; $i++) {
                  if (((($page + $i) - 1) * 25) < $storyCount) {
-                     $pagination .= '<a class="theme-color-hover" href='.home_url( $wp->request ).'?pa='.($page + $i).'>';
+                     $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.($page + $i).'>';
                          $pagination .= ($page + $i);
                      $pagination .= '</a>';
                  }
@@ -241,7 +241,7 @@ $content .= '</div>';
 
              // Right arrows
             if ($page < ceil($storyCount / 25)) {
-                $pagination .= '<a class="theme-color-hover" href='.home_url( $wp->request ).'?pa='.ceil($storyCount / 25).'>';
+                $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.ceil($storyCount / 25).'>';
                     $pagination .= '&raquo;';
                 $pagination .= '</a>';
             }
@@ -266,9 +266,21 @@ $content .= '</div>';
                         $content .= '</p>';
                     $content .= '</div>';
                     $content .= '<div class="story-search-single-result-image">';
+                    
+                        
                         $image = json_decode($story['PreviewImageLink'], true);
                         $imageLink = $image['service']['@id'];
-                        $imageLink .= "/full/300,/0/default.jpg";
+                        if ($image["width"] <= $image["height"]) {
+                            $imageLink .= "/0,0,".$image["width"].",".$image["width"];
+                        }
+                        else {
+                            $imageLink .= "/0,0,".$image["height"].",".$image["height"];
+                        }
+                        $imageLink .= "/280,140/0/default.jpg";
+                        /*
+                        $image = json_decode($story['PreviewImageLink'], true);
+                        $imageLink = $image['service']['@id'];
+                        $imageLink .= "/full/300,/0/default.jpg";*/
 
                         $content .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
                             $content .= '<img src='.$imageLink.'>';
@@ -276,13 +288,29 @@ $content .= '</div>';
                     $content .= '</div>';
                     $content .= '<div style="clear:both"></div>';
                 $content .= '</div>';
-                $content .= '<hr />';
+
             }   
+            
+        $content .= '<script>
+                        jQuery(document).ready(function(){
+                            jQuery("#grid").click(function(){
+                            jQuery(".story-search-single-result").addClass("maingridview");
+                            jQuery(".story-search-single-result-info").removeClass(".story-search-single-result-description");
+                            jQuery(this).addClass("active").prev().removeClass("active");
+                            });
+                            jQuery("#list").click(function(){
+                            jQuery(".story-search-single-result").removeClass("maingridview");
+                            jQuery(".story-search-single-result-info").addClass(".story-search-single-result-description");
+
+                                jQuery(this).addClass("active").next().removeClass("active");
+                            });
+                        });
+        </script>';
         $content .= '</div>';
+
         
         // Pagination below search results
         $content .= $pagination;
-
 
     
  $content .= '</section>';
