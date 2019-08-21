@@ -9,36 +9,47 @@ Description: Gets stories from the API and displays them
 //function _TCT_get_stories( $atts ) {  }
 
 $theme_sets = get_theme_mods();
- /* Domain name of the Solr server */
- define('SOLR_SERVER_HOSTNAME', network_home_url());
 
- /* Whether or not to run in secure mode */
- define('SOLR_SECURE', true);
+$facetFields = [
+    [
+    "fieldName" => "edmCountry",
+    "fieldLabel" => "PROVIDING COUNTRY"]
+];
+/*
+$facetFields[] = (object) array(
+        "fieldName" => "edmCountry",
+        "fieldLabel" => "PROVIDING COUNTRY"
+);*/
 
- /* HTTP Port to connection */
- define('SOLR_SERVER_PORT', ((SOLR_SECURE) ? 8443 : 8983));
 
- /* HTTP Basic Authentication Username */
- //define('SOLR_SERVER_USERNAME', 'admin');
-
- /* HTTP Basic Authentication password */
- //define('SOLR_SERVER_PASSWORD', 'changeit');
-
- /* HTTP connection timeout */
- /* This is maximum time in seconds allowed for the http data transfer operation. Default value is 30 seconds */
- define('SOLR_SERVER_TIMEOUT', 10);
-
- $url = network_home_url()."tp-api/storiesMinimal/count";
+ $url = home_url()."/tp-api/storiesMinimal/count";
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
 
  $storyCount = json_decode($result, true);
 
+ //$url = "http://fresenia.man.poznan.pl:8983/solr/transcribathon/select?facet.field=edmCountry&facet=on&q=*%3A*";
+ $url = 'http://fresenia.man.poznan.pl:8983/solr/transcribathon/select?facet.field=edmCountry&facet=on&q=*:*&fq=';
+
+ foreach ($facetFields as $facetField) {
+    for ($i = 0; $i < sizeof($_GET[$facetField['fieldName']]); $i++) {
+       $url .= $facetField['fieldName'].':"'.str_replace(" ", "+", $_GET[$facetField['fieldName']][$i]).'"';
+       if ($i + 1 < sizeof($_GET[$facetField['fieldName']])) {
+           $url .= "+OR+";
+       }
+    }
+ }
+
+ $requestType = "GET";
+
+ include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
+ $solrData = json_decode($result, true);
+
  $requestData = array(
      'key' => 'testKey'
  );
- $url = network_home_url()."tp-api/storiesMinimal";
+ $url = home_url()."/tp-api/storiesMinimal";
  if ($_GET['pa'] != null && is_numeric($_GET['pa']) && (($_GET['pa'] - 1) * 25) < $storyCount && $_GET['pa'] != 0) {
     $url .= "?pa=".$_GET['pa'];
  }
@@ -71,6 +82,39 @@ $content .= '<section class="complete-search-content">';
 
 $content .= '<div class="search-content-left">';
 $content .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
+
+foreach ($facetFields as $facetField) {
+    $content .= '<form id="story-facet-form">';
+        $content .= '<div class="search-panel-default collapse-controller">';
+            $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#'.$facetField['fieldName'].'-area" 
+            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
+                $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
+                    $content .= '<li style="font-size:14px;">'.$facetField['fieldLabel'].'</li>';
+                $content .= '</h4>';
+                $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
+            $content .= '</div>';
+
+            $content .= "<div id='".$facetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
+                    $facetData = $solrData['facet_counts']['facet_fields'][$facetField['fieldName']];
+                    for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
+                        if ($i + 1 != 0) {
+                            $content .= '<label class="search-container theme-color">';
+                                $content .= $facetData[$i].' ('.$facetData[$i+1].')';
+                                $checked = "";
+                                if (isset($_GET[$facetField['fieldName']]) && in_array($facetData[$i], $_GET[$facetField['fieldName']])) {
+                                    $checked = "checked";
+                                }
+                                $content .= '<input id="type-letter-checkbox" type="checkbox" name="edmCountry[]" value="'.$facetData[$i].'"
+                                                '.$checked.' onChange="this.form.submit()">
+                                                <span class="theme-color-background checkmark"></span>';
+                            $content .= '</label>';
+                        }
+                    }
+            $content .= '</div>';
+        $content .= '</div>';
+    $content .= '</form>';
+}
 
 $content .= '<div class="search-panel-default collapse-controller">';
     $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#type-area" 
@@ -187,25 +231,7 @@ $content .= '</div>';
                     $content .=   '</div>';
             $content .= '</div>';
         
-             /*    $content .= '<div class="search-content-results-headline search-division-detail">';
-                        $content .= '<div class="">';
-                            $content .= '<span class="">Per page</span>';
-                                $content .= '<div class="">';
-                                    $content .= '<a class="" href="#" data-dropdown="">';
-                                    $content .= '12';
-                                    $content .= '</a>';
-                                    $content .= '<div id="" class="">';
-                                    $content .= '<ul class="">';
-                                        $content .= '<li class="active"><a href="/portal/en/search?locale=en&amp;per_page=12&amp;q=" >12</a></li>';
-                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=24&amp;q=" >24</a></li>';
-                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=36&amp;q=" >36</a></li>';
-                                        $content .= '<li><a href="/portal/en/search?locale=en&amp;per_page=48&amp;q=" >48</a></li>';
-                                        $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=72&amp;q=" >72</a></li>';
-                                        $content .= '<li ><a href="/portal/en/search?locale=en&amp;per_page=96&amp;q=" >96</a></li>';
-                                    $content .= '</ul>';
-                                $content .= '</div>';
-                        $content .= '</div>';
-                    $content .= '</div>';*/
+
          $content .= '</div>';
          
         // Search result pagination
@@ -285,7 +311,11 @@ $content .= '</div>';
                         $content .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
                             $content .= '<img src='.$imageLink.'>';
                         $content .= "</a>";
+                        $content .= '<div class="search-document-progress-bar" style="height: 20px;
+                        background: #eeeeee;
+                        width: 100%;"></div>';
                     $content .= '</div>';
+                   
                     $content .= '<div style="clear:both"></div>';
                 $content .= '</div>';
 

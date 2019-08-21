@@ -14,7 +14,7 @@ function _TCT_item_page( $atts ) {
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/items/".$_GET['item'];
+        $url = home_url()."/tp-api/items/".$_GET['item'];
         $requestType = "GET";
         $isLoggedIn = is_user_logged_in();
 
@@ -26,7 +26,7 @@ function _TCT_item_page( $atts ) {
         $itemData = $itemData[0];
 
         // Set request parameters for story data
-        $url = network_home_url()."/tp-api/stories/".$itemData['StoryId'];
+        $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
         $requestType = "GET";
 
         // Execude http request
@@ -42,24 +42,27 @@ function _TCT_item_page( $atts ) {
         // Build Item page content
         $content = "";
         $content = "<style>
-                        .transcription-toggle>a:hover {
-                            color: ".$theme_sets['vantage_general_link_color']." !important;
-                        }
-                        
-                        #transcription-selected-languages.language-selected ul li {
-                            background: ".$theme_sets['vantage_general_link_color']." ;
-                        }
-                                                
-                        .item-page-slider button.slick-prev.slick-arrow:hover {
-                            background: ".$theme_sets['vantage_general_link_color']." ;
-                            color: #ffffff;
-                        }
-                        
-                        .item-page-slider button.slick-next.slick-arrow:hover {
-                            background: ".$theme_sets['vantage_general_link_color']." ;
-                            color: #ffffff;
-                        }
-                    
+                            .transcription-toggle>a:hover {
+                                color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+                            }
+
+                            #transcription-selected-languages.language-selected ul li {
+                                background: ".$theme_sets['vantage_general_link_hover_color']." ;
+                                color: #ffffff;
+                            }
+                                                    
+                            .item-page-slider button.slick-prev.slick-arrow:hover {
+                                background: ".$theme_sets['vantage_general_link_hover_color']." ;
+                                color: #ffffff;
+                                opacity: 0.7;
+                            }
+                            
+                            .item-page-slider button.slick-next.slick-arrow:hover {
+                                background: ".$theme_sets['vantage_general_link_hover_color']." ;
+                                color: #ffffff;
+                                opacity: 0.7;
+                            }              
+
                     </style>";
 
         $content .= '<script>
@@ -90,6 +93,20 @@ function _TCT_item_page( $atts ) {
                             }
                         }
                     </script>';
+
+
+        $content .= '<div id="item-page-login-container">';
+            $content .=   '<div id="item-page-login-modal">';
+                $content .=   '<div class="modal-header theme-color-background">';
+                    $content .=      '<span class="close">&times;</span>';
+                $content .=  '</div>';
+                $content .=  '<div class="modal-body">';
+                    $content .= do_shortcode('[ultimatemember form_id="40"]');
+                $content .= '</div>';
+                $content .= '<div class="modal-footer theme-color-background">';
+                $content .= '</div>';
+            $content .= '</div>';
+        $content .= '</div>';
         // Image viewer
         $imageViewer = "";
             $imageViewer .= '<div id="openseadragon">  <div class="buttons" id="buttons">';
@@ -101,13 +118,17 @@ function _TCT_item_page( $atts ) {
             $imageViewer .= '<div id="rotate-left"><i class="far fa-undo"></i></div>';
             $imageViewer .= '<div id="filterButton"><i class="far fa-sliders-h"></i></div>';
             $imageViewer .= '<div id="full-page"><i class="far fa-expand-arrows-alt"></i></div>';
-            $imageViewer .= '<div id="transcribeIcon"><i class="far fa-pen"></i></div>';
-            $imageViewer .= '</div></div>';
+            if($isLoggedIn) {
+                $imageViewer .= '<div id="transcribe"><i class="far fa-pen"></i></div>';
+              } else {
+                $imageViewer .= '<div id="transcribe locked"><i class="far fa-lock" id="lock-login"></i></div>';
+              }
+              $imageViewer .= '</div></div>';
 
         // Editor tab
         $editorTab = "";
             // Set request parameters for status data
-            $url = network_home_url()."/tp-api/completionStatus";
+            $url = home_url()."/tp-api/completionStatus";
             $requestType = "GET";
 
             // Execude http request
@@ -291,7 +312,7 @@ function _TCT_item_page( $atts ) {
 
                     $editorTab .= '<div id="transcription-language-selector" class="language-selector">';
                             // Set request parameters for language data
-                        $url = network_home_url()."/tp-api/languages";
+                        $url = home_url()."/tp-api/languages";
                         $requestType = "GET";
 
                             // Execude http request
@@ -316,12 +337,13 @@ function _TCT_item_page( $atts ) {
                             if ($transcriptionData[0]['Languages'] != null) {
                                 $transcriptionLanguages = $transcriptionData[0]['Languages'];
                                         foreach($transcriptionLanguages as $transcriptionLanguage) {
-                                            $editorTab .= "<li onClick='removeTranscriptionLanguage(".$transcriptionLanguage['LanguageId'].", this)'>";
+                                            $editorTab .= "<li class='theme-colored-data-box'>";
                                                 $editorTab .= $transcriptionLanguage['Name'];
                                                 $editorTab .= '<script>
-                                                                    jQuery("#transcription-language-selector option[value=\''.$transcriptionLanguage['LanguageId'].'\'").prop("disabled", true)
-                                                                </script>';
-                                            $editorTab .= '</li>';
+                                                            jQuery("#transcription-language-selector option[value=\''.$transcriptionLanguage['LanguageId'].'\'").prop("disabled", true)
+                                                        </script>';
+                                        $editorTab .= '<i class="far fa-times-circle" onClick="removeTranscriptionLanguage('.$transcriptionLanguage['LanguageId'].', this)"></i>';
+                                        $editorTab .= '</li>';
                                         }
                             }
                         $editorTab .= '</ul>';
@@ -389,7 +411,7 @@ function _TCT_item_page( $atts ) {
                     $editorTab .= "<div id=\"description-area\" class=\"description-save collapse show\">";
                         $editorTab .= "<div id=\"category-checkboxes\">";
                             // Set request parameters for category data
-                            $url = network_home_url()."/tp-api/properties?PropertyType=Category";
+                            $url = home_url()."/tp-api/properties?PropertyType=Category";
                             $requestType = "GET";
 
                             // Execude http request
@@ -517,7 +539,9 @@ function _TCT_item_page( $atts ) {
 
         // Info tab
         $infoTab = "";
-            $infoTab .= '<div id="info-collapse-headline-container" class="item-page-section-headline-container">';
+        $infoTab .= '<div class="item-page-section additional-info-bottom">';
+            $infoTab .= '<div id="info-collapse-headline-container" class="item-page-section-headline-container collapse-headline collapse-controller" data-toggle="collapse" href="#additional-information-area"
+                onClick="">';
                 $infoTab .= '<h4 id="info-collapse-heading" class="theme-color item-page-section-headline">';
                     $infoTab .= 'Additional Information';
                 $infoTab .= '</h4>';
@@ -525,7 +549,7 @@ function _TCT_item_page( $atts ) {
             $infoTab .= '</div>';
             $infoTab .= '<div style="clear: both;"></div>';
 
-            $infoTab .= '<div>';
+            $infoTab .= '<div id="additional-information-area">';
                 $infoTab .= "<h4 class='theme-color item-page-section-headline'>";
                     $infoTab .= "Title: ".$itemData['Title'];
                 $infoTab .= "</h4>";
@@ -534,7 +558,7 @@ function _TCT_item_page( $atts ) {
                 $infoTab .= "</p>";
 
                 // Set request parameters
-                $url = network_home_url()."/tp-api/fieldMappings";
+                $url = home_url()."/tp-api/fieldMappings";
                 $requestType = "GET";
 
                 // Execude request
@@ -671,7 +695,7 @@ function _TCT_item_page( $atts ) {
                                     $taggingTab .= '<h6 class="collapse-controller" data-toggle="collapse" href="#location-data-output-'.$place['PlaceId'].'">';
                                         $taggingTab .= $place['Name'];
                                     $taggingTab .= '</h6>';
-                                    $taggingTab .= '<i class="delete-item-data fal fa-trash-alt" 
+                                    $taggingTab .= '<i class="delete-item-data fas fa-pencil" 
                                                         onClick="deleteItemData(\'places\', '.$place['PlaceId'].', '.$_GET['item'].', \'place\')"></i>';
                                     $taggingTab .= '<div style="clear:both;"></div>';
                                 $taggingTab .= '</div>';
@@ -767,7 +791,7 @@ function _TCT_item_page( $atts ) {
                                         onClick="
                                             jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
                                             jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';                                          
-                        $taggingTab .= '<h6 class="theme-color item-data-input-headline">';
+                        $taggingTab .= '<h6 class="theme-color item-data-input-headline" title="Click to add Person data">';
                             $taggingTab .= 'Add Person data';
                             $taggingTab .= '<i class="fas fa-plus-circle"></i>';
                         $taggingTab .= '</h6>';
@@ -855,30 +879,85 @@ function _TCT_item_page( $atts ) {
                                     $description = "";
                                 } 
                                 $taggingTab .= '<li id="person-'.$person['PersonId'].'">';
-                                    $taggingTab .= '<div class="item-data-output-element-header">';
-                                        $taggingTab .= '<h6 class="person-data-ouput-headline collapse-controller" data-toggle="collapse" href="#person-data-output-'.$person['PersonId'].'">';
+                                    $taggingTab .= '<div class="item-data-output-element-header collapse-controller" data-toggle="collapse" href="#person-data-output-'.$person['PersonId'].'">';
+                                        $taggingTab .= '<h6 class="person-data-ouput-headline">';
                                             $taggingTab .= $firstName.' '.$lastName;
                                         $taggingTab .= '</h6>';
-                                        $taggingTab .= '<i class="delete-item-data fal fa-trash-alt" 
-                                                            onClick="deleteItemData(\'persons\', '.$person['PersonId'].', '.$_GET['item'].', \'person\')"></i>';
+                                        $taggingTab .= '<i class="fas fa-angle-down" style= "float:right;"></i>';
                                         $taggingTab .= '<div style="clear:both;"></div>';
                                     $taggingTab .= '</div>';
+
                                     $taggingTab .= '<div id="person-data-output-'.$person['PersonId'].'" class="collapse">';
-                                        $taggingTab .= '<span>';
-                                            $taggingTab .= 'Birth: ';
-                                            $taggingTab .= $birthDate.' '.$birthPlace;
-                                        $taggingTab .= '</span>';
-                                        $taggingTab .= '</br>';
-                                        $taggingTab .= '<span>';
-                                            $taggingTab .= 'Death: ';
-                                            $taggingTab .= $deathDate.' '.$deathPlace;
-                                        $taggingTab .= '</span>';
-                                        $taggingTab .= '</br>';
-                                        $taggingTab .= '<span>';
-                                            $taggingTab .= 'Description: ';
-                                            $taggingTab .= $description;
-                                        $taggingTab .= '</span>';
+                                        $taggingTab .= '<div id="person-data-output-display-'.$person['PersonId'].'" class="person-data-output-content">';
+                                            $taggingTab .= '<div class="person-data-output-birthDeath">';
+                                                $taggingTab .= '<span>';
+                                                    $taggingTab .= 'Birth Location: ';
+                                                    $taggingTab .= $birthPlace;
+                                                $taggingTab .= '</span>';
+                                                $taggingTab .= '</br>';
+                                                $taggingTab .= '<span>';
+                                                    $taggingTab .= 'Death Location: ';
+                                                    $taggingTab .= $deathPlace;
+                                                $taggingTab .= '</span>';
+                                            $taggingTab .= '</div>';
+                                            $taggingTab .= '<div class="person-data-output-birthDeath">';
+                                                $taggingTab .= '<span>';
+                                                    $taggingTab .= 'Birth Date: ';
+                                                    $taggingTab .= $birthDate;
+                                                $taggingTab .= '</span>';
+                                                $taggingTab .= '</br>';
+                                                $taggingTab .= '<span>';
+                                                    $taggingTab .= 'Death Date: ';
+                                                    $taggingTab .= $deathDate;
+                                                $taggingTab .= '</span>';
+
+                                                $taggingTab .= '</br>';
+        
+                                                $taggingTab .= '<div class="person-data-output-buttom">';
+                                                    $taggingTab .= '<span>';
+                                                        $taggingTab .= 'Description: ';
+                                                        $taggingTab .= $description;
+                                                    $taggingTab .= '</span>';
+                                                    $taggingTab .= '<i class="edit-item-data-icon fas fa-pencil theme-color-hover" 
+                                                                        onClick="editPerson('.$person['PersonId'].')"></i>';
+                                                    $taggingTab .= '<i class="edit-item-data-icon fal fa-trash-alt theme-color-hover" 
+                                                                        onClick="deleteItemData(\'persons\', '.$person['PersonId'].', '.$_GET['item'].', \'person\')"></i>';
+                                                $taggingTab .= '</div>';
+                                            $taggingTab .= '</div>';
+                                            $taggingTab .= '<div style="clear:both;"></div>';  
+                                        $taggingTab .= '</div>';
+
+                                        $taggingTab .= '<div class="person-data-edit-container" id="person-data-edit-'.$person['PersonId'].'">';
+                                            $taggingTab .= '<div id="person-input-names-container">';
+                                                $taggingTab .= '<input type="text" id="person-firstName-input" class="person-input-field" value="'.$firstName.'" style="outline:none;">';
+                                                $taggingTab .= '<input type="text" id="person-lastName-input" class="person-input-field" value="'.$lastName.'">';
+                                            $taggingTab .= '</div>'; 
+    
+                                            $taggingTab .= '<div id="person-location-birth-inputs">';
+                                                $taggingTab .= '<input type="text" id="person-birthPlace-input"   class="person-input-field" value="'.$birthPlace.'">';
+                                                $taggingTab .= '<input type="text" id="person-birthDate-input" class="person-input-field" value="'.$birthDate.'">';
+                                            $taggingTab .= '</div>'; 
+    
+                                            $taggingTab .= '<div id="person-location-death-inputs">';
+                                                $taggingTab .= '<input type="text" id="person-deathPlace-input" class="person-input-field" value="'.$deathPlace.'">';
+                                                $taggingTab .= '<input type="text" id="person-deathDate-input" class="person-input-field" value="'.$deathDate.'">';
+                                            $taggingTab .= '</div>';    
+    
+                                            $taggingTab .= '<div id="person-description-input">';
+                                                $taggingTab .= '<label>Additional description:</label><br/>';
+                                                $taggingTab .= '<input type="text" class="person-input-field" value="'.$description.'">';
+                                            $taggingTab .= '</div>';
+    
+                                            $taggingTab .= "<button id='save-personinfo-button' class='theme-color-background' id='person-save-button'>";
+                                                $taggingTab .= "SAVE";
+                                            $taggingTab .= "</button>";
+                                            $taggingTab .= '<div id="item-person-spinner-container" class="spinner-container spinner-container-left">';
+                                                $taggingTab .= '<div class="spinner"></div>';
+                                            $taggingTab .= "</div>";
+                                            $taggingTab .= '<div style="clear:both;"></div>';           
+                                        $taggingTab .= '</div>';
                                     $taggingTab .= '</div>';
+
                                 $taggingTab .= '</li>';
                             }
                         $taggingTab .= '</ul>';
@@ -890,52 +969,48 @@ function _TCT_item_page( $atts ) {
 
                 //key word metadata area
                 $taggingTab .= '<div id="item-page-keyword-container">';
-                    $taggingTab .= '<div id="item-page-person-headline" class="collapse-headline collapse-controller" data-toggle="collapse" href="#keyword-input-container">';                                   
-                        $taggingTab .= '<h6 class="theme-color item-data-input-headline">';
-                            $taggingTab .= 'Keywords';
-                            $taggingTab .= '<i class="fas fa-plus-circle"></i>';
-                        $taggingTab .= '</h6>';
-                    $taggingTab .= '</div>';
-                    $taggingTab .= '<div id="keyword-input-container" class="collapse">';
-                        $taggingTab .= '<input type="text" id="keyword-input" name="" placeholder="">';
-                        $taggingTab .= "<button id='keyword-save-button' type='submit' class='theme-color-background'
-                                            onClick='saveKeyword(".$itemData['ItemId'].", ".get_current_user_id()."
-                                            , \"".$statusTypes[1]['ColorCode']."\", ".sizeof($progressData).")'>";
-                            $taggingTab .= 'Save';
-                        $taggingTab .= '</button>';
-                        $taggingTab .= '<div id="item-keyword-spinner-container" class="spinner-container spinner-container-left">';
-                            $taggingTab .= '<div class="spinner"></div>';
-                        $taggingTab .= "</div>";
-                        $taggingTab .= '<div style="clear: both;"></div>';
-                    $taggingTab .= '</div>';
-                    
-                    $taggingTab .= '<div id="item-keyword-list" class="item-data-output-list">';
-                        $taggingTab .= '<ul>';
-                            foreach ($itemData['Properties'] as $property) {
-                                if ($property['PropertyType'] == "Keyword") {
-                                    $taggingTab .= '<li id="keyword-'.$property['PropertyId'].'">';
-                                        $taggingTab .= '<div class="item-data-output-element-header">';
-                                            $taggingTab .= '<h6 class="keyword-data-ouput-headline">';
-                                                $taggingTab .= $property['PropertyValue'];
-                                            $taggingTab .= '</h6>';
-                                            $taggingTab .= '<i class="delete-item-data fal fa-trash-alt" 
-                                                                onClick="deleteItemData(\'properties\', '.$property['PropertyId'].', '.$_GET['item'].', \'keyword\')"></i>';
-                                            $taggingTab .= '<div style="clear:both;"></div>';
-                                        $taggingTab .= '</div>';
-                                    $taggingTab .= '</li>';
-                                }
-                            }
-                        $taggingTab .= '</ul>';
-                    $taggingTab .= '</div>';
+                $taggingTab .= '<div id="item-page-person-headline" class="collapse-headline collapse-controller" data-toggle="collapse" href="#keyword-input-container">';                                   
+                $taggingTab .= '<h6 class="theme-color item-data-input-headline" title="Click to add keywords">';
+                        $taggingTab .= 'Keywords';
+                        $taggingTab .= '<i class="fas fa-plus-circle"></i>';
+                    $taggingTab .= '</h6>';
+                $taggingTab .= '</div>';
+                $taggingTab .= '<div id="keyword-input-container" class="collapse">';
+                    $taggingTab .= '<input type="text" id="keyword-input" name="" placeholder="">';
+                    $taggingTab .= "<button id='keyword-save-button' type='submit' class='theme-color-background'
+                                        onClick='saveKeyword(".$itemData['ItemId'].", ".get_current_user_id()."
+                                        , \"".$statusTypes[1]['ColorCode']."\", ".sizeof($progressData).")'>";
+                        $taggingTab .= 'SAVE';
+                    $taggingTab .= '</button>';
+                    $taggingTab .= '<div id="item-keyword-spinner-container" class="spinner-container spinner-container-left">';
+                        $taggingTab .= '<div class="spinner"></div>';
+                    $taggingTab .= "</div>";
+                    $taggingTab .= '<div style="clear: both;"></div>';
                 $taggingTab .= '</div>';
 
-                $taggingTab .= '<hr>';
+                $taggingTab .= '<div id="item-keyword-list" class="item-data-output-listt">';
+                $taggingTab .= '<ul>';
+                    foreach ($itemData['Properties'] as $property) {
+                        if ($property['PropertyType'] == "Keyword") {
+                            $taggingTab .= '<li id="add-item-keyword" class="theme-color-background">';
+                                        $taggingTab .= $property['PropertyValue'];
+                                    $taggingTab .= '<i class="delete-item-datas far fa-times-circle" style="cursor: pointer; padding: 2px;"
+                                                        onClick="deleteItemData(\'properties\', '.$property['PropertyId'].', '.$_GET['item'].', \'keyword\')"></i>';
+                            
+                                  $taggingTab .= '</li>';
+                              }
+                          }
+                      $taggingTab .= '</ul>';
+                  $taggingTab .= '</div>';
+              $taggingTab .= '</div>';
+        
 
+              $taggingTab .= '<hr>';
                 //other sources metadata area
                 $taggingTab .= '<div id="item-page-link-container">';
                     //add source link collapse heading
                     $taggingTab .= '<div class= "collapse-headline collapse-controller" data-toggle="collapse" href="#link-input-container">';
-                        $taggingTab .= '<h6 class="theme-color item-data-input-headline">';
+                    $taggingTab .= '<h6 class="theme-color item-data-input-headline" title="Click to add a link">';
                             $taggingTab .= 'Other Sources';
                             $taggingTab .= '<i class="fas fa-plus-circle"></i>';
                         $taggingTab .= '</h6>';
@@ -948,7 +1023,7 @@ function _TCT_item_page( $atts ) {
                             $taggingTab .= '</div>';
                             
                             $taggingTab .= '<div id="link-url-input">';
-                                $taggingTab .= '<input class="saving-link-test" type="text" name="" placeholder="Enter URL here">';
+                                $taggingTab .= '<input class="saving-link-test" type="url" name="" placeholder="Enter URL here">';
                             $taggingTab .= '</div>';
 
                             $taggingTab .= '<div id="link-description-input">';
@@ -983,7 +1058,7 @@ function _TCT_item_page( $atts ) {
                                             $taggingTab .= '<a href="'.$property['PropertyValue'].'" target="_blank">';
                                                 $taggingTab .= $property['PropertyValue'];
                                             $taggingTab .= '</a>';
-                                            $taggingTab .= '<i class="delete-item-data fal fa-trash-alt" 
+                                            $taggingTab .= '<i class="delete-item-data fas fa-pencil" 
                                                                 onClick="deleteItemData(\'properties\', '.$property['PropertyId'].', '.$_GET['item'].', \'link\')"></i>';
                                             $taggingTab .= '<div style="clear:both;"></div>';
                                         $taggingTab .= '</div>';
@@ -1001,6 +1076,7 @@ function _TCT_item_page( $atts ) {
                 $taggingTab .= '</div>';
             $taggingTab .= '</div>';
 
+            $taggingTab .= '<hr>';
 
         // Comment section
         $commentSection = "";
@@ -1028,7 +1104,7 @@ function _TCT_item_page( $atts ) {
                             $commentSection .= "<a href=\"https://transcribathon.com/wp-admin/profile.php\" aria-label=\"Logged in as ".wp_get_current_user()->display_name.". Edit your profile.\">";
                                 $commentSection .= "Logged in as ".wp_get_current_user()->display_name."";
                             $commentSection .= "</a>.";
-                            $commentSection .= "<a href=\"".wp_logout_url(network_home_url())."\">";
+                            $commentSection .= "<a href=\"".wp_logout_url(home_url())."\">";
                                 $commentSection .= "Log out?";
                             $commentSection .= "</a>";
                         $commentSection .= "</p>";
@@ -1073,10 +1149,11 @@ function _TCT_item_page( $atts ) {
                 }
                 $imageLink .= "/150,150/0/default.jpg";
                 if ($initialSlide == null && $item['ItemId'] == $_GET['item']){
-                    $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' class='slider-current-item'>";
+                    $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' class='slider-current-item'>";
                         $content .= "<div class='slider-current-item-pointer'></div>";
                         $content .= "<div class='label-img-status shadow-img-corner'></div>";
-                        $content .= "<div class='label-img-status review-img'></div>";
+                        $content .= "<div class='label-img-status' 
+                                        style='border-color: ".$item['CompletionStatusColorCode']." transparent transparent ".$item['CompletionStatusColorCode']."'></div>";
                         $content .= "<div class='image-numbering theme-color-background'>";
                             $content .= ($i + 1);
                         $content .= "</div>";
@@ -1087,9 +1164,10 @@ function _TCT_item_page( $atts ) {
                     $i++;
                 }
                 else {
-                    $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
+                    $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
                         $content .= "<div class='label-img-status shadow-img-corner'></div>";
-                        $content .= "<div class='label-img-status review-img'></div>";
+                        $content .= "<div class='label-img-status' 
+                                        style='border-color: ".$item['CompletionStatusColorCode']." transparent transparent ".$item['CompletionStatusColorCode']."'></div>";
                         $content .= "<div class='image-numbering theme-color-background'>";
                             $content .= ($i + 1);
                         $content .= "</div>";
@@ -1201,11 +1279,13 @@ $content .= "<script>
 
             $content .= '<div class="item-navigation-area">';
                 $content .= '<ul class="item-navigation-content-container left" style="">';
-                    $content .= '<li><a href="/documents/" style="text-decoration:none;">Stories</a></li>';
+                    $content .= '<li><a href="'.home_url().'/documents" style="text-decoration:none;">Stories</a></li>';
                     $content .= '<li><i class="fal fa-angle-right"></i></li>';
-                    $content .= '<li><a href="" style="text-decoration:none;">';
-                    $content .= $itemData['Title'];
-                    $content .= '</a></li>';
+                    $content .= '<li><span style="text-decoration:none;">';
+                        $content .= '<a href="'.home_url().'/documents/story?story='.$itemData['StoryId'].'">';
+                            $content .= $storyData['dcTitle'];
+                        $content .= '</a>';
+                    $content .= '</span></li>';
                     /*$content .= '<li><i class="fal fa-angle-right"></i></li>';
                     $content .= '<li><span>item number</span></li>';*/
                 $content .= '</ul>';
@@ -1262,16 +1342,31 @@ $content .= "<script>
 
             // Image section
             $content .= "<div id='item-image-section' class='panel-left'>";
-            $content .= '<div id="openseadragonFS">  <div class="buttons" id="buttonsFS">';
-            $content .= '<div id="zoom-inFS"><i class="far fa-plus"></i></div>';
-            $content .= '<div id="zoom-outFS"><i class="far fa-minus"></i></div>';
-            $content .= '<div id="homeFS"><i class="far fa-home"></i></div>';
-            $content .= '<div id="full-widthFS"><i class="far fa-arrows-alt-h"></i></div>';
-            $content .= '<div id="rotate-rightFS"><i class="far fa-redo"></i></div>';
-            $content .= '<div id="rotate-leftFS"><i class="far fa-undo"></i></div>';
-            $content .= '<div id="filterButtonFS"><i class="far fa-sliders-h"></i></div>';
-            $content .= '<div id="full-pageFS"><i class="far fa-compress-arrows-alt"></i></div>';
-            $content .= '</div></div>';
+                $content .= '<div id="openseadragonFS">';
+                    $content .= '<div class="buttons" id="buttonsFS">';
+                        $content .= '<div id="zoom-inFS"><i class="far fa-plus"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="zoom-outFS"><i class="far fa-minus"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="homeFS"><i class="far fa-home"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="full-widthFS"><i class="far fa-arrows-alt-h"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="rotate-rightFS"><i class="far fa-redo"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="rotate-leftFS"><i class="far fa-undo"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="filterButtonFS"><i class="far fa-sliders-h"></i>';
+                        $content .= '</div>';
+                        $content .= '<div id="full-pageFS"><i class="far fa-compress-arrows-alt"></i>';
+                        $content .= '</div>';
+                        if($isLoggedIn) {
+                            $content .= '<div id="transcribe"><i class="far fa-pen"></i></div>';
+                        } else {
+                            $content .= '<div id="transcribe locked"><i class="far fa-lock" id="lock-loginFS"></i></div>';
+                        }
+                    $content .= '</div>';
+                $content .= '</div>';
             $content .= "</div>";
 
             // Resize slider
@@ -1330,7 +1425,7 @@ $content .= "<script>
                     //Status Chart
 
                     // Set request parameters for status data
-                    $url = network_home_url()."/tp-api/completionStatus";
+                    $url = home_url()."/tp-api/completionStatus";
                     $requestType = "GET";
 
                     // Execude http request

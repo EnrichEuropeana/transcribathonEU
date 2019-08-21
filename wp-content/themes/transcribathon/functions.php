@@ -94,9 +94,16 @@ function embedd_custom_javascripts_and_css() {
         /* custom.php containing theme color CSS */
         wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
         wp_enqueue_style( 'custom-css' );
+        
      }
  }
  add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
+
+ wp_register_script( 'my-script', 'myscript_url' );
+ wp_enqueue_script( 'my-script' );
+ $translation_array = array( 'home_url' => home_url() );
+ //after wp_enqueue_script
+ wp_localize_script( 'my-script', 'WP_URLs', $translation_array );
 
 
 /* SHORTCODES */

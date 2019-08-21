@@ -1,8 +1,11 @@
+var home_url = WP_URLs.home_url;
+
 jQuery ( document ).ready(function() {
   installEventListeners()
 });
 
 function uninstallEventListeners() {
+
   jQuery("#startdateentry").datepicker("destroy");
   jQuery("#enddateentry").datepicker("destroy");
   jQuery("#person-birthDate-input").datepicker("destroy");
@@ -11,10 +14,19 @@ function uninstallEventListeners() {
 }
 
 function installEventListeners() { 
+
+  jQuery(document).keyup(function(e) {
+    if (e.key === "Escape") {
+       if (jQuery('#image-view-container').css('display') != "none") {
+         switchItemPageView();
+       }
+    }
+  });
+  
   var keyWordList = [];   
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/properties?PropertyType=Keyword'
+      'url': home_url + '/tp-api/properties?PropertyType=Keyword'
   },
   function(response) {
     var response = JSON.parse(response);
@@ -44,8 +56,9 @@ function installEventListeners() {
   jQuery('#transcription-language-selector select').change(function(){
     jQuery('#no-text-selector').css('display','none');
     jQuery('#transcription-selected-languages ul').append(
-            '<li onClick="removeTranscriptionLanguage(' + jQuery('#transcription-language-selector option:selected').val() + ', this)">' 
+            '<li>' 
               + jQuery('#transcription-language-selector option:selected').text() 
+            + '<i class="far fa-times-circle" onClick="removeTranscriptionLanguage(' + jQuery('#transcription-language-selector option:selected').val() + ', this)"></i>'
             + '</li>');
     jQuery('#transcription-language-selector option:selected').prop("disabled", true);   
     var transcriptionText = jQuery('#item-page-transcription-text').text();     
@@ -182,10 +195,12 @@ function switchItemView(event, viewName) {
   icons = document.getElementsByClassName("view-switcher-icons");
   for (i = 0; i < icons.length; i++) {
     icons[i].className = icons[i].className.replace(" active", "");
+    icons[i].className = icons[i].className.replace(" theme-color", "");
   }
 
   // Make icon active
   event.currentTarget.className += " active";
+  event.currentTarget.className += " theme-color";
   switch(viewName) {
     case 'horizontal':
 
@@ -440,9 +455,9 @@ function updateDataProperty(dataType, id, fieldName, value) {
   data[fieldName] = value;
 
   var dataString= JSON.stringify(data);
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'POST',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/' + dataType + '/' + id,
+      'url': home_url + '/tp-api/' + dataType + '/' + id,
       'data': data
   },
   // Check success and create confirmation message
@@ -472,9 +487,9 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
           }
   var dataString= JSON.stringify(data);
 	
-	jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+	jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
 		'type': 'GET',
-		'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+		'url': home_url + '/tp-api/items/' + itemId
 	},
 	function(response) {
 		// Check success and create confirmation message
@@ -482,9 +497,9 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
     var descriptionCompletion = JSON.parse(response.content)[0]["DescriptionStatusName"];
     var oldDescription = JSON.parse(response.content)[0]["Description"];
     
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'POST',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
+      'url': home_url + '/tp-api/items/' + itemId,
       'data': data
     },
     // Check success and create confirmation message
@@ -503,9 +518,9 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
                     ScoreType: "Description",
                     Amount: amount
                   }
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+          'url': home_url + '/tp-api/scores',
           'data': scoreData
       },
       // Check success and create confirmation message
@@ -543,9 +558,9 @@ function updateItemTranscription(itemId, userId, currentTranscription, editStatu
     noText = 1
   }
 
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'GET',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+    'url': home_url + '/tp-api/items/' + itemId
   },
     function(response) {
       var response = JSON.parse(response);
@@ -553,7 +568,7 @@ function updateItemTranscription(itemId, userId, currentTranscription, editStatu
       var transcriptionCompletion = JSON.parse(response.content)[0]["TranscriptionStatusName"];
       
       var newTranscriptionLength = 0
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/strip_tags.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/strip_tags.php', {
         'text': jQuery('#item-page-transcription-text').html().replace("&nbsp;", " ")
       },
       function(response) {
@@ -571,9 +586,9 @@ function updateItemTranscription(itemId, userId, currentTranscription, editStatu
           Languages: transcriptionLanguages,
           }
       var dataString= JSON.stringify(data);
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'POST',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/transcriptions',
+        'url': home_url + '/tp-api/transcriptions',
         'data': data
       },
       // Check success and create confirmation message
@@ -592,9 +607,9 @@ function updateItemTranscription(itemId, userId, currentTranscription, editStatu
                       ScoreType: "Transcription",
                       Amount: amount
                     }
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
             'type': 'POST',
-            'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+            'url': home_url + '/tp-api/scores',
             'data': scoreData
         },
         // Check success and create confirmation message
@@ -626,9 +641,9 @@ function updateItemTranscription(itemId, userId, currentTranscription, editStatu
       LanguageId: transcriptionLanguages[i]
     }
     var dataString= JSON.stringify(data);
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'POST',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/transcriptionLanguages',
+    'url': home_url + '/tp-api/transcriptionLanguages',
     'data': data
     },
     // Check success and create confirmation message
@@ -648,9 +663,9 @@ function addItemProperty(itemId, userId, e) {
           }
   var dataString= JSON.stringify(data);
   if (e.checked) {
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'POST',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties',
+        'url': home_url + '/tp-api/itemProperties',
         'data': data
     },
     // Check success and create confirmation message
@@ -661,9 +676,9 @@ function addItemProperty(itemId, userId, e) {
                     ScoreType: "Enrichment",
                     Amount: 1
                   }
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+          'url': home_url + '/tp-api/scores',
           'data': scoreData
       },
       // Check success and create confirmation message
@@ -672,18 +687,18 @@ function addItemProperty(itemId, userId, e) {
     });
   }
   else {
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'GET',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties?ItemId=' + itemId + '&PropertyId=' + propertyId,
+        'url': home_url + '/tp-api/itemProperties?ItemId=' + itemId + '&PropertyId=' + propertyId,
     },
     // Check success and create confirmation message
     function(response) {
       var response = JSON.parse(response);
       if (response.code == "200") {
         var itemPropertyId = JSON.parse(response.content)[0]['ItemPropertyId'];
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'DELETE',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/itemProperties/' + itemPropertyId
+          'url': home_url + '/tp-api/itemProperties/' + itemPropertyId
         },
         // Check success and create confirmation message
         function(response) {
@@ -703,9 +718,9 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
 
   if (fieldName != "CompletionStatusId") {
     if (oldStatus == null) {
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'GET',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+        'url': home_url + '/tp-api/items/' + itemId
       },
       // Check success and create confirmation message
       function(response) {
@@ -817,7 +832,7 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
 function removeTranscriptionLanguage(languageId, e) {
   jQuery("#transcription-language-selector option[value='" + languageId + "']").prop("disabled", false)  
   jQuery("#transcription-language-selector select").val("") 
-  jQuery(e).remove()
+  jQuery(e.closest("li")).remove()
   var transcriptionText = jQuery('#item-page-transcription-text').text();  
   var languages = jQuery('#transcription-selected-languages ul').children().length;   
   if(transcriptionText.length != 0 && languages > 0) {
@@ -862,16 +877,16 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
           }
   var dataString= JSON.stringify(data);
   
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'GET',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+    'url': home_url + '/tp-api/items/' + itemId
   },
     function(response) {
       var response = JSON.parse(response);
       var locationCompletion = JSON.parse(response.content)[0]["LocationStatusName"];
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/places',
+          'url': home_url + '/tp-api/places',
           'data': data
       },
       // Check success and create confirmation message
@@ -882,9 +897,9 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
                       ScoreType: "Location",
                       Amount: 1
                     }
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
             'type': 'POST',
-            'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+            'url': home_url + '/tp-api/scores',
             'data': scoreData
         },
         // Check success and create confirmation message
@@ -918,16 +933,16 @@ function saveItemDate(itemId, userId, editStatusColor, statusCount) {
   }
   
   var dataString= JSON.stringify(data);
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'GET',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+    'url': home_url + '/tp-api/items/' + itemId
   },
     function(response) {
       var response = JSON.parse(response);
       var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId,
+          'url': home_url + '/tp-api/items/' + itemId,
           'data': data
       },
       // Check success and create confirmation message
@@ -938,9 +953,9 @@ function saveItemDate(itemId, userId, editStatusColor, statusCount) {
                       ScoreType: "Enrichment",
                       Amount: 1
                     }
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
             'type': 'POST',
-            'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+            'url': home_url + '/tp-api/scores',
             'data': scoreData
         },
         // Check success and create confirmation message
@@ -966,7 +981,7 @@ function savePerson(itemId, userId, editStatusColor, statusCount) {
   birthDate = jQuery('#person-birthDate-input').val().split('/');
   deathPlace = jQuery('#person-deathPlace-input').val();
   deathDate = jQuery('#person-deathDate-input').val().split('/');
-  description = jQuery('#person-description-input').val();
+  description = jQuery('#person-description-input input').val();
 
   if (firstName == "" && lastName == "") {
     return 0;
@@ -1002,16 +1017,16 @@ function savePerson(itemId, userId, editStatusColor, statusCount) {
   }
   
   var dataString= JSON.stringify(data);
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'GET',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+    'url': home_url + '/tp-api/items/' + itemId
   },
   function(response) {
     var response = JSON.parse(response);
     var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'POST',
-        'url': 'http://fresenia.man.poznan.pl/tp-api/persons',
+        'url': home_url + '/tp-api/persons',
         'data': data
     },
     // Check success and create confirmation message
@@ -1022,9 +1037,9 @@ function savePerson(itemId, userId, editStatusColor, statusCount) {
                     ScoreType: "Enrichment",
                     Amount: 1
                   }
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+          'url': home_url + '/tp-api/scores',
           'data': scoreData
       },
       // Check success and create confirmation message
@@ -1054,16 +1069,16 @@ function saveKeyword(itemId, userId, editStatusColor, statusCount) {
     }
 
     var dataString= JSON.stringify(data);
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+      'url': home_url + '/tp-api/items/' + itemId
     },
     function(response) {
       var response = JSON.parse(response);
       var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/properties?ItemId=' + itemId,
+          'url': home_url + '/tp-api/properties?ItemId=' + itemId,
           'data': data
       },
       // Check success and create confirmation message
@@ -1074,9 +1089,9 @@ function saveKeyword(itemId, userId, editStatusColor, statusCount) {
                       ScoreType: "Enrichment",
                       Amount: 1
                     }
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
             'type': 'POST',
-            'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+            'url': home_url + '/tp-api/scores',
             'data': scoreData
         },
         // Check success and create confirmation message
@@ -1095,7 +1110,7 @@ function saveKeyword(itemId, userId, editStatusColor, statusCount) {
   }
 }
 
-function saveLink(itemId, userId, editStatusColor, statusCount) {
+function saveLink(itemId, userId, editStatusColor, statusCount, e) {
   jQuery('#item-link-spinner-container').css('display', 'block')
   url = jQuery('#link-url-input input').val();
   description = jQuery('#link-description-input textarea').val();
@@ -1108,16 +1123,16 @@ function saveLink(itemId, userId, editStatusColor, statusCount) {
       PropertyType: "Link"
     }
     var dataString= JSON.stringify(data);
-    jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+      'url': home_url + '/tp-api/items/' + itemId
     },
     function(response) {
       var response = JSON.parse(response);
       var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
-      jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
-          'url': 'http://fresenia.man.poznan.pl/tp-api/properties?ItemId=' + itemId,
+          'url': home_url + '/tp-api/properties?ItemId=' + itemId,
           'data': data
       },
       // Check success and create confirmation message
@@ -1128,9 +1143,9 @@ function saveLink(itemId, userId, editStatusColor, statusCount) {
                       ScoreType: "Enrichment",
                       Amount: 1
                     }
-        jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+        jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
             'type': 'POST',
-            'url': 'http://fresenia.man.poznan.pl/tp-api/scores',
+            'url': home_url + '/tp-api/scores',
             'data': scoreData
         },
         // Check success and create confirmation message
@@ -1152,9 +1167,9 @@ function saveLink(itemId, userId, editStatusColor, statusCount) {
 
 function loadPlaceData(itemId) {
   // Get new location list
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/places?ItemId=' + itemId
+      'url': home_url + '/tp-api/places?ItemId=' + itemId
   },
   function(response) {
     var response = JSON.parse(response);
@@ -1195,9 +1210,9 @@ function loadPlaceData(itemId) {
 
 function loadPersonData(itemId) {
   // Get new person list
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/persons?ItemId=' + itemId
+      'url': home_url + '/tp-api/persons?ItemId=' + itemId
   },
   function(response) {
     var response = JSON.parse(response);
@@ -1287,9 +1302,9 @@ function loadPersonData(itemId) {
 
 function loadKeywordData(itemId) {
   // Get new keyword list
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+      'url': home_url + '/tp-api/items/' + itemId
   },
   function(response) {
     var response = JSON.parse(response);
@@ -1299,15 +1314,10 @@ function loadKeywordData(itemId) {
       for (var i = 0; i < content[0]['Properties'].length; i++) {  
         if (content[0]['Properties'][i]['PropertyType'] == "Keyword") { 
           jQuery('#item-keyword-list ul').append( 
-            '<li id="keyword-' + content[0]['Properties'][i]['PropertyId'] + '">' +
-              '<div class="item-data-output-element-header">' +
-                '<h6 class="keyword-data-ouput-headline">' +
-                  content[0]['Properties'][i]['PropertyValue'] +
-                '</h6>' +
-                '<i class="delete-item-data fal fa-trash-alt"' +
+            '<li id="add-item-keyword" class="theme-color-background">' +
+            jQuery('#keyword-input:selected').text() +
+                '<i class="delete-item-datas far fa-times-circle"' +
                     'onClick="deleteItemData(\'properties\', ' + content[0]['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'keyword\')"></i>' +
-                '<div style="clear:both;"></div>' +
-              '</div>' +
             '</li>'
           )
         }
@@ -1318,9 +1328,9 @@ function loadKeywordData(itemId) {
 
 function loadLinkData(itemId) {
   // Get new link list
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
-      'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + itemId
+      'url': home_url + '/tp-api/items/' + itemId
   },
   function(response) {
     var response = JSON.parse(response);
@@ -1361,9 +1371,9 @@ function loadLinkData(itemId) {
 }
 
 function deleteItemData(type, id, itemId, section) {
-  jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
     'type': 'DELETE',
-    'url': 'http://fresenia.man.poznan.pl/tp-api/' + type + '/' + id
+    'url': home_url + '/tp-api/' + type + '/' + id
   },
   function(response) {
     switch (section) {
@@ -1430,4 +1440,9 @@ function getMoreTopsPage(myid,limit,kind,cp,subject,showshortnames){
 			alert(res.content);	
 		}
 	});
+}
+
+function editPerson(personId) {
+  jQuery('#person-data-edit-' + personId).css('display', 'block');
+  jQuery('#person-data-output-display-' + personId).css('display', 'none');
 }

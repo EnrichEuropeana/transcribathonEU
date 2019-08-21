@@ -38,6 +38,12 @@ echo ".theme-color-border{
 echo "div.um-profile-nav div.um-profile-nav-item.active a{
     border-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
 }";
+echo ".um-button{
+    color: #fff !important;
+    background-color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+    background-image: none !important;
+}";
+
 // Project-Navigation
 $sites = get_sites(array('site__not_in'=>array('1'),'deleted'=>0));
 foreach($sites as $s){

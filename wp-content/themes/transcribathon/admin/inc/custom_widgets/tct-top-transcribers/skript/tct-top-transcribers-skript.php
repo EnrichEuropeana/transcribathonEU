@@ -162,7 +162,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 				*/
 			}else{ // Invdl
 				// Set request parameters for image data
-				$url = network_home_url()."/tp-api/rankings/userCount";
+				$url = home_url()."/tp-api/rankings/userCount";
 				$requestType = "GET";
 
 				// Execude http request
@@ -175,7 +175,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 					$base = (floor(((int)$alltops-1) / $limit)) * $limit;
 				}
 				// Set request parameters for image data
-				$url = network_home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
+				$url = home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
 				$requestType = "GET";
 	
 				// Execude http request
@@ -290,7 +290,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttmtrs"):
 
 	
 	// Set request parameters for image data
-	$url = network_home_url()."/tp-api/rankings/userCount";
+	$url = home_url()."/tp-api/rankings/userCount";
 	$requestType = "GET";
 
 	// Execude http request

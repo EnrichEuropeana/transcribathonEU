@@ -24,7 +24,7 @@ function _TCT_get_document_data( $atts ) {
         $storyId = $_GET['story'];
 
         // Set request parameters
-        $url = network_home_url()."/tp-api/stories/".$storyId;
+        $url = home_url()."/tp-api/stories/".$storyId;
         $requestType = "GET";
     
         // Execude request
@@ -36,8 +36,8 @@ function _TCT_get_document_data( $atts ) {
 
         // Top image slider 
         $content .= "<div class='story-page-slider'>";
+            $i = 0;
             foreach ($storyData['Items'] as $item) {
-                
                 $image = json_decode($item['ImageLink'], true);
                 $imageLink = $image['service']['@id'];
                 if ($image["width"] <= $image["height"]) {
@@ -47,9 +47,16 @@ function _TCT_get_document_data( $atts ) {
                     $imageLink .= "/0,0,".$image["height"].",".$image["height"];
                 }
                 $imageLink .= "/250,250/0/default.jpg";
-                $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'><img data-lazy='".$imageLink."'></a>";
-                //$content .= '<div class="label shad"></div>';
-                //$content .= '<div class="label complete"></div>';
+                $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
+                    $content .= "<div class='label-img-status shadow-img-corner'></div>";
+                    $content .= "<div class='label-img-status' 
+                                    style='border-color: ".$item['CompletionStatusColorCode']." transparent transparent ".$item['CompletionStatusColorCode']."'></div>";
+                    $content .= "<div class='image-numbering theme-color-background'>";
+                        $content .= ($i + 1);
+                    $content .= "</div>";
+                    $content .= "<img data-lazy='".$imageLink."'>";
+                $content .= "</a>";
+                $i++;
             }
                 
         $content .= "</div>";
@@ -121,7 +128,7 @@ function _TCT_get_document_data( $atts ) {
 
         $content .= '<div class="story-navigation-area">';
             $content .= '<ul class="story-navigation-content-container left" style="">';
-                $content .= '<li><a href="/documents/" style="text-decoration: none;">Stories</a></li>';
+                $content .= '<li><a href="'.home_url().'/documents/" style="text-decoration: none;">Stories</a></li>';
                 $content .= '<li><i class="fal fa-angle-right"></i></li>';
                 $content .= '<li>';
                 $content .= $storyData['dcTitle'];
@@ -148,7 +155,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
             $content .= "<div id='story-page-right-side' class='storypg-chart'>";
 
                 // Set request parameters for status data
-                $url = network_home_url()."/tp-api/completionStatus";
+                $url = home_url()."/tp-api/completionStatus";
                 $requestType = "GET";
             
                 // Execude http request
@@ -215,10 +222,10 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                             </script>";
                             
                             $statusPercentage = array(
-                                "Not Started" => intval(($statusCount['Not Started']*100)/$itemCount),
-                                "Edit" => intval(($statusCount['Edit']*100)/$itemCount),
-                                "Review" => intval(($statusCount['Review']*100)/$itemCount),
-                                "Completed" => intval(($statusCount['Completed']*100)/$itemCount)
+                                "Not Started" => round(($statusCount['Not Started']*100)/$itemCount),
+                                "Edit" => round(($statusCount['Edit']*100)/$itemCount),
+                                "Review" => round(($statusCount['Review']*100)/$itemCount),
+                                "Completed" => round(($statusCount['Completed']*100)/$itemCount)
                             );
 
                 $content .= "<table width=\"100%\">\n";
@@ -234,7 +241,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                             $content .= "<div class=\"facts\">\n";
                             
                                 // Set request parameters
-                                $url = network_home_url()."/tp-api/fieldMappings";
+                                $url = home_url()."/tp-api/fieldMappings";
                                 $requestType = "GET";
                             
                                 // Execude request

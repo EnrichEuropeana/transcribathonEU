@@ -14,7 +14,7 @@ function _TCT_item_page_test_iiif( $atts ) {
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/items/".$_GET['item'];
+        $url = home_url()."/tp-api/items/".$_GET['item'];
         $requestType = "GET";
 
         // Execude http request
@@ -25,7 +25,7 @@ function _TCT_item_page_test_iiif( $atts ) {
         $itemData = $itemData[0];
 
         // Set request parameters for story data
-        $url = network_home_url()."/tp-api/stories/".$itemData['StoryId'];
+        $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
         $requestType = "GET";
 
         // Execude http request
@@ -73,7 +73,7 @@ function _TCT_item_page_test_iiif( $atts ) {
         // Editor tab
         $editorTab = "";
             // Set request parameters for status data
-            $url = network_home_url()."/tp-api/completionStatus";
+            $url = home_url()."/tp-api/completionStatus";
             $requestType = "GET";
 
             // Execude http request
@@ -640,7 +640,7 @@ function _TCT_item_page_test_iiif( $atts ) {
                             $commentSection .= "<a href=\"https://transcribathon.com/wp-admin/profile.php\" aria-label=\"Logged in as ".wp_get_current_user()->display_name.". Edit your profile.\">";
                                 $commentSection .= "Logged in as ".wp_get_current_user()->display_name."";
                             $commentSection .= "</a>.";
-                            $commentSection .= "<a href=\"".wp_logout_url(network_home_url())."\">";
+                            $commentSection .= "<a href=\"".wp_logout_url(home_url())."\">";
                                 $commentSection .= "Log out?";
                             $commentSection .= "</a>";
                         $commentSection .= "</p>";
@@ -872,7 +872,7 @@ $content .= "<script>
                             $content .= "<li>";
 
                                     // Set request parameters for status data
-                                    $url = network_home_url()."/tp-api/completionStatus";
+                                    $url = home_url()."/tp-api/completionStatus";
                                     $requestType = "GET";
 
                                     // Execude http request

@@ -357,7 +357,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 		}else{ // Invdl
 			
 			// Set request parameters for image data
-			$url = network_home_url()."/tp-api/rankings/userCount";
+			$url = home_url()."/tp-api/rankings/userCount";
 			$requestType = "GET";
 
 			// Execude http request
@@ -370,7 +370,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 			}
 			
 			// Set request parameters for image data
-			$url = network_home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
+			$url = home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
 			$requestType = "GET";
 
 			// Execude http request
