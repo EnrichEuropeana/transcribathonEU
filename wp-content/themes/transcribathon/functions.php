@@ -84,6 +84,9 @@ function embedd_custom_javascripts_and_css() {
         /* diff-match-patch (Transcription text comparison) JS*/
         wp_enqueue_script( 'diff-match-patch', CHILD_TEMPLATE_DIR . '/js/diff-match-patch.js');
 
+        /* jQuery pagination */
+        wp_enqueue_script( 'pagination', CHILD_TEMPLATE_DIR . '/js/pagination.min.js');
+
         /* custom JS and CSS*/
         wp_enqueue_script( 'custom', CHILD_TEMPLATE_DIR . '/js/custom.js');
         wp_enqueue_style('child-style', get_stylesheet_directory_uri() .'/style.css', array('parent-style'));
@@ -91,9 +94,19 @@ function embedd_custom_javascripts_and_css() {
         /* custom.php containing theme color CSS */
         wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
         wp_enqueue_style( 'custom-css' );
+
+	/* mapbox js and style*/
+        wp_enqueue_script( 'mapbox-gl', 'https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js', null, null, true );
+	wp_enqueue_style('mapblox-gl', CHILD_TEMPLATE_DIR . '/css/mapbox-gl.css'); 
      }
  }
  add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
+
+ wp_register_script( 'my-script', 'myscript_url' );
+ wp_enqueue_script( 'my-script' );
+ $translation_array = array( 'home_url' => home_url() );
+ //after wp_enqueue_script
+ wp_localize_script( 'my-script', 'WP_URLs', $translation_array );
 
 
 /* SHORTCODES */
@@ -136,6 +149,14 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-home-stats/tct-hom
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-icon-links/tct-icon-links-widget.php'); // Adds the widget for icon links
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-news-container/tct-news-container-widget.php'); // Adds the widget for news container
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-search-documents/tct-search-documents-widget.php'); // Adds the widget for document search
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-horizontal-line-hr/tct-horizontal-line-widget.php'); // Adds the widget for headline (hr)
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-tutorial-slider/tct-tutorial-slider-widget.php'); // Adds the widget for tutorial slider
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-storyboxes/tct-storyboxes-widget.php'); // Adds the widget for storyboxes
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-menulist/tct-menulist-widget.php'); // Adds the widget for menulist
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-headline/tct-headline-widget.php'); // Adds the widget for headline
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-colcontent/tct-colcontent-widget.php'); // Adds the widget for displaying content in different columns
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-boxes/tct-boxes-widget.php'); // Adds the widget for feature boxes
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-button/tct-button-widget.php'); // Adds the widget for a preformatted button
 
 function add_custom_widget_collection($folders){
     $folders[] = CHILD_TEMPLATE_DIR.'admin/inc/custom_widgets/';

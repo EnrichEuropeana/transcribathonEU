@@ -6,6 +6,7 @@ var tct_viewer = (function($, document, window) {
 			imageHeight,
 			imageWidth,
 			sliderHtml = '<div class="sliderContainer" id="filterContainer"> ' +
+										'  <div id="closeFilterContainer"><i class="fas fa-times"></i></div>' +
 								    '  <div class="slidecontainer">' +
 								    '    <div id="brightnessIcon" class="sliderIcon"></div>' +
 								    '    <input type="range" min="-100" max="100" value="0" class="iiifSlider" id="brightnessRange">' +
@@ -21,9 +22,9 @@ var tct_viewer = (function($, document, window) {
 								    '    <input type="range" min="-100" max="100" value="0" class="iiifSlider" id="saturationRange">' +
 								    '    <div id="saturationValue" class="sliderValue">0</div>' +
 								    '  </div>' +
-										'  <div class="slidecontainer">' +
-										    '    <div id="inverteIcon" class="sliderIcon">invert</div>' +
+										'  <div class="slidecontainer invert">' +										   
 										    '    <input type="checkbox" class="iiifCheckbox" id="invertRange">' +
+ 										    '    <div id="inverteIcon" class="sliderIcon">invert</div>' +
 										    '  </div>' +
 								    '  <div id="filterReset"><div class="resetText">Reset to default</div></div>' +
 								    '</div>';
@@ -44,6 +45,10 @@ var tct_viewer = (function($, document, window) {
 			openFilterOverlay('');
 		});
 
+		jQuery('#closeFilterContainer').click(function() {
+			jQuery('#filterContainer').hide();
+		})
+
 		jQuery('#full-pageFS').click(function() {
 			toggleFS();
 		});
@@ -51,7 +56,26 @@ var tct_viewer = (function($, document, window) {
 		jQuery('#full-widthFS').click(function() {
 			fullWidthFS();
 		});
+		jQuery('#transcribeIcon').click(function() {
+			toggleFS();
+			//open transcribe tab
+			var i, tabcontent, tablinks;
 
+		  // Hide all tab contents
+		  tabcontent = document.getElementsByClassName("tabcontent");
+		  for (i = 0; i < tabcontent.length; i++) {
+		    tabcontent[i].style.display = "none";
+		  }
+		  // Make tab icons inactive
+		  tablinks = document.getElementsByClassName("tablinks");
+		  for (i = 0; i < tablinks.length; i++) {
+		    tablinks[i].className = tablinks[i].className.replace(" active", "");
+		  }
+
+		  // Show clicked tab content and make icon active
+		  document.getElementById("editor-tab").style.display = "block";
+			document.getElementsByClassName("tablinks")[0].className += " active";
+		});
 		jQuery('#filterButtonFS').click(function() {
 			openFilterOverlay('FS');
 		});
@@ -354,50 +378,90 @@ var tct_viewer = (function($, document, window) {
 	  tinymce.init({
 	    selector: selector,
 	    inline: true,
+			fixed_toolbar_container: selector + '#tcttoolbar',
 	    height:120,
-	    plugins: ['charmap','paste'],
-	    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure position-in-doc',
-	    menubar: true,
+	    plugins: ['charmap','paste', 'autoresize', 'table'],
+	    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure side-info | charmap | table',
+			resize: true,
+	    menubar: false,
 	    browser_spellcheck: true,
 	    paste_auto_cleanup_on_paste : true,
 	    body_id: 'htranscriptor',
-	    setup: function (editor) {
-	      editor.ui.registry.addButton('missbut', {
-	        title: 'Insert an indicator for missing text',
-	        text: '',
-	        icon: 'missing',
-	        onAction: function () {
-	          editor.insertContent('<span style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\"> MISSING </span>');
-	        }
-	      });
-	      editor.ui.registry.addButton('unsure', {
-	        title: 'Mark selected as unclear',
-	        text: '',
-	        icon: 'unsure',
-	        onAction: function () {
-	          if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
-	            editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
-	          }else{
-	            if (editor.selection.getStart().className == "tct-uncertain") {
-	              var node = editor.selection.getStart();
-	              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-	            }
-	            else if (editor.selection.getEnd().className == "tct-uncertain"){
-	              var node = editor.selection.getEnd();
-	              node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
-	            }
-	            else{
-	              editor.insertContent('<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>');
-	            }
-	          }
-	        }
-	      });
-	    },
-	    style_formats: [
-	    {title: 'unclear, please review', inline: 'span', classes: 'tct_unclear'},
-	    {title: 'Note', inline: 'span', classes: 'tct_note'},
-	    {title: 'Badge', inline: 'span', styles: { display: 'inline-block', border: '1px solid #2276d2', 'border-radius': '5px', padding: '2px 5px', margin: '0 2px', color: '#2276d2' }}
-	    ],
+			init_instance_callback: function (editor) {
+        /*
+				editor.on('focus', function (e) {
+					jQuery('#mytoolbar-transcription').height('30px');
+				});
+				editor.on('blur', function (e) {
+					jQuery('#mytoolbar-transcription').height('0px');
+				});
+        */
+			},
+			setup: function (editor) {
+				console.log('in setup');
+				editor.ui.registry.addIcon('missing', '<i class="mce-ico mce-i-missing"></i>');
+    		editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
+				editor.ui.registry.addIcon('info', '<i class="mce-ico mce-i-pos-in-text"></i>');
+
+				editor.ui.registry.addButton('missbut', {
+					title: 'Insert an indicator for missing text',
+					icon: 'missing',
+					onAction: function () {
+						editor.insertContent('<img src="/wp-content/themes/transcribathon/images/tinyMCEImages/missing.gif" style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\" />');
+						}
+				});
+				editor.ui.registry.addButton('unsure', {
+					title: 'Mark selected as unclear',
+					icon: 'unsure',
+					onAction: function () {
+						if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
+							editor.insertContent('<span class=\"tct-uncertain\"> ...</span>')
+						}else{
+							if (editor.selection.getStart().className == "tct-uncertain") {
+								var node = editor.selection.getStart();
+								node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+							}
+							else if (editor.selection.getEnd().className == "tct-uncertain"){
+								var node = editor.selection.getEnd();
+								node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+							}
+							else{
+								editor.insertContent('&nbsp;<span class=\"tct-uncertain\">'+editor.selection.getContent({format : 'html'})+'</span>&nbsp;');
+							}
+						}
+					}
+				});
+        editor.ui.registry.addButton('side-info', {
+          title: 'Mark selected as side information',
+          text: '',
+          icon: 'info',
+          onAction: function () {
+            if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
+              editor.insertContent(' ');
+              editor.insertContent(' ' + '<span class=\"pos-in-text\"> ...</span>' + ' ');
+              editor.insertContent(' ');
+            }else{
+              if (editor.selection.getStart().className == "pos-in-text") {
+                var node = editor.selection.getStart();
+                node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+              }
+              else if (editor.selection.getEnd().className == "pos-in-text"){
+                var node = editor.selection.getEnd();
+                node.parentNode.replaceChild(document.createTextNode(node.innerHTML.replace("&nbsp;", "")), node);
+              }
+              else{
+                editor.insertContent('&nbsp;<span class=\"pos-in-text\">'+editor.selection.getContent({format : 'html'})+'</span>&nbsp;');
+              editor.insertContent(' ');
+              }
+            }
+          }
+        });
+			},
+			style_formats: [
+				    {title: 'unclear, please review', inline: 'span', classes: 'tct_unclear'},
+				    {title: 'Note', inline: 'span', classes: 'tct_note'},
+				    {title: 'Badge', inline: 'span', styles: { display: 'inline-block', border: '1px solid #2276d2', 'border-radius': '5px', padding: '2px 5px', margin: '0 2px', color: '#2276d2' }}
+				    ],
 	    formats: {
 	    alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'left' },
 	    aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },

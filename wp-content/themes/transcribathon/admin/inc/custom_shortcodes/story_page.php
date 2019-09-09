@@ -1,13 +1,30 @@
 <?php
 // get Document data from API
 function _TCT_get_document_data( $atts ) {   
+    //include theme directory for text hovering
+    $theme_sets = get_theme_mods();
+
+    // Build Story page content
     $content = "";
+    $content = "<style>
+                  
+                .story-page-slider:hover button.slick-prev.slick-arrow {
+                    background: ".$theme_sets['vantage_general_link_color']." !important;
+                    color: #ffffff;
+                }
+                
+                .story-page-slider:hover button.slick-next.slick-arrow {
+                    background: ".$theme_sets['vantage_general_link_color']." !important;
+                    color: #ffffff;
+                }
+
+            </style>";
     if (isset($_GET['story']) && $_GET['story'] != "") {
         // get Story Id from url parameter
         $storyId = $_GET['story'];
 
         // Set request parameters
-        $url = network_home_url()."/tp-api/stories/".$storyId;
+        $url = home_url()."/tp-api/stories/".$storyId;
         $requestType = "GET";
     
         // Execude request
@@ -19,8 +36,8 @@ function _TCT_get_document_data( $atts ) {
 
         // Top image slider 
         $content .= "<div class='story-page-slider'>";
+            $i = 0;
             foreach ($storyData['Items'] as $item) {
-                
                 $image = json_decode($item['ImageLink'], true);
                 $imageLink = $image['service']['@id'];
                 if ($image["width"] <= $image["height"]) {
@@ -30,9 +47,18 @@ function _TCT_get_document_data( $atts ) {
                     $imageLink .= "/0,0,".$image["height"].",".$image["height"];
                 }
                 $imageLink .= "/250,250/0/default.jpg";
-                $content .= "<a href='https://europeana.fresenia.man.poznan.pl/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'><img data-lazy='".$imageLink."'></a>";
-                
+                $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
+                    $content .= "<div class='label-img-status shadow-img-corner'></div>";
+                    $content .= "<div class='label-img-status' 
+                                    style='border-color: ".$item['CompletionStatusColorCode']." transparent transparent ".$item['CompletionStatusColorCode']."'></div>";
+                    $content .= "<div class='image-numbering theme-color-background'>";
+                        $content .= ($i + 1);
+                    $content .= "</div>";
+                    $content .= "<img data-lazy='".$imageLink."'>";
+                $content .= "</a>";
+                $i++;
             }
+                
         $content .= "</div>";
 
         // Image slider JavaScript
@@ -46,8 +72,8 @@ function _TCT_get_document_data( $atts ) {
             jQuery(document).ready(function(){
                 jQuery('.story-page-slider').slick({
                     dots: true,
-                    arrows: false,
                     infinite: ".$infinite.",
+                    arrows: true,
                     speed: 300,
                     slidesToShow: 8,
                     slidesToScroll: 8,
@@ -100,6 +126,19 @@ function _TCT_get_document_data( $atts ) {
             });
         </script>";
 
+        $content .= '<div class="story-navigation-area">';
+            $content .= '<ul class="story-navigation-content-container left" style="">';
+                $content .= '<li><a href="'.home_url().'/documents/" style="text-decoration: none;">Stories</a></li>';
+                $content .= '<li><i class="fal fa-angle-right"></i></li>';
+                $content .= '<li>';
+                $content .= $storyData['dcTitle'];
+                $content .= '</li>';
+            $content .= '</ul>';
+                $content .= '<ul class="story-navigation-content-container right" style="">
+                            <li class="rgt"><a title="next" href=""><i class="fal fa-angle-right" style="font-size: 20px;"></i></a></li>
+                        </ul>';
+        $content .= '</div>';
+
 $content .= "<div id='total-storypg' class='storypg-container'>";
     $content .= "<div class='main-storypg'>";
                 $content .= "<div class='storypg-info'>";
@@ -107,7 +146,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                         $content .= $storyData['dcTitle'];
                     $content .= "</h1>";
                     $content .= "<strong>Description</strong>";
-                    $content .= "<div>";
+                    $content .= "<div class='story-page-description-paragraph'>";
                         $content .= $storyData['dcDescription']; 
                     $content .= "</div>";
                 $content .= "</div>";
@@ -116,7 +155,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
             $content .= "<div id='story-page-right-side' class='storypg-chart'>";
 
                 // Set request parameters for status data
-                $url = network_home_url()."/tp-api/completionStatus";
+                $url = home_url()."/tp-api/completionStatus";
                 $requestType = "GET";
             
                 // Execude http request
@@ -183,10 +222,10 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                             </script>";
                             
                             $statusPercentage = array(
-                                "Not Started" => intval(($statusCount['Not Started']*100)/$itemCount),
-                                "Edit" => intval(($statusCount['Edit']*100)/$itemCount),
-                                "Review" => intval(($statusCount['Review']*100)/$itemCount),
-                                "Completed" => intval(($statusCount['Completed']*100)/$itemCount)
+                                "Not Started" => round(($statusCount['Not Started']*100)/$itemCount),
+                                "Edit" => round(($statusCount['Edit']*100)/$itemCount),
+                                "Review" => round(($statusCount['Review']*100)/$itemCount),
+                                "Completed" => round(($statusCount['Completed']*100)/$itemCount)
                             );
 
                 $content .= "<table width=\"100%\">\n";
@@ -202,7 +241,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                             $content .= "<div class=\"facts\">\n";
                             
                                 // Set request parameters
-                                $url = network_home_url()."/tp-api/fieldMappings";
+                                $url = home_url()."/tp-api/fieldMappings";
                                 $requestType = "GET";
                             
                                 // Execude request
@@ -218,15 +257,24 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                                 foreach ($storyData as $key => $value) {
                                     if ($fields[$key] != null && $fields[$key] != "") {
                                         $content .= "<dl>\n";
-                                        $content .= "<dt>".$fields[$key]."</dt>\n";
-                                        $content .= "<dd>".$value."</dd>\n";
+                                            $content .= "<dt>";
+                                                $content .= $fields[$key];
+                                            $content .= "</dt>\n";
+                                            $content .= "<dd>";
+                                                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                                                    $content .= "<a href=\"".$value."\">".$value."</a>";
+                                                }
+                                                else {
+                                                    $content .= $value;
+                                                }
+                                            $content .= "</dd>\n";
                                         $content .= "</dl>\n";
                                     }
                                 }
                             $content .= "</div>\n";
 
             $content .= "</div>";
-            $content .= "<div class='size'></div>";
+            $content .= "<div style='clear:both;'></div>";
     $content .= "</div>";
 $content .= "</div>";
 
