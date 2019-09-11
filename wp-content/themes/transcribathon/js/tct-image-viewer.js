@@ -1,4 +1,7 @@
+var home_url = WP_URLs.home_url;
+
 var tct_viewer = (function($, document, window) {
+	
 	var osdViewer,
 			osdViewerFS,
 			imageData,
@@ -6,7 +9,7 @@ var tct_viewer = (function($, document, window) {
 			imageHeight,
 			imageWidth,
 			sliderHtml = '<div class="sliderContainer" id="filterContainer"> ' +
-										'  <div id="closeFilterContainer">x</div>' +
+										'  <div id="closeFilterContainer"><i class="fas fa-times"></i></div>' +
 								    '  <div class="slidecontainer">' +
 								    '    <div id="brightnessIcon" class="sliderIcon"></div>' +
 								    '    <input type="range" min="-100" max="100" value="0" class="iiifSlider" id="brightnessRange">' +
@@ -22,9 +25,9 @@ var tct_viewer = (function($, document, window) {
 								    '    <input type="range" min="-100" max="100" value="0" class="iiifSlider" id="saturationRange">' +
 								    '    <div id="saturationValue" class="sliderValue">0</div>' +
 								    '  </div>' +
-										'  <div class="slidecontainer">' +
-										    '    <div id="inverteIcon" class="sliderIcon">invert</div>' +
+										'  <div class="slidecontainer invert">' +										   
 										    '    <input type="checkbox" class="iiifCheckbox" id="invertRange">' +
+ 										    '    <div id="inverteIcon" class="sliderIcon">invert</div>' +
 										    '  </div>' +
 								    '  <div id="filterReset"><div class="resetText">Reset to default</div></div>' +
 								    '</div>';
@@ -47,7 +50,10 @@ var tct_viewer = (function($, document, window) {
 
 		jQuery('#closeFilterContainer').click(function() {
 			jQuery('#filterContainer').hide();
-		})
+		});
+		jQuery('#openseadragonFS #closeFilterContainer').click(function() {
+			jQuery('#openseadragonFS #filterContainer').hide();
+		});
 
 		jQuery('#full-pageFS').click(function() {
 			toggleFS();
@@ -81,10 +87,19 @@ var tct_viewer = (function($, document, window) {
 		});
 
 		jQuery('#transcribe').click(function() {
-			if(!this[0].hasClass('locked')) {
+			if(!jQuery(this).children('i').hasClass('locked')) {
 				toggleFS();
+				switchItemView(event, 'popout')
+				tinymce.EditorManager.get('item-page-transcription-text').focus();
 				//TODO maximize
 			}
+		})
+
+		jQuery('#transcribeLockFS').click(function() {
+			lockWarning()
+		})
+		jQuery('#transcribeLock').click(function() {
+			lockWarning()
 		})
 
 		jQuery('#transcribeFS').click(function() {
@@ -98,14 +113,14 @@ var tct_viewer = (function($, document, window) {
 	getManifestUrl = function() {
 		jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
 		    'type': 'GET',
-		    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + getUrlParameter('item')
+		    'url': home_url + '/tp-api/items/' + getUrlParameter('item')
 			}, function(response) {
 			var response = JSON.parse(response);
 			if (response.code == "200") {
-	      imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
-	      imageLink = imageData['service']['@id'];
-	      imageHeight = imageData['height'];
-	      imageWidth = imageData['width'];
+				imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
+				imageLink = imageData['service']['@id'];
+				imageHeight = imageData['height'];
+				imageWidth = imageData['width'];
 				initViewers();
 			}
 		});

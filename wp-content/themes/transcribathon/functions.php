@@ -12,6 +12,10 @@ define( 'TCT_THEME_DIR_PATH', plugin_dir_path( __FILE__ ) );
 // Custom Theme-Settings for Transcribathon
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_themesettings/tct-themesettings.php');
 
+// ### ADMIN PAGES ### //
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/teams-admin-page.php'); // Adds teams admin page
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/campaigns-admin-page.php'); // Adds campaigns admin page
+
 // Custom shortcodes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
@@ -94,12 +98,15 @@ function embedd_custom_javascripts_and_css() {
         /* custom.php containing theme color CSS */
         wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
         wp_enqueue_style( 'custom-css' );
-        
+
+	/* mapbox js and style*/
+        wp_enqueue_script( 'mapbox-gl', 'https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js', null, null, true );
+	wp_enqueue_style('mapblox-gl', CHILD_TEMPLATE_DIR . '/css/mapbox-gl.css'); 
      }
  }
  add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
 
- wp_register_script( 'my-script', 'myscript_url' );
+ wp_register_script( 'my-script', '/myscript_url' );
  wp_enqueue_script( 'my-script' );
  $translation_array = array( 'home_url' => home_url() );
  //after wp_enqueue_script
@@ -162,6 +169,9 @@ function add_custom_widget_collection($folders){
 add_filter('siteorigin_widgets_widget_folders', 'add_custom_widget_collection');
 
 
+
+
+
 // ### HOOKS ### //
 add_action( 'um_profile_header_cover_area', 'my_profile_header_cover_area', 10, 1 );
 function my_profile_header_cover_area( $args ) {
@@ -181,3 +191,44 @@ function increase_upload( $bytes )
 {
   return 210000000; // 200 megabyte
 }
+
+add_action( 'um_registration_complete', 'transfer_new_user', 10, 2 );
+function transfer_new_user( $user_id, $args ) {
+    $url = home_url()."/tp-api/users";
+    $requestType = "POST";
+    $requestData = array(
+        'WP_UserId' => $user_id,
+        'Role' => "Member",
+        'WP_Role' => "Subscriber",
+        'Token' => "fdfsdkfjk"
+    );
+    
+    // Execude http request
+    include TCT_THEME_DIR_PATH.'admin/inc/custom_scripts/send_api_request.php';
+}
+
+
+
+// ### Functions ### //
+function tct_generatePassword($passwordlength = 8,$numNonAlpha = 0,$numNumberChars = 0, $useCapitalLetter = false ) {
+    $numberChars = '123456789';
+    $specialChars = '!$%&=?*-:;.,+~@_';
+    $secureChars = 'abcdefghjkmnpqrstuvwxyz';
+    $stack = '';
+    $stack = $secureChars;
+    if ( $useCapitalLetter == true )
+        $stack .= strtoupper ( $secureChars );
+    $count = $passwordlength - $numNonAlpha - $numNumberChars;
+    $temp = str_shuffle ( $stack );
+    $stack = substr ( $temp , 0 , $count );
+    if ( $numNonAlpha > 0 ) {
+        $temp = str_shuffle ( $specialChars );
+        $stack .= substr ( $temp , 0 , $numNonAlpha );
+    }
+    if ( $numNumberChars > 0 ) {
+        $temp = str_shuffle ( $numberChars );
+        $stack .= substr ( $temp , 0 , $numNumberChars );
+    }
+    $stack = str_shuffle ( $stack );
+    return $stack;
+} 

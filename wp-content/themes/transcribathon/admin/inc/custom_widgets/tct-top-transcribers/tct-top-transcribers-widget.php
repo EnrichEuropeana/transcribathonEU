@@ -38,19 +38,38 @@ class TCT_Top_Transcribers_Widget extends SiteOrigin_Widget {
 	function modify_form( $instance) {
 		global $wpdb;
 		$ex_campgns = array();
-		$cmp = $wpdb->get_results("SELECT campaign_title,id FROM ".$wpdb->prefix."user_campaigns ORDER BY campaign_title ASC,start DESC,ende DESC",ARRAY_A);
+
+		// Set request parameters
+		$url = home_url()."/tp-api/campaigns?Public=1";
+		$requestType = "GET";
+
+		// Execude http request
+		include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+		// Save data
+		$cmp = json_decode($result, true);
+
 		if(sizeof($cmp)>0){
 			foreach($cmp as $cp){
-				$ex_campgns[$cp['id']] = esc_html($cp['campaign_title']); 
+				$ex_campgns[$cp['CampaignId']] = esc_html($cp['Name']); 
 			}
 		}else{
 			$ex_campgns[''] = esc_html(_x('There are no campaigns', 'top-transcribers-widget (backend)','transcribathon')); 
 		}
 		$ex_tm_campgns = array();
-		$cmp = $wpdb->get_results("SELECT campaign_title,id FROM ".$wpdb->prefix."user_campaigns WHERE campaign_type='team_time' ORDER BY campaign_title ASC,start DESC,ende DESC",ARRAY_A);
+
+		// Set request parameters
+		$url = home_url()."/tp-api/campaigns?Public=0";
+		$requestType = "GET";
+
+		// Execude http request
+		include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+
+		// Save data
+		$cmp = json_decode($result, true);
+
 		if(sizeof($cmp)>0){
 			foreach($cmp as $cp){
-				$ex_tm_campgns[$cp['id']] = esc_html($cp['campaign_title']); 
+				$ex_tm_campgns[$cp['CampaignId']] = esc_html($cp['Name']); 
 			}
 		}else{
 			$ex_tm_campgns[''] = esc_html(_x('There are no team-based campaigns', 'top-transcribers-widget (backend)','transcribathon')); 

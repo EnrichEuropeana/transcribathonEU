@@ -8,12 +8,12 @@ function _TCT_get_document_data( $atts ) {
     $content = "";
     $content = "<style>
                   
-                .story-page-slider button.slick-prev.slick-arrow:hover {
+                .story-page-slider:hover button.slick-prev.slick-arrow {
                     background: ".$theme_sets['vantage_general_link_color']." !important;
                     color: #ffffff;
                 }
                 
-                .story-page-slider button.slick-next.slick-arrow:hover {
+                .story-page-slider:hover button.slick-next.slick-arrow {
                     background: ".$theme_sets['vantage_general_link_color']." !important;
                     color: #ffffff;
                 }

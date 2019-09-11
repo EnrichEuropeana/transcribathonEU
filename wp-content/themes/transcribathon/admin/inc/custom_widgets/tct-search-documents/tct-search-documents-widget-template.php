@@ -6,58 +6,172 @@ $base = 0;
 Description: Gets stories from the API and displays them
 */
 
-//function _TCT_get_stories( $atts ) {  }
-
 $theme_sets = get_theme_mods();
 
-$facetFields = [
+
+$storyFacetFields = [
     [
-    "fieldName" => "edmCountry",
-    "fieldLabel" => "PROVIDING COUNTRY"]
-];
-/*
-$facetFields[] = (object) array(
+        "fieldName" => "CompletionStatus",
+        "fieldLabel" => "COMPLETION STATUS"],
+    [
+        "fieldName" => "edmLanguage",
+        "fieldLabel" => "LANGUAGE"],
+    [
         "fieldName" => "edmCountry",
-        "fieldLabel" => "PROVIDING COUNTRY"
-);*/
+        "fieldLabel" => "PROVIDING COUNTRY"],
+    [
+        "fieldName" => "edmProvider",
+        "fieldLabel" => "AGGREGATOR"]
+];
+
+$itemFacetFields = [
+    [
+        "fieldName" => "ItemCompletionStatus",
+        "fieldLabel" => "COMPLETION STATUS"],
+    [
+        "fieldName" => "Categories",
+        "fieldLabel" => "DOCUMENT TYPE"],
+    [
+        "fieldName" => "Languages",
+        "fieldLabel" => "LANGUAGES"],
+];
 
 
- $url = home_url()."/tp-api/storiesMinimal/count";
- $requestType = "GET";
+$itemPage = $_GET['pi'];
+$storyPage = $_GET['ps'];
 
- include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
+ // Story Solr request start
 
- $storyCount = json_decode($result, true);
+ $url = 'http://fresenia.man.poznan.pl:8983/solr/Stories/select?facet=on';
 
- //$url = "http://fresenia.man.poznan.pl:8983/solr/transcribathon/select?facet.field=edmCountry&facet=on&q=*%3A*";
- $url = 'http://fresenia.man.poznan.pl:8983/solr/transcribathon/select?facet.field=edmCountry&facet=on&q=*:*&fq=';
+ foreach ($storyFacetFields as $storyFacetField) {
+    $url .= '&facet.field='.$storyFacetField['fieldName'];
+ }
 
- foreach ($facetFields as $facetField) {
-    for ($i = 0; $i < sizeof($_GET[$facetField['fieldName']]); $i++) {
-       $url .= $facetField['fieldName'].':"'.str_replace(" ", "+", $_GET[$facetField['fieldName']][$i]).'"';
-       if ($i + 1 < sizeof($_GET[$facetField['fieldName']])) {
-           $url .= "+OR+";
-       }
+ $url .= '&q=';
+ if ($_GET['qs'] != null && $_GET['qs'] != "") {
+    $url .= 'dcDescription:('.$_GET['qs'].')+OR+';
+    $url .= 'dcTitle:(*'.$_GET['qs'].'*)';
+ }
+ else {
+    $url .= '*:*';
+ }
+ $url .= '&fq=';
+
+
+ for ($j = 0; $j < sizeof($storyFacetFields); $j++) {
+    for ($i = 0; $i < sizeof($_GET[$storyFacetFields[$j]['fieldName']]); $i++) {
+        if ($i == 0) {
+            $url .= "(";
+        }
+        $url .= $storyFacetFields[$j]['fieldName'].':"'.str_replace(" ", "+", $_GET[$storyFacetFields[$j]['fieldName']][$i]).'"';
+        if ($i + 1 < sizeof($_GET[$storyFacetFields[$j]['fieldName']])) {
+            $url .= "+OR+";
+        }
+        else {
+            $url .= ")";
+            if (($j + 1) < sizeof($storyFacetFields) && sizeof($_GET[$storyFacetFields[$j+1]['fieldName']]) > 0) {
+                $url .= "+AND+";
+            }
+        }
     }
  }
-
- $requestType = "GET";
-
- include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
- $solrData = json_decode($result, true);
-
- $requestData = array(
-     'key' => 'testKey'
- );
- $url = home_url()."/tp-api/storiesMinimal";
- if ($_GET['pa'] != null && is_numeric($_GET['pa']) && (($_GET['pa'] - 1) * 25) < $storyCount && $_GET['pa'] != 0) {
-    $url .= "?pa=".$_GET['pa'];
+ if ($storyPage != null && is_numeric($storyPage) && $storyPage != 0){
+    $url .= "&rows=25&start=".(($storyPage - 1) * 25);
+ }
+ else {
+    $url .= "&rows=25&start=0";
  }
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
 
- $stories = json_decode($result, true);
+ $solrStoryData = json_decode($result, true);
+ 
+ $storyCount = $solrStoryData['response']['numFound'];
+ 
+ if ($storyPage != null && is_numeric($storyPage) && (($storyPage - 1) * 25) < $storyCount && $storyPage != 0){
+     $storyStart = (($storyPage - 1) * 25) + 1;
+     $storyEnd = $storyPage * 25;
+ }
+ else {
+     $storyPage = 1;
+     $storyStart = 1;
+     $storyEnd = 25;
+ }
+
+ // Story Solr request end
+
+
+ // Item Solr request start
+
+ $url = 'http://fresenia.man.poznan.pl:8983/solr/Items/select?facet=on';
+
+ foreach ($itemFacetFields as $itemFacetField) {
+    $url .= '&facet.field='.$itemFacetField['fieldName'];
+ }
+
+ $url .= '&q=';
+ if ($_GET['qi'] != null && $_GET['qi'] != "") {
+    $url .= 'TranscriptionText:('.$_GET['qi'].')+OR+';
+    $url .= 'Description:('.$_GET['qi'].')+OR+';
+    $url .= 'Title:(*'.$_GET['qi'].'*)';
+ }
+ else {
+    $url .= '*:*';
+ }
+ $url .= '&fq=';
+
+ $first = true;
+ for ($j = 0; $j < sizeof($itemFacetFields); $j++) {
+     if ($first == true) {
+        $first = false;
+     }
+     else if (sizeof($_GET[$itemFacetFields[$j]['fieldName']]) > 0) {
+        $url .= "+AND+";
+    }
+    for ($i = 0; $i < sizeof($_GET[$itemFacetFields[$j]['fieldName']]); $i++) {
+        if ($i == 0) {
+            $url .= "(";
+        }
+        $url .= $itemFacetFields[$j]['fieldName'].':"'.str_replace(" ", "+", $_GET[$itemFacetFields[$j]['fieldName']][$i]).'"';
+        if (($i + 1) < sizeof($_GET[$itemFacetFields[$j]['fieldName']])) {
+            $url .= "+OR+";
+        }
+        else {
+            $url .= ")";
+        }
+    }
+ }
+ 
+ if ($itemPage != null && is_numeric($itemPage) && $itemPage != 0){
+    $url .= "&rows=25&start=".(($itemPage - 1) * 25);
+ }
+ else {
+    $url .= "&rows=25&start=0";
+ }
+ 
+ $requestType = "GET";
+
+ include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
+
+ $solrItemData = json_decode($result, true);
+
+ $itemCount = $solrItemData['response']['numFound'];
+ 
+ if ($itemPage != null && is_numeric($itemPage) && (($itemPage - 1) * 25) < $itemCount && $itemPage != 0){
+     $itemStart = (($itemPage - 1) * 25) + 1;
+     $itemEnd = $itemPage * 25;
+ }
+ else {
+     $itemPage = 1;
+     $itemStart = 1;
+     $itemEnd = 25;
+ }
+
+ // Item Solr request end
+ 
+
 
  $content = "";
 
@@ -67,313 +181,484 @@ $facetFields[] = (object) array(
                  }
              </style>";
 
-$content .= '<section id="full-width-header" class="temp-back">';
-$content .= '<div class="searchable">';
-$content .= '<form class="search-bar" action="/action_page.php">';
-$content .= '<div class="theme-color"><input type="text" placeholder="Add a search item" name="search"></div>';
-$content .= '<button type="submit" class="theme-color-background"><i class="far fa-search" style="font-size: 20px; float:right;"></i></button>';
-$content .= '</form>';
-$content .= '</div>';
+$view = "grid";
 
-$content .= '</section>';
-
-$content .= "<div id='primary-full-width'>";
-$content .= '<section class="complete-search-content">';
-
-$content .= '<div class="search-content-left">';
-$content .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
-
-foreach ($facetFields as $facetField) {
-    $content .= '<form id="story-facet-form">';
-        $content .= '<div class="search-panel-default collapse-controller">';
-            $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#'.$facetField['fieldName'].'-area" 
-            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
-                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
-                    $content .= '<li style="font-size:14px;">'.$facetField['fieldLabel'].'</li>';
-                $content .= '</h4>';
-                $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
-            $content .= '</div>';
-
-            $content .= "<div id='".$facetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
-                    $facetData = $solrData['facet_counts']['facet_fields'][$facetField['fieldName']];
-                    for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
-                        if ($i + 1 != 0) {
-                            $content .= '<label class="search-container theme-color">';
-                                $content .= $facetData[$i].' ('.$facetData[$i+1].')';
-                                $checked = "";
-                                if (isset($_GET[$facetField['fieldName']]) && in_array($facetData[$i], $_GET[$facetField['fieldName']])) {
-                                    $checked = "checked";
-                                }
-                                $content .= '<input id="type-letter-checkbox" type="checkbox" name="edmCountry[]" value="'.$facetData[$i].'"
-                                                '.$checked.' onChange="this.form.submit()">
-                                                <span class="theme-color-background checkmark"></span>';
-                            $content .= '</label>';
-                        }
-                    }
-            $content .= '</div>';
-        $content .= '</div>';
-    $content .= '</form>';
+if (isset($_GET['view']) && $_GET['view'] != "") {
+    $view = $_GET['view'];
 }
 
-$content .= '<div class="search-panel-default collapse-controller">';
-    $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#type-area" 
-        onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
-                 jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-            $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
-                $content .= '<li style="font-size:14px;">DOCUMENT TYPE</li>';
-            $content .= '</h4>';
-            $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
-        $content .= '</div>';
-        
-
-        $content .= "<div id=\"type-area\" class=\"search-options-selection panel-body panel-collapse collapse\">";
-        
-        $content .= '<label class="search-container theme-color"> Diaries<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
-        $content .= '<label class="search-container theme-color"> Letters<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-        $content .= '<label class="search-container theme-color"> Post cards<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';                        
-        $content .= '<label class="search-container theme-color"> Pictures<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>'; 
-        $content .= '</div>';
-    $content .= '</div>';
-
-    $content .= '<div class="search-panel-default collapse-controller">';
-            $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#language-area" 
-            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
-                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
-                    $content .= '<li style="font-size:14px;">LANGUAGES</li>';
-                $content .= '</h4>';
-                $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
-            $content .= '</div>';
-            
-
-            $content .= "<div id=\"language-area\" class=\"search-options-selection panel-body panel-collapse collapse\">";
-            
-            $content .= '<label class="search-container theme-color"> Deutsch<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> English<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> Norwegien<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';                        
-            $content .= '<label class="search-container theme-color"> Unknown<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>'; 
-            $content .= '</div>';
-    $content .= '</div>';
-
-    $content .= '<div class="search-panel-default collapse-controller">';
-            $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#tags-area" 
-            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
-                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
-                    $content .= '<li style="font-size:14px;">SHORT TAGS</li>';
-                $content .= '</h4>';
-                $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
-            $content .= '</div>';
-            
-
-            $content .= "<div id=\"tags-area\" class=\"search-options-selection panel-body panel-collapse collapse\">";
-            
-            $content .= '<label class="search-container theme-color"> Children<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> Art<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> Architecture<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';                        
-            $content .= '<label class="search-container theme-color"> Historic<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>'; 
-            $content .= '</div>';
-    $content .= '</div>';
-
-    $content .= '<div class="search-panel-default collapse-controller">';
-            $content .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#status-area" 
-            onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
-                    jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
-                $content .= '<h4 id="description-collapse-heading" class="left-panel-dropdown-title">';  
-                    $content .= '<li style="font-size:14px;">DOCUMENT STATUS</li>';
-                $content .= '</h4>';
-                $content .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
-            $content .= '</div>';
-
-            $content .= "<div id=\"status-area\" class=\"search-options-selection panel-body panel-collapse collapse\">";
-            
-            $content .= '<label class="search-container theme-color"> Not started<input id="type-letter-checkbox" type="checkbox" checked="checked" name="doctype" value="card"><span  class=" theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> Started<input type="checkbox" name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';
-            $content .= '<label class="search-container theme-color"> In review<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>';                        
-            $content .= '<label class="search-container theme-color"> Completed<input type="checkbox"  name="doctype" value="card"><span class="theme-color-background checkmark"></span></label>'; 
-            $content .= '</div>';
-    $content .= '</div>';
-$content .= '</div>';
-    $content .= '<div class="search-content-right">';
-        $content .= '<div class="search-content-right-header">';
-            $content .= '<div class="search-content-results-headline search-headline">';
-                $page = $_GET['pa'];
-                if ($page != null && is_numeric($page) && (($page - 1) * 25) < $storyCount && $page != 0){
-                    $storyStart = (($page - 1) * 25) + 1;
-                    $storyEnd = $page * 25;
-                }
-                else {
-                    $page = 1;
-                    $storyStart = 1;
-                    $storyEnd = 25;
-                }
-                $content .= $storyStart.' - '.$storyEnd.' of '.$storyCount.' results';
-            $content .= '</div>';
-            
-            $content .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
-                        
-                    $content .=    '<div class="result-viewtype" id="btnContainer">';
-                        $content .=    '<ul class="content-view-bar">';
-                            $content .=   '<li class="content-view-list">';
-                            $content .=       '<button class="content-view-button view-btn" id="list">';
-                            $content .= '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
-                            $content .=           'List';
-                            $content .=       '</button>';
-                            $content .=   '</li>';
-                            $content .= '<li class="content-view-grid" id="grid">';
-                            $content .= '<button class="content-view-button view-btn">';
-                            $content .= '<i class="far fa-th-large theme-color" style="font-size: 12px; padding-right: 3px;"></i>';
-                            $content .=            'Grid';
-                            $content .=        '</button>';
-                            $content .=    '</li>';
-                        $content .=   '</ul>';
-                    $content .=   '</div>';
-            $content .= '</div>';
-        
-
-         $content .= '</div>';
-         
-        // Search result pagination
-        $pagination = "";
-        $pagination .= '<div class="story-search-pagination">';
-            // Left arrows
-            if ($page > 1) {
-                $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa=1>';
-                    $pagination .= '&laquo;';
-                $pagination .= '</a>';
+$content .= '<script>
+                jQuery ( document ).ready(function() {';
+            if ($view == "list") {
+                $content .=      'jQuery(".search-results-list-radio").click()';
             }
+            $content .= '});
+            </script>';
 
-            // Previous page
-             if ($page != null && is_numeric($page) && $page > 1) {
-                 $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.($page - 1).'>';
-                     $pagination .= ($page - 1);
-                 $pagination .= '</a>';
-             }
+$itemTabContent = "";
+$storyTabContent = "";
 
-            // Current page
-             $pagination .= '<a class="theme-color-background" style="outline: none; pointer-events: none; cursor: default;">';
-                 $pagination .= $page;
-             $pagination .= '</a>';
-
-            // 3 next pages
-            for ($i = 1; $i <= 3; $i++) {
-                 if (((($page + $i) - 1) * 25) < $storyCount) {
-                     $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.($page + $i).'>';
-                         $pagination .= ($page + $i);
-                     $pagination .= '</a>';
-                 }
-            }
-
-             // Right arrows
-            if ($page < ceil($storyCount / 25)) {
-                $pagination .= '<a class="theme-color-hover" style="outline:none;" href='.home_url( $wp->request ).'?pa='.ceil($storyCount / 25).'>';
-                    $pagination .= '&raquo;';
-                $pagination .= '</a>';
-            }
-            $pagination .= '<div style="clear:both;"></div>';
-         $pagination .= '</div>';
-
-        // Pagination on top of search results
-         $content .= $pagination;
-
-        // Search results
-         $content .= '<div class="search-content-right-items">';
-            foreach ($stories as $story){
-                $content .= '<div class="story-search-single-result">';
-                    $content .= '<div class="story-search-single-result-info">';
-                        $content .= '<h2 class="theme-color">';
-                            $content .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
-                                $content .= $story['dcTitle'];
-                            $content .= "</a>";
-                        $content .= '</h2>';
-                        $content .= '<p class="story-search-single-result-description">';
-                            $content .= $story['dcDescription'];
-                        $content .= '</p>';
-                    $content .= '</div>';
-                    $content .= '<div class="story-search-single-result-image">';
-                    
-                        
-                        $image = json_decode($story['PreviewImageLink'], true);
-                        $imageLink = $image['service']['@id'];
-                        if ($image["width"] <= $image["height"]) {
-                            $imageLink .= "/0,0,".$image["width"].",".$image["width"];
-                        }
-                        else {
-                            $imageLink .= "/0,0,".$image["height"].",".$image["height"];
-                        }
-                        $imageLink .= "/280,140/0/default.jpg";
-                        /*
-                        $image = json_decode($story['PreviewImageLink'], true);
-                        $imageLink = $image['service']['@id'];
-                        $imageLink .= "/full/300,/0/default.jpg";*/
-
-                        $content .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
-                            $content .= '<img src='.$imageLink.'>';
-                        $content .= "</a>";
-                        $content .= '<div class="search-document-progress-bar" style="height: 20px;
-                        background: #eeeeee;
-                        width: 100%;"></div>';
-                    $content .= '</div>';
-                   
-                    $content .= '<div style="clear:both"></div>';
-                $content .= '</div>';
-
-            }   
-            
-        $content .= '<script>
-                        jQuery(document).ready(function(){
-                            jQuery("#grid").click(function(){
-                            jQuery(".story-search-single-result").addClass("maingridview");
-                            jQuery(".story-search-single-result-info").removeClass(".story-search-single-result-description");
-                            jQuery(this).addClass("active").prev().removeClass("active");
-                            });
-                            jQuery("#list").click(function(){
-                            jQuery(".story-search-single-result").removeClass("maingridview");
-                            jQuery(".story-search-single-result-info").addClass(".story-search-single-result-description");
-
-                                jQuery(this).addClass("active").next().removeClass("active");
-                            });
-                        });
-        </script>';
-        $content .= '</div>';
-
-        
-        // Pagination below search results
-        $content .= $pagination;
-
+$content .= '<div id="story-search-container">';
     
- $content .= '</section>';
+
+
+    // Header Search Start
+
+    $itemTabContent .= '<section class="temp-back">';
+        $itemTabContent .= '<div class="facet-form-search">';;
+            $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form"></div>';
+            $itemTabContent .= '<div><button type="submit" form="item-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
+        $itemTabContent .= '</div>';
+    $itemTabContent .= '</section>';
+
+    $storyTabContent .= '<section class="temp-back">';
+        $storyTabContent .= '<div class="facet-form-search">';
+            $storyTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qs" form="story-facet-form"></div>';
+            $storyTabContent .= '<div><button type="submit" form="story-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
+            $storyTabContent .= '<div style="clear:both;"></div>';
+        $storyTabContent .= '</div>';
+    $storyTabContent .= '</section>';
+    
+    // Header Search End
+
+        $storyTabContent .= "<div class='primary-full-width'>";
+            $storyTabContent .= '<section class="complete-search-content">';
+
+        $itemTabContent .= "<div class='primary-full-width'>";
+            $itemTabContent .= '<section class="complete-search-content">';
+
+            // Facets Start
+
+            $storyTabContent .= '<div class="search-content-left">';
+                $storyTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
+                $storyTabContent .=    '<div class="search-page-tab-container">';
+                    $storyTabContent .=    '<ul class="content-view-bar">';
+                        $storyTabContent .=     '<li>';
+                        $storyTabContent .=         '<button class="search-page-tab-button left search-page-story-tab-button theme-color-background">';
+                        $storyTabContent .=            'STORIES';
+                        $storyTabContent .=        '</button>';
+                        $storyTabContent .=    '</li>';
+                        $storyTabContent .=   '<li>';
+                        $storyTabContent .=       '<button class="search-page-tab-button right search-page-item-tab-button">';
+                        $storyTabContent .=           'ITEMS';
+                        $storyTabContent .=       '</button>';
+                        $storyTabContent .=   '</li>';
+                    $storyTabContent .=   '</ul>';
+                $storyTabContent .=   '</div>';
+
+                $storyTabContent .= '<form id="story-facet-form">';
+                    foreach ($storyFacetFields as $storyFacetField) {
+                        $facetData = $solrStoryData['facet_counts']['facet_fields'][$storyFacetField['fieldName']];
+                        
+                        $isEmpty = true;
+                        for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
+                            if ($facetData[$i + 1] != 0) {
+                                $isEmpty = false;
+                            }
+                        }
+
+                        if ($isEmpty != true) {
+                            $storyTabContent .= '<div class="search-panel-default collapse-controller">';
+                                $storyTabContent .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#story-'.$storyFacetField['fieldName'].'-area" 
+                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
+                                    $storyTabContent .= '<h4 class="left-panel-dropdown-title">';  
+                                        $storyTabContent .= '<li style="font-size:14px;">'.$storyFacetField['fieldLabel'].'</li>';
+                                    $storyTabContent .= '</h4>';
+                                    $storyTabContent .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
+                                $storyTabContent .= '</div>';
+    
+                                $storyTabContent .= "<div id='story-".$storyFacetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
+                                    for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
+                                        if ($facetData[$i+1] != 0) {
+                                            $storyTabContent .= '<label class="search-container theme-color">';
+                                                $storyTabContent .= $facetData[$i].' ('.$facetData[$i+1].')';
+                                                $checked = "";
+                                                if (isset($_GET[$storyFacetField['fieldName']]) && in_array($facetData[$i], $_GET[$storyFacetField['fieldName']])) {
+                                                    $checked = "checked";
+                                                }
+                                                $storyTabContent .= '<input type="checkbox" name="'.$storyFacetField['fieldName'].'[]" value="'.$facetData[$i].'"
+                                                                '.$checked.' onChange="this.form.submit()">
+                                                                <span class="theme-color-background checkmark"></span>';
+                                            $storyTabContent .= '</label>';
+                                        }
+                                    }
+                                $storyTabContent .= '</div>';
+                            $storyTabContent .= '</div>';
+                        }
+                    }
+                $storyTabContent .= '</form>';
+            $storyTabContent .= '</div>';
+
+            $itemTabContent .= '<div class="search-content-left">';
+                $itemTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
+                $itemTabContent .= '<div class="search-page-tab-container">';
+                    $itemTabContent .=    '<ul class="content-view-bar">';
+                        $itemTabContent .=     '<li>';
+                        $itemTabContent .=         '<button class="search-page-tab-button left search-page-story-tab-button">';
+                        $itemTabContent .=            'STORIES';
+                        $itemTabContent .=        '</button>';
+                        $itemTabContent .=    '</li>';
+                        $itemTabContent .=   '<li>';
+                        $itemTabContent .=       '<button class="search-page-tab-button right search-page-item-tab-button theme-color-background">';
+                        $itemTabContent .=           'ITEMS';
+                        $itemTabContent .=       '</button>';
+                        $itemTabContent .=   '</li>';
+                    $itemTabContent .=   '</ul>';
+                $itemTabContent .=   '</div>';
+                $itemTabContent .= '<form id="item-facet-form">';
+                    foreach ($itemFacetFields as $itemFacetField) {
+                        $facetData = $solrItemData['facet_counts']['facet_fields'][$itemFacetField['fieldName']];
+                        if (sizeof($facetData) > 0) {
+                            $itemTabContent .= '<div class="search-panel-default collapse-controller">';
+                                $itemTabContent .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#item-'.$itemFacetField['fieldName'].'-area" 
+                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
+                                    $itemTabContent .= '<h4 class="left-panel-dropdown-title">';  
+                                        $itemTabContent .= '<li style="font-size:14px;">'.$itemFacetField['fieldLabel'].'</li>';
+                                    $itemTabContent .= '</h4>';
+                                    $itemTabContent .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
+                                $itemTabContent .= '</div>';
+    
+                                $itemTabContent .= "<div id='item-".$itemFacetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
+                                    for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
+                                        if ($facetData[$i+1] != 0) {
+                                            $itemTabContent .= '<label class="search-container theme-color">';
+                                                $itemTabContent .= $facetData[$i].' ('.$facetData[$i+1].')';
+                                                $checked = "";
+                                                if (isset($_GET[$itemFacetField['fieldName']]) && in_array($facetData[$i], $_GET[$itemFacetField['fieldName']])) {
+                                                    $checked = "checked";
+                                                }
+                                                $itemTabContent .= '<input type="checkbox" name="'.$itemFacetField['fieldName'].'[]" value="'.$facetData[$i].'"
+                                                                '.$checked.' onChange="this.form.submit()">
+                                                                <span class="theme-color-background checkmark"></span>';
+                                            $itemTabContent .= '</label>';
+                                        }
+                                    }
+                                $itemTabContent .= '</div>';
+                            $itemTabContent .= '</div>';
+                        }
+                    }
+                $itemTabContent .= '</form>';
+            $itemTabContent .= '</div>';
+            // Facets End
+
+
+            // Results Start
+            
+
+            $itemTabContent .= '<div class="search-content-right">';
+                $itemTabContent .= '<div class="search-content-right-header">';
+                    $itemTabContent .= '<div class="search-content-results-headline search-headline">';
+                        $itemTabContent .= $itemStart.' - '.$itemEnd.' of '.$itemCount.' results';
+                    $itemTabContent .= '</div>';
+                    
+                    $itemTabContent .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
+                        $itemTabContent .=    '<div class="result-viewtype">';
+                            $itemTabContent .=    '<ul class="content-view-bar">';
+                                $itemTabContent .=     '<li class="search-results-grid-radio search-results-radio left">';
+                                $itemTabContent .=         '<input id="item-grid-button" type="radio" name="view" form="item-facet-form" value="grid" checked>';
+                                $itemTabContent .=             '<label for="item-grid-button" class="theme-color-background">';
+                                $itemTabContent .=                  '<i class="far fa-th-large" style="font-size: 12px; padding-right: 6px;"></i>';
+                                $itemTabContent .=                  'Grid';
+                                $itemTabContent .=             '</label>';
+                                $itemTabContent .=        '</input>';
+                                $itemTabContent .=    '</li>';
+                                $itemTabContent .=   '<li class="search-results-list-radio search-results-radio right">';
+                                $itemTabContent .=       '<input id="item-list-button" type="radio" name="view" form="item-facet-form" value="list">';
+                                $itemTabContent .=             '<label for="item-list-button">';
+                                $itemTabContent .=                  '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 6px;"></i>';
+                                $itemTabContent .=                  'List';
+                                $itemTabContent .=             '</label>';
+                                $itemTabContent .=       '</input>';
+                                $itemTabContent .=   '</li>';
+                            $itemTabContent .=   '</ul>';
+                        $itemTabContent .=   '</div>';
+                    $itemTabContent .= '</div>';
+                $itemTabContent .= '</div>';
+
+                        
+                // Search result pagination
+                $pagination = "";
+                $pagination .= '<div class="search-page-pagination">';
+                    // Left arrows
+                    if ($itemPage > 1) {
+                        $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="1" class="theme-color-hover" style="outline:none;">';
+                            $pagination .= '&laquo;';
+                        $pagination .= '</button>';
+                    }
+
+                    // Previous page
+                        if ($itemPage != null && is_numeric($itemPage) && $itemPage > 1) {
+                            $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.($itemPage - 1).'" class="theme-color-hover" style="outline:none;">';
+                                $pagination .= ($itemPage - 1);
+                            $pagination .= '</button>';
+                        }
+
+                    // Current page
+                        $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.$itemPage.'" class="theme-color-background" style="outline:none;">';
+                            $pagination .= $itemPage;
+                        $pagination .= '</button>';
+
+                    // 3 next pages
+                    for ($i = 1; $i <= 3; $i++) {
+                        if (((($itemPage + $i) - 1) * 25) < $itemCount) {
+                            $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.($itemPage + $i).'" class="theme-color-hover" style="outline:none;">';
+                                $pagination .= ($itemPage + $i);
+                            $pagination .= '</button>';
+                        }
+                    }
+
+                        // Right arrows
+                    if ($itemPage < ceil($itemCount / 25)) {
+                        $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.ceil($itemCount / 25).'" class="theme-color-hover" style="outline:none;">';
+                            $pagination .= '&raquo;';
+                        $pagination .= '</button>';
+                    }
+                    $pagination .= '<div style="clear:both;"></div>';
+                $pagination .= '</div>';
+
+                // Pagination on top of search results
+                $itemTabContent .= $pagination;
+
+                // Search results
+                $itemTabContent .= '<div class="search-content-right-items">';
+                    foreach ($solrItemData['response']['docs'] as $item) {
+                        $itemTabContent .= '<div class="search-page-single-result maingridview">';
+                            $itemTabContent .= '<div class="search-page-single-result-info">';
+                                $itemTabContent .= '<h2 class="theme-color">';
+                                    $itemTabContent .= "<a href='".home_url( $wp->request )."/story/item?item=".$item['ItemId']."'>";
+                                        $itemTabContent .= $item['Title'];
+                                    $itemTabContent .= "</a>";
+                                $itemTabContent .= '</h2>';
+                                $itemTabContent .= '<div class="search-page-single-result-description">';
+                                    $itemTabContent .= $item['Description'];
+                                $itemTabContent .= '</div>';
+                                $itemTabContent .= '<span style="display: none">...</span>';
+                            $itemTabContent .= '</div>';
+                            $itemTabContent .= '<div class="search-page-single-result-image">';
+                            
+                                $image = json_decode($item['PreviewImageLink'], true);
+                                    
+                                if (substr($image['service']['@id'], 0, 4) == "http") {
+                                    $listImageLink = $image['service']['@id'];
+                                }
+                                else {
+                                    $listImageLink = "http://".$image['service']['@id'];
+                                }
+                                $listImageLink .= "/full/300,/0/default.jpg";
+
+                                if (substr($image['service']['@id'], 0, 4) == "http") {
+                                    $gridImageLink = $image['service']['@id'];
+                                }
+                                else {
+                                    $gridImageLink = "http://".$image['service']['@id'];
+                                }
+
+                                if ($image["width"] != null || $image["height"] != null) {
+                                    if ($image["width"] <= ($image["height"] * 2)) {
+                                        $gridImageLink .= "/0,0,".$image["width"].",".($image["width"] / 2);
+                                    }
+                                    else {
+                                        $gridImageLink .= "/".round(($image["width"] - $image["height"]) / 2).",0,".($image["height"] * 2).",".$image["height"];
+                                    }
+                                }
+                                else {
+                                    $gridImageLink .= "/full";
+                                }
+                                $gridImageLink .= "/280,140/0/default.jpg";
+
+                                $itemTabContent .= "<a class='list-view-image' style='display:none' href='".home_url( $wp->request )."/item?item=".$item['ItemId']."'>";
+                                    $itemTabContent .= '<img src='.$listImageLink.'>';
+                                $itemTabContent .= "</a>";
+                                $itemTabContent .= "<a class='grid-view-image' href='".home_url( $wp->request )."/item?item=".$item['ItemId']."'>";
+                                    $itemTabContent .= '<img src='.$gridImageLink.'>';
+                                $itemTabContent .= "</a>";
+
+                                $itemTabContent .= '<div class="search-document-progress-bar" style="height: 20px;
+                                                background: #eeeeee;
+                                                width: 100%;"></div>';
+                            $itemTabContent .= '</div>';
+                            
+                            $itemTabContent .= '<div style="clear:both"></div>';
+                        $itemTabContent .= '</div>';
+                    }   
+                $itemTabContent .= '</div>';
+
+                // Pagination below search results
+                $itemTabContent .= $pagination;
+            $itemTabContent .= '</div>';
+
+
+            $storyTabContent .= '<div class="search-content-right">';
+                $storyTabContent .= '<div class="search-content-right-header">';
+                    $storyTabContent .= '<div class="search-content-results-headline search-headline">';
+                        $storyTabContent .= $storyStart.' - '.$storyEnd.' of '.$storyCount.' results';
+                    $storyTabContent .= '</div>';
+                    
+                    $storyTabContent .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
+                        $storyTabContent .=    '<div class="result-viewtype">';
+                            $storyTabContent .=    '<ul class="content-view-bar">';
+                                $storyTabContent .=     '<li class="search-results-grid-radio search-results-radio left">';
+                                $storyTabContent .=         '<input id="story-grid-button" type="radio" name="view" form="story-facet-form" value="grid" checked>';
+                                $storyTabContent .=             '<label for="story-grid-button" class="theme-color-background">';
+                                $storyTabContent .=                  '<i class="far fa-th-large" style="font-size: 12px; padding-right: 6px;"></i>';
+                                $storyTabContent .=                  'Grid';
+                                $storyTabContent .=             '</label>';
+                                $storyTabContent .=        '</input>';
+                                $storyTabContent .=    '</li>';
+                                $storyTabContent .=   '<li class="search-results-list-radio search-results-radio right">';
+                                $storyTabContent .=       '<input id="story-list-button" type="radio" name="view" form="story-facet-form" value="list">';
+                                $storyTabContent .=             '<label for="story-list-button">';
+                                $storyTabContent .=                  '<i class="far fa-th-list theme-color" style="font-size: 12px; padding-right: 6px;"></i>';
+                                $storyTabContent .=                  'List';
+                                $storyTabContent .=             '</label>';
+                                $storyTabContent .=       '</input>';
+                                $storyTabContent .=   '</li>';
+                            $storyTabContent .=   '</ul>';
+                        $storyTabContent .=   '</div>';
+                    $storyTabContent .= '</div>';
+                $storyTabContent .= '</div>';
+                
+                // Search result pagination
+                $pagination = "";
+                $pagination .= '<div class="search-page-pagination">';
+                    // Left arrows
+                    if ($storyPage > 1) {
+                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="1" class="theme-color-hover" style="outline:none;">';
+                            $pagination .= '&laquo;';
+                        $pagination .= '</button>';
+                    }
+
+                    // Previous page
+                        if ($storyPage != null && is_numeric($storyPage) && $storyPage > 1) {
+                            $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage - 1).'" class="theme-color-hover" style="outline:none;">';
+                                $pagination .= ($storyPage - 1);
+                            $pagination .= '</button>';
+                        }
+
+                    // Current page
+                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.$storyPage.'" class="theme-color-background" style="outline:none;">';
+                            $pagination .= $storyPage;
+                        $pagination .= '</button>';
+
+                    // 3 next pages
+                    for ($i = 1; $i <= 3; $i++) {
+                        if (((($storyPage + $i) - 1) * 25) < $storyCount) {
+                            $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage + $i).'" class="theme-color-hover" style="outline:none;">';
+                                $pagination .= ($storyPage + $i);
+                            $pagination .= '</button>';
+                        }
+                    }
+
+                        // Right arrows
+                    if ($storyPage < ceil($storyCount / 25)) {
+                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.ceil($storyCount / 25).'" class="theme-color-hover" style="outline:none;">';
+                            $pagination .= '&raquo;';
+                        $pagination .= '</button>';
+                    }
+                    $pagination .= '<div style="clear:both;"></div>';
+                $pagination .= '</div>';
+
+                // Pagination on top of search results
+                $storyTabContent .= $pagination;
+
+                // Search results
+                $storyTabContent .= '<div class="search-content-right-items">';
+                    foreach ($solrStoryData['response']['docs'] as $story) {
+                        $storyTabContent .= '<div class="search-page-single-result maingridview">';
+                            $storyTabContent .= '<div class="search-page-single-result-info">';
+                                $storyTabContent .= '<h2 class="theme-color">';
+                                    $storyTabContent .= "<a href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
+                                        $storyTabContent .= $story['dcTitle'];
+                                    $storyTabContent .= "</a>";
+                                $storyTabContent .= '</h2>';
+                                $storyTabContent .= '<div class="search-page-single-result-description">';
+                                    $storyTabContent .= $story['dcDescription'];
+                                $storyTabContent .= '</div>';
+                                $storyTabContent .= '<span style="display: none">...</span>';
+                            $storyTabContent .= '</div>';
+                            $storyTabContent .= '<div class="search-page-single-result-image">';
+                            
+                                $image = json_decode($story['PreviewImageLink'], true);
+                                
+                                if (substr($image['service']['@id'], 0, 4) == "http") {
+                                    $listImageLink = $image['service']['@id'];
+                                }
+                                else {
+                                    $listImageLink = "http://".$image['service']['@id'];
+                                }
+                                $listImageLink .= "/full/300,/0/default.jpg";
+
+                                if (substr($image['service']['@id'], 0, 4) == "http") {
+                                    $gridImageLink = $image['service']['@id'];
+                                }
+                                else {
+                                    $gridImageLink = "http://".$image['service']['@id'];
+                                }
+
+                                if ($image["width"] != null || $image["height"] != null) {
+                                    if ($image["width"] <= ($image["height"] * 2)) {
+                                        $gridImageLink .= "/0,0,".$image["width"].",".($image["width"] / 2);
+                                    }
+                                    else {
+                                        $gridImageLink .= "/".round(($image["width"] - $image["height"]) / 2).",0,".($image["height"] * 2).",".$image["height"];
+                                    }
+                                }
+                                else {
+                                    $gridImageLink .= "/full";
+                                }
+                                $gridImageLink .= "/280,140/0/default.jpg";
+
+                                $storyTabContent .= "<a class='list-view-image' style='display:none' href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
+                                    $storyTabContent .= '<img src='.$listImageLink.'>';
+                                $storyTabContent .= "</a>";
+                                $storyTabContent .= "<a class='grid-view-image' href='".home_url( $wp->request )."/story?story=".$story['StoryId']."'>";
+                                    $storyTabContent .= '<img src='.$gridImageLink.'>';
+                                $storyTabContent .= "</a>";
+
+                                $storyTabContent .= '<div class="search-document-progress-bar" style="height: 20px;
+                                                background: #eeeeee;
+                                                width: 100%;"></div>';
+                            $storyTabContent .= '</div>';
+                            
+                            $storyTabContent .= '<div style="clear:both"></div>';
+                        $storyTabContent .= '</div>';
+                    }   
+                $storyTabContent .= '</div>';
+
+                // Pagination below search results
+                $storyTabContent .= $pagination;
+            $storyTabContent .= '</div>';
+            
+            // Results End
+
+
+        $itemTabContent .= '</section>';
+    $itemTabContent .= "</div>";
+
+        $storyTabContent .= '</section>';
+    $storyTabContent .= "</div>";
+
+    if (is_string($_GET['qi']) || $_GET['pi'] != null) { 
+        $content .= '<div id="search-page-item-tab">';
+            $content .= $itemTabContent;
+        $content .= '</div>';
+        $content .= '<div id="search-page-story-tab" style="display: none;">';
+            $content .= $storyTabContent;
+        $content .= '</div>';
+    }
+    else {
+        $content .= '<div id="search-page-item-tab" style="display: none;">';
+            $content .= $itemTabContent;
+        $content .= '</div>';
+        $content .= '<div id="search-page-story-tab">';
+            $content .= $storyTabContent;
+        $content .= '</div>';  
+    }
 $content .= "</div>";
 
-
-
-
-/*    $content .= '<div class="search-page">';
-     $content .= '<div class="search-page-left" style="background-color:#ddd;">';
-         $content .= '<h2>refine searches</h2>';
-         $content .= '<ul id="search-menu">';*/
-////
-
-
-
-////
-/*              $content .= '<li><a href="#">STATUS</a></li>';
-             $content .= '<li><a href="#">COUNTRY</a></li>';
-             $content .= '<li><a href="#">LANGUAGES</a></li>';
-             $content .= '<li><a href="#">KEY WORDS</a></li>';
-             $content .= '<li><a href="#">MEDIA</a></li>';
-         $content .= '</ul>';
-     $content .= '</div>';  
-
-     $content .= '<div class="search-page-right" style="background-color:#fff;">';
-         $content .= '<h2>Page Content</h2>';
-         $content .= '<p>Start to type for a spe "filter" the search options.</p>';
-         $content .= '<p>Some text..</p>';
-     $content .= '</div>';
- $content .= '</div>';*/
-
- echo $content;
+echo $content;
 
 
 ?>

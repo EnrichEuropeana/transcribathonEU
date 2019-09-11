@@ -29,9 +29,9 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 		
 		echo "<a href=\"http://fresenia.man.poznan.pl/\" class=\"_transcribathon_logo\"></a>";
         if(!is_home()){
-            echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
+            echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
         }else{
-            echo "<span class=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
+            echo "<span class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
 		}
 		
     

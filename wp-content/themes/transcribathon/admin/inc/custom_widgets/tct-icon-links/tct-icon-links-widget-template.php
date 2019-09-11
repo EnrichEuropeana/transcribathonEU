@@ -28,7 +28,7 @@ $content .= "<section id='frontpage-bottom'>";
             $content .= "</li>";
 
             $content .= "<li>";
-                $content .= "<a href='' class='frontpage-bottom-link'>";
+                $content .= '<a href="dev/progress" class="frontpage-bottom-link">';
                 $content .= "<div class='frontpage-bottom-link-div theme-color-hover' style='height: 100%;'>";
                     $content .= "<i class='fal fa-chart-pie frontpage-bottom-icon'></i>";    
                     $content .= "<h5 class='theme-color theme-hover-child'>PROGRESS</h5>";

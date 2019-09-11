@@ -85,7 +85,7 @@
 }
 
 #openseadragonFS {
-	height: 900px;
+	height: 100%;
 	position: relative;
 }
 
@@ -106,10 +106,24 @@
   color: #666666;
   text-align: right;
   cursor: pointer;
+  margin-right: -8px;
+}
+
+#inverteIcon {
+	margin-left: 10px;
+}
+
+#invertRange {
+  vertical-align: text-bottom;
+  margin-left: -2px;
 }
 
 .slidecontainer > * {
 	display: inline-block;
+}
+
+.slidecontainer.invert {
+	margin: 5px;
 }
 
 .iiifSlider {
@@ -152,17 +166,19 @@
 
 .sliderIcon {
   color: #0e4c63;
+  margin-right: 6px;
 }
 
 .sliderValue {
   color: #666666;
   text-align: center;
   position: absolute;
-  left: 170px;
+  right: 8px;
 }
 
 .resetText {
   color: #666666;
+  padding-left: 29px;
 }
 
 .resetText:hover {
@@ -178,7 +194,13 @@
 .tabFilterValue {
 	float: right;
 }
-
+#buttons.new-grid-button{
+	display: grid;
+	position: absolute !important;
+	z-index: 9;
+  margin-left: 31px;
+  margin-top: 5px;
+}
 #buttons {
 	display: grid;
 	position: absolute !important;
@@ -200,8 +222,6 @@
 }
 
 #buttons > div:hover {
-	background-color: #0e4c63;
-	color: #fff;
 	cursor: pointer;
 }
 
@@ -209,8 +229,15 @@
 	display: grid;
 	position: absolute !important;
 	z-index: 9;
-	color: #0e4c63;
   margin-left: 5px;
+  margin-top: 5px;
+}
+
+#buttonsFS.new-grid-button {
+  display: grid;
+  position: absolute !important;
+  z-index: 9;
+  margin-left: 31px;
   margin-top: 5px;
 }
 
@@ -226,8 +253,6 @@
 }
 
 #buttonsFS > div:hover {
-	background-color: #0e4c63;
-	color: #fff;
 	cursor: pointer;
 }
 
@@ -305,4 +330,25 @@ i.mce-i-pos-in-text {
 
 #mytoolbar-transcription {
   height: 30px;
+}
+
+/* TODO wrong place, helper for mapbox map */
+#full-view-map {
+	height: 400px;
+}
+.mapboxgl-marker {
+	font-size: 50px;
+}
+
+.mapboxgl-marker.savedMarker {
+	background-color: #31768a;
+}
+
+#all-places-map {
+	width: 100%;
+	height: 900px;
+}
+
+svg.mapboxgl-ctrl-geocoder--icon-search {
+	left: 90%;
 }

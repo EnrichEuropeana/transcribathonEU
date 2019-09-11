@@ -4,7 +4,8 @@ Shortcode: transcription_tab
 Description: Creates the transcription profile tab
 */
 function _TCT_transcription_tab( $atts ) {  
-    echo "<div class=\"section group \">\n";
+    
+$theme_sets = get_theme_mods();
         // Set request parameters for image data
         $requestData = array(
             'key' => 'testKey'
