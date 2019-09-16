@@ -39,6 +39,27 @@ function _TCT_get_document_data( $atts ) {
             $i = 0;
             foreach ($storyData['Items'] as $item) {
                 $image = json_decode($item['ImageLink'], true);
+                if (substr($image['service']['@id'], 0, 4) == "http") {
+                    $imageLink = $image['service']['@id'];
+                }
+                else {
+                    $imageLink = "http://".$image['service']['@id'];
+                }
+
+                if ($image["width"] != null || $image["height"] != null) {
+                    if ($image["width"] <= $image["height"]) {
+                        $imageLink .= "/0,0,".$image["width"].",".$image["width"];
+                    }
+                    else {
+                        $imageLink .= "/0,0,".$image["height"].",".$image["height"];
+                    }
+                }
+                else {
+                    $imageLink .= "/full";
+                }
+                $imageLink .= "/250,250/0/default.jpg";
+/*
+                $image = json_decode($item['ImageLink'], true);
                 $imageLink = $image['service']['@id'];
                 if ($image["width"] <= $image["height"]) {
                     $imageLink .= "/0,0,".$image["width"].",".$image["width"];
@@ -47,6 +68,7 @@ function _TCT_get_document_data( $atts ) {
                     $imageLink .= "/0,0,".$image["height"].",".$image["height"];
                 }
                 $imageLink .= "/250,250/0/default.jpg";
+                */
                 $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
                     $content .= "<div class='label-img-status shadow-img-corner'></div>";
                     $content .= "<div class='label-img-status' 

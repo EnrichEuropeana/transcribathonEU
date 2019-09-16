@@ -119,6 +119,12 @@ var tct_viewer = (function($, document, window) {
 			if (response.code == "200") {
 				imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
 				imageLink = imageData['service']['@id'];
+                if (imageData['service']['@id'].substr(0, 4) == "http") {
+                    imageLink = imageData['service']['@id'];
+                }
+                else {
+                    imageLink = "http://" + imageData['service']['@id'];
+                }
 				imageHeight = imageData['height'];
 				imageWidth = imageData['width'];
 				initViewers();

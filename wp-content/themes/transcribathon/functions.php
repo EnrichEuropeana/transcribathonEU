@@ -27,8 +27,8 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
 
 // Custom posts
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-news.php'); // Adds custom post-type: news
-
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-news/tct-news.php'); // Adds custom post-type: news
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-tutorial/tct-tutorial.php'); // Adds custom post-type: news
 
 // Image settings
 add_image_size( 'news-image', 300, 200, true );
@@ -161,6 +161,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-headline/tct-headl
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-colcontent/tct-colcontent-widget.php'); // Adds the widget for displaying content in different columns
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-boxes/tct-boxes-widget.php'); // Adds the widget for feature boxes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-button/tct-button-widget.php'); // Adds the widget for a preformatted button
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-barchart/tct-barchart-widget.php'); // Adds the widget for a preformatted button
 
 function add_custom_widget_collection($folders){
     $folders[] = CHILD_TEMPLATE_DIR.'admin/inc/custom_widgets/';

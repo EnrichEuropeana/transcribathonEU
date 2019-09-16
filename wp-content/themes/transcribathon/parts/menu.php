@@ -27,7 +27,7 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
         // Allways home of transcribathon
 		$theme_sets = get_theme_mods();
 		
-		echo "<a href=\"http://fresenia.man.poznan.pl/\" class=\"_transcribathon_logo\"></a>";
+		echo "<a href=\"".network_home_url()."\" class=\"_transcribathon_logo\"></a>";
         if(!is_home()){
             echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
         }else{

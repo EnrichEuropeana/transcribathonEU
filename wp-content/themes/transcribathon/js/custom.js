@@ -1,6 +1,26 @@
 var home_url = WP_URLs.home_url;
 
 jQuery ( document ).ready(function() {
+  jQuery(document).keydown(function(e) {
+    if (e.key === "Escape") {
+      if (jQuery('#item-page-login-container').css('display') != "none") {
+        jQuery('#item-page-login-container').css('display', 'none')
+      }
+      else if (jQuery('#image-view-container').css('display') != "none") {
+        switchItemPageView();
+      }
+    }
+  });
+  window.onclick = function(event) {
+    var modal = document.getElementById('item-page-login-container');
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+    if (!jQuery(event.target).hasClass('status-dropdown-content') && !jQuery(event.target).hasClass('status-indicator')) {
+      jQuery('.status-dropdown-content').removeClass('show')
+    } 
+  }
+  
 
   var x, i, j, selElmnt, a, b, c;
   /*look for any elements with the class "language-selector-background":*/
@@ -57,28 +77,7 @@ function installEventListeners() {
     jQuery('#item-page-login-container').css('display', 'none');
   })
 
-  jQuery('.item-page-section-headline-container.collapse-headline').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#login').length) {
-      event.preventDefault();
-      jQuery('#item-page-login-container').css('display', 'block');
-    }
-  })
-  jQuery('#mce-wrapper-transcription').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#login').length) {
-      event.preventDefault();
-      jQuery('#item-page-login-container').css('display', 'block');
-    }
-  })
-  jQuery('#item-page-description-text').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#login').length) {
-      event.preventDefault();
-      jQuery('#item-page-login-container').css('display', 'block');
-    }
-  })
-  jQuery('.edit-item-data-icon').mousedown(function(event) {
+  jQuery('.login-required').mousedown(function(event) {
     // Checks if document is locked
     if (jQuery('#login').length) {
       event.preventDefault();
@@ -200,14 +199,6 @@ function installEventListeners() {
     jQuery(".search-page-single-result-info").addClass(".search-page-single-result-description");
   });
 
-  jQuery(document).keyup(function(e) {
-    if (e.key === "Escape") {
-       if (jQuery('#image-view-container').css('display') != "none") {
-         switchItemPageView();
-       }
-    }
-  });
-  
   var keyWordList = [];   
   jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
@@ -264,11 +255,14 @@ function installEventListeners() {
   jQuery('#description-area textarea').keyup(function() {
     var text = jQuery(this).val();
     var language = jQuery('#description-language-selector select').val();
-    if(text.length == 0 || language == null) {
+    if(text.length == 0) {
       jQuery('#description-update-button').css('display','none');
     } 
     else {
       jQuery('#description-update-button').css('display','block');
+      if (language != null) {
+        jQuery('#description-update-button').addClass('theme-color-background');
+      }
     }
   });
   jQuery('#description-language-custom-selector').siblings('.language-item-select').children('.selected-option').click(function(){
@@ -286,11 +280,14 @@ function installEventListeners() {
     jQuery('#no-text-selector').css('display','none');
     var transcriptionText = jQuery('#item-page-transcription-text').text();
     var languages = jQuery('#transcription-selected-languages ul').children().length;
-    if(transcriptionText.length != 0 && languages > 0) {
-      jQuery('#transcription-update-button').addClass('theme-color-background');
+    if(transcriptionText.length != 0) {
+      jQuery('#transcription-update-button').css('display', 'block');
+      if (languages > 0) {
+        jQuery('#transcription-update-button').addClass('theme-color-background');
+      }
     }
     else {
-      jQuery('#transcription-update-button').removeClass('theme-color-background');
+      jQuery('#transcription-update-button').css('display', 'none');
     }
     if(transcriptionText.length == 0 && languages == 0) {
       jQuery('#no-text-selector').css('display','block');
@@ -306,6 +303,7 @@ function installEventListeners() {
         jQuery('#transcription-language-custom-selector select').addClass("disabled-dropdown");
         tinymce.remove();
         jQuery('#transcription-update-button').addClass('theme-color-background');
+        jQuery('#transcription-update-button').css('display', 'block');
       }
       else {
         alert("Please remove the transcription text first, if the document has nothing to transcribe");
@@ -739,6 +737,7 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
     },
     // Check success and create confirmation message
     function(response) {
+      /*
       if (oldDescription != null) {
         var amount = description.length - oldDescription.length;
       }
@@ -750,7 +749,8 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
       }
       else { 
         amount = 10;
-      }
+      }*/
+      amount = 1;
 
       scoreData = {
                     ItemId: itemId,
@@ -845,10 +845,10 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
       function(response) {
         var amount = newTranscriptionLength - currentTranscription.length
         if (amount > 0) {
-          amount = amount + 10;
+          amount = amount;
         }
         else { 
-          amount = 10;
+          amount = 0;
         }
   
         scoreData = {
@@ -880,23 +880,6 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
       });
     });
   
-  /*
-  for (var i = 0; i < transcriptionLanguages.length; i++) {
-    // Prepare data and send API request
-    data = {
-      ItemId: itemId,
-      LanguageId: transcriptionLanguages[i]
-    }
-    var dataString= JSON.stringify(data);
-    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
-    'type': 'POST',
-    'url': home_url + '/tp-api/transcriptionLanguages',
-    'data': data
-    },
-    // Check success and create confirmation message
-    function(response) {
-    });
-  }*/
 }
 
 // Adds an Item Property
@@ -915,8 +898,8 @@ function addItemProperty(itemId, userId, e) {
         'url': home_url + '/tp-api/itemProperties',
         'data': data
     },
-    // Check success and create confirmation message
     function(response) {
+      /*
       scoreData = {
                     ItemId: itemId,
                     UserId: userId,
@@ -931,6 +914,7 @@ function addItemProperty(itemId, userId, e) {
       // Check success and create confirmation message
       function(response) {
       })
+    */
     });
   }
   else {
@@ -1073,6 +1057,7 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
   }
   else {
     updateDataProperty("items", itemId , fieldName, value);
+    jQuery('.status-dropdown-content').removeClass('show')
   }
 }
 
@@ -1583,15 +1568,15 @@ function loadPersonData(itemId, userId) {
         '</span>';
         if (birthDate != "") {
           if (deathDate != "") {
-            personHeadline += '(' + birthDate + ' - ' + deathDate + ')';
+            personHeadline += '<span class="item-name-header">(' + birthDate + ' - ' + deathDate + ')</span>';
           }
           else {
-            personHeadline += '(Birth: ' + birthDate + ')';
+            personHeadline += '<span class="item-name-header">(Birth: ' + birthDate + ')</span>';
           }
         }
         else {
           if (deathDate != "") {
-            personHeadline += '(Death: ' + deathDate + ')';
+            personHeadline += '<span class="item-name-header">(Death: ' + deathDate + ')</span>';
           }
           else {
             if (description != "") {
@@ -1703,6 +1688,7 @@ function loadPersonData(itemId, userId) {
                   '<div class="person-description-input">' +
                       '<label>Additional description:</label><br/>' +
                       '<input type="text" id="person-' + content[i]['PersonId'] + '-description-edit" class="person-input-field" value="' + description + '">' +
+                      '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="eg.occupation/profession"></i>' +
                   '</div>' +
                   '<div class="form-buttons-right">' +
                       "<button class='edit-data-save-right theme-color-background'" +
@@ -2390,7 +2376,7 @@ function removeTm(pid,cuid,tid){
 		});
 	}
 }
-// When the user scrolls down 50px from the top of the document, resize the navbar's padding 
+// When the user scrolls down 60px from the top of the document, resize the navbar's padding 
 //and the logo's font size
 
 window.onscroll = function() {scrollFunction()};

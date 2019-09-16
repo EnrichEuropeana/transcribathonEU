@@ -605,21 +605,6 @@ function _TCT_item_page_test_iiif( $atts ) {
 							var itemId = url.searchParams.get('item');
 							var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
 
-							fetch('/dev/tp-api/items/' + itemId)
-							                        .then(function(response) {
-							                          return response.json();
-							                        })
-							                        .then(function(places) {
-							                          console.log(places);
-							                          places[0].Places.forEach(function(marker) {
-							                            var el = document.createElement('div');
-							                            el.className = 'marker savedMarker';
-							
-							                            new mapboxgl.Marker(el)
-							                              .setLngLat([marker.Longitude, marker.Latitude])
-							                              .addTo(map);
-							                          })
-                      						  });
 							    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
 							    var map = new mapboxgl.Map({
 							      container: 'full-view-map',
@@ -627,7 +612,27 @@ function _TCT_item_page_test_iiif( $atts ) {
 							      center: [62.8, -21],
 							      zoom: 1
 							    });
+							map.addControl(new mapboxgl.NavigationControl());
 							
+								fetch('/dev/tp-api/items/' + itemId)
+							                        .then(function(response) {
+							                          return response.json();
+							                        })
+							                        .then(function(places) {
+							                          console.log(places);
+							                          places[0].Places.forEach(function(marker) {
+							                            var el = document.createElement('div');
+							                            el.className = 'marker savedMarker fas fa-map-marker-alt';
+										      var popup = new mapboxgl.Popup({offset: 25})
+        										.setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + marker.Name + '</div><div class=\"comment\">' + marker.Comment + '</div></div>');
+
+							                            new mapboxgl.Marker({element: el, anchor: 'bottom'})
+							                              .setLngLat([marker.Longitude, marker.Latitude])
+										      .setPopup(popup)
+							                              .addTo(map);
+							                          })
+                      						  });
+
 							    var geocoder = new MapboxGeocoder({
 							      accessToken: mapboxgl.accessToken,
 							      mapboxgl: mapboxgl,
@@ -641,14 +646,13 @@ function _TCT_item_page_test_iiif( $atts ) {
 							      var el = document.createElement('div');
 							      el.className = 'marker';
 							
-							      // make a marker for each feature and add to the map
 								var icon = document.createElement('i');
-								icon .className = 'fal fa-map-marker-alt';
+								icon .className = 'fas fa-map-marker-plus';
 							      marker = new mapboxgl.Marker({element: el, draggable: true, element: icon})
 							        .setLngLat(res.result.geometry.coordinates)
 							        .addTo(map);
 							        var lngLat = marker.getLngLat();
-								coordinates.value = lngLat.lng + ', ' + lngLat.lat;
+								coordinates.value = lngLat.lat + ', ' + lngLat.lng;
 							marker.on('dragend', onDragEnd);
 							    })
 							
@@ -675,9 +679,17 @@ function _TCT_item_page_test_iiif( $atts ) {
 								 
 								
 							
-							    jQuery('#saveMarker').click(function() {
+							    jQuery('#location-input-section > div:nth-child(4) > button:nth-child(1)').click(function() {
 							      marker.setDraggable(false);
+							      marker.getElement().classList.remove('fa-map-marker-plus');
+							      marker.getElement().classList.add('fa-map-marker-alt');
 							      marker.getElement().classList.add('savedMarker');
+							      // set the popup
+							      var name = jQuery('#location-input-section > div:nth-child(1) > div:nth-child(1) > input:nth-child(3)').val();
+							     var desc = jQuery('#location-input-section > div:nth-child(2) > textarea:nth-child(3)').val();
+							      var popup = new mapboxgl.Popup({offset: 25})
+        										.setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + name + '</div><div class=\"comment\">' + desc + '</div></div>');
+							      marker.setPopup(popup);
 							      console.log(marker._lngLat);
 						    	    });
 						});

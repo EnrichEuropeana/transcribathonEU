@@ -337,11 +337,27 @@ i.mce-i-pos-in-text {
 	height: 400px;
 }
 .mapboxgl-marker {
-	font-size: 50px;
+	font-size: 40px;
 }
 
 .mapboxgl-marker.savedMarker {
-	background-color: #31768a;
+}
+
+.mapboxgl-popup-close-button {
+	padding: 2px;
+	width: 22px;
+	height: 22px;
+	background: none;
+	font-size: 18px;
+}
+
+.mapboxgl-popup .popupWrapper .name {
+	margin-right: 18px;
+	font-weight: 600;
+}
+
+.mapboxgl-popup .popupWrapper .comment {
+	font-style: italic;
 }
 
 #all-places-map {
