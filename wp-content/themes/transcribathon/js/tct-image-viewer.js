@@ -88,8 +88,7 @@ var tct_viewer = (function($, document, window) {
 
 		jQuery('#transcribe').click(function() {
 			if(!jQuery(this).children('i').hasClass('locked')) {
-				toggleFS();
-				switchItemView(event, 'popout')
+				toggleFS(); 
 				tinymce.EditorManager.get('item-page-transcription-text').focus();
 				//TODO maximize
 			}
@@ -405,7 +404,8 @@ var tct_viewer = (function($, document, window) {
 	    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure side-info | charmap | table',
 			resize: true,
 	    menubar: false,
-	    browser_spellcheck: true,
+		browser_spellcheck: true,
+		object_resizing : false,
 	    paste_auto_cleanup_on_paste : true,
 	    body_id: 'htranscriptor',
 			init_instance_callback: function (editor) {
@@ -419,20 +419,19 @@ var tct_viewer = (function($, document, window) {
         */
 			},
 			setup: function (editor) {
-				console.log('in setup');
 				editor.ui.registry.addIcon('missing', '<i class="mce-ico mce-i-missing"></i>');
-    		editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
+    			editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
 				editor.ui.registry.addIcon('info', '<i class="mce-ico mce-i-pos-in-text"></i>');
 
 				editor.ui.registry.addButton('missbut', {
-					title: 'Insert an indicator for missing text',
+					tooltip: 'Insert an indicator for missing text',
 					icon: 'missing',
 					onAction: function () {
 						editor.insertContent('<img src="/wp-content/themes/transcribathon/images/tinyMCEImages/missing.gif" style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\" />');
 						}
 				});
 				editor.ui.registry.addButton('unsure', {
-					title: 'Mark selected as unclear',
+					tooltip: 'Mark selected as unclear',
 					icon: 'unsure',
 					onAction: function () {
 						if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
@@ -453,7 +452,7 @@ var tct_viewer = (function($, document, window) {
 					}
 				});
         editor.ui.registry.addButton('side-info', {
-          title: 'Mark selected as side information',
+          tooltip: 'Add a comment',
           text: '',
           icon: 'info',
           onAction: function () {

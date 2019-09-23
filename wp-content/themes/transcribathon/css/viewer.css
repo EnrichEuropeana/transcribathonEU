@@ -368,3 +368,73 @@ i.mce-i-pos-in-text {
 svg.mapboxgl-ctrl-geocoder--icon-search {
 	left: 90%;
 }
+
+#storyMap {
+	width: 100%;
+	height: 500px;
+}
+
+#documentsMap {
+	width: 100%;
+	height: 750px;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+	height: 27px !important;
+}
+
+.mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+	width: 100%;
+	box-shadow: none;
+}
+
+span.tct-uncertain::after {
+
+    content: '';
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 9px;
+    height: 20px;
+
+}
+
+
+span.tct-uncertain::before {
+
+    content: '';
+    background: transparent url(/wp-content/themes/transcribathon/images/tinyMCEImages/uncertain.png) bottom left no-repeat;
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 23px;
+    height: 20px;
+
+}
+
+span.tct-uncertain {
+    color: #444;
+    background: #ffeea2;
+}
+
+span.pos-in-text
+{
+    color: #fff;
+    background: #999;
+    font-weight: 400;
+}
+
+span.pos-in-text::before {
+    content: '';
+    background: transparent url(/wp-content/themes/transcribathon/images/tinyMCEImages/info.png) bottom left no-repeat;
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 23px;
+    height: 20px;
+}
+
+span.pos-in-text::after {
+    content: '';
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 9px;
+    height: 20px;
+}

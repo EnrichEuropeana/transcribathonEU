@@ -23,5 +23,6 @@
 
 <footer class="_tct_footer">
 
+	<strong class="rights-footer"><i class="far fa-copyright"></i> 2019 Facts & Files</strong>
 
 </footer>

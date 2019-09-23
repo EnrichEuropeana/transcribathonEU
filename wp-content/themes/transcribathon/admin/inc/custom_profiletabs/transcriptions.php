@@ -84,7 +84,7 @@ $theme_sets = get_theme_mods();
     
     // Display data
     $documents = json_decode($result, true);
-
+    
 	echo "<h2>"._x('Transcribed Documents','Transcription-Tab on Profile', 'transcribathon'  )."</h2>\n";
 		echo "<div id=\"doc-results profile\">\n";
             echo "<div class=\"tableholder\">\n";
@@ -99,7 +99,7 @@ $theme_sets = get_theme_mods();
                                     //$thumb_url = wp_get_attachment_image_src( get_post_thumbnail_id( $doc['docid'] ),'post-thumbnail');
                                     //$c = get_post_custom($doc['docid']);
                                         echo "<a href=\"https://europeana.fresenia.man.poznan.pl/documents/story/item?item=".$document['ItemId']."\">";
-                                        echo "<div class=\"dcholder\" style=\"background-image: url(".$document['ItemImageLink']."); \"><img src=\"".$document['ItemImageLink']."\" alt=\"\" /></div>\n";
+                                        echo "<div class=\"dcholder\" style=\"background-image: url(".$document['ItemImageLink']."); \"><img src=\"".home_url()."documents/story/item?item=".$document['ItemId']."\" alt=\"\" /></div>\n";
                                         echo "<h3 id= \"nopadmod\" class=\"nopad\">".$document['ItemTitle']."</h3>\n";
                                         echo "<p id= \"smalladinfo\" class=\"smallinfo\">";
                                         echo "Last time: ".date_i18n(get_option('date_format'),strtotime($document['Timestamp']))."<br />";

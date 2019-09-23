@@ -20,7 +20,7 @@ $storyFacetFields = [
 
 $itemFacetFields = [
     [
-        "fieldName" => "ItemCompletionStatus",
+        "fieldName" => "CompletionStatus",
         "fieldLabel" => "COMPLETION STATUS"],
     [
         "fieldName" => "Categories",
@@ -77,6 +77,7 @@ $storyPage = $_GET['ps'];
  else {
     $url .= "&rows=25&start=0";
  }
+ 
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
@@ -146,7 +147,7 @@ $storyPage = $_GET['ps'];
  else {
     $url .= "&rows=25&start=0";
  }
- 
+
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
@@ -205,6 +206,7 @@ $content .= '<div id="story-search-container">';
         $storyTabContent .= '<div class="facet-form-search">';
             $storyTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qs" form="story-facet-form"></div>';
             $storyTabContent .= '<div><button type="submit" form="story-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
+            $storyTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button">MAP</a></div>';
             $storyTabContent .= '<div style="clear:both;"></div>';
         $storyTabContent .= '</div>';
     $storyTabContent .= '</section>';
@@ -213,6 +215,8 @@ $content .= '<div id="story-search-container">';
         $itemTabContent .= '<div class="facet-form-search">';;
             $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form"></div>';
             $itemTabContent .= '<div><button type="submit" form="item-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
+            $itemTabContent .= '<div class="map-search-page"><button type="submit" form="" class="theme-color-background document-search-button">MAP</button></div>';
+            $itemTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button">MAP</a></div>';
             $itemTabContent .= '<div style="clear:both;"></div>';
         $itemTabContent .= '</div>';
     $itemTabContent .= '</section>';
@@ -393,7 +397,14 @@ $content .= '<div id="story-search-container">';
                         $pagination .= '</button>';
                     }
 
-                    // Previous page
+                    // Previous page arrow
+                        if ($storyPage != null && is_numeric($storyPage) && $storyPage > 1) {
+                            $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage - 1).'" class="theme-color-hover" style="outline:none;">';
+                                $pagination .= '&lsaquo;';
+                            $pagination .= '</button>';
+                        }
+
+                    // Previous page number
                         if ($storyPage != null && is_numeric($storyPage) && $storyPage > 1) {
                             $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage - 1).'" class="theme-color-hover" style="outline:none;">';
                                 $pagination .= ($storyPage - 1);
@@ -414,7 +425,14 @@ $content .= '<div id="story-search-container">';
                         }
                     }
 
-                        // Right arrows
+                    // Next page arrow
+                    if ($storyPage < ceil($storyCount / 25)) {
+                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage + 1).'" class="theme-color-hover" style="outline:none;">';
+                            $pagination .= '&rsaquo;';  
+                        $pagination .= '</button>';
+                    }
+
+                    // Right arrows
                     if ($storyPage < ceil($storyCount / 25)) {
                         $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.ceil($storyCount / 25).'" class="theme-color-hover" style="outline:none;">';
                             $pagination .= '&raquo;';
@@ -434,7 +452,7 @@ $content .= '<div id="story-search-container">';
                     }
                     
                     // Get additional story data
-                    $url = home_url()."/tp-api/storiesMinimal?storyId=";
+                    $url = home_url()."/tp-api/storiesMinimal?story=";
                     $first = true;
                     foreach($storyIdList as $storyId) {
                         if ($first == true) {
@@ -510,7 +528,25 @@ $content .= '<div id="story-search-container">';
                                 $storyTabContent .= "</a>";
 
                                 // Progress bar
+
+                                // Get status data
+                                $url = home_url()."/tp-api/completionStatus";
+                                $requestType = "GET";
+
+                                include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+
+                                // Save status data
+                                $statusTypes = json_decode($result, true);
+
                                 $statusData = array();
+                                foreach ($statusTypes as $statusType) {
+                                    $statusObject = new stdClass;
+                                    $statusObject->Name = $statusType['Name'];
+                                    $statusObject->ColorCode = $statusType['ColorCode'];
+                                    $statusObject->ColorCodeGradient = $statusType['ColorCodeGradient'];
+                                    $statusObject->Amount = 0;
+                                    $statusData[$statusType['Name']] = $statusObject;
+                                }
                                 $itemAmount = 0;
                                 foreach($storyData[$i]['CompletionStatus'] as $status) {
                                     $itemAmount += $status['Amount'];
@@ -526,7 +562,7 @@ $content .= '<div id="story-search-container">';
                                     $statusObject->ColorCodeGradient = $status['ColorCodeGradient'];
                                     $statusObject->Amount = (round($status['Amount'] / $itemAmount, 2) * 100);
 
-                                    array_push($statusData, $statusObject);
+                                    $statusData[$status['Name']] = $statusObject;
                                     $totalPercent += $statusObject->Amount;
                                 }
 
@@ -761,14 +797,6 @@ $content .= '<div id="story-search-container">';
                                 $itemTabContent .= "</a>";
 
                                 
-                                // Get status data
-                                $url = home_url()."/tp-api/completionStatus";
-                                $requestType = "GET";
-
-                                include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
-
-                                // Save status data
-                                $statusTypes = json_decode($result, true);
 
                                 // Progress bar
                                 $progressData = array(
@@ -793,17 +821,17 @@ $content .= '<div id="story-search-container">';
                                     $itemTabContent .= '<div class="item-status-info-box box-status-bar-info-box">';
                                         $itemTabContent .= '<ul class="item-status-info-box-list">';
                                             foreach ($statusTypes as $status) {
-                                                $percentage = $status->Amount;
+                                                $percentage = ($progressCount[$status['Name']] / sizeof($progressData)) * 100;
                                                 $itemTabContent .= '<li>';
-                                                    $itemTabContent .= '<span class="status-info-box-color-indicator" style="background-color:'.$status->ColorCode.';
+                                                    $itemTabContent .= '<span class="status-info-box-color-indicator" style="background-color:'.$status['ColorCode'].';
                                                                     background-image: -webkit-gradient(linear, left top, left bottom,
-                                                                    color-stop(0, '.$status->ColorCode.'), color-stop(1, '.$status->ColorCodeGradient.'));">';
+                                                                    color-stop(0, '.$status['ColorCode'].'), color-stop(1, '.$status['ColorCodeGradient'].'));">';
                                                     $itemTabContent .= '</span>';
-                                                    $itemTabContent .= '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status->Name).'-section" class="status-info-box-percentage" style="width: 20%;">';
+                                                    $itemTabContent .= '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status['Name']).'-section" class="status-info-box-percentage" style="width: 20%;">';
                                                         $itemTabContent .= $percentage.'%';
                                                     $itemTabContent .= '</span>';
                                                     $itemTabContent .= '<span class="status-info-box-text">';
-                                                        $itemTabContent .= $status->Name;
+                                                        $itemTabContent .= $status['Name'];
                                                     $itemTabContent .= '</span>';
                                                 $itemTabContent .= '</li>';
                                             }

@@ -7,7 +7,7 @@
  * @license GPL 2.0
  */
 ?>
-
+    
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
 	<div class="entry-main">
@@ -18,7 +18,7 @@
 		<div class="entry-content bubbles">  
 			<a class="bubble search theme-color-background" href="documents"><i class="fal fa-search"></i><br />&nbsp;<br />Search <br /></a>
 			<a class="bubble big transcribe-now theme-color-background" href="documents"><i class="fal fa-pen"></i><br />&nbsp;<br />Transcribe <br />now</a>
-			<a class="bubble help theme-color-background" id="tutorial-mode" href="#"><i class="fal fa-question-circle"></i><br />&nbsp;<br />How to <br />start</a>
+			<a class="bubble help theme-color-background tutorial-model" id="tutorial-mode"><i class="fal fa-question-circle"></i><br />&nbsp;<br />How to <br />start</a>
 		</div>
 		<div id="tutorial-popup-window-container">
             <div id="tutorial-window-popup">
@@ -27,109 +27,75 @@
                     <span class="tutorial-window-close">&times;</span>
                 </div>
                 <div class="tutorial-window-popup-body">
-					<div class="tutorial-left">
+					<div class="tutorial-left action">
 					<ul>
-					<li>Register</li>
-					<li>Enrich</li>
-					<li>Step 1: Transcription</li>
-					<li>Step 2: Description</li>
-					<li>Step 3: Location</li>
-					<li>Step 4: Tagging</li>
-					<li>What are the different user-roles and how and when does my user-roles change?</li>
-					<li>What are miles in this context and how do I earn them?</li>
-					<li>I finished a transcription-now what?</li>
-					<li>How can I ask other members for help?</li>
+						<li><a href="#" data-slide="1" class="theme-color"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Register</span></a></li>
+						<li><a href="#" data-slide="2"><i class="fal fa-long-arrow-right"  style="margin-right: 5px;"></i><span>Enrich</span></a>
+							<ul>
+								<li><a href="#" data-slide="5"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Step 1: Transcription</span></a></li>
+								<li><a href="#" data-slide="6"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Step 2: Description</span></a></li>
+								<li><a href="#" data-slide="7"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Step 3: Location</span></a></li>
+								<li><a href="#" data-slide="8"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Step 4: Tagging</span></a></li>
+								<li><a href="#" data-slide="9"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Step 5: Mark for Review</span></a></li>
+							</ul>
+						</li>
+						<li><a href="#" data-slide="10"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Formatting</span></a></li>
+						<li><a href="#" data-slide="11"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Review</span></a></li>
+						<li><a href="#" data-slide="12"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Completion Statuses</span></a></li>
+						<li><a href="#" data-slide="13"><i class="fal fa-long-arrow-right" style="margin-right: 5px;"></i><span>Miles and Levels</span></a></li>
 					</ul>
 					</div>
+					
+					<?php
+						//include theme directory for text hovering
+						$theme_sets = get_theme_mods();
+						echo "<style>
+						.tutorial-window-slider button.slick-arrow{
+							color: ".$theme_sets['vantage_general_link_hover_color']." !important;
+						}
+				</style>";
+										// Get all tutorial posts
+						$args = array( 
+							'posts_per_page'   => 50,
+							'post_type'		=> 'tutorial', // or 'post', 'page'
+							'meta_key' => 'tct_tutorial_order',
+							'orderby'  => 'meta_value_num',
+							'order'			=> 'ASC'
+							);
+
+						$tutorialPosts = get_posts($args);
+						global $_wp_additional_image_sizes;
+					?>
 					<div class="tutorial-right tutorial-window-slider">
-						<div class="testing active slick-slide">
+						<?php
+							foreach ($tutorialPosts as $tutorialPost) {
+								echo "<div class='testing active slick-slide'>";
+									if (get_post_meta($tutorialPost->ID, "_thumbnail_id")[0] != null) {
+										echo "<div class='tutorial-image-area'>";
+											echo '<img data-lazy="'.wp_get_attachment_image_src(get_post_meta($tutorialPost->ID, "_thumbnail_id")[0], 
+															array($_wp_additional_image_sizes['tutorial-image']['width'],$_wp_additional_image_sizes['tutorial-image']['height']))[0].'" alt=""/>';
+										echo "</div>";
+										echo "<div class='tutorial-text-area'>";
+											echo "<h2 class='theme-color tutorial-headline'>".$tutorialPost->post_title."</h2>";
+											echo $tutorialPost->post_content;
+										echo "</div>";
+									}
+									else {
+										echo "<div class='tutorial-text-area' style='height: 100%'>";
+											echo "<h2 class='theme-color tutorial-headline'>".$tutorialPost->post_title."</h2>";
+											echo $tutorialPost->post_content;
+										echo "</div>";
+									}
+									echo '<div style="clear:both;"></div>';
+								echo "</div>";
+							}
+						?>
+						<!--<div class="testing active slick-slide">
 							<div class="tutorial-image-area">
-								<?php 
 									echo '<img src="'.CHILD_TEMPLATE_DIR.'/images/tutorial-trial.png">';
 								?>
-							</div>
-							<div class="tutorial-text-area"><h2>Register</h2><br>
-							<p>To contribute to Transcribathon, you must first create an account. You can 
-							work on all projects using one account. Follow the instructions on the Registration 
-							[LINK] page to set up your Transcribathon account.</p><br>
-							<p>You can only add new enrichments to items marked with the grey 
-							(Not Started) or yellow (Edit) statuses. Tasks for items in the orange 
-							and green statuses are explained in the Review [LINK to ANCHOR] section of 
-							this tutorial.</p>
-							</div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Enrich</h2><br>
-							<p>Enrichment takes place on the item page. First, find an item (a single document) you want to enrich by searching and browsing the project collection on the Discovery Page [LINK]. Click on a story (a bundle of items) and select an item from the story page, or select an item directly from your discovery results. </p></div>
-							<br><p>Get started by clicking on the pen button in the left menu of the item image. This will open up the full-screen Enrichment Mode. Edit your workspace view by using the top-right menu. You can have the white Activity Panel docked to the right (default) , to the bottom , or as an independent overlay . If you just want to view the image, you can hide the panel using the minimise button , and then re-open it again with the pencil button. Adjust the size and location of your activity panel </p>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><p>You enrich documents following a step-by-step process. Each of these steps are explained below.</p></div>
-							<div><h2>Transcription</h2><br>
-							<p>To start a transcription, select the transcription tab (the pencil) at the top of the activity panel. 
-							Click inside the box underneath the heading TRANSCRIPTION and start writing your transcription.
-							 Use the toolbar to format your text and to add special characters and tables. A guide to the
-							  toolbar is available in the Formatting section.</p><br>
-							  <p>Identify the language(s) of the text using the dropdown list under the transcription box. You can select multiple languages at once.</p><br>
-							  <p>If the image has no text to transcribe, tick the checkbox ‘No Text’.</p><br>
-							  <p>Once you have finished, click SAVE.</p>
-							</div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Description</h2><br>
-							<p>You can add a description underneath the Transcription field. The first task is to identify what type of document the item is: a letter, diary, postcard or picture. Users should tick the category which best applies to the item. Multiple categories can be selected at once.</p><br>
-							  <p>The second task is to write the description. Click inside the box underneath the heading DESCRIPTION. Here, you can write what the item is, what it is about, and specify the images and objects that appear in the item.</p><br>
-							  <p>Identify the language of the description text that you wrote using the dropdown list underneath. You can only select one language.</p><br>
-							  <p>Once you have finished your description, click SAVE.</p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Location</h2><br>
-							<p>To tag locations to the item, select the tagging tab (map pin and tag icons) at the top of the activity panel. Click ADD LOCATION.</p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Tagging</h2><br>
-							<p></p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2></h2><br>
-							<p></p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2></h2><br>
-							<p></p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Formatting</h2><br>
-							<p>Guidelines on how users should format their transcription using special tools. Toolbar diagram with explanations for each section.</p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div><img src=""></div>
-							<div class="tutorial-text-area"><h2>Review</h2><br>
-							<p>How to review and complete contributions to each of the four steps, and how they are locked to advanced users.</p></div>
-							<div style="clear:both;"></div>
-						</div>
-						<div class="testing slick-slide">
-							<div class="tutorial-image-area"><img src='https://transcribathon.com/wp-content/uploads/PB281692c-2-436x272.jpg' alt=''/></div>
-							<div class="tutorial-text-area"><p>10 tutorial text in the popup..tutorialtutorial text in the popup.. text in the popup..tutorial text in the popup..tutorial text in the popup..tutorial text in the popup..</p></div>
-							<div style="clear:both;"></div>
-						</div>
+							</div> -->
+ 						</div> 
 					</div>
 				</div>
 				<!--<div class="prev">Prev</div>
@@ -150,8 +116,14 @@
 								dots: false,
 								infinite: false,
 								lazyLoad: 'ondemand'
-
-                            });
+							});
+							jQuery('a[data-slide]').click(function(e) {
+							e.preventDefault();
+							var slideno = jQuery(this).data('slide');
+								jQuery('a[data-slide]').removeClass("theme-color");
+								jQuery(this).addClass("theme-color");
+							jQuery('.tutorial-window-slider').slick('slickGoTo', slideno - 1);
+							});
                         });
 		</script>
 		<!--<div id="myModal" class="modal">
@@ -165,7 +137,7 @@
 		<script>
 		jQuery ( document ).ready(function() {
                                 // When the user clicks the button, open the modal 
-                                jQuery('#tutorial-mode').click(function() {
+                                jQuery('.tutorial-model').click(function() {
 								jQuery('#tutorial-popup-window-container').css('display', 'block');
 								jQuery('.tutorial-window-slider').slick('refresh');
 								
@@ -174,13 +146,13 @@
                                 // When the user clicks on <span> (x), close the modal
                                 jQuery('.tutorial-window-close').click(function() {
                                 jQuery('#tutorial-popup-window-container').css('display', 'none');
+								})		
+								
+								jQuery('#tutorial-popup-window-container').mousedown(function(event){
+									if (event.target.id == 'tutorial-popup-window-container') {
+										jQuery('#tutorial-popup-window-container').css('display', 'none')
+									}
 								})			
-								var modal = document.getElementById('tutorial-popup-window-container');
-								window.onclick = function(event) {
-										if (event.target == modal) {
-										modal.style.display = "none";
-										}
-									}					
 							});
 							
 		</script> 

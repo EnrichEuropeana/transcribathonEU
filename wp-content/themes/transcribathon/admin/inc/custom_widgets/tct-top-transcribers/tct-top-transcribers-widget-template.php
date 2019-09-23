@@ -41,7 +41,8 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					background: rgba(9, 97, 129, 0.6);
 				}
 				ul.topusers li.p2{
-					background: rgba(9, 97, 129, 0.45)}
+					background: rgba(9, 97, 129, 0.45);
+				}
 				ul.topusers li.p3{
 					background: rgba(9, 97, 129, 0.3);
 				}
@@ -214,8 +215,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					echo "<li class=\"p".$i."\">";
 					echo "<div class=\"tct-user-banner\"></div>\n"; 
 					if($kind === "campaign"){
-						
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s mile per member', '%s miles per member', (float)$team['MilesPerPerson'], 'transcribathon'  ) ), number_format_i18n($team['MilesPerPerson'],2))."</span>\n";
+						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s mile per member', '%s miles per member', (int)$team['MilesPerPerson'], 'transcribathon'  ) ), number_format_i18n((int)$team['MilesPerPerson'],2))."</span>\n";
 						$miles2 = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$team['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$team['Miles']))."</span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$team['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$team['TranscriptionCharacters']))."</span>\n";
 						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$team['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$team['Locations']))."</span>\n";

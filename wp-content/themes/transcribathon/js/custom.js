@@ -3,19 +3,26 @@ var home_url = WP_URLs.home_url;
 jQuery ( document ).ready(function() {
   jQuery(document).keydown(function(e) {
     if (e.key === "Escape") {
-      if (jQuery('#item-page-login-container').css('display') != "none") {
+      if (jQuery('#item-page-login-container').css('display') != "none" || jQuery('#locked-warning-container').css('display') != "none") {
         jQuery('#item-page-login-container').css('display', 'none')
+        jQuery('#locked-warning-container').css('display', 'none')
       }
       else if (jQuery('#image-view-container').css('display') != "none") {
         switchItemPageView();
       }
     }
   });
-  window.onclick = function(event) {
-    var modal = document.getElementById('item-page-login-container');
-    if (event.target == modal) {
-      modal.style.display = "none";
+  window.onmousedown = function(event) {
+    var loginModal = document.getElementById('item-page-login-container');
+    if (event.target == loginModal) {
+      loginModal.style.display = "none";
     }
+    var lockedModal = document.getElementById('locked-warning-container');
+    if (event.target == lockedModal) {
+      lockedModal.style.display = "none";
+    }
+  }
+  window.click = function(event) {
     if (!jQuery(event.target).hasClass('status-dropdown-content') && !jQuery(event.target).hasClass('status-indicator')) {
       jQuery('.status-dropdown-content').removeClass('show')
     } 
@@ -64,6 +71,106 @@ function uninstallEventListeners() {
 }
 
 function installEventListeners() {
+   // test reinitialising map
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var itemId = url.searchParams.get('item');
+    var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
+    if (jQuery('#full-view-map').length) {
+        var map = new mapboxgl.Map({
+          container: 'full-view-map',
+          style: 'mapbox://styles/fandf/cjnpzoia60m4y2rp5cvoq9t8z',
+          center: [16, 49],
+          zoom: 2.25
+        });
+        map.addControl(new mapboxgl.NavigationControl());
+        
+        fetch('/dev/tp-api/items/' + itemId)
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(places) {
+            console.log(places);
+            places[0].Places.forEach(function(marker) {
+              var el = document.createElement('div');
+              el.className = 'marker savedMarker fas fa-map-marker-alt';
+              var popup = new mapboxgl.Popup({offset: 25})
+              .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + marker.Name + '</div><div class=\"comment\">' + marker.Comment + '</div></div>');
+
+              new mapboxgl.Marker({element: el, anchor: 'bottom'})
+                .setLngLat([marker.Longitude, marker.Latitude])
+              .setPopup(popup)
+                .addTo(map);
+            })
+        });
+
+      var geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+              marker: false,
+	language: 'en-EN'
+      });
+      
+      geocoder.on('result', function(res) {
+        console.log(res);
+                      jQuery('#location-input-section').addClass('show');
+        jQuery('.location-input-name-container.location-input-container > input').val(res.result.place_name);
+        jQuery('#location-input-geonames-search-container > input').val(res.result['text_en-EN'] + ', ' + res.result.properties.wikidata);
+        var el = document.createElement('div');
+        el.className = 'marker';
+
+        var icon = document.createElement('i');
+        icon .className = 'fas fa-map-marker-plus';
+	if(typeof marker !== 'undefined') {
+		marker.remove();
+	}
+        marker = new mapboxgl.Marker({element: el, draggable: true, element: icon})
+          .setLngLat(res.result.geometry.coordinates)
+          .addTo(map);
+          var lngLat = marker.getLngLat();
+        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
+        marker.on('dragend', onDragEnd);
+      })
+      
+        //map.addControl(geocoder, 'bottom-left');
+	jQuery('.location-input-name-container.location-input-container')[0].appendChild(geocoder.onAdd(map));       
+	var marker;
+
+      jQuery('#addMarker').click(function() {
+        var el = document.createElement('div');
+        el.className = 'marker';
+      
+        // make a marker for each feature and add to the map
+        marker = new mapboxgl.Marker({element: el, draggable: true})
+          .setLngLat(map.getCenter())
+          .addTo(map);
+
+        marker.on('dragend', onDragEnd);
+      });
+
+      function onDragEnd() {
+        var lngLat = marker.getLngLat();
+        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
+      }  
+    }
+    
+  jQuery('#location-input-section > div:nth-child(4) > button:nth-child(1)').click(function() {
+    marker.setDraggable(false);
+    marker.getElement().classList.remove('fa-map-marker-plus');
+    marker.getElement().classList.add('fa-map-marker-alt');
+    marker.getElement().classList.add('savedMarker');
+    // set the popup
+    var name = jQuery('#location-input-section > div:nth-child(1) > div:nth-child(1) > input:nth-child(3)').val();
+    var desc = jQuery('#location-input-section > div:nth-child(2) > textarea:nth-child(3)').val();
+    var popup = new mapboxgl.Popup({offset: 25})
+            .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + name + '</div><div class=\"comment\">' + desc + '</div></div>');
+    marker.setPopup(popup);
+    console.log(marker._lngLat);
+  });
+
+
   // When the user clicks the button, open the modal 
   jQuery('#lock-login').click(function() {
     jQuery('#item-page-login-container').css('display', 'block');
@@ -240,6 +347,8 @@ function installEventListeners() {
     var transcriptionText = jQuery('#item-page-transcription-text').text();     
     if(transcriptionText.length != 0) {
       jQuery('#transcription-update-button').addClass('theme-color-background');
+      jQuery('#transcription-update-button').prop('disabled', false);
+      jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
     }
   })
   
@@ -262,6 +371,8 @@ function installEventListeners() {
       jQuery('#description-update-button').css('display','block');
       if (language != null) {
         jQuery('#description-update-button').addClass('theme-color-background');
+        jQuery('#description-update-button').prop('disabled', false);
+        jQuery('#description-update-button .language-tooltip-text').css('display', 'none');
       }
     }
   });
@@ -284,6 +395,8 @@ function installEventListeners() {
       jQuery('#transcription-update-button').css('display', 'block');
       if (languages > 0) {
         jQuery('#transcription-update-button').addClass('theme-color-background');
+        jQuery('#transcription-update-button').prop('disabled', false);
+        jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
       }
     }
     else {
@@ -303,6 +416,8 @@ function installEventListeners() {
         jQuery('#transcription-language-custom-selector select').addClass("disabled-dropdown");
         tinymce.remove();
         jQuery('#transcription-update-button').addClass('theme-color-background');
+        jQuery('#transcription-update-button').prop('disabled', false);
+        jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
         jQuery('#transcription-update-button').css('display', 'block');
       }
       else {
@@ -316,6 +431,8 @@ function installEventListeners() {
       jQuery('#transcription-language-selector select').removeClass("disabled-dropdown");
       tct_viewer.initTinyWithConfig('#item-page-transcription-text');
       jQuery('#transcription-update-button').removeClass('theme-color-background');
+      jQuery('#transcription-update-button').prop('disabled', true);
+      jQuery('#transcription-update-button .language-tooltip-text').css('display', 'block');
     }
   })
 
@@ -421,7 +538,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").addClass("panel-right")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery("#item-splitter").addClass("splitter-vertical")
-      jQuery("#item-data-section").draggable()
+      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -457,7 +574,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").addClass("panel-bottom")
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").addClass("splitter-horizontal")
-      jQuery("#item-data-section").draggable()
+      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -493,7 +610,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery( "#item-data-section" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
-      jQuery("#item-data-section").draggable()
+      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
       jQuery("#item-data-section").draggable('enable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('enable')
@@ -523,7 +640,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery( "#item-data-section" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
-      jQuery("#item-data-section").draggable()
+      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -630,6 +747,8 @@ function switchItemPageView() {
     jQuery('#description-language-selector select').val(descriptionLanguage);
 
   } else {
+    var descriptionText = jQuery('#item-page-description-text').val();
+    var descriptionLanguage = jQuery('#description-language-selector select').val();
     //switch to full view
     jQuery('.site-footer').css('display', 'block')
     jQuery('#full-view-container').css('display', 'block')
@@ -675,6 +794,9 @@ function switchItemPageView() {
       inline: true
     });
     */
+    
+    jQuery('#item-page-description-text').val(descriptionText);
+    jQuery('#description-language-selector select').val(descriptionLanguage);
   }
   installEventListeners();
   jQuery('.item-page-slider').slick('refresh')
@@ -780,10 +902,6 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
 
 // Updates the item description
 function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
-  if (!jQuery('#transcription-update-button').hasClass('theme-color-background')) {
-    alert("Please add a text and language first");
-    return 0;
-  }
 
   jQuery('#item-transcription-spinner-container').css('display', 'block')
 
@@ -875,6 +993,7 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
             changeStatus(itemId, "Not Started", "Edit", "TranscriptionStatusId", 2, editStatusColor, statusCount)
           }
           jQuery('#transcription-update-button').removeClass('theme-color-background');
+          jQuery('#transcription-update-button').prop('disabled', true);
         }
         jQuery('#item-transcription-spinner-container').css('display', 'none')
       });
@@ -1069,9 +1188,13 @@ function removeTranscriptionLanguage(languageId, e) {
   var languages = jQuery('#transcription-selected-languages ul').children().length;   
   if(transcriptionText.length != 0 && languages > 0) {
     jQuery('#transcription-update-button').addClass('theme-color-background');
+    jQuery('#transcription-update-button').prop('disabled', false);
+    jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
   }
   else {
     jQuery('#transcription-update-button').removeClass('theme-color-background');
+    jQuery('#transcription-update-button').prop('disabled', true);
+    jQuery('#transcription-update-button .language-tooltip-text').css('display', 'block');
   }   
   if(transcriptionText.length == 0 && languages == 0) {
     jQuery('#no-text-selector').css('display','block');
@@ -1091,6 +1214,12 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
   }
   if (isNaN(latitude) || isNaN(longitude)) {
     jQuery('#location-input-section .location-input-coordinates-container span').css('display', 'block');
+    jQuery('#item-location-spinner-container').css('display', 'none')
+    return 0;
+  }
+
+  if (jQuery('#location-input-section .location-input-name-container input').val() == "") {
+    jQuery('#location-input-section .location-input-name-container span').css('display', 'block');
     jQuery('#item-location-spinner-container').css('display', 'none')
     return 0;
   }
@@ -1151,6 +1280,10 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
 }
 
 function saveItemDate(itemId, userId, editStatusColor, statusCount) {
+  if (jQuery('#transcribeLock').length) {
+    lockWarning();
+    return 0;
+  }
   jQuery('#item-date-spinner-container').css('display', 'block')
   // Prepare data and send API request
   data = {
@@ -1158,10 +1291,30 @@ function saveItemDate(itemId, userId, editStatusColor, statusCount) {
   startDate = jQuery('#startdateentry').val().split('/');
   if (!isNaN(startDate[2]) && !isNaN(startDate[1]) && !isNaN(startDate[0])) {
     data['DateStart'] = startDate[2] + "-" + startDate[1] + "-" + startDate[0];
+    console.log(data['DateStart']);
   }
+  else if (startDate.length == 1 && startDate[0].length <= 4 && !isNaN(startDate[0])) {
+    data['DateStart'] = startDate[0] + "-01-01";
+    jQuery('#startdateentry').val("01/01/" + startDate[0])
+  }
+  else {
+    jQuery('#item-date-spinner-container').css('display', 'none')
+    alert("Please enter a valid date or year");
+    return 0
+  }
+
   endDate = jQuery('#enddateentry').val().split('/');
   if (!isNaN(endDate[2]) && !isNaN(endDate[1]) && !isNaN(endDate[0])) {
     data['DateEnd'] = endDate[2] + "-" + endDate[1] + "-" + endDate[0];
+  }
+  else if (endDate.length == 1 && endDate[0].length <=4 && !isNaN(endDate[0])) {
+    data['DateEnd'] = endDate[0] + "-01-01";
+    jQuery('#startdateentry').val("01/01/" + endDate[0])
+  }
+  else {
+    jQuery('#item-date-spinner-container').css('display', 'none')
+    alert("Please enter a valid date or year");
+    return 0
   }
   
   var dataString= JSON.stringify(data);
@@ -1453,7 +1606,7 @@ function loadPlaceData(itemId, userId) {
                             '<div id="location-data-edit-' + content[i]['PlaceId'] + '" class="location-data-edit-container">' + 
                                 '<div class="location-input-section-top">' +
                                     '<div class="location-input-name-container location-input-container">' +
-                                        '<label>Location name:</label><br/>' +
+                                        '<label>Location Name:</label><br/>' +
                                         '<input type="text" value="' + content[i]['Name'] + '" name="" placeholder="">' +
                                     '</div>' +
                                     '<div class="location-input-coordinates-container location-input-container">' +
@@ -1466,7 +1619,7 @@ function loadPlaceData(itemId, userId) {
                                 '</div>' +
                 
                                 '<div class="location-input-description-container location-input-container">' +
-                                    '<label>Description:</label><br/>' +
+                                    '<label>Description:<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this location, e.g. the building name, or its significance to the item"></i></label><br/>' +
                                     '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc" placeholder="" name="">' + comment + '</textarea>' +
                                 '</div>' +
 
@@ -1564,7 +1717,7 @@ function loadPersonData(itemId, userId) {
         } 
         
         var personHeadline = '<span class="item-name-header">' +
-         firstName + ', ' + lastName + ' ' +
+         firstName + ' ' + lastName + ' ' +
         '</span>';
         if (birthDate != "") {
           if (deathDate != "") {
@@ -1596,29 +1749,32 @@ function loadPersonData(itemId, userId) {
           '</div>' + 
           '<div id="person-data-output-' + content[i]['PersonId'] + '" class="collapse">' +
             '<div id="person-data-output-display-' + content[i]['PersonId'] + '" class="person-data-output-content">' +
-              '<div class="person-data-output-birthDeath">' +
-                  '<span>' +
-                      'Birth Location: ' +
-                      birthPlace +
-                  '</span>' +
-                    '</br>' +
-                  '<span>' +
-                      'Death Location: ' +
-                      deathPlace +
-                  '</span>' +
-              '</div>' +
-              '<div class="person-data-output-birthDeath">' +
-                  '<span>' +
-                      'Birth Date: ' +
-                      birthDate +
-                  '</span>' +
-                  '</br>' +
-                  '<span>' +
-                      'Death Date: ' +
-                      deathDate +
-                  '</span>' +
+              '<div>' +
+                  '<div class="person-data-output-birthDeath">' +
+                      '<span>' +
+                          'Birth Location: ' +
+                          birthPlace +
+                      '</span>' +
+                        '</br>' +
+                      '<span>' +
+                          'Death Location: ' +
+                          deathPlace +
+                      '</span>' +
+                  '</div>' +
+                  '<div class="person-data-output-birthDeath">' +
+                      '<span>' +
+                          'Birth Date: ' +
+                          birthDate +
+                      '</span>' +
+                      '</br>' +
+                      '<span>' +
+                          'Death Date: ' +
+                          deathDate +
+                      '</span>' +
 
-                  '</br>' +
+                      '</br>' +
+                  '</div>' +
+                  '<div style="clear:both;"></div>' +
               '</div>' +
               '<div class="person-data-output-button">'+
                       '<span>'+
@@ -1686,9 +1842,9 @@ function loadPersonData(itemId, userId) {
                   '</div>' + 
 
                   '<div class="person-description-input">' +
-                      '<label>Additional description:</label><br/>' +
+                      '<label>Description:</label><br/>' +
                       '<input type="text" id="person-' + content[i]['PersonId'] + '-description-edit" class="person-input-field" value="' + description + '">' +
-                      '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="eg.occupation/profession"></i>' +
+                      '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i>' +
                   '</div>' +
                   '<div class="form-buttons-right">' +
                       "<button class='edit-data-save-right theme-color-background'" +
@@ -2443,5 +2599,5 @@ function checkExAbbr(fid,txt,tid){
 }
 
 function lockWarning() {
-  alert("Someone else is currently editing this document");
+  jQuery('#locked-warning-container').css('display', 'block');
 }

@@ -608,7 +608,7 @@ function _TCT_item_page_test_iiif( $atts ) {
 							    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
 							    var map = new mapboxgl.Map({
 							      container: 'full-view-map',
-							      style: 'mapbox://styles/fandf/cjnq53ido0nlt2smrm8wjd8nw',
+							      style: 'mapbox://styles/fandf/cjnpzoia60m4y2rp5cvoq9t8z',
 							      center: [62.8, -21],
 							      zoom: 1
 							    });
@@ -641,6 +641,7 @@ function _TCT_item_page_test_iiif( $atts ) {
 							
 							    geocoder.on('result', function(res) {
 							      console.log(res);
+							      jQuery('#location-input-section').addClass('show');
 							      jQuery('.location-input-name-container.location-input-container > input').val(res.result.place_name);
 							      jQuery('#location-input-geonames-search-container > input').val(res.result.properties.wikidata);
 							      var el = document.createElement('div');

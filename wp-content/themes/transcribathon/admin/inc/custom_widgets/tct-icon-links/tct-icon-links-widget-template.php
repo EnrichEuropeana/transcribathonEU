@@ -19,7 +19,7 @@ $content .= "<section id='frontpage-bottom'>";
             $content .= "</li>";
 
             $content .= "<li>";
-                $content .= "<a href='' class='frontpage-bottom-link'>";
+                $content .= "<a href='dev/map' class='frontpage-bottom-link'>";
                 $content .= "<div class='frontpage-bottom-link-div theme-color-hover' style='height: 100%;'>";
                     $content .= "<i class='far fa-map-marked-alt frontpage-bottom-icon'></i>";
                     $content .= "<h5 class='theme-color theme-hover-child'>DOCUMENT MAP</h5>";

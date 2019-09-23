@@ -97,10 +97,17 @@ function _TCT_get_document_data( $atts ) {
                     infinite: ".$infinite.",
                     arrows: true,
                     speed: 300,
-                    slidesToShow: 8,
-                    slidesToScroll: 8,
+                    slidesToShow: 9,
+                    slidesToScroll: 9,
                     lazyLoad: 'ondemand',
                     responsive: [
+                        {
+                            breakpoint: 1900,
+                            settings: {
+                            slidesToShow: 8,
+                            slidesToScroll: 8
+                            }
+                        },
                         {
                             breakpoint: 1650,
                             settings: {
@@ -156,9 +163,11 @@ function _TCT_get_document_data( $atts ) {
                 $content .= $storyData['dcTitle'];
                 $content .= '</li>';
             $content .= '</ul>';
+            /*
                 $content .= '<ul class="story-navigation-content-container right" style="">
                             <li class="rgt"><a title="next" href=""><i class="fal fa-angle-right" style="font-size: 20px;"></i></a></li>
                         </ul>';
+            */
         $content .= '</div>';
 
 $content .= "<div id='total-storypg' class='storypg-container'>";
@@ -297,6 +306,48 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
 
             $content .= "</div>";
             $content .= "<div style='clear:both;'></div>";
+	    $content .= "<div id='storyMap'></div>";
+	    $content .= "<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.min.js'></script>
+						<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.css' type='text/css' />";
+	    $content .= "    <script>
+							jQuery(document).ready(function() {
+						        var url_string = window.location.href;
+							var url = new URL(url_string);
+							var storyId = url.searchParams.get('story');
+							var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
+
+							    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
+							    var map = new mapboxgl.Map({
+							      container: 'storyMap',
+							      style: 'mapbox://styles/fandf/cjnpzoia60m4y2rp5cvoq9t8z',
+							      center: [62.8, -21],
+							      zoom: 1
+							    });
+							map.addControl(new mapboxgl.NavigationControl());
+							
+								fetch('/dev/tp-api/stories/' + storyId)
+							                        .then(function(response) {
+							                          return response.json();
+							                        })
+							                        .then(function(places) {
+							                          console.log(places);
+							                          places[0].Items.forEach(function(marker) {
+											marker.Places.forEach(function(place) {
+							                            var el = document.createElement('div');
+							                            el.className = 'marker savedMarker fas fa-map-marker-alt';
+										      var popup = new mapboxgl.Popup({offset: 25})
+        										.setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + place.Name + '</div><div class=\"comment\">' + place.Comment + '</div>' + '<a class=\"item-link\" href=\"http://europeana.fresenia.man.poznan.pl/dev/documents/story/item/?story=' + places[0].StoryId + '&item=' + marker.ItemId + '\">' + marker.Title + '</a></div></div>');
+
+							                            new mapboxgl.Marker({element: el, anchor: 'bottom'})
+							                              .setLngLat([place.Longitude, place.Latitude])
+										      .setPopup(popup)
+							                              .addTo(map);
+											});
+							                          });
+                      						  });
+							  
+						});
+    						</script>";
     $content .= "</div>";
 $content .= "</div>";
 

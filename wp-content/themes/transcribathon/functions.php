@@ -22,7 +22,9 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_slider.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/solr_test.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/documents_map.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
 
@@ -32,6 +34,8 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-tutorial/tct-tutoria
 
 // Image settings
 add_image_size( 'news-image', 300, 200, true );
+// Image settings
+add_image_size( 'tutorial-image', 800, 400, true );
 
 
 // Embedd custom Javascripts and CSS
