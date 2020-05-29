@@ -5,7 +5,11 @@ namespace WPForms\Forms;
 /**
  * Class Loader gives ability to track/load all forms modules.
  *
- * @since 1.5.1
+ * @package    WPForms\Forms
+ * @author     WPForms
+ * @since      1.5.1
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2019, WPForms LLC
  */
 class Loader {
 

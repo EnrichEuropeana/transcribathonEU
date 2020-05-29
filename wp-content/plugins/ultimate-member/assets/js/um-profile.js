@@ -34,14 +34,12 @@ jQuery(document).ready(function() {
 		return false;
 	});
 
-	jQuery(document.body).on('click', '.um-reset-profile-photo', function(e) {
+	jQuery(document.body).on('click', '.um-reset-profile-photo', function(e){
 
-		jQuery('.um-profile-photo-img img').attr( 'src', jQuery(this).attr( 'data-default_src' ) );
+		jQuery('.um-profile-photo-img img').attr('src', jQuery(this).attr('data-default_src') );
 
 		user_id = jQuery(this).attr('data-user_id');
 		metakey = 'profile_photo';
-
-		UM_hide_menus();
 
 		jQuery.ajax({
 			url: wp.ajax.settings.url,
@@ -54,16 +52,13 @@ jQuery(document).ready(function() {
 			}
 		});
 
-		jQuery(this).parents('li').hide();
-		return false;
 	});
 
 	jQuery(document.body).on('click', '.um-reset-cover-photo', function(e){
 		var obj = jQuery(this);
-
 		jQuery('.um-cover-overlay').hide();
-
-		jQuery('.um-cover-e').html('<a href="javascript:void(0);" class="um-cover-add" style="height: 370px;"><span class="um-cover-add-i"><i class="um-icon-plus um-tip-n" original-title="Upload a cover photo"></i></span></a>');
+		jQuery('.um-cover-e').html('<a href="#" class="um-cover-add um-manual-trigger" data-parent=".um-cover" data-child=".um-btn-auto-width"><span class="um-cover-add-i"><i class="um-icon-plus um-tip-n" title="Upload a cover photo"></i></span></a>');
+		jQuery('.um-dropdown').hide();
 
 		um_responsive();
 
@@ -84,8 +79,6 @@ jQuery(document).ready(function() {
 			}
 		});
 
-		UM_hide_menus();
-		return false;
 	});
 
 	/*function um_update_bio_countdown() {
@@ -124,8 +117,7 @@ jQuery(document).ready(function() {
 
 	jQuery( '.um-profile-edit a.um_delete-item' ).click( function(e) {
 		e.preventDefault();
-
-		if ( ! confirm( wp.i18n.__( 'Are you sure that you want to delete this user?', 'ultimate-member' ) ) ) {
+		if ( ! confirm( 'Are you sure that you want to delete this user?' ) ) {
 			return false;
 		}
 	});

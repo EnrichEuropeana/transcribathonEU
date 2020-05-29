@@ -5,7 +5,11 @@ namespace WPForms\Providers\Provider\Settings;
 /**
  * Interface FormBuilderInterface defines required method for builder to work properly.
  *
- * @since 1.4.7
+ * @package    WPForms\Providers\Provider\Settings
+ * @author     WPForms
+ * @since      1.4.7
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2018, WPForms LLC
  */
 interface FormBuilderInterface {
 

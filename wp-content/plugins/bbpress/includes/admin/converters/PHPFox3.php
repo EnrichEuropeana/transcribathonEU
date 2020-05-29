@@ -1,27 +1,21 @@
 <?php
 
 /**
- * bbPress PHPFox3 Converter
- *
- * @package bbPress
- * @subpackage Converters
- */
-
-/**
  * Implementation of PHPFox v3.x Forum converter.
  *
- * @since 2.5.0 bbPress (r5146)
- *
- * @link Codex Docs https://codex.bbpress.org/import-forums/phpfox
+ * @since bbPress (r5146)
+ * @link Codex Docs http://codex.bbpress.org/import-forums/phpfox
  */
 class PHPFox3 extends BBP_Converter_Base {
 
 	/**
 	 * Main Constructor
 	 *
+	 * @uses PHPFox3::setup_globals()
 	 */
-	public function __construct() {
+	function __construct() {
 		parent::__construct();
+		$this->setup_globals();
 	}
 
 	/**
@@ -31,12 +25,12 @@ class PHPFox3 extends BBP_Converter_Base {
 
 		/** Forum Section *****************************************************/
 
-		// Old forum id (Stored in postmeta)
+		// Forum id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forum',
 			'from_fieldname' => 'forum_id',
 			'to_type'        => 'forum',
-			'to_fieldname'   => '_bbp_old_forum_id'
+			'to_fieldname'   => '_bbp_forum_id'
 		);
 
 		// Forum parent id (If no parent, then 0, Stored in postmeta)
@@ -44,7 +38,7 @@ class PHPFox3 extends BBP_Converter_Base {
 			'from_tablename'  => 'forum',
 			'from_fieldname'  => 'parent_id',
 			'to_type'         => 'forum',
-			'to_fieldname'    => '_bbp_old_forum_parent_id'
+			'to_fieldname'    => '_bbp_forum_parent_id'
 		);
 
 		// Forum topic count (Stored in postmeta)
@@ -155,12 +149,12 @@ class PHPFox3 extends BBP_Converter_Base {
 
 		/** Topic Section *****************************************************/
 
-		// Old topic id (Stored in postmeta)
+		// Topic id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forum_thread',
 			'from_fieldname' => 'thread_id',
 			'to_type'        => 'topic',
-			'to_fieldname'   => '_bbp_old_topic_id'
+			'to_fieldname'   => '_bbp_topic_id'
 		);
 
 		// Topic reply count (Stored in postmeta)
@@ -244,16 +238,16 @@ class PHPFox3 extends BBP_Converter_Base {
 			'from_tablename'  => 'forum_thread',
 			'from_fieldname'  => 'is_closed',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_closed_status_id',
+			'to_fieldname'    => 'post_status',
 			'callback_method' => 'callback_topic_status'
 		);
 
-		// Sticky status (Stored in postmeta)
+		// Sticky status (Stored in postmeta))
 		$this->field_map[] = array(
 			'from_tablename'  => 'forum_thread',
 			'from_fieldname'  => 'order_id',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_sticky_status_id',
+			'to_fieldname'    => '_bbp_old_sticky_status',
 			'callback_method' => 'callback_sticky_status'
 		);
 
@@ -332,12 +326,12 @@ class PHPFox3 extends BBP_Converter_Base {
 
 		/** Reply Section *****************************************************/
 
-		// Old reply id (Stored in postmeta)
+		// Reply id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'forum_post',
 			'from_fieldname'  => 'post_id',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_reply_id'
+			'to_fieldname'    => '_bbp_post_id'
 		);
 
 		// Reply parent forum id (If no parent, then 0. Stored in postmeta)
@@ -368,6 +362,30 @@ class PHPFox3 extends BBP_Converter_Base {
 			'to_type'         => 'reply',
 			'to_fieldname'    => 'post_author',
 			'callback_method' => 'callback_userid'
+		);
+
+		// Reply title.
+		$this->field_map[] = array(
+			'from_tablename'  => 'forum_thread',
+			'from_fieldname'  => 'title',
+			'join_tablename'  => 'forum_post',
+			'join_type'       => 'LEFT',
+			'join_expression' => 'USING (thread_id)',
+			'to_type'         => 'reply',
+			'to_fieldname'    => 'post_title',
+			'callback_method' => 'callback_reply_title'
+		);
+
+		// Reply slug (Clean name to avoid conflicts)
+		$this->field_map[] = array(
+			'from_tablename'  => 'forum_thread',
+			'from_fieldname'  => 'title_url',
+			'join_tablename'  => 'forum_post',
+			'join_type'       => 'LEFT',
+			'join_expression' => 'USING (thread_id)',
+			'to_type'         => 'reply',
+			'to_fieldname'    => 'post_name',
+			'callback_method' => 'callback_slug'
 		);
 
 		// Reply content.
@@ -425,15 +443,15 @@ class PHPFox3 extends BBP_Converter_Base {
 
 		/** User Section ******************************************************/
 
-		// Store old user id (Stored in usermeta)
+		// Store old User id (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'user',
 			'from_fieldname' => 'user_id',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_old_user_id'
+			'to_fieldname'   => '_bbp_user_id'
 		);
 
-		// Store old user password (Stored in usermeta serialized with salt)
+		// Store old User password (Stored in usermeta serialized with salt)
 		$this->field_map[] = array(
 			'from_tablename'  => 'user',
 			'from_fieldname'  => 'password',
@@ -442,7 +460,7 @@ class PHPFox3 extends BBP_Converter_Base {
 			'callback_method' => 'callback_savepass'
 		);
 
-		// Store old user salt (This is only used for the SELECT row info for the above password save)
+		// Store old User Salt (This is only used for the SELECT row info for the above password save)
 		$this->field_map[] = array(
 			'from_tablename' => 'user',
 			'from_fieldname' => 'password_salt',
@@ -504,7 +522,8 @@ class PHPFox3 extends BBP_Converter_Base {
 	 * This method allows us to indicates what is or is not converted for each
 	 * converter.
 	 */
-	public function info() {
+	public function info()
+	{
 		return '';
 	}
 
@@ -513,7 +532,8 @@ class PHPFox3 extends BBP_Converter_Base {
 	 * way when we authenticate it we can get it out of the database
 	 * as one value. Array values are auto sanitized by WordPress.
 	 */
-	public function callback_savepass( $field, $row ) {
+	public function callback_savepass( $field, $row )
+	{
 		$pass_array = array( 'hash' => $field, 'salt' => $row['salt'] );
 		return $pass_array;
 	}
@@ -522,13 +542,14 @@ class PHPFox3 extends BBP_Converter_Base {
 	 * This method is to take the pass out of the database and compare
 	 * to a pass the user has typed in.
 	 */
-	public function authenticate_pass( $password, $serialized_pass ) {
+	public function authenticate_pass( $password, $serialized_pass )
+	{
 		$pass_array = unserialize( $serialized_pass );
 		return ( $pass_array['hash'] == md5( md5( $password ). $pass_array['salt'] ) );
 	}
 
 	/**
-	 * Translate the forum type from PHPFox v3.5.x numerics to WordPress's strings.
+	 * Translate the forum type from PHPFox v3.5.x numeric's to WordPress's strings.
 	 *
 	 * @param int $status PHPFox v3.5.x numeric forum type
 	 * @return string WordPress safe
@@ -548,7 +569,7 @@ class PHPFox3 extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the forum status from PHPFox v3.5.x numerics to WordPress's strings.
+	 * Translate the forum status from PHPFox v3.5.x numeric's to WordPress's strings.
 	 *
 	 * @param int $status PHPFox v3.5.x numeric forum status
 	 * @return string WordPress safe
@@ -568,7 +589,7 @@ class PHPFox3 extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the post status from PHPFox v3.5.x numerics to WordPress's strings.
+	 * Translate the post status from PHPFox v3.5.x numeric's to WordPress's strings.
 	 *
 	 * @param int $status PHPFox v3.5.x numeric topic status
 	 * @return string WordPress safe
@@ -588,7 +609,7 @@ class PHPFox3 extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the topic sticky status type from PHPFox v3.5.x numerics to WordPress's strings.
+	 * Translate the topic sticky status type from PHPFox v3.5.x numeric's to WordPress's strings.
 	 *
 	 * @param int $status PHPFox v3.5.x numeric forum type
 	 * @return string WordPress safe
@@ -616,5 +637,16 @@ class PHPFox3 extends BBP_Converter_Base {
 	public function callback_topic_reply_count( $count = 1 ) {
 		$count = absint( (int) $count - 1 );
 		return $count;
+	}
+
+	/**
+	 * Set the reply title
+	 *
+	 * @param string $title PHPFox v3.5.x topic title of this reply
+	 * @return string Prefixed topic title, or empty string
+	 */
+	public function callback_reply_title( $title = '' ) {
+		$title = !empty( $title ) ? __( 'Re: ', 'bbpress' ) . html_entity_decode( $title ) : '';
+		return $title;
 	}
 }

@@ -1,16 +1,14 @@
 <?php
 namespace um\core;
 
-
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
-
 
 if ( ! class_exists( 'um\core\Setup' ) ) {
 
 
 	/**
 	 * Class Setup
-	 *
 	 * @package um\core
 	 */
 	class Setup {
@@ -20,6 +18,7 @@ if ( ! class_exists( 'um\core\Setup' ) ) {
 		 * Setup constructor.
 		 */
 		function __construct() {
+			//add_action('init',  array(&$this, 'install_basics'), 9);
 		}
 
 
@@ -27,35 +26,11 @@ if ( ! class_exists( 'um\core\Setup' ) ) {
 		 * Run setup
 		 */
 		function run_setup() {
-			$this->create_db();
 			$this->install_basics();
 			$this->install_default_forms();
+			//$this->install_default_pages();
 			$this->set_default_settings();
 			$this->set_default_role_meta();
-		}
-
-
-		/**
-		 * Create custom DB tables
-		 */
-		function create_db() {
-			global $wpdb;
-
-			$charset_collate = $wpdb->get_charset_collate();
-
-			$sql = "CREATE TABLE {$wpdb->prefix}um_metadata (
-umeta_id bigint(20) unsigned NOT NULL auto_increment,
-user_id bigint(20) unsigned NOT NULL default '0',
-um_key varchar(255) default NULL,
-um_value longtext default NULL,
-PRIMARY KEY  (umeta_id),
-KEY user_id_indx (user_id),
-KEY meta_key_indx (um_key),
-KEY meta_value_indx (um_value(191))
-) $charset_collate;";
-
-			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-			dbDelta( $sql );
 		}
 
 
@@ -209,8 +184,6 @@ KEY meta_value_indx (um_value(191))
 					$content = '[ultimatemember form_id="' . $setup_shortcodes[ $slug ] . '"]';
 				}
 
-				$content = apply_filters( 'um_setup_predefined_page_content', $content, $slug );
-
 				$user_page = array(
 					'post_title'        => $array['title'],
 					'post_content'      => $content,
@@ -235,9 +208,6 @@ KEY meta_value_indx (um_value(191))
 			}
 
 			update_option( 'um_options', $options );
-
-			// reset rewrite rules after first install of core pages
-			UM()->rewrite()->reset_rules();
 		}
 
 
@@ -245,13 +215,13 @@ KEY meta_value_indx (um_value(191))
 		 * Set default UM settings
 		 */
 		function set_default_settings() {
-			$options = get_option( 'um_options', array() );
+			$options = get_option( 'um_options' );
+			$options = empty( $options ) ? array() : $options;
 
 			foreach ( UM()->config()->settings_defaults as $key => $value ) {
 				//set new options to default
-				if ( ! isset( $options[ $key ] ) ) {
+				if ( ! isset( $options[ $key ] ) )
 					$options[ $key ] = $value;
-				}
 			}
 
 			update_option( 'um_options', $options );

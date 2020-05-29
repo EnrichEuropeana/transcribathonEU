@@ -17,36 +17,16 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/ml-slider-pro.php:229
+#: src/ml-slider-pro.php:201
 msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be installed. You may download it by clicking <a href='%s'>here</a>."
 msgstr ""
 
-#: src/ml-slider-pro.php:235
+#: src/ml-slider-pro.php:207
 msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be activated. You may activate it by clicking <a href='%s'>here</a>."
 msgstr ""
 
-#: src/ml-slider-pro.php:241
-msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin (free version) to be at least version %s. You may update it by clicking <a href='%s'>here</a>."
-msgstr ""
-
-#: src/modules/css_manager/loader.php:13, src/modules/css_manager/loader.php:16
-msgid "Add CSS"
-msgstr ""
-
-#: src/modules/css_manager/snippets.js:5
-msgid "Hide on desktop"
-msgstr ""
-
-#: src/modules/css_manager/snippets.js:6
-msgid "Display the slideshow on mobile only"
-msgstr ""
-
-#: src/modules/css_manager/snippets.js:15
-msgid "Hide on mobile"
-msgstr ""
-
-#: src/modules/css_manager/snippets.js:16
-msgid "Display the slideshow on desktop only"
+#: src/ml-slider-pro.php:213
+msgid "The MetaSlider Pro Add-on Pack requires the MetaSlider plugin to be at least version %s. You may update it by clicking <a href='%s'>here</a>."
 msgstr ""
 
 #: src/modules/external/slide.php:19, src/modules/external/slide.php:180
@@ -117,7 +97,7 @@ msgstr ""
 msgid "Duplicate Layer"
 msgstr ""
 
-#: src/modules/layer/slide.php:110, src/modules/theme_editor/theme_editor.php:439
+#: src/modules/layer/slide.php:110, src/modules/theme_editor/theme_editor.php:440
 msgid "Save"
 msgstr ""
 
@@ -133,7 +113,7 @@ msgstr ""
 msgid "Styling"
 msgstr ""
 
-#: src/modules/layer/slide.php:114, src/modules/theme_editor/theme_editor.php:451, src/modules/theme_editor/theme_editor.php:525, src/modules/theme_editor/theme_editor.php:529, src/modules/theme_editor/theme_editor.php:597, src/modules/theme_editor/theme_editor.php:633, src/modules/theme_editor/theme_editor.php:637, src/modules/theme_editor/theme_editor.php:667, src/modules/theme_editor/theme_editor.php:671, src/modules/theme_editor/theme_editor.php:675, src/modules/theme_editor/theme_editor.php:679, src/modules/thumbnails/thumbnails.php:282, src/modules/thumbnails/thumbnails.php:295, src/modules/thumbnails/thumbnails.php:316
+#: src/modules/layer/slide.php:114, src/modules/theme_editor/theme_editor.php:452, src/modules/theme_editor/theme_editor.php:526, src/modules/theme_editor/theme_editor.php:530, src/modules/theme_editor/theme_editor.php:598, src/modules/theme_editor/theme_editor.php:634, src/modules/theme_editor/theme_editor.php:638, src/modules/theme_editor/theme_editor.php:668, src/modules/theme_editor/theme_editor.php:672, src/modules/theme_editor/theme_editor.php:676, src/modules/theme_editor/theme_editor.php:680, src/modules/thumbnails/thumbnails.php:282, src/modules/thumbnails/thumbnails.php:295, src/modules/thumbnails/thumbnails.php:316
 msgid "px"
 msgstr ""
 
@@ -185,7 +165,7 @@ msgstr ""
 msgid "Please set a height in the slideshow settings"
 msgstr ""
 
-#: src/modules/layer/slide.php:131, src/modules/post_feed/slide.php:1172, src/modules/vimeo/slide.php:633, src/modules/youtube/slide.php:665
+#: src/modules/layer/slide.php:131, src/modules/post_feed/slide.php:1169, src/modules/vimeo/slide.php:633, src/modules/youtube/slide.php:656
 msgid "Add to slideshow"
 msgstr ""
 
@@ -245,256 +225,256 @@ msgstr ""
 msgid "Post Feed"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:111
+#: src/modules/post_feed/slide.php:112
 msgid "Post Feed Slide"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:132
+#: src/modules/post_feed/slide.php:133
 msgid "Please update to MetaSlider to version 3.0 or above."
 msgstr ""
 
-#: src/modules/post_feed/slide.php:159
+#: src/modules/post_feed/slide.php:160
 msgid "Select the Post types to include in the feed. Posts must have a Featured Image to appear in the feed."
 msgstr ""
 
-#: src/modules/post_feed/slide.php:161
+#: src/modules/post_feed/slide.php:162
 msgid "Posts must be tagged to at least one of the selected categories to display in the feed."
 msgstr ""
 
-#: src/modules/post_feed/slide.php:164
+#: src/modules/post_feed/slide.php:165
 msgid "Slide Link"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:168
+#: src/modules/post_feed/slide.php:169
 msgid "Order By"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:172
+#: src/modules/post_feed/slide.php:173
 msgid "Post Limit"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:176
+#: src/modules/post_feed/slide.php:177
 msgid "Preserve New Lines"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:182
+#: src/modules/post_feed/slide.php:183
 msgid "Caption Template"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:186
+#: src/modules/post_feed/slide.php:187
 msgid "Post Types"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:190
+#: src/modules/post_feed/slide.php:191
 msgid "Taxonomies"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:194
+#: src/modules/post_feed/slide.php:195
 msgid "Display Settings"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:272, src/modules/post_feed/slide.php:365
+#: src/modules/post_feed/slide.php:273, src/modules/post_feed/slide.php:366
 msgid "Post Title"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:273, src/modules/post_feed/slide.php:363
+#: src/modules/post_feed/slide.php:274, src/modules/post_feed/slide.php:364
 msgid "Post ID"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:274
+#: src/modules/post_feed/slide.php:275
 msgid "Post Link"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:275
+#: src/modules/post_feed/slide.php:276
 msgid "Post Excerpt"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:276
+#: src/modules/post_feed/slide.php:277
 msgid "Post Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:277
+#: src/modules/post_feed/slide.php:278
 msgid "Post Content"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:278
+#: src/modules/post_feed/slide.php:279
 msgid "Post Content (with formatting)"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:279, src/modules/post_feed/slide.php:364
+#: src/modules/post_feed/slide.php:280, src/modules/post_feed/slide.php:365
 msgid "Author"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:280
+#: src/modules/post_feed/slide.php:281
 msgid "Author Link"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:281
+#: src/modules/post_feed/slide.php:282
 msgid "Tag List"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:282
+#: src/modules/post_feed/slide.php:283
 msgid "Category List"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:289
+#: src/modules/post_feed/slide.php:290
 msgid "WooCommerce - Price (Formatted)"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:290
+#: src/modules/post_feed/slide.php:291
 msgid "WooCommerce - Price"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:291
+#: src/modules/post_feed/slide.php:292
 msgid "WooCommerce - Sale Price"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:292
+#: src/modules/post_feed/slide.php:293
 msgid "WooCommerce - Add to Cart URL"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:293
+#: src/modules/post_feed/slide.php:294
 msgid "WooCommerce - SKU"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:303
+#: src/modules/post_feed/slide.php:304
 msgid "Events Calendar - Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:304
+#: src/modules/post_feed/slide.php:305
 msgid "Events Calendar - Start Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:305
+#: src/modules/post_feed/slide.php:306
 msgid "Events Calendar - Start Time"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:306
+#: src/modules/post_feed/slide.php:307
 msgid "Events Calendar - End Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:307
+#: src/modules/post_feed/slide.php:308
 msgid "Events Calendar - End Time"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:308
+#: src/modules/post_feed/slide.php:309
 msgid "Events Calendar - Address"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:309
+#: src/modules/post_feed/slide.php:310
 msgid "Events Calendar - City"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:310
+#: src/modules/post_feed/slide.php:311
 msgid "Events Calendar - Country"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:311
+#: src/modules/post_feed/slide.php:312
 msgid "Events Calendar - Full Address"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:312
+#: src/modules/post_feed/slide.php:313
 msgid "Events Calendar - Phone"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:313
+#: src/modules/post_feed/slide.php:314
 msgid "Events Calendar - Province"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:314
+#: src/modules/post_feed/slide.php:315
 msgid "Events Calendar - Region"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:315
+#: src/modules/post_feed/slide.php:316
 msgid "Events Calendar - State"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:316
+#: src/modules/post_feed/slide.php:317
 msgid "Events Calendar - State / Province"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:317
+#: src/modules/post_feed/slide.php:318
 msgid "Events Calendar - Venue"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:318
+#: src/modules/post_feed/slide.php:319
 msgid "Events Calendar - Venue ID"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:319
+#: src/modules/post_feed/slide.php:320
 msgid "Events Calendar - Venue Link"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:320
+#: src/modules/post_feed/slide.php:321
 msgid "Events Calendar - Zip"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:332
+#: src/modules/post_feed/slide.php:333
 msgid "Insert Tag"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:341
+#: src/modules/post_feed/slide.php:340
 msgid "Custom Fields"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:362
+#: src/modules/post_feed/slide.php:363
 msgid "Publish Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:366
+#: src/modules/post_feed/slide.php:367
 msgid "Post Slug"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:367
+#: src/modules/post_feed/slide.php:368
 msgid "Modified Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:368
+#: src/modules/post_feed/slide.php:369
 msgid "Random"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:369
+#: src/modules/post_feed/slide.php:370
 msgid "Menu Order"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:376
+#: src/modules/post_feed/slide.php:377
 msgid "Event Date"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:477
+#: src/modules/post_feed/slide.php:474
 msgid "Disabled"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:478
+#: src/modules/post_feed/slide.php:475
 msgid "Post"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:494
+#: src/modules/post_feed/slide.php:491
 msgid "DESC"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:495
+#: src/modules/post_feed/slide.php:492
 msgid "ASC"
 msgstr ""
 
-#: src/modules/post_feed/slide.php:1166
+#: src/modules/post_feed/slide.php:1163
 msgid "Click 'Add to slideshow' to create a new post feed slide."
 msgstr ""
 
-#: src/modules/schedule/schedule.php:38
+#: src/modules/schedule/schedule.php:36
 msgctxt "As in \"Your slide will display Tuesday at 5pm\""
 msgid "at"
 msgstr ""
 
-#: src/modules/schedule/schedule.php:61
+#: src/modules/schedule/schedule.php:59
 msgid "Plugin <strong>Deactivated</strong>! MetaSlider Schedule Slides is no longer needed as we have added its functionality to MetaSlider - Pro Add-on Pack. Activating the plugin will cause a conflict on your site."
 msgstr ""
 
-#: src/modules/schedule/schedule.php:211
+#: src/modules/schedule/schedule.php:179
 msgid "Schedule"
 msgstr ""
 
-#: src/modules/schedule/schedule.php:293
+#: src/modules/schedule/schedule.php:242
 msgid "Hide slide"
 msgstr ""
 
@@ -502,12 +482,12 @@ msgstr ""
 msgid "Schedule this slide"
 msgstr ""
 
-#: src/modules/schedule/tabs/schedule-tab.php:32
+#: src/modules/schedule/tabs/schedule-tab.php:33
 msgctxt "As in \"From January 7th to April 2nd...\""
 msgid "From"
 msgstr ""
 
-#: src/modules/schedule/tabs/schedule-tab.php:33
+#: src/modules/schedule/tabs/schedule-tab.php:34
 msgctxt "As in \"From January 7th to April 2nd...\""
 msgid "To"
 msgstr ""
@@ -517,36 +497,11 @@ msgctxt "As in \"your slide will display Tuesday at 5pm\""
 msgid "at"
 msgstr ""
 
-#: src/modules/schedule/tabs/schedule-tab.php:104
-msgid "Show on:"
+#: src/modules/schedule/tabs/schedule-tab.php:100
+msgid "Days"
 msgstr ""
 
-#: src/modules/schedule/tabs/schedule-tab.php:139
-msgid "Daily constraint:"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:155
-msgid "If checked, the folowing time constraints will be ignored"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:156
-msgid "All day (<span class=\"text-blue\">?</span>)"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:193
-msgctxt "As in \"1:00 until 2:30...\""
-msgid "until"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:237
-msgid "If unchecked, the slide will be hidden during this time constraint"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:239
-msgid "Show (<span class=\"text-blue\">?</span>)"
-msgstr ""
-
-#: src/modules/schedule/tabs/schedule-tab.php:247
+#: src/modules/schedule/tabs/schedule-tab.php:119
 msgid "Current server time"
 msgstr ""
 
@@ -554,259 +509,259 @@ msgstr ""
 msgid "Theme Editor"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:393
+#: src/modules/theme_editor/theme_editor.php:394
 msgid "Theme Saved. To apply the theme to a slideshow, edit the slideshow and select this theme from the theme dropdown menu."
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:405
+#: src/modules/theme_editor/theme_editor.php:406
 msgid "Switch Preview Slider"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:438
+#: src/modules/theme_editor/theme_editor.php:439
 msgid "Theme Settings"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:445
+#: src/modules/theme_editor/theme_editor.php:446
 msgid "Slideshow"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:449
+#: src/modules/theme_editor/theme_editor.php:450
 msgid "Outer Border Radius"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:455
+#: src/modules/theme_editor/theme_editor.php:456
 msgid "CSS3 Shadow"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:456
+#: src/modules/theme_editor/theme_editor.php:457
 msgid "Note: Not compatible with 'thumbnail' navigation type"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:460
+#: src/modules/theme_editor/theme_editor.php:461
 msgid "None"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:461, src/modules/theme_editor/theme_editor.php:621
+#: src/modules/theme_editor/theme_editor.php:462, src/modules/theme_editor/theme_editor.php:622
 msgid "Default"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:462
+#: src/modules/theme_editor/theme_editor.php:463
 msgid "Bottom"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:463
+#: src/modules/theme_editor/theme_editor.php:464
 msgid "Page Curl"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:464
+#: src/modules/theme_editor/theme_editor.php:465
 msgid "Bottom Curve"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:465
+#: src/modules/theme_editor/theme_editor.php:466
 msgid "Top and Bottom Curve"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:466
+#: src/modules/theme_editor/theme_editor.php:467
 msgid "Sides"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:472
+#: src/modules/theme_editor/theme_editor.php:473
 msgid "Caption"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:476
+#: src/modules/theme_editor/theme_editor.php:477
 msgid "Enable Custom Caption"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:482, src/modules/theme_editor/theme_editor.php:618
+#: src/modules/theme_editor/theme_editor.php:483, src/modules/theme_editor/theme_editor.php:619
 msgid "Position"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:485, src/modules/theme_editor/theme_editor.php:625
+#: src/modules/theme_editor/theme_editor.php:486, src/modules/theme_editor/theme_editor.php:626
 msgid "Bottom Left"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:486, src/modules/theme_editor/theme_editor.php:627
+#: src/modules/theme_editor/theme_editor.php:487, src/modules/theme_editor/theme_editor.php:628
 msgid "Bottom Right"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:487, src/modules/theme_editor/theme_editor.php:622
+#: src/modules/theme_editor/theme_editor.php:488, src/modules/theme_editor/theme_editor.php:623
 msgid "Top Left"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:488, src/modules/theme_editor/theme_editor.php:624
+#: src/modules/theme_editor/theme_editor.php:489, src/modules/theme_editor/theme_editor.php:625
 msgid "Top Right"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:489
+#: src/modules/theme_editor/theme_editor.php:490
 msgid "Underneath"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:494
+#: src/modules/theme_editor/theme_editor.php:495
 msgid "Width"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:498, src/modules/theme_editor/theme_editor.php:678
+#: src/modules/theme_editor/theme_editor.php:499, src/modules/theme_editor/theme_editor.php:679
 msgid "Border Radius"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:502
+#: src/modules/theme_editor/theme_editor.php:503
 msgid "Text Color"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:508
+#: src/modules/theme_editor/theme_editor.php:509
 msgid "Text Align"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:511
+#: src/modules/theme_editor/theme_editor.php:512
 msgid "Left"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:512
+#: src/modules/theme_editor/theme_editor.php:513
 msgid "Center"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:513
+#: src/modules/theme_editor/theme_editor.php:514
 msgid "Right"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:518
+#: src/modules/theme_editor/theme_editor.php:519
 msgid "Background Color"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:524, src/modules/theme_editor/theme_editor.php:632
+#: src/modules/theme_editor/theme_editor.php:525, src/modules/theme_editor/theme_editor.php:633
 msgid "Vertical Margin"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:528, src/modules/theme_editor/theme_editor.php:636
+#: src/modules/theme_editor/theme_editor.php:529, src/modules/theme_editor/theme_editor.php:637
 msgid "Horizontal Margin"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:533
+#: src/modules/theme_editor/theme_editor.php:534
 msgid "Arrows"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:537
+#: src/modules/theme_editor/theme_editor.php:538
 msgid "Enable Custom Arrows"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:543
+#: src/modules/theme_editor/theme_editor.php:544
 msgid "Built In Styles"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:550
+#: src/modules/theme_editor/theme_editor.php:551
 msgid "Custom Prev Arrow"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:557, src/modules/theme_editor/theme_editor.php:562, src/modules/theme_editor/theme_editor.php:578, src/modules/theme_editor/theme_editor.php:583
+#: src/modules/theme_editor/theme_editor.php:558, src/modules/theme_editor/theme_editor.php:563, src/modules/theme_editor/theme_editor.php:579, src/modules/theme_editor/theme_editor.php:584
 msgid "Select"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:558, src/modules/theme_editor/theme_editor.php:563, src/modules/theme_editor/theme_editor.php:579, src/modules/theme_editor/theme_editor.php:584
+#: src/modules/theme_editor/theme_editor.php:559, src/modules/theme_editor/theme_editor.php:564, src/modules/theme_editor/theme_editor.php:580, src/modules/theme_editor/theme_editor.php:585
 msgid "Remove"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:571
+#: src/modules/theme_editor/theme_editor.php:572
 msgid "Custom Next Arrow"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:592
+#: src/modules/theme_editor/theme_editor.php:593
 msgid "Opacity"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:596
+#: src/modules/theme_editor/theme_editor.php:597
 msgid "Distance from edge"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:600
+#: src/modules/theme_editor/theme_editor.php:601
 msgid "Always show"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:608, src/modules/thumbnails/thumbnails.php:260
+#: src/modules/theme_editor/theme_editor.php:609, src/modules/thumbnails/thumbnails.php:260
 msgid "Navigation"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:612
+#: src/modules/theme_editor/theme_editor.php:613
 msgid "Enable Custom Navigation"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:623
+#: src/modules/theme_editor/theme_editor.php:624
 msgid "Top Center"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:626
+#: src/modules/theme_editor/theme_editor.php:627
 msgid "Bottom Center"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:640
+#: src/modules/theme_editor/theme_editor.php:641
 msgid "Fill Color"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:647
+#: src/modules/theme_editor/theme_editor.php:648
 msgid "Fill Color (Active)"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:654
+#: src/modules/theme_editor/theme_editor.php:655
 msgid "Border Color"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:660
+#: src/modules/theme_editor/theme_editor.php:661
 msgid "Border Color (Active)"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:666
+#: src/modules/theme_editor/theme_editor.php:667
 msgid "Size"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:670
+#: src/modules/theme_editor/theme_editor.php:671
 msgid "Spacing"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:674
+#: src/modules/theme_editor/theme_editor.php:675
 msgid "Border Width"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:683
+#: src/modules/theme_editor/theme_editor.php:684
 msgid "Delete Theme"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1576
+#: src/modules/theme_editor/theme_editor.php:1577
 msgid "Type"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1591
+#: src/modules/theme_editor/theme_editor.php:1592
 msgid "Black"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1592
+#: src/modules/theme_editor/theme_editor.php:1593
 msgid "Blue"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1593
+#: src/modules/theme_editor/theme_editor.php:1594
 msgid "Green"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1594
+#: src/modules/theme_editor/theme_editor.php:1595
 msgid "Grey"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1595
+#: src/modules/theme_editor/theme_editor.php:1596
 msgid "Navy"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1596
+#: src/modules/theme_editor/theme_editor.php:1597
 msgid "Purple"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1597, src/modules/youtube/slide.php:243
+#: src/modules/theme_editor/theme_editor.php:1598, src/modules/youtube/slide.php:243
 msgid "Red"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1598, src/modules/youtube/slide.php:244
+#: src/modules/theme_editor/theme_editor.php:1599, src/modules/youtube/slide.php:244
 msgid "White"
 msgstr ""
 
-#: src/modules/theme_editor/theme_editor.php:1599
+#: src/modules/theme_editor/theme_editor.php:1600
 msgid "Yellow"
 msgstr ""
 
@@ -879,7 +834,7 @@ msgid "Show the user portrait on the video"
 msgstr ""
 
 #: src/modules/vimeo/slide.php:253
-msgid "Auto play (may require video to be muted)&lrm;"
+msgid "Auto play (may require video to be muted)"
 msgstr ""
 
 #: src/modules/vimeo/slide.php:254

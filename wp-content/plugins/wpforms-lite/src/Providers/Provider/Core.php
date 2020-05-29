@@ -6,7 +6,11 @@ namespace WPForms\Providers\Provider;
  * Class Core stores the basic information about the provider.
  * It's also a Container to load single instances of requires classes.
  *
- * @since 1.4.7
+ * @package    WPForms\Providers\Provider\Settings
+ * @author     WPForms
+ * @since      1.4.7
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2018, WPForms LLC
  */
 abstract class Core {
 
@@ -113,8 +117,8 @@ abstract class Core {
 	}
 
 	/**
-	 * Provide an instance of the object, that should process the submitted entry.
-	 * It will use data from an already saved entry to pass it further to a Provider.
+	 * Provide an instance of the object, that should process the entry submitted.
+	 * It will use data from already saved entry to pass it further to a Provider.
 	 *
 	 * @since 1.4.7
 	 *
@@ -123,8 +127,7 @@ abstract class Core {
 	abstract public function get_process();
 
 	/**
-	 * Provide an instance of the object, that should display provider settings
-	 * on Settings > Integrations page in admin area.
+	 * Provide an instance of the object, that should display provider on Settings > Integrations page in admin area.
 	 * If you don't want to display it (i.e. you don't need it), you can pass null here in your Core provider class.
 	 *
 	 * @since 1.4.7
@@ -134,7 +137,7 @@ abstract class Core {
 	abstract public function get_page_integrations();
 
 	/**
-	 * Provide an instance of the object, that should display provider settings in the Form Builder.
+	 * Provide an instance of the object, that should display provider Form builder in admin area.
 	 * If you don't want to display it (i.e. you don't need it), you can pass null here in your Core provider class.
 	 *
 	 * @since 1.4.7

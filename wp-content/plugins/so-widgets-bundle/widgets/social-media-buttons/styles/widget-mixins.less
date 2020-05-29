@@ -7,37 +7,41 @@
 @responsive_breakpoint: 780px;
 
 .social-media-button-container {
-	.clearfix();
-	text-align: @align;
+    .clearfix();
 
-	@media (max-width: @responsive_breakpoint) {
-		text-align: @mobile_align;
-	}
+    text-align: @align;
 
-	// This little gem allows justified buttons when there's only one row of buttons or if it's the last row of buttons
+    @media (max-width: @responsive_breakpoint) {
+        text-align: @mobile_align;
+    }
+
+    //this little gem allows justified buttons when there's only one row of buttons or if it's the last row of buttons
 	/*
-	&:after {
-		content:"";
-		display:inline-block;
-		width:100%;
-	}
-	*/
+    &:after {
+        content:"";
+        display:inline-block;
+        width:100%;
+    }
+    */
 }
 
 .social-media-button-base() {
-	display: inline-block;
-	font-size: @icon_size;
+
+    font-size: @icon_size;
+    padding: @padding @padding;
+    margin: @margin;
+
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+
 	line-height: 1em;
-	margin: @margin;
-	padding: @padding 0;
-	width: (1em + @padding * 2);
-	text-align: center;
-	vertical-align: middle;
 
 	.sow-icon-fontawesome {
-		display: inline-block;
+		width: 1em;
 		height: 1em;
+		display: inline-block;
 	}
 
-	.rounded(@rounding);
+    .rounded(@rounding);
 }

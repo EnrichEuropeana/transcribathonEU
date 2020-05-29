@@ -1,48 +1,36 @@
 <?php
 
 /**
- * bbPress Invision Converter
- *
- * @package bbPress
- * @subpackage Converters
- */
-
-/**
  * Implementation of Invision Power Board v3.x converter.
  *
- * @since 2.3.0 bbPress (r4713)
- *
- * @link Codex Docs https://codex.bbpress.org/import-forums/invision
+ * @since bbPress (r4713)
+ * @link Codex Docs http://codex.bbpress.org/import-forums/invision
  */
 class Invision extends BBP_Converter_Base {
 
 	/**
 	 * Main Constructor
 	 *
+	 * @uses Invision::setup_globals()
 	 */
-	public function __construct() {
+	function __construct() {
 		parent::__construct();
+		$this->setup_globals();
 	}
 
 	/**
 	 * Sets up the field mappings
 	 */
-	public function setup_globals() {
-
-		// Setup smiley URL & path
-		$this->bbcode_parser_properties = array(
-			'smiley_url' => false,
-			'smiley_dir' => false
-		);
+	public function setup_globals()	{
 
 		/** Forum Section *****************************************************/
 
-		// Old forum id (Stored in postmeta)
+		// Forum id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'forums',
 			'from_fieldname'  => 'id',
 			'to_type'         => 'forum',
-			'to_fieldname'    => '_bbp_old_forum_id'
+			'to_fieldname'    => '_bbp_forum_id'
 		);
 
 		// Forum parent id (If no parent, then 0, Stored in postmeta)
@@ -50,7 +38,7 @@ class Invision extends BBP_Converter_Base {
 			'from_tablename'  => 'forums',
 			'from_fieldname'  => 'parent_id',
 			'to_type'         => 'forum',
-			'to_fieldname'    => '_bbp_old_forum_parent_id'
+			'to_fieldname'    => '_bbp_forum_parent_id'
 		);
 
 		// Forum topic count (Stored in postmeta)
@@ -128,13 +116,6 @@ class Invision extends BBP_Converter_Base {
 			'callback_method' => 'callback_forum_type'
 		);
 
-		// Forum status (Set a default value 'open', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_status',
-			'default'      => 'open'
-		);
-
 		// Forum dates.
 		$this->field_map[] = array(
 			'to_type'         => 'forum',
@@ -159,12 +140,12 @@ class Invision extends BBP_Converter_Base {
 
 		/** Topic Section *****************************************************/
 
-		// Old topic id (Stored in postmeta)
+		// Topic id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'topics',
 			'from_fieldname'  => 'tid',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_topic_id'
+			'to_fieldname'    => '_bbp_topic_id'
 		);
 
 		// Topic reply count (Stored in postmeta)
@@ -233,12 +214,12 @@ class Invision extends BBP_Converter_Base {
 			'callback_method' => 'callback_forumid'
 		);
 
-		// Sticky status (Stored in postmeta)
+		// Sticky status (Stored in postmeta))
 		$this->field_map[] = array(
 			'from_tablename'  => 'topics',
 			'from_fieldname'  => 'pinned',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_sticky_status_id',
+			'to_fieldname'    => '_bbp_old_sticky_status',
 			'callback_method' => 'callback_sticky_status'
 		);
 
@@ -300,12 +281,12 @@ class Invision extends BBP_Converter_Base {
 
 		/** Reply Section *****************************************************/
 
-		// Old reply id (Stored in postmeta)
+		// Reply id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'posts',
 			'from_fieldname'  => 'pid',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_reply_id'
+			'to_fieldname'    => '_bbp_post_id'
 		);
 
 		// Reply parent forum id (If no parent, then 0. Stored in postmeta)
@@ -341,6 +322,19 @@ class Invision extends BBP_Converter_Base {
 			'to_type'         => 'reply',
 			'to_fieldname'    => 'post_author',
 			'callback_method' => 'callback_userid'
+		);
+
+		// Reply title.
+		// Note: We join the topics table because post table does not include topic title.
+		$this->field_map[] = array(
+			'from_tablename'  => 'topics',
+			'from_fieldname'  => 'title',
+			'join_tablename'  => 'posts',
+			'join_type'       => 'INNER',
+			'join_expression' => 'ON (topics.tid = posts.topic_id) WHERE posts.new_topic = 0',
+			'to_type'         => 'reply',
+			'to_fieldname'    => 'post_title',
+			'callback_method' => 'callback_reply_title'
 		);
 
 		// Reply content.
@@ -393,15 +387,15 @@ class Invision extends BBP_Converter_Base {
 
 		/** User Section ******************************************************/
 
-		// Store old user id (Stored in usermeta)
+		// Store old User id (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'members',
 			'from_fieldname'  => 'member_id',
 			'to_type'         => 'user',
-			'to_fieldname'    => '_bbp_old_user_id'
+			'to_fieldname'    => '_bbp_user_id'
 		);
 
-		// Store old user password (Stored in usermeta serialized with salt)
+		// Store old User password (Stored in usermeta serialized with salt)
 		$this->field_map[] = array(
 			'from_tablename'  => 'members',
 			'from_fieldname'  => 'members_pass_hash',
@@ -410,7 +404,7 @@ class Invision extends BBP_Converter_Base {
 			'callback_method' => 'callback_savepass'
 		);
 
-		// Store old user salt (This is only used for the SELECT row info for the above password save)
+		// Store old User Salt (This is only used for the SELECT row info for the above password save)
 		$this->field_map[] = array(
 			'from_tablename'  => 'members',
 			'from_fieldname'  => 'members_pass_salt',
@@ -476,7 +470,7 @@ class Invision extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the forum type from Invision numerics to WordPress's strings.
+	 * Translate the forum type from Invision numeric's to WordPress's strings.
 	 *
 	 * @param int $status Invision numeric forum type
 	 * @return string WordPress safe
@@ -491,7 +485,7 @@ class Invision extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the topic sticky status type from Invision numerics to WordPress's strings.
+	 * Translate the topic sticky status type from Invision numeric's to WordPress's strings.
 	 *
 	 * @param int $status Invision numeric forum type
 	 * @return string WordPress safe
@@ -522,6 +516,17 @@ class Invision extends BBP_Converter_Base {
 	}
 
 	/**
+	 * Set the reply title
+	 *
+	 * @param string $title Invision topic title of this reply
+	 * @return string Prefixed topic title, or empty string
+	 */
+	public function callback_reply_title( $title = '' ) {
+		$title = !empty( $title ) ? __( 'Re: ', 'bbpress' ) . html_entity_decode( $title ) : '';
+		return $title;
+	}
+
+	/**
 	 * This method is to save the salt and password together.  That
 	 * way when we authenticate it we can get it out of the database
 	 * as one value. Array values are auto sanitized by WordPress.
@@ -542,22 +547,22 @@ class Invision extends BBP_Converter_Base {
 	private function to_char( $input ) {
 		$output = "";
 		for ( $i = 0; $i < strlen( $input ); $i++ ) {
-			$j = ord( $input[$i] );
+			$j = ord( $input{$i} );
 			if ( ( $j >= 65 && $j <= 90 )
 				|| ( $j >= 97 && $j <= 122 )
 				|| ( $j >= 48 && $j <= 57 ) )
 			{
-				$output .= $input[$i];
+				$output .= $input{$i};
 			} else {
-				$output .= "&#" . ord( $input[$i] ) . ";";
+				$output .= "&#" . ord( $input{$i} ) . ";";
 			}
 		}
 		return $output;
 	}
 
 	/**
-	 * This callback processes any custom BBCodes with parser.php
-	 */
+	* This callback processes any custom BBCodes with parser.php
+	*/
 	protected function callback_html( $field ) {
 
 		// Strips Invision custom HTML first from $field before parsing $field to parser.php
@@ -632,7 +637,10 @@ class Invision extends BBP_Converter_Base {
 		// Now that Invision custom HTML has been stripped put the cleaned HTML back in $field
 		$field = $invision_markup;
 
-		// Parse out any bbCodes in $field with the BBCode 'parser.php'
-		return parent::callback_html( $field );
+		require_once( bbpress()->admin->admin_dir . 'parser.php' );
+		$bbcode = BBCode::getInstance();
+		$bbcode->enable_smileys = false;
+		$bbcode->smiley_regex   = false;
+		return html_entity_decode( $bbcode->Parse( $field ) );
 	}
 }

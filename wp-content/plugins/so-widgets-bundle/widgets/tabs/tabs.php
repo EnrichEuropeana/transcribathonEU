@@ -14,7 +14,7 @@ class SiteOrigin_Widget_Tabs_Widget extends SiteOrigin_Widget {
 			'sow-tabs',
 			__( 'SiteOrigin Tabs', 'so-widgets-bundle' ),
 			array(
-				'description' => __( 'A tabby widget to switch between tabbed content panels.', 'so-widgets-bundle' ),
+				'description' => __( 'A tabs widget.', 'so-widgets-bundle' ),
 				'help' => 'https://siteorigin.com/widgets-bundle/tabs-widget/',
 			),
 			array(),
@@ -170,10 +170,6 @@ class SiteOrigin_Widget_Tabs_Widget extends SiteOrigin_Widget {
 	}
 	
 	public function get_less_variables( $instance ) {
-		if ( empty( $instance ) || empty( $instance['design'] ) ) {
-			return array();
-		}
-
 		$design = $instance['design'];
 		
 		return array(

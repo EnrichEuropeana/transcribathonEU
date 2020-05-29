@@ -25,7 +25,10 @@ class MetaSlider_Theme_Precognition extends MetaSlider_Theme_Base {
 	 *
 	 * @var string
 	 */
-	public $slider_parameters = array();
+	public $slider_parameters = array(
+		"prevText" => "'<i class=\"left\"></i>'",
+		"nextText" => "'<i class=\"right\"></i>'"
+	);
 
 	public function __construct() {
 		parent::__construct($this->id, $this->version);

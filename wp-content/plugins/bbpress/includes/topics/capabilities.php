@@ -12,14 +12,13 @@
 /**
  * Return topic capabilities
  *
- * @since 2.0.0 bbPress (r2593)
+ * @since bbPress (r2593)
  *
+ * @uses apply_filters() Calls 'bbp_get_topic_caps' with the capabilities
  * @return array Topic capabilities
  */
 function bbp_get_topic_caps() {
-
-	// Filter & return
-	return (array) apply_filters( 'bbp_get_topic_caps', array(
+	return apply_filters( 'bbp_get_topic_caps', array (
 		'edit_posts'          => 'edit_topics',
 		'edit_others_posts'   => 'edit_others_topics',
 		'publish_posts'       => 'publish_topics',
@@ -33,15 +32,13 @@ function bbp_get_topic_caps() {
 /**
  * Return topic tag capabilities
  *
- * @since 2.0.0 bbPress (r2593)
+ * @since bbPress (r2593)
  *
- *
+ * @uses apply_filters() Calls 'bbp_get_topic_tag_caps' with the capabilities
  * @return array Topic tag capabilities
  */
 function bbp_get_topic_tag_caps() {
-
-	// Filter & return
-	return (array) apply_filters( 'bbp_get_topic_tag_caps', array(
+	return apply_filters( 'bbp_get_topic_tag_caps', array (
 		'manage_terms' => 'manage_topic_tags',
 		'edit_terms'   => 'edit_topic_tags',
 		'delete_terms' => 'delete_topic_tags',
@@ -52,13 +49,15 @@ function bbp_get_topic_tag_caps() {
 /**
  * Maps topic capabilities
  *
- * @since 2.2.0 bbPress (r4242)
+ * @since bbPress (r4242)
  *
- * @param array  $caps    Capabilities for meta capability.
- * @param string $cap     Capability name.
- * @param int    $user_id User id.
- * @param array  $args    Arguments.
- *
+ * @param array $caps Capabilities for meta capability
+ * @param string $cap Capability name
+ * @param int $user_id User id
+ * @param mixed $args Arguments
+ * @uses get_post() To get the post
+ * @uses get_post_type_object() To get the post type object
+ * @uses apply_filters() Filter capability map results
  * @return array Actual capabilities for meta capability
  */
 function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $args = array() ) {
@@ -77,14 +76,9 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 			// Do some post ID based logic
 			} else {
 
-				// Bail if no post ID
-				if ( empty( $args[0] ) ) {
-					break;
-				}
-
-				// Get the post.
+				// Get the post
 				$_post = get_post( $args[0] );
-				if ( ! empty( $_post ) ) {
+				if ( !empty( $_post ) ) {
 
 					// Get caps for post type object
 					$post_type = get_post_type_object( $_post->post_type );
@@ -95,10 +89,6 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 
 					// User is author so allow read
 					} elseif ( (int) $user_id === (int) $_post->post_author ) {
-						$caps = array( 'spectate' );
-
-					// Moderators can always edit forum content
-					} elseif ( user_can( $user_id, 'moderate', $_post->ID ) ) {
 						$caps = array( 'spectate' );
 
 					// Unknown so map to private posts
@@ -131,18 +121,9 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 			if ( user_can( $user_id, 'moderate' ) ) {
 				$caps = array( $cap );
 
-			// Otherwise, check forum
+			// Otherwise, block
 			} else {
-				$forum_id = bbp_get_forum_id();
-
-				// Moderators can always edit forum content
-				if ( user_can( $user_id, 'moderate', $forum_id ) ) {
-					$caps = array( 'spectate' );
-
-				// Fallback to do_not_allow
-				} else {
-					$caps = array( 'do_not_allow' );
-				}
+				$caps = array( 'do_not_allow' );
 			}
 
 			break;
@@ -150,45 +131,25 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 		// Used everywhere
 		case 'edit_topic' :
 
-			// Bail if no post ID
-			if ( empty( $args[0] ) ) {
-				break;
-			}
-
-			// Get the post.
+			// Get the post
 			$_post = get_post( $args[0] );
-			if ( ! empty( $_post ) ) {
+			if ( !empty( $_post ) ) {
 
 				// Get caps for post type object
 				$post_type = get_post_type_object( $_post->post_type );
+				$caps      = array();
 
 				// Add 'do_not_allow' cap if user is spam or deleted
 				if ( bbp_is_user_inactive( $user_id ) ) {
-					$caps = array( 'do_not_allow' );
+					$caps[] = 'do_not_allow';
 
-				// Moderators can always edit forum content
-				} elseif ( user_can( $user_id, 'moderate', $_post->ID ) ) {
-					$caps = array( 'spectate' );
-
-				// User is author so allow edit if not in admin, unless it's past edit lock time
-				} elseif ( ! is_admin() && ( (int) $user_id === (int) $_post->post_author ) ) {
-
-					// If editing...
-					if ( bbp_is_topic_edit() ) {
-
-						// Only allow if not past the edit-lock period
-						$caps = ! bbp_past_edit_lock( $_post->post_date_gmt )
-							? array( $post_type->cap->edit_posts )
-							: array( 'do_not_allow' );
-
-					// Otherwise...
-					} else {
-						$caps = array( $post_type->cap->edit_posts );
-					}
+				// User is author so allow edit if not in admin
+				} elseif ( !is_admin() && ( (int) $user_id === (int) $_post->post_author ) ) {
+					$caps[] = $post_type->cap->edit_posts;
 
 				// Unknown, so map to edit_others_posts
 				} else {
-					$caps = array( $post_type->cap->edit_others_posts );
+					$caps[] = $post_type->cap->edit_others_posts;
 				}
 			}
 
@@ -198,33 +159,25 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 
 		case 'delete_topic' :
 
-			// Bail if no post ID
-			if ( empty( $args[0] ) ) {
-				break;
-			}
-
-			// Get the post.
+			// Get the post
 			$_post = get_post( $args[0] );
-			if ( ! empty( $_post ) ) {
+			if ( !empty( $_post ) ) {
 
 				// Get caps for post type object
 				$post_type = get_post_type_object( $_post->post_type );
+				$caps      = array();
 
 				// Add 'do_not_allow' cap if user is spam or deleted
 				if ( bbp_is_user_inactive( $user_id ) ) {
-					$caps = array( 'do_not_allow' );
+					$caps[] = 'do_not_allow';
 
 				// Moderators can always edit forum content
-				} elseif ( user_can( $user_id, 'moderate', $_post->ID ) ) {
-					$caps = array( 'spectate' );
-
-				// User is author so allow delete if not in admin
-				} elseif ( ! is_admin() && ( (int) $user_id === (int) $_post->post_author ) ) {
-					$caps = array( $post_type->cap->delete_posts );
+				} elseif ( user_can( $user_id, 'moderate' ) ) {
+					$caps[] = 'moderate';
 
 				// Unknown so map to delete_others_posts
 				} else {
-					$caps = array( $post_type->cap->delete_others_posts );
+					$caps[] = $post_type->cap->delete_others_posts;
 				}
 			}
 
@@ -244,146 +197,40 @@ function bbp_map_topic_meta_caps( $caps = array(), $cap = '', $user_id = 0, $arg
 		/** Admin *************************************************************/
 
 		case 'bbp_topics_admin' :
-			$caps = array( 'edit_topics' );
+			$caps = array( 'moderate' );
 			break;
 	}
 
-	// Filter & return
-	return (array) apply_filters( 'bbp_map_topic_meta_caps', $caps, $cap, $user_id, $args );
+	return apply_filters( 'bbp_map_topic_meta_caps', $caps, $cap, $user_id, $args );
 }
 
 /**
  * Maps topic tag capabilities
  *
- * @since 2.2.0 bbPress (r4242)
+ * @since bbPress (r4242)
  *
  * @param array $caps Capabilities for meta capability
  * @param string $cap Capability name
  * @param int $user_id User id
- * @param array $args Arguments
- *
+ * @param mixed $args Arguments
+ * @uses apply_filters() Filter capability map results
  * @return array Actual capabilities for meta capability
  */
 function bbp_map_topic_tag_meta_caps( $caps, $cap, $user_id, $args ) {
 
 	// What capability is being checked?
 	switch ( $cap ) {
-
-		/** Assignment ********************************************************/
-
-		case 'assign_topic_tags' :
-
-			// Get post
-			$post_id = ! empty( $args[0] )
-				? get_post( $args[0] )->ID
-				: 0;
-
-			// Add 'do_not_allow' cap if user is spam or deleted
-			if ( bbp_is_user_inactive( $user_id ) ) {
-				$caps = array( 'do_not_allow' );
-
-			// Moderators can always assign
-			} elseif ( user_can( $user_id, 'moderate', $post_id ) ) {
-				$caps = array( 'moderate' );
-
-			// Do not allow if topic tags are disabled
-			} elseif ( ! bbp_allow_topic_tags() ) {
-				$caps = array( 'do_not_allow' );
-			}
-
-			break;
-
-		/** Management ********************************************************/
-
-		case 'manage_topic_tags' :
-
-			// Moderators can always edit
-			if ( user_can( $user_id, 'moderate' ) ) {
-				$caps = array( 'moderate' );
-			}
-
-			break;
-
-		/** Editing ***********************************************************/
-
-		case 'edit_topic_tags' :
-
-			// Moderators can always edit
-			if ( user_can( $user_id, 'moderate' ) ) {
-				$caps = array( 'moderate' );
-			}
-
-			break;
-
-		case 'edit_topic_tag' :
-
-			// Get the term
-			$_tag = get_term( $args[0], bbp_get_topic_tag_tax_id() );
-			if ( ! empty( $_tag ) ) {
-
-				// Add 'do_not_allow' cap if user is spam or deleted
-				if ( bbp_is_user_inactive( $user_id ) ) {
-					$caps = array( 'do_not_allow' );
-
-				// Moderators can always edit topic tags
-				} elseif ( user_can( $user_id, 'moderate', $_tag->term_id ) ) {
-					$caps = array( 'spectate' );
-
-				// Fallback to edit_terms.
-				} else {
-					$taxonomy = get_taxonomy( bbp_get_topic_tag_tax_id() );
-					$caps     = array( $taxonomy->cap->edit_terms );
-				}
-			}
-
-			break;
-
-		/** Deleting **********************************************************/
-
-		case 'delete_topic_tags' :
-
-			// Moderators can always edit
-			if ( user_can( $user_id, 'moderate' ) ) {
-				$caps = array( 'moderate' );
-			}
-
-			break;
-
-		case 'delete_topic_tag' :
-
-			// Get the term
-			$_tag = get_term( $args[0], bbp_get_topic_tag_tax_id() );
-			if ( ! empty( $_tag ) ) {
-
-				// Add 'do_not_allow' cap if user is spam or deleted
-				if ( bbp_is_user_inactive( $user_id ) ) {
-					$caps = array( 'do_not_allow' );
-
-				// Moderators can always delete topic tags
-				} elseif ( user_can( $user_id, 'moderate', $_tag->term_id ) ) {
-					$caps = array( 'spectate' );
-
-				// Fallback to delete_terms.
-				} else {
-					$taxonomy = get_taxonomy( $_tag->post_type );
-					$caps     = array( $taxonomy->cap->delete_terms );
-				}
-			}
-
-			break;
-
-		/** Admin *************************************************************/
-
+		case 'manage_topic_tags'    :
+		case 'edit_topic_tags'      :
+		case 'delete_topic_tags'    :
+		case 'assign_topic_tags'    :
 		case 'bbp_topic_tags_admin' :
 
 			// Moderators can always edit
 			if ( user_can( $user_id, 'moderate' ) ) {
 				$caps = array( 'moderate' );
 			}
-
-			break;
 	}
 
-	// Filter & return
-	return (array) apply_filters( 'bbp_map_topic_tag_meta_caps', $caps, $cap, $user_id, $args );
+	return apply_filters( 'bbp_map_topic_tag_meta_caps', $caps, $cap, $user_id, $args );
 }

@@ -95,16 +95,16 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'supported_positions' => array('header'),
 				'validity_function' => 'is_updraftplus_installed',
 			),
-			'wp_optimize' => array(
-				'title' => __('WP-Optimize - Clean, Compress, Cache.', 'ml-slider'),
-				'text' => __('Make your site fast & efficient with our cutting-edge speed plugin.', 'ml-slider'),
-				'image' => 'wp_optimize_logo.png',
-				'button_link' => 'wp-optimize',
-				'button_meta' => 'wp-optimize',
-				'dismiss_time' => 'wp-optimize',
+			'keyy' => array(
+				'title' => _x('Keyy: Instant and secure logon with a wave of your phone', 'Keep the plugin name "Keyy" when possible', 'ml-slider'),
+				'text' => __('No more forgotten passwords. Find out more about our revolutionary new WordPress plugin', 'ml-slider'),
+				'image' => 'keyy_logo.png',
+				'button_link' => 'keyy',
+				'button_meta' => 'keyy',
+				'dismiss_time' => 'keyy',
 				'hide_time' => 12,
 				'supported_positions' => array('header'),
-				'validity_function' => 'is_wp_optimize_installed',
+				'validity_function' => 'is_keyy_installed',
 			),
 			'updraftcentral' => array(
 				'title' => __('Save Time and Money. Manage multiple WordPress sites from one location.', 'ml-slider'),
@@ -218,7 +218,7 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
 				'dismiss_time' => 'blackfriday2019',
-				'discount_code' => 'blackfridaysale2019',
+				'discount_code' => 'blackfriday2019sale',
 				'valid_from' => '2019-11-20 00:00:00',
                 'valid_to' => '2019-11-30 23:59:59',
                 'hide_time' => '',
@@ -231,48 +231,48 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
 				'dismiss_time' => 'christmas2019',
-				'discount_code' => 'christmassale2019',
+				'discount_code' => 'christmas2019sale',
 				'valid_from' => '2019-12-01 00:00:00',
 				'valid_to' => '2019-12-25 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'newyear2020' => array(
+			'newyear2019' => array(
 				'title' => _x('Happy New Year - 20% off the MetaSlider Add-on Pack until January 14th', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/new_year.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
 				'dismiss_time' => 'newyear2020',
-				'discount_code' => 'newyearsale2020',
+				'discount_code' => 'newyear2020sale',
 				'valid_from' => '2019-12-26 00:00:00',
 				'valid_to' => '2020-01-14 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'spring2020' => array(
+			'spring2019' => array(
 				'title' => _x('Spring sale - 20% off the MetaSlider Add-on Pack until April 30th', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/spring.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'spring2020',
-				'discount_code' => 'springsale2020',
-				'valid_from' => '2020-04-01 00:00:00',
-				'valid_to' => '2020-04-30 23:59:59',
+				'dismiss_time' => 'spring2019',
+				'discount_code' => 'spring2019sale',
+				'valid_from' => '2019-04-01 00:00:00',
+				'valid_to' => '2019-04-30 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'summer2020' => array(
+			'summer2019' => array(
 				'title' => _x('Summer sale - 20% off the MetaSlider Add-on Pack until July 31st', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/summer.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'summer2020',
-				'discount_code' => 'summersale2020',
-				'valid_from' => '2020-07-01 00:00:00',
-				'valid_to' => '2020-07-31 23:59:59',
+				'dismiss_time' => 'summer2019',
+				'discount_code' => 'summer2019sale',
+				'valid_from' => '2019-07-01 00:00:00',
+				'valid_to' => '2019-07-31 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			)
@@ -321,6 +321,13 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'button_link' => 'wp_optimize_wordpress',
                 'button_meta' => 'wp-optimize',
 			),
+			'keyy' => array(
+				'title' => _x('Keyy', 'Keep the plugin name "Keyy" when possible', 'ml-slider'), 
+				'text' => htmlspecialchars(__('Simple & secure login with a wave of your phone.', 'ml-slider')),
+				'image' => '',
+				'button_link' => 'keyy',
+                'button_meta' => 'keyy',
+			),
 			'updraftcentral' => array(
 				'title' => _x('UpdraftCentral', 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider'), 
 				'text' => __('is a highly efficient way to manage, update and backup multiple websites from one place.', 'ml-slider'),
@@ -341,12 +348,12 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
     }
 
 	/**
-	 * Check to see if wp-optimize is installed
+	 * Check to see if UpdraftPlus is installed
      *
 	 * @return bool 
 	 */
-	protected function is_wp_optimize_installed() {
-		return parent::is_plugin_installed('wp-optimize', false);
+	protected function is_keyy_installed() {
+		return parent::is_plugin_installed('keyy', false);
     }
     
 	/**
@@ -553,6 +560,7 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 	public function get_button_link($link, $type) {
 		$messages = array(
 			'updraftplus' => _x('Get UpdraftPlus', 'Keep the plugin name "UpdraftPlus" when possible', 'ml-slider'),
+			'keyy' => _x('Get Keyy', 'Keep the plugin name "Keyy" when possible', 'ml-slider'),
 			'wp-optimize' => _x('Optimize today', 'This refers to WP_Optimize, but please translate "optimize" accordingly', 'ml-slider'),
 			'updraftcentral' => _x('Get UpdraftCentral', 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider'),
 			'lets_start' => __('Let\'s Start', 'ml-slider'),
@@ -563,7 +571,7 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 		);
 		$message = isset($messages[$type]) ? $messages[$type] : __('Read more', 'ml-slider');
 
-		return '<a class="updraft_notice_link underline text-blue-dark" href="' . $this->get_notice_url($link) . '">' . $message . '</a>';
+		return '<a class="updraft_notice_link" href="' . $this->get_notice_url($link) . '">' . $message . '</a>';
 	}
 
 	/**
@@ -685,6 +693,7 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
  */
 	public function get_notice_url($link_id) {
 		$urls = array(
+			'keyy' => 'https://getkeyy.com',
 			'metaslider' => apply_filters('metaslider_hoplink', 'https://www.metaslider.com/upgrade'),
 			'metaslider_rate' => 'https://wordpress.org/support/plugin/ml-slider/reviews?rate=5#new-post',
 			'metaslider_survey' => 'https://www.metaslider.com/survey',

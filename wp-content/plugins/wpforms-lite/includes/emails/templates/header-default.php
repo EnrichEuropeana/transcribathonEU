@@ -2,10 +2,14 @@
 /**
  * Email Header
  *
- * @since 1.1.3
- */
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.1.3
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
+*/
 
-// Exit if accessed directly.
+// Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $header_image     = wpforms_setting( 'email-header-image', false );

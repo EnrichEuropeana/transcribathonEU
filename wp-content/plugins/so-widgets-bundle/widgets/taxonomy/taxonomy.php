@@ -16,7 +16,7 @@ class SiteOrigin_Widget_Taxonomy_Widget extends SiteOrigin_Widget {
 			'sow-taxonomy',
 			__( 'SiteOrigin Taxonomy', 'so-widgets-bundle' ),
 			array(
-				'description' => __( 'Displays the selected taxonomy for the current post.', 'so-widgets-bundle' )
+				'description' => __( 'A taxonomy widget.', 'so-widgets-bundle' )
 			),
 			array(),
 			false,
@@ -68,10 +68,6 @@ class SiteOrigin_Widget_Taxonomy_Widget extends SiteOrigin_Widget {
 	}
 
 	function get_less_variables( $instance ) {
-		if ( empty( $instance ) ) {
-			return array();
-		}
-
 		return array(
 			'color' => $instance['color'],
 			'has_color' => empty($instance['color']) ? 'false' : 'true',

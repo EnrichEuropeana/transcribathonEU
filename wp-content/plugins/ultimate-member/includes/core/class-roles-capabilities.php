@@ -510,16 +510,18 @@ if ( ! class_exists( 'um\core\Roles_Capabilities' ) ) {
 		 * Get role data
 		 *
 		 * @param int $roleID Role ID
-		 * @return array
+		 * @return mixed|void
 		 */
 		function role_data( $roleID ) {
 			if ( strpos( $roleID, 'um_' ) === 0 ) {
-				$roleID = substr( $roleID, 3 );
-				$role_data = get_option( "um_role_{$roleID}_meta", array() );
-			}
+				$role_data = get_option( "um_role_{$roleID}_meta" );
 
-			if ( empty( $role_data ) ) {
-				$role_data = get_option( "um_role_{$roleID}_meta", array() );
+				if ( ! $role_data ) {
+					$roleID = substr( $roleID, 3 );
+					$role_data = get_option( "um_role_{$roleID}_meta" );
+				}
+			} else {
+				$role_data = get_option( "um_role_{$roleID}_meta" );
 			}
 
 			if ( ! $role_data ) {
@@ -564,8 +566,8 @@ if ( ! class_exists( 'um\core\Roles_Capabilities' ) ) {
 			}
 
 			if ( $exclude ) {
-				foreach ( $exclude as $role ) {
-					unset ( $roles[ $role ] );
+				foreach( $exclude as $role ) {
+					unset( $roles[$role] );
 				}
 			}
 

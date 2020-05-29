@@ -3,7 +3,11 @@
 /**
  * Payments panel.
  *
- * @since 1.0.0
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.0.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 
@@ -23,7 +27,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Output the Payments panel sidebar.
+	 * Outputs the Payments panel sidebar.
 	 *
 	 * @since 1.0.0
 	 */
@@ -40,7 +44,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Output the Payments panel primary content.
+	 * Outputs the Payments panel primary content.
 	 *
 	 * @since 1.0.0
 	 */

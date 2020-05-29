@@ -57,18 +57,13 @@ if(sizeof($instance['tct-barchart-repeater'])>0){
 						$chars = array_column($chars,0);
 						$myh = $chars[0];
 					break;
-					case 'total-characters-day':			
-						$dateData = $instance['tct-barchart-repeater'][$i]['tct-campaign-related-values']['total-characters-day'];
-						$date = $dateData["tct-barchart-campaign-year"]."-".str_pad($dateData["tct-barchart-campaign-month"], 2, "0", STR_PAD_LEFT)."-".str_pad($dateData["tct-barchart-campaign-day"], 2, "0", STR_PAD_LEFT);
-						// Set request parameters for image data
-						$url = home_url()."/tp-api/statistics/characters?campaign=".(int)$cp."&dateEnd=".$date."";
-						$requestType = "GET";
-			
-						// Execude http request
-						include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
-			
-						// Save image data
-						$myh = json_decode($result, true);
+					case 'total-characters-day':
+						$year = $instance['tct-barchart-repeater'][$i]['tct-campaign-related-values']['total-characters-day']['tct-barchart-campaign-year'];
+						$month = $instance['tct-barchart-repeater'][$i]['tct-campaign-related-values']['total-characters-day']['tct-barchart-campaign-month'];
+						$day = $instance['tct-barchart-repeater'][$i]['tct-campaign-related-values']['total-characters-day']['tct-barchart-campaign-day'];
+						$chars = $wpdb->get_results("SELECT SUM(cp.amount) FROM ".$wpdb->prefix."campaign_transcriptionprogress cp WHERE campaignid='".(int)$cp."' AND datum <= '".$year."-".$month."-".$day." 23:59:59'",ARRAY_N);
+						$chars = array_column($chars,0);
+						$myh = $chars[0];
 					break;
 					case 'total-characters-team':
 						$team = $instance['tct-barchart-repeater'][$i]['tct-campaign-related-values']['total-characters-team'];

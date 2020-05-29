@@ -3,7 +3,11 @@
 /**
  * Name text field.
  *
- * @since 1.0.0
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.0.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Field_Name extends WPForms_Field {
 
@@ -461,7 +465,7 @@ class WPForms_Field_Name extends WPForms_Field {
 	}
 
 	/**
-	 * Validate field on form submit.
+	 * Validates field on form submit.
 	 *
 	 * @since 1.0.0
 	 *
@@ -493,7 +497,7 @@ class WPForms_Field_Name extends WPForms_Field {
 	}
 
 	/**
-	 * Format and sanitize field.
+	 * Formats field.
 	 *
 	 * @since 1.0.0
 	 *

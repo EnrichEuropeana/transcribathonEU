@@ -14,7 +14,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 	 *
 	 * @since 1.5.1
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
 	var app = {
 
@@ -54,7 +54,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 
 			$( document ).on(
 				'click',
-				'.wpforms-add-fields-button, .wpforms-panel-sidebar-section, .wpforms-builder-settings-block-add, .wpforms-field-option-group-toggle',
+				'.wpforms-add-fields-button, .wpforms-panel-sidebar-section, .wpforms-builder-settings-block-add',
 				function( event ) {
 
 					var $this = $( this );
@@ -65,35 +65,13 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 						event.stopImmediatePropagation();
 
 						if ( $this.hasClass( 'wpforms-add-fields-button' ) ) {
-							app.upgradeModal( $this.text() + ' ' + wpforms_builder.field, $this.data( 'license' ) );
+							app.upgradeModal( $this.text() + ' ' + wpforms_builder.field );
 						} else {
-							app.upgradeModal( $this.data( 'name' ), $this.data( 'license' ) );
+							app.upgradeModal( $this.data( 'name' ) );
 						}
 					}
 				}
 			);
-
-			// "Did You Know?" Click on the dismiss button.
-			$( '.wpforms-dyk' ).on( 'click', '.dismiss', function( e ) {
-
-				var $t = $( this ),
-					$dyk = $t.closest( '.wpforms-dyk' ),
-					data = {
-						action: 'wpforms_dyk_dismiss',
-						nonce: wpforms_builder.nonce,
-						section: $t.attr( 'data-section' ),
-					};
-
-				$dyk.find( '.wpforms-dyk-fbox' ).addClass( 'out' );
-				setTimeout(
-					function() {
-						$dyk.remove();
-					},
-					300
-				);
-
-				$.get( wpforms_builder.ajax_url, data );
-			} );
 		},
 
 		/**
@@ -102,42 +80,31 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 * @since 1.5.1
 		 *
 		 * @param {string} feature Feature name.
-		 * @param {string} type Feature license type: pro or elite.
 		 */
-		upgradeModal: function( feature, type ) {
+		upgradeModal: function( feature ) {
 
-			// Provide a default value.
-			if ( typeof type === 'undefined' || type.length === 0 ) {
-				type = 'pro';
-			}
-
-			// Make sure we received only supported type.
-			if ( $.inArray( type, [ 'pro', 'elite' ] ) < 0 ) {
-				return;
-			}
-
-			var message    = wpforms_builder_lite.upgrade[type].message.replace( /%name%/g, feature ),
-				upgradeURL = encodeURI( wpforms_builder_lite.upgrade[type].url + '&utm_content=' + feature.trim() );
+			var message    = wpforms_builder_lite.upgrade_message.replace( /%name%/g, feature ),
+				upgradeURL = encodeURI( wpforms_builder_lite.upgrade_url + '&utm_content=' + feature.trim() );
 
 			$.alert( {
-				title   : feature + ' ' + wpforms_builder_lite.upgrade[type].title,
+				title   : feature + ' ' + wpforms_builder_lite.upgrade_title,
 				icon    : 'fa fa-lock',
 				content : message,
 				boxWidth: '550px',
 				onOpenBefore: function() {
-					this.$btnc.after( '<div class="discount-note">' + wpforms_builder_lite.upgrade[type].bonus + wpforms_builder_lite.upgrade[type].doc + '</div>' );
+					this.$btnc.after( '<div class="discount-note">' + wpforms_builder_lite.upgrade_bonus + wpforms_builder_lite.upgrade_doc + '</div>' );
 					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
 				},
 				buttons : {
 					confirm: {
-						text    : wpforms_builder_lite.upgrade[type].button,
+						text    : wpforms_builder_lite.upgrade_button,
 						btnClass: 'btn-confirm',
 						keys    : [ 'enter' ],
-						action: function() {
+						action: function () {
 							window.open( upgradeURL, '_blank' );
-							$.alert( {
+							$.alert({
 								title   : false,
-								content : wpforms_builder_lite.upgrade[type].modal,
+								content : wpforms_builder_lite.upgrade_modal,
 								icon    : 'fa fa-info-circle',
 								type    : 'blue',
 								boxWidth: '565px',
@@ -145,15 +112,15 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 									confirm: {
 										text    : wpforms_builder.ok,
 										btnClass: 'btn-confirm',
-										keys    : [ 'enter' ],
-									},
-								},
+										keys    : [ 'enter' ]
+									}
+								}
 							} );
-						},
-					},
-				},
+						}
+					}
+				}
 			} );
-		},
+		}
 	};
 
 	// Provide access to public functions/properties.

@@ -111,7 +111,7 @@
             },
 
             render: function(image_url, editor_id, width, height) {
-                var layer_color_bg = $("<input class='px-1' type='text' id='layerBgColor' />");
+                var layer_color_bg = $("<input type='text' id='layerBgColor' />");
                 var layer_editor = $("<div class='layer_editor' />");
                 var layer_config = $("<div />");
 
@@ -133,7 +133,7 @@
                                         });
 
                 var container = $("<div />")
-                                    .attr('class', 'ms-layer-container')
+                                    .attr('class', 'container')
                                     .css('position', 'relative')
                                     .css('overflow', 'auto');
 
@@ -162,13 +162,13 @@
 
                 var style_toolbar = $("<div id='style_toolbar'></div>");
 
-                var layer_padding = $("<input class='px-1' id='layer_padding' type='number' step='1' min='0' max='99' value='0' size='3' />" + metasliderpro.px + "&nbsp;")
+                var layer_padding = $("<input id='layer_padding' type='number' step='1' min='0' max='99' value='0' size='3' />" + metasliderpro.px + "&nbsp;")
                                         .on('change', function() {
                                             $('.metaslider-active .content').attr('data-padding', $(this).val());
                                             $('.metaslider-active .content').css('padding', $(this).val() + 'px');
                                         });
 
-                var snap_to_grid = $("<input class='px-1' type='checkbox' />")
+                var snap_to_grid = $("<input type='checkbox' />")
                                         .attr('checked', 'checked')
                                         .change(function() {
                                             if ($(this).is(':checked')) {
@@ -219,13 +219,13 @@
                     'fadeOutRightBig','hinge'
                 ];
 
-                var animation_in_delay = $("<input class='px-1' id='animation_in_delay' type='number' max='99' min='0' step='0.1' size='3' value='0' />")
+                var animation_in_delay = $("<input id='animation_in_delay' type='number' max='99' min='0' step='0.1' size='3' value='0' />")
                                                 .change(function() {
                                                     layerEditor.checkForSelectedLayer();
                                                     layerEditor.updateLayerAnimationDelay();
                                                 });
 
-                var animation_out_delay = $("<input class='px-1' id='animation_out_delay' type='number' max='99' min='0' step='0.1' size='3' value='0' />")
+                var animation_out_delay = $("<input id='animation_out_delay' type='number' max='99' min='0' step='0.1' size='3' value='0' />")
                                                 .change(function() {
                                                     layerEditor.checkForSelectedLayer();
                                                     layerEditor.updateLayerAnimationDelay();

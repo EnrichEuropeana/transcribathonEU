@@ -11,17 +11,8 @@ $storyFacetFields = [
         "fieldName" => "edmLanguage",
         "fieldLabel" => "LANGUAGE"],
     [
-        "fieldName" => "dcLanguage",
-        "fieldLabel" => "DOCUMENT LANGUAGE"],
-    [
-        "fieldName" => "Categories",
-        "fieldLabel" => "DOCUMENT TYPE"],
-    [
         "fieldName" => "edmCountry",
         "fieldLabel" => "PROVIDING COUNTRY"],
-    [
-        "fieldName" => "Dataset",
-        "fieldLabel" => "DATASET"],
     [
         "fieldName" => "edmProvider",
         "fieldLabel" => "AGGREGATOR"]
@@ -36,7 +27,7 @@ $itemFacetFields = [
         "fieldLabel" => "DOCUMENT TYPE"],
     [
         "fieldName" => "Languages",
-        "fieldLabel" => "LANGUAGES"]
+        "fieldLabel" => "LANGUAGES"],
 ];
 
 
@@ -46,59 +37,47 @@ $storyPage = $_GET['ps'];
  // #### Story Solr request start #### 
 
  // Build query from url parameters
- $url = 'http://transcribathon.eu:8983/solr/Stories/select?facet=on';
+ $url = 'http://fresenia.man.poznan.pl:8983/solr/Stories/select?facet=on';
 
  foreach ($storyFacetFields as $storyFacetField) {
-    $url .= '&facet.field='.urlencode($storyFacetField['fieldName']);
+    $url .= '&facet.field='.$storyFacetField['fieldName'];
  }
 
  $url .= '&q=';
  if ($_GET['qs'] != null && $_GET['qs'] != "") {
-    $url .= 'dcDescription:("'.urlencode($_GET['qs']).'")+OR+';
-    $url .= 'StoryId:("'.urlencode($_GET['qs']).'")+OR+';
-    $url .= 'dcTitle:("'.urlencode($_GET['qs']).'")';
+    $url .= 'dcDescription:('.$_GET['qs'].')+OR+';
+    $url .= 'dcTitle:(*'.$_GET['qs'].'*)';
  }
  else {
     $url .= '*:*';
  }
-
  $url .= '&fq=';
 
- $url .= "(ProjectId:\"".get_current_blog_id()."\")";
- $first = true;
+
  for ($j = 0; $j < sizeof($storyFacetFields); $j++) {
     for ($i = 0; $i < sizeof($_GET[$storyFacetFields[$j]['fieldName']]); $i++) {
-        if ($first == true) {
-            $url .= "+AND+";
-            $first = false;
-        }
         if ($i == 0) {
             $url .= "(";
         }
-        $url .= urlencode($storyFacetFields[$j]['fieldName']).':"'.str_replace(" ", "+", urlencode($_GET[$storyFacetFields[$j]['fieldName']][$i])).'"';
-        if (($i + 1) < sizeof($_GET[$storyFacetFields[$j]['fieldName']])) {
+        $url .= $storyFacetFields[$j]['fieldName'].':"'.str_replace(" ", "+", $_GET[$storyFacetFields[$j]['fieldName']][$i]).'"';
+        if ($i + 1 < sizeof($_GET[$storyFacetFields[$j]['fieldName']])) {
             $url .= "+OR+";
         }
         else {
             $url .= ")";
-            if (($j + 1) < sizeof($storyFacetFields)) {
-                for ($k = ($j + 1); $k < sizeof($storyFacetFields); $k++) {
-                    if (sizeof($_GET[$storyFacetFields[$k]['fieldName']]) > 0) {
-                        $url .= "+AND+";
-                        break;
-                    }
-                }
+            if (($j + 1) < sizeof($storyFacetFields) && sizeof($_GET[$storyFacetFields[$j+1]['fieldName']]) > 0) {
+                $url .= "+AND+";
             }
         }
     }
  }
  if ($storyPage != null && is_numeric($storyPage) && $storyPage != 0){
-    $url .= "&rows=24&start=".(($storyPage - 1) * 24);
+    $url .= "&rows=25&start=".(($storyPage - 1) * 25);
  }
  else {
-    $url .= "&rows=24&start=0";
+    $url .= "&rows=25&start=0";
  }
- //var_dump($url); 
+ 
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
@@ -107,14 +86,14 @@ $storyPage = $_GET['ps'];
  
  $storyCount = $solrStoryData['response']['numFound'];
  
- if ($storyPage != null && is_numeric($storyPage) && (($storyPage - 1) * 24) < $storyCount && $storyPage != 0){
-     $storyStart = (($storyPage - 1) * 24) + 1;
-     $storyEnd = $storyPage * 24;
+ if ($storyPage != null && is_numeric($storyPage) && (($storyPage - 1) * 25) < $storyCount && $storyPage != 0){
+     $storyStart = (($storyPage - 1) * 25) + 1;
+     $storyEnd = $storyPage * 25;
  }
  else {
      $storyPage = 1;
      $storyStart = 1;
-     $storyEnd = 24;
+     $storyEnd = 25;
  }
 
  // #### Story Solr request end ####
@@ -123,7 +102,7 @@ $storyPage = $_GET['ps'];
  // #### Item Solr request start ####
 
  // Build query from url parameters
- $url = 'http://transcribathon.eu:8983/solr/Items/select?facet=on';
+ $url = 'http://fresenia.man.poznan.pl:8983/solr/Items/select?facet=on';
 
  foreach ($itemFacetFields as $itemFacetField) {
     $url .= '&facet.field='.$itemFacetField['fieldName'];
@@ -131,44 +110,42 @@ $storyPage = $_GET['ps'];
 
  $url .= '&q=';
  if ($_GET['qi'] != null && $_GET['qi'] != "") {
-    $url .= 'TranscriptionText:('.urlencode($_GET['qi']).')+OR+';
-    $url .= 'Description:('.urlencode($_GET['qi']).')+OR+';
-    $url .= 'ItemId:('.urlencode($_GET['qi']).')+OR+';
-    $url .= 'Title:('.urlencode($_GET['qi']).')';
+    $url .= 'TranscriptionText:('.$_GET['qi'].')+OR+';
+    $url .= 'Description:('.$_GET['qi'].')+OR+';
+    $url .= 'Title:(*'.$_GET['qi'].'*)';
  }
  else {
     $url .= '*:*';
  }
  $url .= '&fq=';
 
+ $first = true;
  for ($j = 0; $j < sizeof($itemFacetFields); $j++) {
+     if ($first == true) {
+        $first = false;
+     }
+     else if (sizeof($_GET[$itemFacetFields[$j]['fieldName']]) > 0) {
+        $url .= "+AND+";
+    }
     for ($i = 0; $i < sizeof($_GET[$itemFacetFields[$j]['fieldName']]); $i++) {
         if ($i == 0) {
             $url .= "(";
         }
-        $url .= urlencode($itemFacetFields[$j]['fieldName']).':"'.str_replace(" ", "+", urlencode($_GET[$itemFacetFields[$j]['fieldName']][$i])).'"';
-        if ($i + 1 < sizeof($_GET[$itemFacetFields[$j]['fieldName']])) {
+        $url .= $itemFacetFields[$j]['fieldName'].':"'.str_replace(" ", "+", $_GET[$itemFacetFields[$j]['fieldName']][$i]).'"';
+        if (($i + 1) < sizeof($_GET[$itemFacetFields[$j]['fieldName']])) {
             $url .= "+OR+";
         }
         else {
             $url .= ")";
-            if (($j + 1) < sizeof($itemFacetFields) && sizeof($_GET[$itemFacetFields[$j+1]['fieldName']]) > 0) {
-                for ($k = ($j + 1); $k < sizeof($itemFacetFields); $k++) {
-                    if (sizeof($_GET[$itemFacetFields[$k]['fieldName']]) > 0) {
-                        $url .= "+AND+";
-                        break;
-                    }
-                }
-            }
         }
     }
  }
  
  if ($itemPage != null && is_numeric($itemPage) && $itemPage != 0){
-    $url .= "&rows=24&start=".(($itemPage - 1) * 24);
+    $url .= "&rows=25&start=".(($itemPage - 1) * 25);
  }
  else {
-    $url .= "&rows=24&start=0";
+    $url .= "&rows=25&start=0";
  }
 
  $requestType = "GET";
@@ -179,14 +156,14 @@ $storyPage = $_GET['ps'];
 
  $itemCount = $solrItemData['response']['numFound'];
  
- if ($itemPage != null && is_numeric($itemPage) && (($itemPage - 1) * 24) < $itemCount && $itemPage != 0){
-     $itemStart = (($itemPage - 1) * 24) + 1;
-     $itemEnd = $itemPage * 24;
+ if ($itemPage != null && is_numeric($itemPage) && (($itemPage - 1) * 25) < $itemCount && $itemPage != 0){
+     $itemStart = (($itemPage - 1) * 25) + 1;
+     $itemEnd = $itemPage * 25;
  }
  else {
      $itemPage = 1;
      $itemStart = 1;
-     $itemEnd = 24;
+     $itemEnd = 25;
  }
 
  // #### Item Solr request end ####
@@ -219,10 +196,8 @@ $content .= '<script>
 $itemTabContent = "";
 $storyTabContent = "";
 
-$clearButton = "";
-if (isset($_GET['qs']) || isset($_GET['qi']))  {
-    $clearButton .= "<a style='text-decoration:none; outline:none;' href='dev/documents'>clear filters</a>";
-}
+$content .= '<div id="story-search-container">';
+    
 
 
     // #### Header Search Start ####
@@ -231,7 +206,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
         $storyTabContent .= '<div class="facet-form-search">';
             $storyTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qs" form="story-facet-form"></div>';
             $storyTabContent .= '<div><button type="submit" form="story-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
-            $storyTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button"><i class="fal fa-globe-europe" style="font-size: 20px;"></i></a></div>';
+            $storyTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button">MAP</a></div>';
             $storyTabContent .= '<div style="clear:both;"></div>';
         $storyTabContent .= '</div>';
     $storyTabContent .= '</section>';
@@ -240,7 +215,8 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
         $itemTabContent .= '<div class="facet-form-search">';;
             $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form"></div>';
             $itemTabContent .= '<div><button type="submit" form="item-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
-            $itemTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button"><i class="fal fa-globe-europe" style="font-size: 20px;"></i></a></div>';
+            $itemTabContent .= '<div class="map-search-page"><button type="submit" form="" class="theme-color-background document-search-button">MAP</button></div>';
+            $itemTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button">MAP</a></div>';
             $itemTabContent .= '<div style="clear:both;"></div>';
         $itemTabContent .= '</div>';
     $itemTabContent .= '</section>';
@@ -248,17 +224,15 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
     // #### Header Search End ####
 
         $storyTabContent .= "<div class='primary-full-width'>";
-            $storyTabContent .= '<div class="complete-search-content">';
+            $storyTabContent .= '<section class="complete-search-content">';
 
         $itemTabContent .= "<div class='primary-full-width'>";
-            $itemTabContent .= '<div class="complete-search-content">';
+            $itemTabContent .= '<section class="complete-search-content">';
 
             // #### Facets Start ####
-            $storyTabContent .= '<div class="search-page-mobile-facets">';
-                $storyTabContent .= '<i class="fas fa-bars"></i>';
-            $storyTabContent .= '</div>';
-            $storyTabContent .= '<div id="story-search-container" class="search-content-left">';
-                $storyTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH <i class="facet-close-button fa fa-times"></i></h2>';
+
+            $storyTabContent .= '<div class="search-content-left">';
+                $storyTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
 
                 // Item/Story switcher
                 $storyTabContent .= '<div class="search-page-tab-container">';
@@ -274,11 +248,10 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                             $storyTabContent .= '</button>';
                         $storyTabContent .= '</li>';
                     $storyTabContent .= '</ul>';
-                $storyTabContent .= '</div>'; 
+                $storyTabContent .= '</div>';
 
                 // Facet form
                 $storyTabContent .= '<form id="story-facet-form">';
-                    $storyTabContent .= $clearButton;
                     foreach ($storyFacetFields as $storyFacetField) {
                         $facetData = $solrStoryData['facet_counts']['facet_fields'][$storyFacetField['fieldName']];
                         
@@ -292,27 +265,17 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                         if ($isEmpty != true) {
                             $storyTabContent .= '<div class="search-panel-default collapse-controller">';
                                 $storyTabContent .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#story-'.$storyFacetField['fieldName'].'-area" 
-                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
-                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';
+                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
                                     $storyTabContent .= '<h4 class="left-panel-dropdown-title">';  
                                         $storyTabContent .= '<li style="font-size:14px;">'.$storyFacetField['fieldLabel'].'</li>';
                                     $storyTabContent .= '</h4>';
-                                    $storyTabContent .= '<i class="far fa-caret-circle-up collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
+                                    $storyTabContent .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
                                 $storyTabContent .= '</div>';
     
                                 $storyTabContent .= "<div id='story-".$storyFacetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
-                                    $rowCount = 0;
                                     for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
                                         if ($facetData[$i+1] != 0) {
-                                            if ($rowCount == 5) {
-                                                $storyTabContent .= '<div class="show-more theme-color" 
-                                                                            data-toggle="collapse" href="#story-'.$storyFacetField['fieldName'].'-hidden-area">';
-                                                    $storyTabContent .= 'Show More';
-                                                $storyTabContent .= '</div>';
-
-                                                $storyTabContent .= "<div id='story-".$storyFacetField['fieldName']."-hidden-area' 
-                                                                        class=\"facet-search-subsection collapse\">";
-                                            }
                                             $storyTabContent .= '<label class="search-container theme-color">';
                                                 $storyTabContent .= $facetData[$i].' ('.$facetData[$i+1].')';
                                                 $checked = "";
@@ -323,14 +286,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                                                 '.$checked.' onChange="this.form.submit()">
                                                                 <span class="theme-color-background checkmark"></span>';
                                             $storyTabContent .= '</label>';
-                                            $rowCount += 1;
                                         }
-                                    }
-                                    if ($rowCount > 5) {
-                                            $storyTabContent .= '<div class="show-less theme-color" data-toggle="collapse" href="#story-'.$storyFacetField['fieldName'].'-hidden-area">';
-                                                $storyTabContent .= 'Show Less';
-                                            $storyTabContent .= '</div>';
-                                        $storyTabContent .= '</div>';
                                     }
                                 $storyTabContent .= '</div>';
                             $storyTabContent .= '</div>';
@@ -339,11 +295,8 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                 $storyTabContent .= '</form>';
             $storyTabContent .= '</div>';
 
-            $itemTabContent .= '<div class="search-page-mobile-facets">';
-                $itemTabContent .= '<i class="fas fa-bars"></i>';
-            $itemTabContent .= '</div>';
             $itemTabContent .= '<div class="search-content-left">';
-                $itemTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH <i class="facet-close-button fa fa-times"></i></h2>';
+                $itemTabContent .= '<h2 class="theme-color">REFINE YOUR SEARCH</h2>';
 
                 // Item/Story switcher
                 $itemTabContent .= '<div class="search-page-tab-container">';
@@ -363,33 +316,22 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
                 // Facet form
                 $itemTabContent .= '<form id="item-facet-form">';
-                    $itemTabContent .= $clearButton;
                     foreach ($itemFacetFields as $itemFacetField) {
                         $facetData = $solrItemData['facet_counts']['facet_fields'][$itemFacetField['fieldName']];
                         if (sizeof($facetData) > 0) {
                             $itemTabContent .= '<div class="search-panel-default collapse-controller">';
                                 $itemTabContent .= '<div class="search-panel-heading collapse-headline clickable" data-toggle="collapse" href="#item-'.$itemFacetField['fieldName'].'-area" 
-                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')
-                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')">';
+                                                    onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
+                                                            jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-up\')">';
                                     $itemTabContent .= '<h4 class="left-panel-dropdown-title">';  
                                         $itemTabContent .= '<li style="font-size:14px;">'.$itemFacetField['fieldLabel'].'</li>';
                                     $itemTabContent .= '</h4>';
-                                    $itemTabContent .= '<i class="far fa-caret-circle-up collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
+                                    $itemTabContent .= '<i class="far fa-caret-circle-down collapse-icon theme-color" style="font-size: 17px; float:right; margin-top:17.4px;"></i>';
                                 $itemTabContent .= '</div>';
     
                                 $itemTabContent .= "<div id='item-".$itemFacetField['fieldName']."-area' class=\"facet-search-subsection collapse show\">";
-                                $rowCount = 0;
                                     for ($i = 0; $i < sizeof($facetData); $i = $i + 2) {
                                         if ($facetData[$i+1] != 0) {
-                                            if ($rowCount == 5) {
-                                                $itemTabContent .= '<div class="show-more theme-color" 
-                                                                            data-toggle="collapse" href="#item-'.$itemFacetField['fieldName'].'-hidden-area">';
-                                                    $itemTabContent .= 'Show More';
-                                                $itemTabContent .= '</div>';
-                
-                                                $itemTabContent .= "<div id='item-".$itemFacetField['fieldName']."-hidden-area' 
-                                                                        class=\"facet-search-subsection collapse\">";
-                                            }
                                             $itemTabContent .= '<label class="search-container theme-color">';
                                                 $itemTabContent .= $facetData[$i].' ('.$facetData[$i+1].')';
                                                 $checked = "";
@@ -400,14 +342,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                                                 '.$checked.' onChange="this.form.submit()">
                                                                 <span class="theme-color-background checkmark"></span>';
                                             $itemTabContent .= '</label>';
-                                            $rowCount += 1;
                                         }
-                                    }
-                                    if ($rowCount > 5) {
-                                            $itemTabContent .= '<div class="show-less theme-color" data-toggle="collapse" href="#item-'.$itemFacetField['fieldName'].'-hidden-area">';
-                                                $itemTabContent .= 'Show Less';
-                                            $itemTabContent .= '</div>';
-                                        $itemTabContent .= '</div>';
                                     }
                                 $itemTabContent .= '</div>';
                             $itemTabContent .= '</div>';
@@ -423,6 +358,9 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
             $storyTabContent .= '<div class="search-content-right">';
                 $storyTabContent .= '<div class="search-content-right-header">';
+                    $storyTabContent .= '<div class="search-content-results-headline search-headline">';
+                        $storyTabContent .= $storyStart.' - '.$storyEnd.' of '.$storyCount.' results';
+                    $storyTabContent .= '</div>';
                     
                     // List/Grid switcher
                     $storyTabContent .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
@@ -446,10 +384,6 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                 $storyTabContent .= '</li>';
                             $storyTabContent .= '</ul>';
                         $storyTabContent .= '</div>';
-                    $storyTabContent .= '</div>';
-
-                    $storyTabContent .= '<div class="search-content-results-headline search-headline">';
-                        $storyTabContent .= $storyStart.' - '.$storyEnd.' of '.$storyCount.' results';
                     $storyTabContent .= '</div>';
                 $storyTabContent .= '</div>';
                 
@@ -484,7 +418,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
                     // 3 next pages
                     for ($i = 1; $i <= 3; $i++) {
-                        if (((($storyPage + $i) - 1) * 24) < $storyCount) {
+                        if (((($storyPage + $i) - 1) * 25) < $storyCount) {
                             $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage + $i).'" class="theme-color-hover" style="outline:none;">';
                                 $pagination .= ($storyPage + $i);
                             $pagination .= '</button>';
@@ -492,15 +426,15 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                     }
 
                     // Next page arrow
-                    if ($storyPage < ceil($storyCount / 24)) {
+                    if ($storyPage < ceil($storyCount / 25)) {
                         $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.($storyPage + 1).'" class="theme-color-hover" style="outline:none;">';
                             $pagination .= '&rsaquo;';  
                         $pagination .= '</button>';
                     }
 
                     // Right arrows
-                    if ($storyPage < ceil($storyCount / 24)) {
-                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.ceil($storyCount / 24).'" class="theme-color-hover" style="outline:none;">';
+                    if ($storyPage < ceil($storyCount / 25)) {
+                        $pagination .= '<button type="submit" form="story-facet-form" name="ps" value="'.ceil($storyCount / 25).'" class="theme-color-hover" style="outline:none;">';
                             $pagination .= '&raquo;';
                         $pagination .= '</button>';
                     }
@@ -518,7 +452,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                     }
                     
                     // Get additional story data
-                    $url = home_url()."/tp-api/storiesMinimal?storyId=";
+                    $url = home_url()."/tp-api/storiesMinimal?story=";
                     $first = true;
                     foreach($storyIdList as $storyId) {
                         if ($first == true) {
@@ -537,10 +471,21 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                     // Save story data
                     $storyData = json_decode($result, true);
 
-
                     for ($i = 0; $i < sizeof($solrStoryData['response']['docs']); $i++) {
                         $storyTabContent .= '<div class="search-page-single-result maingridview">';
 
+                            // Single story info
+                            $storyTabContent .= '<div class="search-page-single-result-info">';
+                                $storyTabContent .= '<h2 class="theme-color">';
+                                    $storyTabContent .= "<a href='".home_url( $wp->request )."/story?story=".$solrStoryData['response']['docs'][$i]['StoryId']."'>";
+                                        $storyTabContent .= $solrStoryData['response']['docs'][$i]['dcTitle'];
+                                    $storyTabContent .= "</a>";
+                                $storyTabContent .= '</h2>';
+                                $storyTabContent .= '<div class="search-page-single-result-description">';
+                                    $storyTabContent .= $solrStoryData['response']['docs'][$i]['dcDescription'];
+                                $storyTabContent .= '</div>';
+                                $storyTabContent .= '<span style="display: none">...</span>';
+                            $storyTabContent .= '</div>';
 
                             // Single story image
                             $storyTabContent .= '<div class="search-page-single-result-image">';
@@ -600,44 +545,25 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                     $statusObject->ColorCode = $statusType['ColorCode'];
                                     $statusObject->ColorCodeGradient = $statusType['ColorCodeGradient'];
                                     $statusObject->Amount = 0;
-                                    $statusObject->Percentage = 0;
                                     $statusData[$statusType['Name']] = $statusObject;
                                 }
                                 $itemAmount = 0;
-                                $itemAmount += $solrStoryData['response']['docs'][$i]['NotStartedAmount'];
-                                $itemAmount += $solrStoryData['response']['docs'][$i]['EditAmount'];
-                                $itemAmount += $solrStoryData['response']['docs'][$i]['ReviewAmount'];
-                                $itemAmount += $solrStoryData['response']['docs'][$i]['CompletedAmount'];
+                                foreach($storyData[$i]['CompletionStatus'] as $status) {
+                                    $itemAmount += $status['Amount'];
+                                }
                                 
                                 $totalPercent = 0;
 
                                 // Create status objects for each status
-                                foreach($statusTypes as $status) {
+                                foreach($storyData[$i]['CompletionStatus'] as $status) {
                                     $statusObject = new stdClass;
                                     $statusObject->Name = $status['Name'];
                                     $statusObject->ColorCode = $status['ColorCode'];
                                     $statusObject->ColorCodeGradient = $status['ColorCodeGradient'];
-				    switch ($status['Name']) {
-					case "Not Started":
-						$statusObject->Amount = $solrStoryData['response']['docs'][$i]['NotStartedAmount'];
-						$statusObject->Percentage = (round($solrStoryData['response']['docs'][$i]['NotStartedAmount'] / $itemAmount, 2) * 100);
-						break;
-					case "Edit":
-						$statusObject->Amount = $solrStoryData['response']['docs'][$i]['EditAmount'];
-						$statusObject->Percentage = (round($solrStoryData['response']['docs'][$i]['EditAmount'] / $itemAmount, 2) * 100);
-						break;
-					case "Review":
-						$statusObject->Amount = $solrStoryData['response']['docs'][$i]['ReviewAmount'];
-						$statusObject->Percentage = (round($solrStoryData['response']['docs'][$i]['ReviewAmount'] / $itemAmount, 2) * 100);
-						break;
-					case "Completed":
-						$statusObject->Amount = $solrStoryData['response']['docs'][$i]['CompletedAmount'];
-                                    		$statusObject->Percentage = (round($solrStoryData['response']['docs'][$i]['CompletedAmount'] / $itemAmount, 2) * 100);
-						break;
-				    }
+                                    $statusObject->Amount = (round($status['Amount'] / $itemAmount, 2) * 100);
 
                                     $statusData[$status['Name']] = $statusObject;
-                                    $totalPercent += $statusObject->Percentage;
+                                    $totalPercent += $statusObject->Amount;
                                 }
 
                                 // Make sure that percent total is 100
@@ -655,14 +581,14 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                     $storyTabContent .= '<div class="item-status-info-box box-status-bar-info-box">';
                                         $storyTabContent .= '<ul class="item-status-info-box-list">';
                                             foreach ($statusData as $status) {
-                                                $percentage = $status->Percentage;
+                                                $percentage = $status->Amount;
                                                 $storyTabContent .= '<li>';
                                                     $storyTabContent .= '<span class="status-info-box-color-indicator" style="background-color:'.$status->ColorCode.';
                                                                     background-image: -webkit-gradient(linear, left top, left bottom,
                                                                     color-stop(0, '.$status->ColorCode.'), color-stop(1, '.$status->ColorCodeGradient.'));">';
                                                     $storyTabContent .= '</span>';
-                                                    $storyTabContent .= '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status->Name).'-section" class="status-info-box-percentage">';
-                                                        $storyTabContent .= $percentage.'% | '.$status->Amount;
+                                                    $storyTabContent .= '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status->Name).'-section" class="status-info-box-percentage" style="width: 20%;">';
+                                                        $storyTabContent .= $percentage.'%';
                                                     $storyTabContent .= '</span>';
                                                     $storyTabContent .= '<span class="status-info-box-text">';
                                                         $storyTabContent .= $status->Name;
@@ -679,7 +605,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
                                     // Add each status section to progress bar
                                     foreach ($statusData as $status) {
-                                        $percentage = $status->Percentage;
+                                        $percentage = $status->Amount;
 
                                         switch ($status->Name) {
                                             case "Completed":
@@ -723,16 +649,6 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                     }
                                 $storyTabContent .= '</div>';
                             $storyTabContent .= '</div>';
-
-                            // Single story info
-                            $storyTabContent .= '<div class="search-page-single-result-info">';
-                                $storyTabContent .= '<h2 class="theme-color">';
-                                    $storyTabContent .= "<a href='".home_url( $wp->request )."/story?story=".$solrStoryData['response']['docs'][$i]['StoryId']."'>";
-                                        $storyTabContent .= $solrStoryData['response']['docs'][$i]['dcTitle'];
-                                    $storyTabContent .= "</a>";
-                                $storyTabContent .= '</h2>';
-                                $storyTabContent .= '<span style="display: none">...</span>';
-                            $storyTabContent .= '</div>';
                             
                             $storyTabContent .= '<div style="clear:both"></div>';
                         $storyTabContent .= '</div>';
@@ -748,8 +664,9 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
             
             $itemTabContent .= '<div class="search-content-right">';
                 $itemTabContent .= '<div class="search-content-right-header">';
-
-                    
+                    $itemTabContent .= '<div class="search-content-results-headline search-headline">';
+                        $itemTabContent .= $itemStart.' - '.$itemEnd.' of '.$itemCount.' results';
+                    $itemTabContent .= '</div>';
                     
                     // List/Grid switcher
                     $itemTabContent .= '<div class="search-content-results-headline search-content-results-view search-division-detail">';
@@ -773,9 +690,6 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                 $itemTabContent .= '</li>';
                             $itemTabContent .= '</ul>';
                         $itemTabContent .= '</div>';
-                    $itemTabContent .= '</div>';
-                    $itemTabContent .= '<div class="search-content-results-headline search-headline">';
-                        $itemTabContent .= $itemStart.' - '.$itemEnd.' of '.$itemCount.' results';
                     $itemTabContent .= '</div>';
                 $itemTabContent .= '</div>';
 
@@ -804,7 +718,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
                     // 3 next pages
                     for ($i = 1; $i <= 3; $i++) {
-                        if (((($itemPage + $i) - 1) * 24) < $itemCount) {
+                        if (((($itemPage + $i) - 1) * 25) < $itemCount) {
                             $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.($itemPage + $i).'" class="theme-color-hover" style="outline:none;">';
                                 $pagination .= ($itemPage + $i);
                             $pagination .= '</button>';
@@ -812,8 +726,8 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                     }
 
                         // Right arrows
-                    if ($itemPage < ceil($itemCount / 24)) {
-                        $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.ceil($itemCount / 24).'" class="theme-color-hover" style="outline:none;">';
+                    if ($itemPage < ceil($itemCount / 25)) {
+                        $pagination .= '<button type="submit" form="item-facet-form" name="pi" value="'.ceil($itemCount / 25).'" class="theme-color-hover" style="outline:none;">';
                             $pagination .= '&raquo;';
                         $pagination .= '</button>';
                     }
@@ -827,6 +741,19 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                 $itemTabContent .= '<div class="search-content-right-items">';
                     foreach ($solrItemData['response']['docs'] as $item) {
                         $itemTabContent .= '<div class="search-page-single-result maingridview">';
+
+                            // Single item info
+                            $itemTabContent .= '<div class="search-page-single-result-info">';
+                                $itemTabContent .= '<h2 class="theme-color">';
+                                    $itemTabContent .= "<a href='".home_url( $wp->request )."/story/item?item=".$item['ItemId']."'>";
+                                        $itemTabContent .= $item['Title'];
+                                    $itemTabContent .= "</a>";
+                                $itemTabContent .= '</h2>';
+                                $itemTabContent .= '<div class="search-page-single-result-description">';
+                                    $itemTabContent .= $item['Description'];
+                                $itemTabContent .= '</div>';
+                                $itemTabContent .= '<span style="display: none">...</span>';
+                            $itemTabContent .= '</div>';
 
                             // Single item image
                             $itemTabContent .= '<div class="search-page-single-result-image">';
@@ -962,16 +889,6 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                     }
                                 $itemTabContent .= '</div>';
                             $itemTabContent .= '</div>';
-
-                            // Single item info
-                            $itemTabContent .= '<div class="search-page-single-result-info">';
-                                $itemTabContent .= '<h2 class="theme-color">';
-                                    $itemTabContent .= "<a href='".home_url( $wp->request )."/story/item?item=".$item['ItemId']."'>";
-                                        $itemTabContent .= $item['Title'];
-                                    $itemTabContent .= "</a>";
-                                $itemTabContent .= '</h2>';
-                                $itemTabContent .= '<span style="display: none">...</span>';
-                            $itemTabContent .= '</div>';
                             
                             $itemTabContent .= '<div style="clear:both"></div>';
                         $itemTabContent .= '</div>';
@@ -987,10 +904,10 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
             // #### Results End ####
 
 
-        $itemTabContent .= '</div>';
+        $itemTabContent .= '</section>';
     $itemTabContent .= "</div>";
 
-        $storyTabContent .= '</div>';
+        $storyTabContent .= '</section>';
     $storyTabContent .= "</div>";
 
     // Show Stories unless search was done on items
@@ -1010,6 +927,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
             $content .= $storyTabContent;
         $content .= '</div>';  
     }
+$content .= "</div>";
 
 echo $content;
 

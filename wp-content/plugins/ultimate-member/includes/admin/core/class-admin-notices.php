@@ -1,9 +1,8 @@
 <?php
 namespace um\admin\core;
 
-
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
-
 
 if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 
@@ -35,16 +34,13 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 		}
 
 
-		/**
-		 *
-		 */
 		function create_list() {
 			$this->old_extensions_notice();
 			$this->install_core_page_notice();
 			$this->exif_extension_notice();
 			$this->show_update_messages();
 			$this->check_wrong_install_folder();
-			//$this->admin_notice_opt_in();
+			$this->admin_notice_opt_in();
 			$this->need_upgrade();
 			$this->check_wrong_licenses();
 
@@ -199,7 +195,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 
 			ob_start(); ?>
 
-			<div class="<?php echo esc_attr( $class ) ?> um-admin-notice notice <?php echo $dismissible ? 'is-dismissible' : '' ?>" data-key="<?php echo esc_attr( $key ) ?>">
+			<div class="<?php echo esc_attr( $class ) ?> um-admin-notice notice <?php echo $dismissible ? 'is-dismissible' : '' ?>" data-key="<?php echo $key ?>">
 				<?php echo ! empty( $notice_data['message'] ) ? $notice_data['message'] : '' ?>
 			</div>
 
@@ -266,11 +262,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 			$active_plugins = UM()->dependencies()->get_active_plugins();
 			foreach ( $slugs as $slug ) {
 				if ( in_array( $slug, $active_plugins ) ) {
-					$path = wp_normalize_path( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $slug );
-					if ( ! file_exists( $path ) ) {
-						continue;
-					}
-					$plugin_data = get_plugin_data( $path );
+					$plugin_data = get_plugin_data( um_path . '..' . DIRECTORY_SEPARATOR . $slug );
 					if ( version_compare( '2.0', $plugin_data['Version'], '>' ) ) {
 						$show = true;
 						break;
@@ -284,7 +276,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 
 			$this->add_notice( 'old_extensions', array(
 				'class' => 'error',
-				'message' => '<p>' . sprintf( __( '<strong>%s %s</strong> requires 2.0 extensions. You have pre 2.0 extensions installed on your site. <br /> Please update %s extensions to latest versions. For more info see this <a href="%s" target="_blank">doc</a>.', 'ultimate-member' ), ultimatemember_plugin_name, ultimatemember_version, ultimatemember_plugin_name, 'https://docs.ultimatemember.com/article/201-how-to-update-your-site' ) . '</p>',
+				'message' => '<p>' . sprintf( __( '<strong>%s %s</strong> requires 2.0 extensions. You have pre 2.0 extensions installed on your site. <br /> Please update %s extensions to latest versions. For more info see this <a href="%s" target="_blank">doc</a>.', 'ultimate-member' ), ultimatemember_plugin_name, ultimatemember_version, ultimatemember_plugin_name, 'http://docs.ultimatemember.com/article/266-updating-to-2-0-versions-of-extensions' ) . '</p>',
 			), 0 );
 		}
 
@@ -309,7 +301,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 						</p>
 
 						<p>
-							<a href="<?php echo esc_url( add_query_arg( 'um_adm_action', 'install_core_pages' ) ); ?>" class="button button-primary"><?php _e( 'Create Pages', 'ultimate-member' ) ?></a>
+							<a href="<?php echo esc_attr( add_query_arg( 'um_adm_action', 'install_core_pages' ) ); ?>" class="button button-primary"><?php _e( 'Create Pages', 'ultimate-member' ) ?></a>
 							&nbsp;
 							<a href="javascript:void(0);" class="button-secondary um_secondary_dimiss"><?php _e( 'No thanks', 'ultimate-member' ) ?></a>
 						</p>
@@ -374,30 +366,28 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 				return;
 			}
 
-			$update = sanitize_key( $_REQUEST['update'] );
+			$update = $_REQUEST['update'];
 			switch( $update ) {
 
 				case 'confirm_delete':
-					$request_users = array_map( 'absint', (array) $_REQUEST['user'] );
-
 					$confirm_uri = admin_url( 'users.php?' . http_build_query( array(
 						'um_adm_action' => 'delete_users',
-						'user'          => $request_users,
+						'user'          => array_map( 'intval', (array) $_REQUEST['user'] ),
 						'confirm'       => 1
 					) ) );
 					$users = '';
 
-					if ( isset( $request_users ) ) {
-						foreach ( $request_users as $user_id ) {
+					if ( isset( $_REQUEST['user'] ) ){
+						foreach ( $_REQUEST['user'] as $user_id ) {
 							$user = get_userdata( $user_id );
 							$users .= '#' . $user_id . ': ' . $user->user_login . '<br />';
 						}
 					}
 
-					$ignore = admin_url( 'users.php' );
+					$ignore = admin_url('users.php');
 
-					$messages[0]['err_content'] = sprintf( __( 'Are you sure you want to delete the selected user(s)? The following users will be deleted: <p>%s</p> <strong>This cannot be undone!</strong>', 'ultimate-member' ), $users );
-					$messages[0]['err_content'] .= '<p><a href="'. esc_url( $confirm_uri ) .'" class="button-primary">' . __( 'Remove', 'ultimate-member' ) . '</a>&nbsp;&nbsp;<a href="' . esc_url( $ignore ) . '" class="button">' . __( 'Undo', 'ultimate-member' ) . '</a></p>';
+					$messages[0]['err_content'] = sprintf( __( 'Are you sure you want to delete the selected user(s)? The following users will be deleted: <p>%s</p> <strong>This cannot be undone!</strong>','ultimate-member'), $users);
+					$messages[0]['err_content'] .= '<p><a href="'. esc_html( $confirm_uri ) .'" class="button-primary">' . __( 'Remove', 'ultimate-member' ) . '</a>&nbsp;&nbsp;<a href="'.$ignore.'" class="button">' . __('Undo','ultimate-member') . '</a></p>';
 
 					break;
 
@@ -544,7 +534,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 			if ( ! empty(  $arr_inactive_license_keys ) ) {
 				$this->add_notice( 'license_key', array(
 					'class'     => 'error',
-					'message'   => '<p>' . sprintf( __( 'There are %d inactive %s license keys for this site. This site is not authorized to get plugin updates. You can active this site on <a href="%s">www.ultimatemember.com</a>.', 'ultimate-member' ), count( $arr_inactive_license_keys ) , ultimatemember_plugin_name, UM()->store_url ) . '</p>',
+					'message'   => '<p>' . sprintf( __( 'There are %d inactive %s license keys for this site. This site is not authorized to get plugin updates. You can active this site on <a href="%s">www.ultimatemember.com</a>.', 'ultimate-member' ), count( $arr_inactive_license_keys ) , ultimatemember_plugin_name, 'https://ultimatemember.com' ) . '</p>',
 				), 3 );
 			}
 
@@ -580,18 +570,11 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 					'message'   => $message,
 				), 4 );
 			} else {
-				if ( isset( $_GET['msg'] ) && 'updated' == sanitize_key( $_GET['msg'] ) ) {
-					if ( isset( $_GET['page'] ) && 'um_options' == sanitize_key( $_GET['page'] ) ) {
-						$this->add_notice( 'settings_upgrade', array(
-							'class'     => 'updated',
-							'message'   => '<p>' . __( 'Settings successfully upgraded', 'ultimate-member' ) . '</p>',
-						), 4 );
-					} else {
-						$this->add_notice( 'upgrade', array(
-							'class'     => 'updated',
-							'message'   => '<p>' . sprintf( __( '<strong>%s %s</strong> Successfully Upgraded', 'ultimate-member' ), ultimatemember_plugin_name, ultimatemember_version ) . '</p>',
-						), 4 );
-					}
+				if ( isset( $_GET['msg'] ) && 'updated' == $_GET['msg'] ) {
+					$this->add_notice( 'upgrade', array(
+						'class'     => 'updated',
+						'message'   => '<p>' . sprintf( __( '<strong>%s %s</strong> Successfully Upgraded', 'ultimate-member' ), ultimatemember_plugin_name, ultimatemember_version ) . '</p>',
+					), 4 );
 				}
 			}
 		}
@@ -690,7 +673,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Notices' ) ) {
 			}
 
 			$hidden_notices = get_option( 'um_hidden_admin_notices', array() );
-			$hidden_notices[] = sanitize_key( $_POST['key'] );
+			$hidden_notices[] = $_POST['key'];
 
 			update_option( 'um_hidden_admin_notices', $hidden_notices );
 

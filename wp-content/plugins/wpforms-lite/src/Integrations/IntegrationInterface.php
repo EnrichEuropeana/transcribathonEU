@@ -5,12 +5,16 @@ namespace WPForms\Integrations;
 /**
  * Interface IntegrationInterface defines required methods for integrations to work properly.
  *
- * @since 1.4.8
+ * @package    WPForms\Integrations
+ * @author     WPForms
+ * @since      1.4.8
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2018, WPForms LLC
  */
 interface IntegrationInterface {
 
 	/**
-	 * Indicate if current integration is allowed to load.
+	 * Indicates if current integration is allowed to load.
 	 *
 	 * @since 1.4.8
 	 *
@@ -19,7 +23,7 @@ interface IntegrationInterface {
 	public function allow_load();
 
 	/**
-	 * Load an integration.
+	 * Loads an integration.
 	 *
 	 * @since 1.4.8
 	 */

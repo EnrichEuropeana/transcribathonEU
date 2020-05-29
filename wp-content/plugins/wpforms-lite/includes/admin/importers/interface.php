@@ -2,7 +2,11 @@
 /**
  * Interface WPForms_Importer_Interface to handle common methods for all importers.
  *
- * @since 1.4.2
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.4.2
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2017, WPForms LLC
  */
 interface WPForms_Importer_Interface {
 

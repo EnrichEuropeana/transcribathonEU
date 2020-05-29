@@ -1,27 +1,21 @@
 <?php
 
 /**
- * bbPress Phorum Converter
- *
- * @package bbPress
- * @subpackage Converters
- */
-
-/**
  * Implementation of Phorum Forum converter.
  *
- * @since 2.5.0 bbPress (r5141)
- *
- * @link Codex Docs https://codex.bbpress.org/import-forums/phorum
+ * @since bbPress (r5141)
+ * @link Codex Docs http://codex.bbpress.org/import-forums/phorum
  */
 class Phorum extends BBP_Converter_Base {
 
 	/**
 	 * Main Constructor
 	 *
+	 * @uses Phorum::setup_globals()
 	 */
-	public function __construct() {
+	function __construct() {
 		parent::__construct();
+		$this->setup_globals();
 	}
 
 	/**
@@ -31,12 +25,12 @@ class Phorum extends BBP_Converter_Base {
 
 		/** Forum Section *****************************************************/
 
-		// Old forum id (Stored in postmeta)
+		// Forum id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forums',
 			'from_fieldname' => 'forum_id',
 			'to_type'        => 'forum',
-			'to_fieldname'   => '_bbp_old_forum_id'
+			'to_fieldname'   => '_bbp_forum_id'
 		);
 
 		// Forum parent id (If no parent, then 0, Stored in postmeta)
@@ -44,7 +38,7 @@ class Phorum extends BBP_Converter_Base {
 			'from_tablename'  => 'forums',
 			'from_fieldname'  => 'parent_id',
 			'to_type'         => 'forum',
-			'to_fieldname'    => '_bbp_old_forum_parent_id'
+			'to_fieldname'    => '_bbp_forum_parent_id'
 		);
 
 		// Forum topic count (Stored in postmeta)
@@ -106,13 +100,6 @@ class Phorum extends BBP_Converter_Base {
 			'callback_method' => 'callback_forum_type'
 		);
 
-		// Forum status (Set a default value 'open', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_status',
-			'default'      => 'open'
-		);
-
 		// Forum dates.
 		$this->field_map[] = array(
 			'to_type'      => 'forum',
@@ -137,13 +124,13 @@ class Phorum extends BBP_Converter_Base {
 
 		/** Topic Section *****************************************************/
 
-		// Old topic id (Stored in postmeta)
+		// Topic id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'messages',
 			'from_fieldname'  => 'thread',
 			'from_expression' => 'WHERE parent_id = 0',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_topic_id'
+			'to_fieldname'    => '_bbp_topic_id'
 		);
 
 		// Topic reply count (Stored in postmeta)
@@ -180,23 +167,6 @@ class Phorum extends BBP_Converter_Base {
 			'to_type'         => 'topic',
 			'to_fieldname'    => 'post_author',
 			'callback_method' => 'callback_userid'
-		);
-
-		// Topic author name (Stored in postmeta as _bbp_anonymous_name)
-		$this->field_map[] = array(
-			'from_tablename' => 'messages',
-			'from_fieldname' => 'author',
-			'to_type'        => 'topic',
-			'to_fieldname'   => '_bbp_old_topic_author_name_id'
-		);
-
-		// Is the topic anonymous (Stored in postmeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'user_id',
-			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_is_topic_anonymous_id',
-			'callback_method' => 'callback_check_anonymous'
 		);
 
 		// Topic Author ip (Stored in postmeta)
@@ -284,7 +254,7 @@ class Phorum extends BBP_Converter_Base {
 			'from_tablename'  => 'messages',
 			'from_fieldname'  => 'closed',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_closed_status_id',
+			'to_fieldname'    => 'post_status',
 			'callback_method' => 'callback_topic_status'
 		);
 
@@ -294,34 +264,15 @@ class Phorum extends BBP_Converter_Base {
 		 * Phorum v5.2.19 Forums do not support topic tags out of the box
 		 */
 
-		/** Topic Subscriptions Section ***************************************/
-
-		// Subscribed topic ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'subscribers',
-			'from_fieldname'  => 'thread',
-			'to_type'         => 'topic_subscriptions',
-			'to_fieldname'    => '_bbp_subscriptions'
-		);
-
-		// Subscribed user ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'subscribers',
-			'from_fieldname'  => 'user_id',
-			'to_type'         => 'topic_subscriptions',
-			'to_fieldname'    => 'user_id',
-			'callback_method' => 'callback_userid'
-		);
-
 		/** Reply Section *****************************************************/
 
-		// Old reply id (Stored in postmeta)
+		// Reply id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'messages',
 			'from_fieldname'  => 'message_id',
 			'from_expression' => 'WHERE parent_id != 0',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_reply_id'
+			'to_fieldname'    => '_bbp_post_id'
 		);
 
 		// Reply parent forum id (If no parent, then 0. Stored in postmeta)
@@ -330,7 +281,7 @@ class Phorum extends BBP_Converter_Base {
 			'from_fieldname'  => 'forum_id',
 			'to_type'         => 'reply',
 			'to_fieldname'    => '_bbp_forum_id',
-			'callback_method' => 'callback_forumid'
+			'callback_method' => 'callback_topicid_to_forumid'
 		);
 
 		// Reply parent topic id (If no parent, then 0. Stored in postmeta)
@@ -359,21 +310,21 @@ class Phorum extends BBP_Converter_Base {
 			'callback_method' => 'callback_userid'
 		);
 
-		// Reply author name (Stored in postmeta as _bbp_anonymous_name)
+		// Reply title.
 		$this->field_map[] = array(
-			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'author',
-			'to_type'         => 'reply',
-			'to_fieldname'   => '_bbp_old_reply_author_name_id'
+			'from_tablename' => 'messages',
+			'from_fieldname' => 'subject',
+			'to_type'        => 'reply',
+			'to_fieldname'   => 'post_title'
 		);
 
-		// Is the reply anonymous  (Stored in postmeta)
+		// Reply slug (Clean name to avoid conflicts)
 		$this->field_map[] = array(
 			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'user_id',
+			'from_fieldname'  => 'subject',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_is_reply_anonymous_id',
-			'callback_method' => 'callback_check_anonymous'
+			'to_fieldname'    => 'post_name',
+			'callback_method' => 'callback_slug'
 		);
 
 		// Reply content.
@@ -426,15 +377,15 @@ class Phorum extends BBP_Converter_Base {
 
 		/** User Section ******************************************************/
 
-		// Store old user id (Stored in usermeta)
+		// Store old User id (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'users',
 			'from_fieldname' => 'user_id',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_old_user_id'
+			'to_fieldname'   => '_bbp_user_id'
 		);
 
-		// Store old user password (Stored in usermeta serialized with salt)
+		// Store old User password (Stored in usermeta serialized with salt)
 		$this->field_map[] = array(
 			'from_tablename'  => 'users',
 			'from_fieldname'  => 'password',
@@ -443,7 +394,7 @@ class Phorum extends BBP_Converter_Base {
 			'callback_method' => 'callback_savepass'
 		);
 
-		// Store old user salt (This is only used for the SELECT row info for the above password save)
+		// Store old User Salt (This is only used for the SELECT row info for the above password save)
 //		$this->field_map[] = array(
 //			'from_tablename' => 'users',
 //			'from_fieldname' => 'salt',
@@ -514,7 +465,8 @@ class Phorum extends BBP_Converter_Base {
 	 * This method allows us to indicates what is or is not converted for each
 	 * converter.
 	 */
-	public function info() {
+	public function info()
+	{
 		return '';
 	}
 
@@ -523,7 +475,8 @@ class Phorum extends BBP_Converter_Base {
 	 * way when we authenticate it we can get it out of the database
 	 * as one value. Array values are auto sanitized by WordPress.
 	 */
-	public function callback_savepass( $field, $row ) {
+	public function callback_savepass( $field, $row )
+	{
 		$pass_array = array( 'hash' => $field, 'salt' => $row['salt'] );
 		return $pass_array;
 	}
@@ -532,13 +485,14 @@ class Phorum extends BBP_Converter_Base {
 	 * This method is to take the pass out of the database and compare
 	 * to a pass the user has typed in.
 	 */
-	public function authenticate_pass( $password, $serialized_pass ) {
+	public function authenticate_pass( $password, $serialized_pass )
+	{
 		$pass_array = unserialize( $serialized_pass );
 		return ( $pass_array['hash'] == md5( md5( $password ). $pass_array['salt'] ) );
 	}
 
 	/**
-	 * Translate the forum type from Phorum v5.2.19 numerics to WordPress's strings.
+	 * Translate the forum type from Phorum v5.2.19 numeric's to WordPress's strings.
 	 *
 	 * @param int $status Phorum v5.2.19 numeric forum type
 	 * @return string WordPress safe
@@ -558,7 +512,7 @@ class Phorum extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the post status from Phorum v5.2.19 numerics to WordPress's strings.
+	 * Translate the post status from Phorum v5.2.19 numeric's to WordPress's strings.
 	 *
 	 * @param int $status Phorum v5.2.19 numeric topic status
 	 * @return string WordPress safe
@@ -587,4 +541,5 @@ class Phorum extends BBP_Converter_Base {
 		$count = absint( (int) $count - 1 );
 		return $count;
 	}
+
 }

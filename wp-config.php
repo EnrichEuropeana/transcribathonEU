@@ -17,15 +17,16 @@
  *
  * @package WordPress
  */
+
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'wp_transcribathon');
+define('DB_NAME', 'wp_transcribathon'); 
 
 /** MySQL database username */
 define('DB_USER', 'enrichingeuropeana');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'ishoR#R7k%faQz');
+define('DB_PASSWORD', 'Ke;u5De)u8sh');
 
 
 /** MySQL hostname */
@@ -58,24 +59,19 @@ define('NONCE_SALT',       'V+jAXo#~|{ M[h=Q/Q^MEXLt+Sex5mDO>}5}=6I>fY4*8jY.1]9%
 /**#@-*/
 
 /* Multisite */
-define('WP_ALLOW_MULTISITE', true);
-
 define('MULTISITE', true);
 define('SUBDOMAIN_INSTALL', true);
-define('DOMAIN_CURRENT_SITE', 'transcribathon.eu');
+define('DOMAIN_CURRENT_SITE', 'fresenia.man.poznan.pl');
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
-define('RELOCATE', true);
-define('COOKIE_DOMAIN', '.transcribathon.eu');
-define('COOKIEPATH', '/');
-define('COOKIEHASH', md5('transcribathon.eu'));
+
 define('FS_METHOD', 'direct');
 
 
 
 /**
- * WordPress Database Table prefix. 
+ * WordPress Database Table prefix.
  *
  * You can have multiple installations in one database if you give each
  * a unique prefix. Only numbers, letters, and underscores please!
@@ -96,11 +92,6 @@ $table_prefix  = 'wp_';
  */
 define('WP_DEBUG', false);
 
-
-putenv( 'PANTHEON_INDEX_HOST=transcribathon.eu' );
-putenv( 'PANTHEON_INDEX_PORT=8983' );
-
-
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
@@ -109,4 +100,3 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
-

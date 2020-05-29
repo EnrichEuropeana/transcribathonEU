@@ -165,7 +165,7 @@ class MetaFlexSlider extends MetaSlider {
         $class = $this->get_setting( 'noConflict' ) == 'true' ? "" : ' class="flexslider"';
 
         $return_value = '<div id="' . $this->get_identifier() . '"' . $class . '>';
-        $return_value .= "\n            <ul aria-live=\"polite\" class=\"slides\">";
+        $return_value .= "\n            <ul class=\"slides\">";
 
         foreach ( $this->slides as $slide ) {
             // backwards compatibility with older versions of MetaSlider Pro (< v2.0)

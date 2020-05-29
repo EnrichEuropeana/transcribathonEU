@@ -15,10 +15,8 @@ class SiteOrigin_Widget_Field_Location extends SiteOrigin_Widget_Field_Base {
 		$address = '';
 		if ( ! empty( $value['address'] ) ) {
 			$address = $value['address'];
-		}
-
-		if ( ! empty( $value['name'] ) && strpos( $address, $value['name'] ) !== 0) {
-			$address = $value['name'] . ', ' . $address;
+		} else if ( ! empty( $value['name'] ) ) {
+			$address = $value['name'];
 		}
 		
 		$api_key = SiteOrigin_Widget_GoogleMap_Widget::get_api_key( $instance );
@@ -63,7 +61,7 @@ class SiteOrigin_Widget_Field_Location extends SiteOrigin_Widget_Field_Base {
 					'</a>'
 				),
 				'globalSettingsButtonLabel' => __( 'Go to Google Maps Widget settings', 'so-widgets-bundle' ),
-				'globalSettingsButtonUrl' => admin_url( 'plugins.php?page=so-widgets-plugins#settings-google-map' ),
+				'globalSettingsButtonUrl' => admin_url( 'plugins.php?page=so-widgets-plugins' ),
 			)
 		);
 	}

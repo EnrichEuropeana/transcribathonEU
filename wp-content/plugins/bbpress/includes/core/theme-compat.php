@@ -1,14 +1,14 @@
 <?php
 
 /**
- * bbPress Theme Compatibility
+ * bbPress Core Theme Compatibility
  *
  * @package bbPress
- * @subpackage Core
+ * @subpackage ThemeCompatibility
  */
 
 // Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 
 /** Theme Compat **************************************************************/
 
@@ -28,9 +28,10 @@ defined( 'ABSPATH' ) || exit;
  * Theme Compatibility base class
  *
  * This is only intended to be extended, and is included here as a basic guide
- * for future Template Packs to use. @link bbp_setup_theme_compat()
+ * for future Theme Packs to use. @link BBP_Twenty_Ten is a good example of
+ * extending this class, as is @link bbp_setup_theme_compat()
  *
- * @since 2.0.0 bbPress (r3506)
+ * @since bbPress (r3506)
  */
 class BBP_Theme_Compat {
 
@@ -51,197 +52,139 @@ class BBP_Theme_Compat {
 	/**
 	 * Pass the $properties to the object on creation.
 	 *
-	 * @since 2.1.0 bbPress (r3926)
-	 *
+	 * @since bbPress (r3926)
 	 * @param array $properties
 	 */
-	public function __construct( Array $properties = array() ) {
+    public function __construct( Array $properties = array() ) {
 		$this->_data = $properties;
 	}
 
 	/**
 	 * Set a theme's property.
 	 *
-	 * @since 2.1.0 bbPress (r3926)
-	 *
+	 * @since bbPress (r3926)
 	 * @param string $property
 	 * @param mixed $value
 	 * @return mixed
 	 */
 	public function __set( $property, $value ) {
-		return $this->_data[ $property ] = $value;
+		return $this->_data[$property] = $value;
 	}
 
 	/**
 	 * Get a theme's property.
 	 *
-	 * @since 2.1.0 bbPress (r3926)
-	 *
+	 * @since bbPress (r3926)
 	 * @param string $property
 	 * @param mixed $value
 	 * @return mixed
 	 */
 	public function __get( $property ) {
-		return array_key_exists( $property, $this->_data )
-			? $this->_data[ $property ]
-			: '';
-	}
-
-	/**
-	 * Return the template directory.
-	 *
-	 * @since 2.6.0 bbPress (r6548)
-	 *
-	 * @return string
-	 */
-	public function get_dir() {
-		return $this->dir;
+		return array_key_exists( $property, $this->_data ) ? $this->_data[$property] : '';
 	}
 }
 
 /** Functions *****************************************************************/
 
 /**
- * Setup the active template pack and register it's directory in the stack.
+ * Setup the default theme compat theme
  *
- * @since 2.0.0 bbPress (r3311)
- *
+ * @since bbPress (r3311)
  * @param BBP_Theme_Compat $theme
  */
-function bbp_setup_theme_compat( $theme = 'default' ) {
+function bbp_setup_theme_compat( $theme = '' ) {
 	$bbp = bbpress();
 
-	// Bail if something already has this under control
-	if ( ! empty( $bbp->theme_compat->theme ) ) {
-		return;
-	}
-
-	// Fallback for empty theme
-	if ( empty( $theme ) ) {
+	// Make sure theme package is available, set to default if not
+	if ( ! isset( $bbp->theme_compat->packages[$theme] ) || ! is_a( $bbp->theme_compat->packages[$theme], 'BBP_Theme_Compat' ) ) {
 		$theme = 'default';
 	}
 
-	// If the theme is registered, use it and add it to the stack
-	if ( isset( $bbp->theme_compat->packages[ $theme ] ) ) {
-		$bbp->theme_compat->theme = $bbp->theme_compat->packages[ $theme ];
-
-		// Setup the template stack for the active template pack
-		bbp_register_template_stack( array( $bbp->theme_compat->theme, 'get_dir' ) );
-	}
+	// Set the active theme compat theme
+	$bbp->theme_compat->theme = $bbp->theme_compat->packages[$theme];
 }
 
 /**
- * Get the current template pack package.
- *
- * @since 2.6.0 bbPress (r6548)
- *
- * @return BBP_Theme_Compat
- */
-function bbp_get_current_template_pack() {
-	$bbp = bbpress();
-
-	// Theme was not setup, so fallback to an empty object
-	if ( empty( $bbp->theme_compat->theme ) ) {
-		$bbp->theme_compat->theme = new BBP_Theme_Compat();
-	}
-
-	// Filter & return
-	return apply_filters( 'bbp_get_current_template_pack', $bbp->theme_compat->theme );
-}
-
-/**
- * Gets the id of the bbPress compatible theme used, in the event the
+ * Gets the name of the bbPress compatable theme used, in the event the
  * currently active WordPress theme does not explicitly support bbPress.
  * This can be filtered or set manually. Tricky theme authors can override the
  * default and include their own bbPress compatibility layers for their themes.
  *
- * @since 2.0.0 bbPress (r3506)
- *
+ * @since bbPress (r3506)
+ * @uses apply_filters()
  * @return string
  */
 function bbp_get_theme_compat_id() {
-
-	// Filter & return
-	return apply_filters( 'bbp_get_theme_compat_id', bbp_get_current_template_pack()->id );
+	return apply_filters( 'bbp_get_theme_compat_id', bbpress()->theme_compat->theme->id );
 }
 
 /**
- * Gets the name of the bbPress compatible theme used, in the event the
+ * Gets the name of the bbPress compatable theme used, in the event the
  * currently active WordPress theme does not explicitly support bbPress.
  * This can be filtered or set manually. Tricky theme authors can override the
  * default and include their own bbPress compatibility layers for their themes.
  *
- * @since 2.0.0 bbPress (r3506)
- *
+ * @since bbPress (r3506)
+ * @uses apply_filters()
  * @return string
  */
 function bbp_get_theme_compat_name() {
-
-	// Filter & return
-	return apply_filters( 'bbp_get_theme_compat_name', bbp_get_current_template_pack()->name );
+	return apply_filters( 'bbp_get_theme_compat_name', bbpress()->theme_compat->theme->name );
 }
 
 /**
- * Gets the version of the bbPress compatible theme used, in the event the
+ * Gets the version of the bbPress compatable theme used, in the event the
  * currently active WordPress theme does not explicitly support bbPress.
  * This can be filtered or set manually. Tricky theme authors can override the
  * default and include their own bbPress compatibility layers for their themes.
  *
- * @since 2.0.0 bbPress (r3506)
- *
+ * @since bbPress (r3506)
+ * @uses apply_filters()
  * @return string
  */
 function bbp_get_theme_compat_version() {
-
-	// Filter & return
-	return apply_filters( 'bbp_get_theme_compat_version', bbp_get_current_template_pack()->version );
+	return apply_filters( 'bbp_get_theme_compat_version', bbpress()->theme_compat->theme->version );
 }
 
 /**
- * Gets the bbPress compatible theme used in the event the currently active
+ * Gets the bbPress compatable theme used in the event the currently active
  * WordPress theme does not explicitly support bbPress. This can be filtered,
  * or set manually. Tricky theme authors can override the default and include
  * their own bbPress compatibility layers for their themes.
  *
- * @since 2.0.0 bbPress (r3032)
- *
+ * @since bbPress (r3032)
+ * @uses apply_filters()
  * @return string
  */
 function bbp_get_theme_compat_dir() {
-
-	// Filter & return
-	return apply_filters( 'bbp_get_theme_compat_dir', bbp_get_current_template_pack()->dir );
+	return apply_filters( 'bbp_get_theme_compat_dir', bbpress()->theme_compat->theme->dir );
 }
 
 /**
- * Gets the bbPress compatible theme used in the event the currently active
+ * Gets the bbPress compatable theme used in the event the currently active
  * WordPress theme does not explicitly support bbPress. This can be filtered,
  * or set manually. Tricky theme authors can override the default and include
  * their own bbPress compatibility layers for their themes.
  *
- * @since 2.0.0 bbPress (r3032)
- *
+ * @since bbPress (r3032)
+ * @uses apply_filters()
  * @return string
  */
 function bbp_get_theme_compat_url() {
-
-	// Filter & return
-	return apply_filters( 'bbp_get_theme_compat_url', bbp_get_current_template_pack()->url );
+	return apply_filters( 'bbp_get_theme_compat_url', bbpress()->theme_compat->theme->url );
 }
 
 /**
  * Gets true/false if page is currently inside theme compatibility
  *
- * @since 2.0.0 bbPress (r3265)
- *
+ * @since bbPress (r3265)
  * @return bool
  */
 function bbp_is_theme_compat_active() {
 	$bbp = bbpress();
 
-	if ( empty( $bbp->theme_compat->active ) ) {
+	if ( empty( $bbp->theme_compat->active ) )
 		return false;
-	}
 
 	return $bbp->theme_compat->active;
 }
@@ -249,8 +192,7 @@ function bbp_is_theme_compat_active() {
 /**
  * Sets true/false if page is currently inside theme compatibility
  *
- * @since 2.0.0 bbPress (r3265)
- *
+ * @since bbPress (r3265)
  * @param bool $set
  * @return bool
  */
@@ -266,7 +208,7 @@ function bbp_set_theme_compat_active( $set = true ) {
  * Stash possible template files for the current query. Useful if plugins want
  * to override them, or see what files are being scanned for inclusion.
  *
- * @since 2.0.0 bbPress (r3311)
+ * @since bbPress (r3311)
  */
 function bbp_set_theme_compat_templates( $templates = array() ) {
 	bbpress()->theme_compat->templates = $templates;
@@ -280,7 +222,7 @@ function bbp_set_theme_compat_templates( $templates = array() ) {
  * Stash the template file for the current query. Useful if plugins want
  * to override it, or see what file is being included.
  *
- * @since 2.0.0 bbPress (r3311)
+ * @since bbPress (r3311)
  */
 function bbp_set_theme_compat_template( $template = '' ) {
 	bbpress()->theme_compat->template = $template;
@@ -294,7 +236,7 @@ function bbp_set_theme_compat_template( $template = '' ) {
  * Stash the original template file for the current query. Useful for checking
  * if bbPress was able to find a more appropriate template.
  *
- * @since 2.1.0 bbPress (r3926)
+ * @since bbPress (r3926)
  */
 function bbp_set_theme_compat_original_template( $template = '' ) {
 	bbpress()->theme_compat->original_template = $template;
@@ -303,20 +245,18 @@ function bbp_set_theme_compat_original_template( $template = '' ) {
 }
 
 /**
- * Is a template the original_template global
+ * Set the theme compat original_template global
  *
  * Stash the original template file for the current query. Useful for checking
  * if bbPress was able to find a more appropriate template.
  *
- * @since 2.1.0 bbPress (r3926)
+ * @since bbPress (r3926)
  */
 function bbp_is_theme_compat_original_template( $template = '' ) {
 	$bbp = bbpress();
 
-	// Bail if no original template
-	if ( empty( $bbp->theme_compat->original_template ) ) {
+	if ( empty( $bbp->theme_compat->original_template ) )
 		return false;
-	}
 
 	return (bool) ( $bbp->theme_compat->original_template === $template );
 }
@@ -324,37 +264,32 @@ function bbp_is_theme_compat_original_template( $template = '' ) {
 /**
  * Register a new bbPress theme package to the active theme packages array
  *
- * @since 2.1.0 bbPress (r3829)
- *
+ * @since bbPress (r3829)
  * @param array $theme
  */
 function bbp_register_theme_package( $theme = array(), $override = true ) {
 
 	// Create new BBP_Theme_Compat object from the $theme array
-	if ( is_array( $theme ) ) {
+	if ( is_array( $theme ) )
 		$theme = new BBP_Theme_Compat( $theme );
-	}
 
 	// Bail if $theme isn't a proper object
-	if ( ! is_a( $theme, 'BBP_Theme_Compat' ) ) {
+	if ( ! is_a( $theme, 'BBP_Theme_Compat' ) )
 		return;
-	}
 
 	// Load up bbPress
 	$bbp = bbpress();
 
 	// Only override if the flag is set and not previously registered
-	if ( empty( $bbp->theme_compat->packages[ $theme->id ] ) || ( true === $override ) ) {
-		$bbp->theme_compat->packages[ $theme->id ] = $theme;
+	if ( empty( $bbp->theme_compat->packages[$theme->id] ) || ( true === $override ) ) {
+		$bbp->theme_compat->packages[$theme->id] = $theme;
 	}
 }
-
 /**
  * This fun little function fills up some WordPress globals with dummy data to
  * stop your average page template from complaining about it missing.
  *
- * @since 2.0.0 bbPress (r3108)
- *
+ * @since bbPress (r3108)
  * @global WP_Query $wp_query
  * @global object $post
  * @param array $args
@@ -394,7 +329,7 @@ function bbp_theme_compat_reset_post( $args = array() ) {
 			'is_page'               => false,
 			'is_single'             => false,
 			'is_archive'            => false,
-			'is_tax'                => false
+			'is_tax'                => false,
 		), 'theme_compat_reset_post' );
 	} else {
 		$dummy = bbp_parse_args( $args, array(
@@ -427,7 +362,7 @@ function bbp_theme_compat_reset_post( $args = array() ) {
 			'is_page'               => false,
 			'is_single'             => false,
 			'is_archive'            => false,
-			'is_tax'                => false
+			'is_tax'                => false,
 		), 'theme_compat_reset_post' );
 	}
 
@@ -451,12 +386,17 @@ function bbp_theme_compat_reset_post( $args = array() ) {
 	$wp_query->is_archive = $dummy['is_archive'];
 	$wp_query->is_tax     = $dummy['is_tax'];
 
-	// Reset is_singular based on page/single args
-	// https://bbpress.trac.wordpress.org/ticket/2545
-	$wp_query->is_singular = $wp_query->is_single;
-
 	// Clean up the dummy post
 	unset( $dummy );
+
+	/**
+	 * Force the header back to 200 status if not a deliberate 404
+	 *
+	 * @see http://bbpress.trac.wordpress.org/ticket/1973
+	 */
+	if ( ! $wp_query->is_404() ) {
+		status_header( 200 );
+	}
 
 	// If we are resetting a post, we are in theme compat
 	bbp_set_theme_compat_active( true );
@@ -466,17 +406,37 @@ function bbp_theme_compat_reset_post( $args = array() ) {
  * Reset main query vars and filter 'the_content' to output a bbPress
  * template part as needed.
  *
- * @since 2.0.0 bbPress (r3032)
- *
+ * @since bbPress (r3032)
  * @param string $template
+ * @uses bbp_is_single_user() To check if page is single user
+ * @uses bbp_get_single_user_template() To get user template
+ * @uses bbp_is_single_user_edit() To check if page is single user edit
+ * @uses bbp_get_single_user_edit_template() To get user edit template
+ * @uses bbp_is_single_view() To check if page is single view
+ * @uses bbp_get_single_view_template() To get view template
+ * @uses bbp_is_search() To check if page is search
+ * @uses bbp_get_search_template() To get search template
+ * @uses bbp_is_forum_edit() To check if page is forum edit
+ * @uses bbp_get_forum_edit_template() To get forum edit template
+ * @uses bbp_is_topic_merge() To check if page is topic merge
+ * @uses bbp_get_topic_merge_template() To get topic merge template
+ * @uses bbp_is_topic_split() To check if page is topic split
+ * @uses bbp_get_topic_split_template() To get topic split template
+ * @uses bbp_is_topic_edit() To check if page is topic edit
+ * @uses bbp_get_topic_edit_template() To get topic edit template
+ * @uses bbp_is_reply_move() To check if page is reply move
+ * @uses bbp_get_reply_move_template() To get reply move template
+ * @uses bbp_is_reply_edit() To check if page is reply edit
+ * @uses bbp_get_reply_edit_template() To get reply edit template
+ * @uses bbp_set_theme_compat_template() To set the global theme compat template
  */
 function bbp_template_include_theme_compat( $template = '' ) {
-
+	
 	/**
 	 * Bail if a root template was already found. This prevents unintended
 	 * recursive filtering of 'the_content'.
 	 *
-	 * @link https://bbpress.trac.wordpress.org/ticket/2429
+	 * @link http://bbpress.trac.wordpress.org/ticket/2429
 	 */
 	if ( bbp_is_template_included() ) {
 		return $template;
@@ -490,17 +450,15 @@ function bbp_template_include_theme_compat( $template = '' ) {
 	 * This is a bit more brute-force than is probably necessary, but gets the
 	 * job done while we work towards something more elegant.
 	 */
-	if ( function_exists( 'is_buddypress' ) && is_buddypress() ) {
+	if ( function_exists( 'is_buddypress' ) && is_buddypress() )
 		return $template;
-	}
 
 	// Define local variable(s)
 	$bbp_shortcodes = bbpress()->shortcodes;
 
 	// Bail if shortcodes are unset somehow
-	if ( ! is_a( $bbp_shortcodes, 'BBP_Shortcodes' ) ) {
+	if ( !is_a( $bbp_shortcodes, 'BBP_Shortcodes' ) )
 		return $template;
-	}
 
 	/** Users *************************************************************/
 
@@ -563,7 +521,7 @@ function bbp_template_include_theme_compat( $template = '' ) {
 
 		// Reset post
 		bbp_theme_compat_reset_post( array(
-			'ID'             => ! empty( $page->ID ) ? $page->ID : 0,
+			'ID'             => !empty( $page->ID ) ? $page->ID : 0,
 			'post_title'     => $new_title,
 			'post_author'    => 0,
 			'post_date'      => 0,
@@ -589,9 +547,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 			'is_single'      => true,
 			'comment_status' => 'closed'
 		) );
-
-		// Lock the forum from other edits
-		bbp_set_post_lock( bbp_get_forum_id() );
 
 	} elseif ( bbp_is_single_forum() ) {
 
@@ -636,7 +591,7 @@ function bbp_template_include_theme_compat( $template = '' ) {
 
 		// Reset post
 		bbp_theme_compat_reset_post( array(
-			'ID'             => ! empty( $page->ID ) ? $page->ID : 0,
+			'ID'             => !empty( $page->ID ) ? $page->ID : 0,
 			'post_title'     => bbp_get_topic_archive_title(),
 			'post_author'    => 0,
 			'post_date'      => 0,
@@ -661,9 +616,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 		// Edit
 		} elseif ( bbp_is_topic_edit() ) {
 			$new_content = $bbp_shortcodes->display_topic_form();
-
-			// Lock the topic from other edits
-			bbp_set_post_lock( bbp_get_topic_id() );
 
 		// Single
 		} else {
@@ -691,13 +643,12 @@ function bbp_template_include_theme_compat( $template = '' ) {
 		// Reset post
 		bbp_theme_compat_reset_post( array(
 			'ID'             => 0,
-			'post_title'     => esc_html__( 'Replies', 'bbpress' ),
+			'post_title'     => __( 'Replies', 'bbpress' ),
 			'post_author'    => 0,
 			'post_date'      => 0,
 			'post_content'   => $bbp_shortcodes->display_reply_index(),
 			'post_type'      => bbp_get_reply_post_type(),
 			'post_status'    => bbp_get_public_status_id(),
-			'is_archive'     => true,
 			'comment_status' => 'closed'
 		) );
 
@@ -711,9 +662,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 		// Edit
 		} elseif ( bbp_is_reply_edit() ) {
 			$new_content = $bbp_shortcodes->display_reply_form();
-
-			// Lock the reply from other edits
-			bbp_set_post_lock( bbp_get_reply_id() );
 
 		// Single
 		} else {
@@ -729,7 +677,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 			'post_content'   => $new_content,
 			'post_type'      => bbp_get_reply_post_type(),
 			'post_status'    => bbp_get_reply_status(),
-			'is_single'      => true,
 			'comment_status' => 'closed'
 		) );
 
@@ -746,7 +693,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 			'post_content'   => $bbp_shortcodes->display_view( array( 'id' => get_query_var( bbp_get_view_rewrite_id() ) ) ),
 			'post_type'      => '',
 			'post_status'    => bbp_get_public_status_id(),
-			'is_archive'     => true,
 			'comment_status' => 'closed'
 		) );
 
@@ -763,7 +709,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 			'post_content'   => $bbp_shortcodes->display_search( array( 'search' => get_query_var( bbp_get_search_rewrite_id() ) ) ),
 			'post_type'      => '',
 			'post_status'    => bbp_get_public_status_id(),
-			'is_archive'     => true,
 			'comment_status' => 'closed'
 		) );
 
@@ -791,10 +736,8 @@ function bbp_template_include_theme_compat( $template = '' ) {
 			'post_date'      => 0,
 			'post_content'   => $new_content,
 			'post_type'      => '',
-			'post_title'     => sprintf( esc_html__( 'Topic Tag: %s', 'bbpress' ), bbp_get_topic_tag_name() ),
+			'post_title'     => sprintf( __( 'Topic Tag: %s', 'bbpress' ), '<span>' . bbp_get_topic_tag_name() . '</span>' ),
 			'post_status'    => bbp_get_public_status_id(),
-			'is_tax'         => true,
-			'is_archive'     => true,
 			'comment_status' => 'closed'
 		) );
 	}
@@ -808,13 +751,13 @@ function bbp_template_include_theme_compat( $template = '' ) {
 	 * We do this after the above checks to prevent incorrect 404 body classes
 	 * and header statuses, as well as to set the post global as needed.
 	 *
-	 * @see https://bbpress.trac.wordpress.org/ticket/1478/
+	 * @see http://bbpress.trac.wordpress.org/ticket/1478/
 	 */
 	if ( bbp_is_template_included() ) {
 		return $template;
 
 	/**
-	 * If we are relying on the built-in theme compatibility API to load
+	 * If we are relying on bbPress's built in theme compatibility to load
 	 * the proper content, we need to intercept the_content, replace the
 	 * output, and display ours instead.
 	 *
@@ -836,7 +779,6 @@ function bbp_template_include_theme_compat( $template = '' ) {
 		$template = bbp_get_theme_compat_templates();
 	}
 
-	// Filter & return
 	return apply_filters( 'bbp_template_include_theme_compat', $template );
 }
 
@@ -845,17 +787,20 @@ function bbp_template_include_theme_compat( $template = '' ) {
 /**
  * Remove the canonical redirect to allow pretty pagination
  *
- * @since 2.0.0 bbPress (r2628)
- *
+ * @since bbPress (r2628)
  * @param string $redirect_url Redirect url
- *
+ * @uses WP_Rewrite::using_permalinks() To check if the blog is using permalinks
+ * @uses bbp_get_paged() To get the current page number
+ * @uses bbp_is_single_topic() To check if it's a topic page
+ * @uses bbp_is_single_forum() To check if it's a forum page
  * @return bool|string False if it's a topic/forum and their first page,
  *                      otherwise the redirect url
  */
 function bbp_redirect_canonical( $redirect_url ) {
+	global $wp_rewrite;
 
 	// Canonical is for the beautiful
-	if ( bbp_use_pretty_urls() ) {
+	if ( $wp_rewrite->using_permalinks() ) {
 
 		// If viewing beyond page 1 of several
 		if ( 1 < bbp_get_paged() ) {
@@ -899,8 +844,7 @@ function bbp_redirect_canonical( $redirect_url ) {
  * Removes all filters from a WordPress filter, and stashes them in the $bbp
  * global in the event they need to be restored later.
  *
- * @since 2.0.0 bbPress (r3251)
- *
+ * @since bbPress (r3251)
  * @global WP_filter $wp_filter
  * @global array $merged_filters
  * @param string $tag
@@ -913,36 +857,36 @@ function bbp_remove_all_filters( $tag, $priority = false ) {
 	$bbp = bbpress();
 
 	// Filters exist
-	if ( isset( $wp_filter[ $tag ] ) ) {
+	if ( isset( $wp_filter[$tag] ) ) {
 
 		// Filters exist in this priority
-		if ( ! empty( $priority ) && isset( $wp_filter[ $tag ][ $priority ] ) ) {
+		if ( !empty( $priority ) && isset( $wp_filter[$tag][$priority] ) ) {
 
 			// Store filters in a backup
-			$bbp->filters->wp_filter[ $tag ][ $priority ] = $wp_filter[ $tag ][ $priority ];
+			$bbp->filters->wp_filter[$tag][$priority] = $wp_filter[$tag][$priority];
 
 			// Unset the filters
-			unset( $wp_filter[ $tag ][ $priority ] );
+			unset( $wp_filter[$tag][$priority] );
 
 		// Priority is empty
 		} else {
 
 			// Store filters in a backup
-			$bbp->filters->wp_filter[ $tag ] = $wp_filter[ $tag ];
+			$bbp->filters->wp_filter[$tag] = $wp_filter[$tag];
 
 			// Unset the filters
-			unset( $wp_filter[ $tag ] );
+			unset( $wp_filter[$tag] );
 		}
 	}
 
 	// Check merged filters
-	if ( isset( $merged_filters[ $tag ] ) ) {
+	if ( isset( $merged_filters[$tag] ) ) {
 
 		// Store filters in a backup
-		$bbp->filters->merged_filters[ $tag ] = $merged_filters[ $tag ];
+		$bbp->filters->merged_filters[$tag] = $merged_filters[$tag];
 
 		// Unset the filters
-		unset( $merged_filters[ $tag ] );
+		unset( $merged_filters[$tag] );
 	}
 
 	return true;
@@ -952,8 +896,7 @@ function bbp_remove_all_filters( $tag, $priority = false ) {
  * Restores filters from the $bbp global that were removed using
  * bbp_remove_all_filters()
  *
- * @since 2.0.0 bbPress (r3251)
- *
+ * @since bbPress (r3251)
  * @global WP_filter $wp_filter
  * @global array $merged_filters
  * @param string $tag
@@ -966,36 +909,36 @@ function bbp_restore_all_filters( $tag, $priority = false ) {
 	$bbp = bbpress();
 
 	// Filters exist
-	if ( isset( $bbp->filters->wp_filter[ $tag ] ) ) {
+	if ( isset( $bbp->filters->wp_filter[$tag] ) ) {
 
 		// Filters exist in this priority
-		if ( ! empty( $priority ) && isset( $bbp->filters->wp_filter[ $tag ][ $priority  ] ) ) {
+		if ( !empty( $priority ) && isset( $bbp->filters->wp_filter[$tag][$priority] ) ) {
 
 			// Store filters in a backup
-			$wp_filter[ $tag ][ $priority ] = $bbp->filters->wp_filter[ $tag ][ $priority ];
+			$wp_filter[$tag][$priority] = $bbp->filters->wp_filter[$tag][$priority];
 
 			// Unset the filters
-			unset( $bbp->filters->wp_filter[ $tag ][ $priority ] );
+			unset( $bbp->filters->wp_filter[$tag][$priority] );
 
 		// Priority is empty
 		} else {
 
 			// Store filters in a backup
-			$wp_filter[ $tag ] = $bbp->filters->wp_filter[ $tag ];
+			$wp_filter[$tag] = $bbp->filters->wp_filter[$tag];
 
 			// Unset the filters
-			unset( $bbp->filters->wp_filter[ $tag ] );
+			unset( $bbp->filters->wp_filter[$tag] );
 		}
 	}
 
 	// Check merged filters
-	if ( isset( $bbp->filters->merged_filters[ $tag ] ) ) {
+	if ( isset( $bbp->filters->merged_filters[$tag] ) ) {
 
 		// Store filters in a backup
-		$merged_filters[ $tag ] = $bbp->filters->merged_filters[ $tag ];
+		$merged_filters[$tag] = $bbp->filters->merged_filters[$tag];
 
 		// Unset the filters
-		unset( $bbp->filters->merged_filters[ $tag ] );
+		unset( $bbp->filters->merged_filters[$tag] );
 	}
 
 	return true;
@@ -1004,25 +947,28 @@ function bbp_restore_all_filters( $tag, $priority = false ) {
 /**
  * Force comments_status to 'closed' for bbPress post types
  *
- * @since 2.1.0 bbPress (r3589)
- *
+ * @since bbPress (r3589)
  * @param bool $open True if open, false if closed
  * @param int $post_id ID of the post to check
  * @return bool True if open, false if closed
  */
-function bbp_force_comment_status( $open = false, $post_id = 0 ) {
-
-	// Default return value is what is passed in $open
-	$retval = (bool) $open;
+function bbp_force_comment_status( $open, $post_id = 0 ) {
 
 	// Get the post type of the post ID
 	$post_type = get_post_type( $post_id );
 
+	// Default return value is what is passed in $open
+	$retval = $open;
+
 	// Only force for bbPress post types
-	if ( in_array( $post_type, bbp_get_post_types(), true ) ) {
-		$retval = false;
+	switch ( $post_type ) {
+		case bbp_get_forum_post_type() :
+		case bbp_get_topic_post_type() :
+		case bbp_get_reply_post_type() :
+			$retval = false;
+			break;
 	}
 
-	// Filter & return
-	return (bool) apply_filters( 'bbp_force_comment_status', $retval, $open, $post_id, $post_type );
+	// Allow override of the override
+	return apply_filters( 'bbp_force_comment_status', $retval, $open, $post_id, $post_type );
 }

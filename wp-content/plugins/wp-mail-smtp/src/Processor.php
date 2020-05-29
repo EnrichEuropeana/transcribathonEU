@@ -27,9 +27,8 @@ class Processor {
 
 		add_action( 'phpmailer_init', array( $this, 'phpmailer_init' ) );
 
-		// High priority number tries to ensure our plugin code executes last and respects previous hooks, if not forced.
-		add_filter( 'wp_mail_from', array( $this, 'filter_mail_from_email' ), PHP_INT_MAX );
-		add_filter( 'wp_mail_from_name', array( $this, 'filter_mail_from_name' ), PHP_INT_MAX );
+		add_filter( 'wp_mail_from', array( $this, 'filter_mail_from_email' ), 1000 );
+		add_filter( 'wp_mail_from_name', array( $this, 'filter_mail_from_name' ), 1000 );
 	}
 
 	/**
@@ -114,7 +113,6 @@ class Processor {
 	 * This method will be called every time 'smtp' and 'mail' mailers will be used to send emails.
 	 *
 	 * @since 1.3.0
-	 * @since 1.5.0 Added a do_action() to be able to hook into.
 	 *
 	 * @param bool $is_sent
 	 * @param array $to
@@ -135,8 +133,6 @@ class Processor {
 		} else {
 			Debug::clear();
 		}
-
-		do_action( 'wp_mail_smtp_mailcatcher_smtp_send_after', $is_sent, $to, $cc, $bcc, $subject, $body, $from );
 	}
 
 	/**
@@ -144,30 +140,28 @@ class Processor {
 	 *
 	 * @since 1.0.0
 	 * @since 1.3.0 Forcing email rewrite if option is selected.
-	 * @since 1.7.0 Default email may be empty, so pay attention to that as well.
 	 *
-	 * @param string $wp_email
+	 * @param string $email
 	 *
 	 * @return string
 	 */
-	public function filter_mail_from_email( $wp_email ) {
+	public function filter_mail_from_email( $email ) {
 
-		$options    = new Options();
-		$forced     = $options->get( 'mail', 'from_email_force' );
+		$options = new Options();
+		$force   = $options->get( 'mail', 'from_email_force' );
+
+		// If the FROM EMAIL is not the default and not forced, return it unchanged.
+		if ( ! $force && $email !== $this->get_default_email() ) {
+			return $email;
+		}
+
 		$from_email = $options->get( 'mail', 'from_email' );
-		$def_email  = $this->get_default_email();
 
-		// Return FROM EMAIL if forced in settings.
-		if ( $forced & ! empty( $from_email ) ) {
-			return $from_email;
+		if ( ! empty( $from_email ) ) {
+			$email = $from_email;
 		}
 
-		// If the FROM EMAIL is not the default, return it unchanged.
-		if ( ! empty( $def_email ) && $wp_email !== $def_email ) {
-			return $wp_email;
-		}
-
-		return ! empty( $from_email ) ? $from_email : $wp_email;
+		return $email;
 	}
 
 	/**
@@ -199,19 +193,15 @@ class Processor {
 	 * Get the default email address based on domain name.
 	 *
 	 * @since 1.0.0
-	 * @since 1.7.0 May return an empty string.
 	 *
-	 * @return string Empty string when we aren't able to get the site domain (CLI, misconfigured server etc).
+	 * @return string
 	 */
 	public function get_default_email() {
 
-		$server_name = Geo::get_site_domain();
+		// In case of CLI we don't have SERVER_NAME, so use host name instead, may be not a domain name.
+		$server_name = ! empty( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : wp_parse_url( get_home_url( get_current_blog_id() ), PHP_URL_HOST );
 
-		if ( empty( $server_name ) ) {
-			return '';
-		}
-
-		// Get rid of www.
+		// Get the site domain and get rid of www.
 		$sitename = strtolower( $server_name );
 		if ( substr( $sitename, 0, 4 ) === 'www.' ) {
 			$sitename = substr( $sitename, 4 );
@@ -229,25 +219,5 @@ class Processor {
 	 */
 	public function get_default_name() {
 		return 'WordPress';
-	}
-
-	/**
-	 * Get or create the phpmailer.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @return \WPMailSMTP\MailCatcher
-	 */
-	public function get_phpmailer() {
-
-		global $phpmailer;
-
-		// Make sure the PHPMailer class has been instantiated.
-		if ( ! is_object( $phpmailer ) || ! is_a( $phpmailer, 'PHPMailer' ) ) {
-			require_once ABSPATH . WPINC . '/class-phpmailer.php';
-			$phpmailer = new MailCatcher( true ); // phpcs:ignore
-		}
-
-		return $phpmailer;
 	}
 }

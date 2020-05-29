@@ -2,7 +2,6 @@
 
 namespace WPMailSMTP\Providers\Gmail;
 
-use WPMailSMTP\Admin\Area;
 use WPMailSMTP\Debug;
 use WPMailSMTP\Options as PluginOptions;
 use WPMailSMTP\Providers\AuthAbstract;
@@ -15,54 +14,59 @@ use WPMailSMTP\Providers\AuthAbstract;
 class Auth extends AuthAbstract {
 
 	/**
+	 * Gmail options.
+	 *
+	 * @var array
+	 */
+	private $gmail;
+
+	/**
+	 * @var \Google_Client
+	 */
+	private $client;
+
+	/**
+	 * @var string
+	 */
+	private $mailer;
+
+	/**
 	 * Auth constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
 
-		$options           = new PluginOptions();
-		$this->mailer_slug = $options->get( 'mail', 'mailer' );
+		$options      = new PluginOptions();
+		$this->mailer = $options->get( 'mail', 'mailer' );
 
-		if ( $this->mailer_slug !== Options::SLUG ) {
+		if ( $this->mailer !== 'gmail' ) {
 			return;
 		}
 
-		$this->options = $options->get_group( $this->mailer_slug );
+		$this->gmail = $options->get_group( $this->mailer );
 
 		if ( $this->is_clients_saved() ) {
 
-			$this->include_vendor_lib();
+			$this->include_google_lib();
 
 			$this->client = $this->get_client();
 		}
 	}
 
 	/**
-	 * Get the url, that users will be redirected back to finish the OAuth process.
+	 * Use the composer autoloader to include the Google Library and all its dependencies.
 	 *
-	 * @since 1.5.2 Returned to the old, pre-1.5, structure of the link to preserve BC.
-	 *
-	 * @return string
+	 * @since 1.0.0
 	 */
-	public static function get_plugin_auth_url() {
-
-		return add_query_arg(
-			array(
-				'page' => Area::SLUG,
-				'tab'  => 'auth',
-			),
-			admin_url( 'options-general.php' )
-		);
+	protected function include_google_lib() {
+		require_once wp_mail_smtp()->plugin_path . '/vendor/autoload.php';
 	}
 
 	/**
 	 * Init and get the Google Client object.
 	 *
 	 * @since 1.0.0
-	 * @since 1.5.0 Add ability to apply custom options to the client via a filter.
-	 *
-	 * @return \Google_Client
 	 */
 	public function get_client() {
 
@@ -71,14 +75,14 @@ class Auth extends AuthAbstract {
 			return $this->client;
 		}
 
-		$this->include_vendor_lib();
+		$this->include_google_lib();
 
 		$client = new \Google_Client(
 			array(
-				'client_id'     => $this->options['client_id'],
-				'client_secret' => $this->options['client_secret'],
+				'client_id'     => $this->gmail['client_id'],
+				'client_secret' => $this->gmail['client_secret'],
 				'redirect_uris' => array(
-					self::get_plugin_auth_url(),
+					Auth::get_plugin_auth_url(),
 				),
 			)
 		);
@@ -90,15 +94,12 @@ class Auth extends AuthAbstract {
 		$client->setScopes( array( \Google_Service_Gmail::MAIL_GOOGLE_COM ) );
 		$client->setRedirectUri( self::get_plugin_auth_url() );
 
-		// Apply custom options to the client.
-		$client = apply_filters( 'wp_mail_smtp_providers_gmail_auth_get_client_custom_options', $client );
-
 		if (
-			$this->is_auth_required() &&
-			! empty( $this->options['auth_code'] )
+			empty( $this->gmail['access_token'] ) &&
+			! empty( $this->gmail['auth_code'] )
 		) {
 			try {
-				$creds = $client->fetchAccessTokenWithAuthCode( $this->options['auth_code'] );
+				$creds = $client->fetchAccessTokenWithAuthCode( $this->gmail['auth_code'] );
 			} catch ( \Exception $e ) {
 				$creds['error'] = $e->getMessage();
 				Debug::set(
@@ -116,15 +117,15 @@ class Auth extends AuthAbstract {
 			$this->update_refresh_token( $client->getRefreshToken() );
 		}
 
-		if ( ! empty( $this->options['access_token'] ) ) {
-			$client->setAccessToken( $this->options['access_token'] );
+		if ( ! empty( $this->gmail['access_token'] ) ) {
+			$client->setAccessToken( $this->gmail['access_token'] );
 		}
 
 		// Refresh the token if it's expired.
 		if ( $client->isAccessTokenExpired() ) {
 			$refresh = $client->getRefreshToken();
-			if ( empty( $refresh ) && isset( $this->options['refresh_token'] ) ) {
-				$refresh = $this->options['refresh_token'];
+			if ( empty( $refresh ) && isset( $this->gmail['refresh_token'] ) ) {
+				$refresh = $this->gmail['refresh_token'];
 			}
 
 			if ( ! empty( $refresh ) ) {
@@ -159,17 +160,10 @@ class Auth extends AuthAbstract {
 	 */
 	public function process() {
 
-		if ( ! ( isset( $_GET['tab'] ) && $_GET['tab'] === 'auth' ) ) {
-			wp_safe_redirect( wp_mail_smtp()->get_admin()->get_admin_page_url() );
-			exit;
-		}
-
 		// We can't process without saved client_id/secret.
 		if ( ! $this->is_clients_saved() ) {
-			Debug::set(
-				esc_html__( 'There was an error while processing the Google authentication request. Please make sure that you have Client ID and Client Secret both valid and saved.', 'wp-mail-smtp' )
-			);
-			wp_safe_redirect(
+			Debug::set( 'There was an error while processing the Google authentication request. Please make sure that you have Client ID and Client Secret both valid and saved.' );
+			wp_redirect(
 				add_query_arg(
 					'error',
 					'google_no_clients',
@@ -179,7 +173,7 @@ class Auth extends AuthAbstract {
 			exit;
 		}
 
-		$this->include_vendor_lib();
+		$this->include_google_lib();
 
 		$code  = '';
 		$scope = '';
@@ -191,7 +185,7 @@ class Auth extends AuthAbstract {
 
 		// In case of any error: display a message to a user.
 		if ( ! empty( $error ) ) {
-			wp_safe_redirect(
+			wp_redirect(
 				add_query_arg(
 					'error',
 					'google_' . $error,
@@ -221,7 +215,7 @@ class Auth extends AuthAbstract {
 			// Save the auth code. So \Google_Client can reuse it to retrieve the access token.
 			$this->update_auth_code( $code );
 		} else {
-			wp_safe_redirect(
+			wp_redirect(
 				add_query_arg(
 					'error',
 					'google_no_code_scope',
@@ -231,7 +225,7 @@ class Auth extends AuthAbstract {
 			exit;
 		}
 
-		wp_safe_redirect(
+		wp_redirect(
 			add_query_arg(
 				'success',
 				'google_site_linked',
@@ -242,13 +236,67 @@ class Auth extends AuthAbstract {
 	}
 
 	/**
-	 * Get the auth URL used to proceed to Provider to request access to send emails.
+	 * Update access token in our DB.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $token
+	 */
+	protected function update_access_token( $token ) {
+
+		$options = new PluginOptions();
+		$all     = $options->get_all();
+
+		$all[ $this->mailer ]['access_token'] = $token;
+		$this->gmail['access_token']          = $token;
+
+		$options->set( $all );
+	}
+
+	/**
+	 * Update refresh token in our DB.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $token
+	 */
+	protected function update_refresh_token( $token ) {
+
+		$options = new PluginOptions();
+		$all     = $options->get_all();
+
+		$all[ $this->mailer ]['refresh_token'] = $token;
+		$this->gmail['refresh_token']          = $token;
+
+		$options->set( $all );
+	}
+
+	/**
+	 * Update auth code in our DB.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $code
+	 */
+	protected function update_auth_code( $code ) {
+
+		$options = new PluginOptions();
+		$all     = $options->get_all();
+
+		$all[ $this->mailer ]['auth_code'] = $code;
+		$this->gmail['auth_code']          = $code;
+
+		$options->set( $all );
+	}
+
+	/**
+	 * Get the auth URL used to proceed to Google to request access to send emails.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return string
 	 */
-	public function get_auth_url() {
+	public function get_google_auth_url() {
 
 		if (
 			! empty( $this->client ) &&
@@ -262,22 +310,25 @@ class Auth extends AuthAbstract {
 	}
 
 	/**
-	 * Get user information (like email etc) that is associated with the current connection.
+	 * Whether user saved Client ID and Client Secret or not.
+	 * Both options are required.
 	 *
-	 * @since 1.5.0
+	 * @since 1.0.0
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	public function get_user_info() {
+	public function is_clients_saved() {
+		return ! empty( $this->gmail['client_id'] ) && ! empty( $this->gmail['client_secret'] );
+	}
 
-		$gmail = new \Google_Service_Gmail( $this->get_client() );
-
-		try {
-			$email = $gmail->users->getProfile( 'me' )->getEmailAddress();
-		} catch ( \Exception $e ) {
-			$email = '';
-		}
-
-		return array( 'email' => $email );
+	/**
+	 * Whether we have an access and refresh tokens or not.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 */
+	public function is_auth_required() {
+		return empty( $this->gmail['access_token'] ) || empty( $this->gmail['refresh_token'] );
 	}
 }

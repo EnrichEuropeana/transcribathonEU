@@ -29,10 +29,7 @@
 					<?php endforeach; ?>>
 				<?php endif; ?>
 
-				<?php echo wp_get_attachment_image( $item['image'], 'full', false, array(
-					'title' => esc_attr( $title ),
-					'class' => 'sow-masonry-grid-image',
-				) ); ?>
+				<?php echo wp_get_attachment_image( $item['image'], 'full', false, array( 'title' => esc_attr( $title ) ) ); ?>
 
 				<?php if ( ! empty( $url ) ) : ?>
 					</a>

@@ -1,27 +1,21 @@
 <?php
 
 /**
- * bbPress Mingle Converter
- *
- * @package bbPress
- * @subpackage Converters
- */
-
-/**
  * Implementation of Mingle Forums converter.
  *
- * @since 2.3.0 bbPress (r4691)
- *
- * @link Codex Docs https://codex.bbpress.org/import-forums/mingle
+ * @since bbPress (r4691)
+ * @link Codex Docs http://codex.bbpress.org/import-forums/mingle
  */
 class Mingle extends BBP_Converter_Base {
 
 	/**
 	 * Main constructor
 	 *
+	 * @uses Mingle::setup_globals()
 	 */
-	public function __construct() {
+	function __construct() {
 		parent::__construct();
+		$this->setup_globals();
 	}
 
 	/**
@@ -29,20 +23,14 @@ class Mingle extends BBP_Converter_Base {
 	 */
 	public function setup_globals()	{
 
-		// Setup smiley URL & path
-		$this->bbcode_parser_properties = array(
-			'smiley_url' => false,
-			'smiley_dir' => false
-		);
-
 		/** Forum Section ******************************************************/
 
-		// Old forum id (Stored in postmeta)
+		// Forum id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forum_forums',
 			'from_fieldname' => 'id',
 			'to_type'        => 'forum',
-			'to_fieldname'   => '_bbp_old_forum_id'
+			'to_fieldname'   => '_bbp_forum_id'
 		);
 
 		// Forum parent id (If no parent, then 0. Stored in postmeta)
@@ -50,7 +38,7 @@ class Mingle extends BBP_Converter_Base {
 			'from_tablename' => 'forum_forums',
 			'from_fieldname' => 'parent_id',
 			'to_type'        => 'forum',
-			'to_fieldname'   => '_bbp_old_forum_parent_id'
+			'to_fieldname'   => '_bbp_forum_parent_id'
 		);
 
 		// Forum title.
@@ -86,20 +74,6 @@ class Mingle extends BBP_Converter_Base {
 			'to_fieldname'   => 'menu_order'
 		);
 
-		// Forum type (Set a default value 'forum', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_forum_type',
-			'default'      => 'forum'
-		);
-
-		// Forum status (Set a default value 'open', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_status',
-			'default'      => 'open'
-		);
-
 		// Forum dates.
 		$this->field_map[] = array(
 			'to_type'        => 'forum',
@@ -124,12 +98,12 @@ class Mingle extends BBP_Converter_Base {
 
 		/** Topic Section ******************************************************/
 
-		// Old topic id (Stored in postmeta)
+		// Topic id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forum_threads',
 			'from_fieldname' => 'id',
 			'to_type'        => 'topic',
-			'to_fieldname'   => '_bbp_old_topic_id'
+			'to_fieldname'   => '_bbp_topic_id'
 		);
 
 		// Topic parent forum id (If no parent, then 0. Stored in postmeta)
@@ -188,12 +162,12 @@ class Mingle extends BBP_Converter_Base {
 			'callback_method' => 'callback_forumid'
 		);
 
-		// Sticky status (Stored in postmeta)
+		// Sticky status (Stored in postmeta))
 		$this->field_map[] = array(
 			'from_tablename'  => 'forum_threads',
 			'from_fieldname'  => 'status',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_sticky_status_id',
+			'to_fieldname'    => '_bbp_old_sticky_status',
 			'callback_method' => 'callback_sticky_status'
 		);
 
@@ -234,7 +208,7 @@ class Mingle extends BBP_Converter_Base {
 			'from_tablename'  => 'forum_threads',
 			'from_fieldname'  => 'closed',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_closed_status_id',
+			'to_fieldname'    => 'post_status',
 			'callback_method' => 'callback_topic_status'
 		);
 
@@ -242,16 +216,16 @@ class Mingle extends BBP_Converter_Base {
 
 		/**
 		 * Mingle Forums do not support topic tags
-		 */
+         */
 
 		/** Reply Section ******************************************************/
 
-		// Old reply id (Stored in postmeta)
+		// Reply id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'forum_posts',
 			'from_fieldname' => 'id',
 			'to_type'        => 'reply',
-			'to_fieldname'   => '_bbp_old_reply_id'
+			'to_fieldname'   => '_bbp_post_id'
 		);
 
 		// Setup reply section table joins
@@ -292,6 +266,23 @@ class Mingle extends BBP_Converter_Base {
 			'to_type'         => 'reply',
 			'to_fieldname'    => 'post_author',
 			'callback_method' => 'callback_userid'
+		);
+
+		// Reply title.
+		$this->field_map[] = array(
+			'from_tablename' => 'forum_posts',
+			'from_fieldname' => 'subject',
+			'to_type'        => 'reply',
+			'to_fieldname'   => 'post_title'
+		);
+
+		// Reply slug (Clean name to avoid conflicts)
+		$this->field_map[] = array(
+			'from_tablename'  => 'forum_posts',
+			'from_fieldname'  => 'subject',
+			'to_type'         => 'reply',
+			'to_fieldname'    => 'post_name',
+			'callback_method' => 'callback_slug'
 		);
 
 		// Reply content.
@@ -340,15 +331,15 @@ class Mingle extends BBP_Converter_Base {
 
 		/** User Section ******************************************************/
 
-		// Store old user id (Stored in usermeta)
+		// Store old User id (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'users',
 			'from_fieldname' => 'ID',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_old_user_id'
+			'to_fieldname'   => '_bbp_user_id'
 		);
 
-		// Store old user password (Stored in usermeta)
+		// Store old User password (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'users',
 			'from_fieldname' => 'user_pass',
@@ -439,7 +430,7 @@ class Mingle extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the topic status from Mingle numerics to WordPress's strings.
+	 * Translate the topic status from Mingle numeric's to WordPress's strings.
 	 *
 	 * @param int $status Mingle v1.x numeric topic status
 	 * @return string WordPress safe
@@ -459,7 +450,7 @@ class Mingle extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the topic sticky status type from Mingle numerics to WordPress's strings.
+	 * Translate the topic sticky status type from Mingle numeric's to WordPress's strings.
 	 *
 	 * @param int $status Mingle numeric forum type
 	 * @return string WordPress safe
@@ -477,4 +468,16 @@ class Mingle extends BBP_Converter_Base {
 		}
 		return $status;
 	}
+
+	/**
+	* This callback processes any custom BBCodes with parser.php
+	*/
+	protected function callback_html( $field ) {
+		require_once( bbpress()->admin->admin_dir . 'parser.php' );
+		$bbcode = BBCode::getInstance();
+		$bbcode->enable_smileys = false;
+		$bbcode->smiley_regex   = false;
+		return html_entity_decode( $bbcode->Parse( $field ) );
+	}
+
 }

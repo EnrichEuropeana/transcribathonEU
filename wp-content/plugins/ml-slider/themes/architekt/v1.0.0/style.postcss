@@ -9,7 +9,6 @@ $theme_name: architekt;
 $theme_prefix: .metaslider.ms-theme-$(theme_name);
 
 .ms-theme-architekt {
-	overflow: hidden;
 	padding-bottom: 40px;
 	opacity: 0;
 	transition: opacity 0.3s;
@@ -145,10 +144,10 @@ $(theme_prefix) {
 
 	@mixin arrowsLink {
 		background: transparent;
-		text-indent: -9999px;
 		box-shadow: none;
 		width: 34px;
 		height: 20px;
+		text-indent: 0!important;
 		color: black;
 		opacity: 1;
 		overflow: visible;

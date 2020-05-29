@@ -7,12 +7,9 @@
  * @subpackage Theme
  */
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
 ?>
 
-<div id="bbpress-forums" class="bbpress-wrapper">
+<div id="bbpress-forums">
 
 	<?php bbp_breadcrumb(); ?>
 

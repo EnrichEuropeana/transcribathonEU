@@ -5,7 +5,11 @@ namespace WPForms\Admin;
 /**
  * Class Loader gives ability to track/load all admin modules.
  *
- * @since 1.5.0
+ * @package    WPForms\Admin
+ * @author     WPForms
+ * @since      1.5.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2018, WPForms LLC
  */
 class Loader {
 
@@ -33,20 +37,10 @@ class Loader {
 	public function __construct() {
 
 		$core_class_names = array(
-			'Connect',
 			'DashboardWidget',
 			'Challenge',
-			'Education',
-			'FlyoutMenu',
 			'Builder\Education',
-			'Builder\LicenseAlert',
-			'Pages\Community',
-			'Pages\SMTP',
-			'Pages\Analytics',
-			'Settings\Education',
 			'Entries\PrintPreview',
-			'Entries\DefaultScreen',
-			'Entries\Export\Export',
 		);
 
 		$class_names = \apply_filters( 'wpforms_admin_classes_available', $core_class_names );

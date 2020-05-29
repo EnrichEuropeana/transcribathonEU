@@ -54,15 +54,10 @@ class SolrPower_Options {
 	 */
 	function add_pages() {
 		add_menu_page(
-			'Solr Power',
-			'Solr Power',
-			'manage_options',
-			'solr-power',
-			array(
+			'Solr Power', 'Solr Power', 'manage_options', 'solr-power', array(
 				$this,
 				'options_page',
-			),
-			'dashicons-search'
+			), 'dashicons-search'
 		);
 	}
 
@@ -522,26 +517,14 @@ class SolrPower_Options {
 		);
 
 		$this->add_field(
-			's4wp_default_operator',
-			'Default Search Operator',
-			$page,
-			$section,
-			'radio',
-			null,
-			array(
+			's4wp_default_operator', 'Default Search Operator', $page, $section, 'radio', null, array(
 				'OR',
 				'AND',
 			)
 		);
 
 		$this->add_field(
-			's4wp_default_sort',
-			'Default Sort',
-			$page,
-			$section,
-			'select',
-			null,
-			array(
+			's4wp_default_sort', 'Default Sort', $page, $section, 'select', null, array(
 				'score',
 				'displaydate',
 			)
@@ -594,15 +577,10 @@ class SolrPower_Options {
 			'choices' => $choices,
 		);
 		add_settings_field(
-			$name,
-			$title,
-			array(
+			$name, $title, array(
 				$this,
 				'render_field',
-			),
-			$page,
-			$section,
-			$args
+			), $page, $section, $args
 		);
 	}
 

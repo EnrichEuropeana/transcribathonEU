@@ -751,8 +751,8 @@ class SiteOrigin_Panels_Admin {
 	function get_widgets() {
 		global $wp_widget_factory;
 		$widgets = array();
-		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
-			$class = preg_match( '/[0-9a-f]{32}/', $class ) ? get_class( $widget_obj ) : $class;
+		foreach ( $wp_widget_factory->widgets as $widget_obj ) {
+			$class = get_class( $widget_obj );
 			$widgets[ $class ] = array(
 				'class'       => $class,
 				'title'       => ! empty( $widget_obj->name ) ? $widget_obj->name : __( 'Untitled Widget', 'siteorigin-panels' ),
@@ -1257,9 +1257,8 @@ class SiteOrigin_Panels_Admin {
 		$post_types = siteorigin_panels_setting( 'post-types' );
 		$is_panels_type = in_array( $typenow, $post_types );
 		$use_classic = siteorigin_panels_setting( 'use-classic' );
-		$show_classic_admin_notice = $is_new && $is_panels_type && $use_classic;
-		$show_classic_admin_notice = apply_filters( 'so_panels_show_classic_admin_notice', $show_classic_admin_notice );
-		if ( $show_classic_admin_notice ) {
+		
+		if ( $is_new && $is_panels_type && $use_classic ) {
 			$settings_url = self_admin_url( 'options-general.php?page=siteorigin_panels' );
 			$notice = sprintf(
 				__( 'This post type is set to use the Classic Editor by default for new posts. If you’d like to change this to the block editor, please go to <a href="%s" class="components-notice__action is-link">Page Builder Settings</a> and uncheck <strong>Use Classic Editor for new posts</strong>' ),
@@ -1288,10 +1287,9 @@ class SiteOrigin_Panels_Admin {
 			return false;
 		}
 		
+		// If the `$post_type` is set to be used by Page Builder.
 		$post_types = siteorigin_panels_setting( 'post-types' );
-        global $pagenow;
-		// If the `$post_type` is set to be used by Page Builder for new posts.
-		$is_new_panels_type = $pagenow == 'post-new.php' && in_array( $post_type, $post_types );
+		$is_panels_type = in_array( $post_type, $post_types );
 		$use_classic = siteorigin_panels_setting( 'use-classic' );
 		// For existing posts.
 		global $post;
@@ -1299,11 +1297,13 @@ class SiteOrigin_Panels_Admin {
 			// If the post has blocks just allow `$use_block_editor` to decide.
 			if ( ! has_blocks( $post ) ) {
 				$panels_data = get_post_meta( $post->ID, 'panels_data', true );
-				if ( ! empty( $panels_data ) || ( $use_classic && $is_new_panels_type ) ) {
+				global $pagenow;
+				$is_new = $pagenow == 'post-new.php';
+				if ( ! empty( $panels_data ) || ( $use_classic && $is_new && $is_panels_type ) ) {
 					$use_block_editor = false;
 				}
 			}
-		} else if ( $is_new_panels_type ) {
+		} else if ( $is_panels_type ) {
 			$use_block_editor = false;
 		}
 		
@@ -1374,12 +1374,16 @@ class SiteOrigin_Panels_Admin {
 				font: 400 20px/.5 dashicons;
 				speak: none;
 				top: 0px;
+			<?php if ( is_rtl() ) : ?>
+				right: -1px;
+			<?php else : ?>
+				left: -1px;
+			<?php endif; ?>
 				position: relative;
 				vertical-align: top;
 				text-decoration: none !important;
-				padding: 4px 5px 4px 4px;
+				padding: 4px 5px 5px 4px;
 				border-radius: 0px 2px 2px 0px;
-				<?php echo  is_rtl() ? 'right: -1px;' : 'left: -1px;' ?>
 			}
 			
 			.split-page-title-action .dropdown {
@@ -1397,13 +1401,15 @@ class SiteOrigin_Panels_Admin {
 				display: block;
 				top: 0;
 				margin: -1px 0;
-				<?php echo is_rtl() ? 'padding-left: 9px;' : 'padding-right: 9px;' ?>
+			<?php if ( is_rtl() ) : ?>
+				padding-left: 9px;
+			<?php else : ?>
+				padding-right: 9px;
+			<?php endif; ?>
 			}
 			
 			.split-page-title-action .expander {
 				outline: none;
-				float: right;
-				margin-top: 1px;
 			}
 		
 		</style>
@@ -1464,7 +1470,7 @@ class SiteOrigin_Panels_Admin {
 			$show = $show && ! isset( $so_custom_types[ $post_type ] );
 		}
 		
-		return apply_filters( 'so_panels_show_add_new_dropdown_for_type', $show, $post_type );
+		return $show;
 	}
 	
 	public function add_panels_post_state( $post_states, $post ) {

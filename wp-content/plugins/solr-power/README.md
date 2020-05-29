@@ -1,10 +1,10 @@
 # Solr Search for WordPress #
-**Contributors:** getpantheon, Outlandish Josh, 10up, collinsinternet, andrew.taylor, danielbachhuber  
+**Contributors:** getpantheon, Outlandish Josh, 10up, collinsinternet, andrew.taylor  
 **Tags:** search  
 **Requires at least:** 4.6  
 **Requires PHP:** 7.1  
-**Tested up to:** 5.4  
-**Stable tag:** 2.1.4  
+**Tested up to:** 4.9  
+**Stable tag:** 2.0.0  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -50,15 +50,17 @@ Alternatively, there are a couple of community-maintained Docker containers you 
 
 In a local development environment, you can point Solr Power to a custom Solr instance by creating a MU plugin with:
 
-    <?php
-    /**
-     * Define Solr host IP, port, scheme and path
-     * Update these as necessary if your configuration differs
-     */
-    putenv( 'PANTHEON_INDEX_HOST=192.168.50.4' );
-    putenv( 'PANTHEON_INDEX_PORT=8983' );
-    add_filter( 'solr_scheme', function(){ return 'http'; });
-    define( 'SOLR_PATH', '/solr/wordpress/' );
+```
+<?php
+/**
+ * Define Solr host IP, port, scheme and path
+ * Update these as necessary if your configuration differs
+*/
+putenv( 'PANTHEON_INDEX_HOST=192.168.50.4' );
+putenv( 'PANTHEON_INDEX_PORT=8983' );
+add_filter( 'solr_scheme', function(){ return 'http'; });
+define( 'SOLR_PATH', '/solr/wordpress/' );
+```
 
 ## Development ##
 
@@ -163,25 +165,6 @@ To support searching by author name (e.g. where "Pantheon" would return posts au
 ```
 
 ## Changelog ##
-
-### 2.1.4 (April 24, 2020) ###
-* Ensures highlighting is also applied to the post excerpt [[#446](https://github.com/pantheon-systems/solr-power/pull/446)].
-
-### 2.1.3 (November 16, 2019) ###
-* Add `solr_power_ajax_search_query_args` filter to modify AJAX search query arguments [[#432](https://github.com/pantheon-systems/solr-power/pull/432)].
-
-### 2.1.2 (August 28, 2019) ###
-* Adds `solr_is_private_blog` filter to allow control over whether a blog is indexed [[#423](https://github.com/pantheon-systems/solr-power/pull/423)].
-
-### 2.1.1 (August 14, 2019) ###
-* Uses some fancy `composer` magic to unblock WordPress.org plugin updates [[#418](https://github.com/pantheon-systems/solr-power/pull/418)].
-
-### 2.1.0 (May 22, 2019) ###
-* Introduces `solr_index_stat` filter for allowing additional information to be included [[#396](https://github.com/pantheon-systems/solr-power/pull/396)].
-* Introduces `solr_facet_operator` filter for allowing facet operator to be overridden [[#388](https://github.com/pantheon-systems/solr-power/pull/388)].
-* Ensures warning message appears when activating across the entire network [[#399](https://github.com/pantheon-systems/solr-power/pull/399)].
-* Parses `<h1>` tags in Solr error response, in addition to `<title>` [[#407](https://github.com/pantheon-systems/solr-power/pull/407)].
-* Fixes incorrect variable name when outputting schema error message [[#404](https://github.com/pantheon-systems/solr-power/pull/404)].
 
 ### 2.0.0 ###
 * Fix PHP 7 warning caused by bad conditional

@@ -7,14 +7,19 @@
  * @subpackage Theme
  */
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
 ?>
 
-<div id="bbpress-forums" class="bbpress-wrapper">
+<div id="bbpress-forums">
 
-	<?php bbp_get_template_part( 'form', 'search' ); ?>
+	<?php if ( bbp_allow_search() ) : ?>
+
+		<div class="bbp-search-form">
+
+			<?php bbp_get_template_part( 'form', 'search' ); ?>
+
+		</div>
+
+	<?php endif; ?>
 
 	<?php bbp_breadcrumb(); ?>
 

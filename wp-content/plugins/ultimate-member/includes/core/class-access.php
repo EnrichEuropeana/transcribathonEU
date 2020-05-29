@@ -180,6 +180,11 @@ if ( ! class_exists( 'um\core\Access' ) ) {
 							add_filter( 'archive_template', array( &$this, 'taxonomy_message' ), 10, 3 );
 							add_filter( 'category_template', array( &$this, 'taxonomy_message' ), 10, 3 );
 							add_filter( 'taxonomy_template', array( &$this, 'taxonomy_message' ), 10, 3 );
+
+							/*global $wp_query;
+							$wp_query->set_404();
+							status_header( 404 );
+							nocache_headers();*/
 						}
 					} else {
 						$user_can = $this->user_can( get_current_user_id(), $restriction['_um_access_roles'] );
@@ -367,22 +372,15 @@ if ( ! class_exists( 'um\core\Access' ) ) {
 		 * Old global restrict content logic
 		 */
 		function template_redirect() {
-			global $post, $wp_query;
+			global $post;
 
 			//if we logged by administrator it can access to all content
 			if ( current_user_can( 'administrator' ) )
 				return;
 
-			if ( is_object( $wp_query ) ) {
-				$is_singular = $wp_query->is_singular();
-			} else {
-				$is_singular = ! empty( $wp_query->is_singular ) ? true : false;
-			}
-
 			//if we use individual restrict content options skip this function
-			if ( $is_singular && $this->singular_page ) {
+			if ( $this->singular_page )
 				return;
-			}
 
 			//also skip if we currently at wp-admin or 404 page
 			if ( is_admin() || is_404() )
@@ -545,7 +543,6 @@ if ( ! class_exists( 'um\core\Access' ) ) {
 
 			//exclude from privacy UM default pages (except Members list and User(Profile) page)
 			if ( ! empty( $post->post_type ) && $post->post_type == 'page' ) {
-
 				if ( um_is_core_post( $post, 'login' ) || um_is_core_post( $post, 'register' ) ||
 				     um_is_core_post( $post, 'account' ) || um_is_core_post( $post, 'logout' ) ||
 				     um_is_core_post( $post, 'password-reset' ) || ( is_user_logged_in() && um_is_core_post( $post, 'user' ) ) )
@@ -596,30 +593,6 @@ if ( ! class_exists( 'um\core\Access' ) ) {
 
 						return false;
 					} else {
-
-						// set default redirect if Profile page is restricted for not-logged in users and showing message instead of redirect
-						// this snippet was added to make the same action for {site_url}/user and {site_url}/user/{user_slug} URLs
-						// by default {site_url}/user is redirected to Homepage in rewrite rules because hasn't found username in query when user is not logged in
-						if ( ! is_user_logged_in() && um_is_core_post( $post, 'user' ) && $restriction['_um_accessible'] == '2' && $restriction['_um_noaccess_action'] == '0' ) {
-							if ( isset( $restriction['_um_access_roles'] ) ) {
-								$restriction = array(
-									'_um_accessible'            => '2',
-									'_um_access_roles'          => $restriction['_um_access_roles'],
-									'_um_noaccess_action'       => '1',
-									'_um_access_redirect'       => '1',
-									'_um_access_redirect_url'   => get_home_url( get_current_blog_id() )
-								);
-							} else {
-								$restriction = array(
-									'_um_accessible'            => '2',
-									'_um_noaccess_action'       => '1',
-									'_um_access_redirect'       => '1',
-									'_um_access_redirect_url'   => get_home_url( get_current_blog_id() )
-								);
-							}
-						}
-
-						$restriction = apply_filters( 'um_post_content_restriction_settings', $restriction, $post );
 						return $restriction;
 					}
 				}
@@ -1246,8 +1219,6 @@ if ( ! class_exists( 'um\core\Access' ) ) {
 					$has_thumbnail = false;
 				}
 			}
-
-			$has_thumbnail = apply_filters( 'um_restrict_post_thumbnail', $has_thumbnail, $post, $thumbnail_id );
 
 			return $has_thumbnail;
 		}

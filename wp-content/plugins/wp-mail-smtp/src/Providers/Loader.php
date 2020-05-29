@@ -16,30 +16,19 @@ class Loader {
 	/**
 	 * Key is the mailer option, value is the path to its classes.
 	 *
-	 * @since 1.0.0
-	 * @since 1.6.0 Added Sendinblue.
-	 * @since 1.7.0 Added AmazonSES/Outlook as indication of the Pro mailers.
-	 *
 	 * @var array
 	 */
 	protected $providers = array(
-		'mail'        => 'WPMailSMTP\Providers\Mail\\',
-		'smtpcom'     => 'WPMailSMTP\Providers\SMTPcom\\',
-		'pepipostapi' => 'WPMailSMTP\Providers\PepipostAPI\\',
-		'sendinblue'  => 'WPMailSMTP\Providers\Sendinblue\\',
-		'mailgun'     => 'WPMailSMTP\Providers\Mailgun\\',
-		'sendgrid'    => 'WPMailSMTP\Providers\Sendgrid\\',
-		'amazonses'   => 'WPMailSMTP\Providers\AmazonSES\\',
-		'gmail'       => 'WPMailSMTP\Providers\Gmail\\',
-		'outlook'     => 'WPMailSMTP\Providers\Outlook\\',
-		'smtp'        => 'WPMailSMTP\Providers\SMTP\\',
-		'pepipost'    => 'WPMailSMTP\Providers\Pepipost\\',
+		'mail'     => 'WPMailSMTP\Providers\Mail\\',
+		'gmail'    => 'WPMailSMTP\Providers\Gmail\\',
+		'mailgun'  => 'WPMailSMTP\Providers\Mailgun\\',
+		'sendgrid' => 'WPMailSMTP\Providers\Sendgrid\\',
+		'pepipost' => 'WPMailSMTP\Providers\Pepipost\\',
+		'smtp'     => 'WPMailSMTP\Providers\SMTP\\',
 	);
 
 	/**
-	 * @since 1.0.0
-	 *
-	 * @var MailCatcher
+	 * @var \WPMailSMTP\MailCatcher
 	 */
 	private $phpmailer;
 
@@ -66,17 +55,14 @@ class Loader {
 	 *
 	 * @param string $provider
 	 *
-	 * @return string|null
+	 * @return array
 	 */
 	public function get_provider_path( $provider ) {
-
 		$provider = sanitize_key( $provider );
-
-		$providers = $this->get_providers();
 
 		return apply_filters(
 			'wp_mail_smtp_providers_loader_get_provider_path',
-			isset( $providers[ $provider ] ) ? $providers[ $provider ] : null,
+			isset( $this->providers[ $provider ] ) ? $this->providers[ $provider ] : null,
 			$provider
 		);
 	}
@@ -88,10 +74,9 @@ class Loader {
 	 *
 	 * @param string $provider
 	 *
-	 * @return OptionsAbstract|null
+	 * @return \WPMailSMTP\Providers\OptionsAbstract|null
 	 */
 	public function get_options( $provider ) {
-
 		return $this->get_entity( $provider, 'Options' );
 	}
 
@@ -100,10 +85,9 @@ class Loader {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return OptionsAbstract[]
+	 * @return \WPMailSMTP\Providers\OptionsAbstract[]
 	 */
 	public function get_options_all() {
-
 		$options = array();
 
 		foreach ( $this->get_providers() as $provider => $path ) {
@@ -132,10 +116,10 @@ class Loader {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string      $provider
+	 * @param string $provider
 	 * @param MailCatcher $phpmailer
 	 *
-	 * @return MailerAbstract|null
+	 * @return \WPMailSMTP\Providers\MailerAbstract|null
 	 */
 	public function get_mailer( $provider, $phpmailer ) {
 
@@ -154,24 +138,23 @@ class Loader {
 	 *
 	 * @param string $provider
 	 *
-	 * @return AuthAbstract|null
+	 * @return \WPMailSMTP\Providers\AuthAbstract|null
 	 */
 	public function get_auth( $provider ) {
-
 		return $this->get_entity( $provider, 'Auth' );
 	}
 
 	/**
 	 * Get a generic entity based on the request.
 	 *
-	 * @uses  \ReflectionClass
+	 * @uses ReflectionClass
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param string $provider
 	 * @param string $request
 	 *
-	 * @return OptionsAbstract|MailerAbstract|AuthAbstract|null
+	 * @return null
 	 */
 	protected function get_entity( $provider, $request ) {
 
@@ -195,8 +178,7 @@ class Loader {
 					$entity = new $class();
 				}
 			}
-		}
-		catch ( \Exception $e ) {
+		} catch ( \Exception $e ) {
 			Debug::set( "There was a problem while retrieving {$request} for {$provider}: {$e->getMessage()}" );
 			$entity = null;
 		}

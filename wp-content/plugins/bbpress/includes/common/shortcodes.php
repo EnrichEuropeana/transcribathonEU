@@ -8,13 +8,13 @@
  */
 
 // Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 
-if ( ! class_exists( 'BBP_Shortcodes' ) ) :
+if ( !class_exists( 'BBP_Shortcodes' ) ) :
 /**
  * bbPress Shortcode Class
  *
- * @since 2.0.0 bbPress (r3031)
+ * @since bbPress (r3031)
  */
 class BBP_Shortcodes {
 
@@ -30,8 +30,10 @@ class BBP_Shortcodes {
 	/**
 	 * Add the register_shortcodes action to bbp_init
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
+	 * @uses setup_globals()
+	 * @uses add_shortcodes()
 	 */
 	public function __construct() {
 		$this->setup_globals();
@@ -41,9 +43,10 @@ class BBP_Shortcodes {
 	/**
 	 * Shortcode globals
 	 *
-	 * @since 2.0.0 bbPress (r3143)
-	 *
+	 * @since bbPress (r3143)
 	 * @access private
+	 *
+	 * @uses apply_filters()
 	 */
 	private function setup_globals() {
 
@@ -96,7 +99,10 @@ class BBP_Shortcodes {
 	/**
 	 * Register the bbPress shortcodes
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
+	 *
+	 * @uses add_shortcode()
+	 * @uses do_action()
 	 */
 	private function add_shortcodes() {
 		foreach ( (array) $this->codes as $code => $function ) {
@@ -107,7 +113,7 @@ class BBP_Shortcodes {
 	/**
 	 * Unset some globals in the $bbp object that hold query related info
 	 *
-	 * @since 2.0.0 bbPress (r3034)
+	 * @since bbPress (r3034)
 	 */
 	private function unset_globals() {
 		$bbp = bbpress();
@@ -138,9 +144,12 @@ class BBP_Shortcodes {
 	 * than outputting the HTML at run-time. This allows shortcodes to appear
 	 * in the correct location in the_content() instead of when it's created.
 	 *
-	 * @since 2.0.0 bbPress (r3079)
+	 * @since bbPress (r3079)
 	 *
 	 * @param string $query_name
+	 *
+	 * @uses bbp_set_query_name()
+	 * @uses ob_start()
 	 */
 	private function start( $query_name = '' ) {
 
@@ -154,8 +163,9 @@ class BBP_Shortcodes {
 	/**
 	 * Return the contents of the output buffer and flush its contents.
 	 *
-	 * @since 2.0.0 bbPress (r3079)
+	 * @since bbPress( r3079)
 	 *
+	 * @uses BBP_Shortcodes::unset_globals() Cleans up global values
 	 * @return string Contents of output buffer.
 	 */
 	private function end() {
@@ -163,17 +173,11 @@ class BBP_Shortcodes {
 		// Unset globals
 		$this->unset_globals();
 
-		// Get the query name, for filter
-		$query_name = bbp_get_query_name();
-
 		// Reset the query name
 		bbp_reset_query_name();
 
 		// Return and flush the output buffer
-		$output = ob_get_clean();
-
-		// Filter & return
-		return apply_filters( 'bbp_display_shortcode', $output, $query_name );
+		return ob_get_clean();
 	}
 
 	/** Forum shortcodes ******************************************************/
@@ -182,8 +186,12 @@ class BBP_Shortcodes {
 	 * Display an index of all visible root level forums in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
+	 * @param array $attr
+	 * @param string $content
+	 * @uses bbp_has_forums()
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_forum_index() {
@@ -204,26 +212,26 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific forum ID in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
+	 * @uses bbp_single_forum_description()
 	 * @return string
 	 */
 	public function display_forum( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( ! empty( $content ) || ( empty( $attr['id'] ) || ! is_numeric( $attr['id'] ) ) ) {
+		if ( !empty( $content ) || ( empty( $attr['id'] ) || !is_numeric( $attr['id'] ) ) )
 			return $content;
-		}
 
 		// Set passed attribute to $forum_id for clarity
 		$forum_id = bbpress()->current_forum_id = $attr['id'];
 
 		// Bail if ID passed is not a forum
-		if ( ! bbp_is_forum( $forum_id ) ) {
+		if ( !bbp_is_forum( $forum_id ) )
 			return $content;
-		}
 
 		// Start output buffer
 		$this->start( 'bbp_single_forum' );
@@ -245,7 +253,9 @@ class BBP_Shortcodes {
 	 * Display the forum form in an output buffer and return to ensure
 	 * post/page contents are displayed first.
 	 *
-	 * @since 2.1.0 bbPress (r3566)
+	 * @since bbPress (r3566)
+	 *
+	 * @uses get_template_part()
 	 */
 	public function display_forum_form() {
 
@@ -265,8 +275,12 @@ class BBP_Shortcodes {
 	 * Display an index of all visible root level topics in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
+	 * @param array $attr
+	 * @param string $content
+	 * @uses bbp_get_hidden_forum_ids()
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_topic_index() {
@@ -293,18 +307,18 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific topic ID in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_topic( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( ! empty( $content ) || ( empty( $attr['id'] ) || ! is_numeric( $attr['id'] ) ) ) {
+		if ( !empty( $content ) || ( empty( $attr['id'] ) || !is_numeric( $attr['id'] ) ) )
 			return $content;
-		}
 
 		// Unset globals
 		$this->unset_globals();
@@ -314,12 +328,11 @@ class BBP_Shortcodes {
 		$forum_id = bbp_get_topic_forum_id( $topic_id );
 
 		// Bail if ID passed is not a topic
-		if ( ! bbp_is_topic( $topic_id ) ) {
+		if ( !bbp_is_topic( $topic_id ) )
 			return $content;
-		}
 
 		// Reset the queries if not in theme compat
-		if ( ! bbp_is_theme_compat_active() ) {
+		if ( !bbp_is_theme_compat_active() ) {
 
 			$bbp = bbpress();
 
@@ -356,26 +369,26 @@ class BBP_Shortcodes {
 	 *
 	 * Supports 'forum_id' attribute to display the topic form for a particular
 	 * forum. This currently has styling issues from not being wrapped in
-	 * <div id="bbpress-forums" class="bbpress-wrapper"></div> which will need to be sorted out later.
+	 * <div id="bbpress-forums"></div> which will need to be sorted out later.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_topic_form( $attr = array(), $content = '' ) {
 
 		// Sanity check supplied info
-		if ( ! empty( $content ) || ( ! empty( $attr['forum_id'] ) && ( ! is_numeric( $attr['forum_id'] ) || ! bbp_is_forum( $attr['forum_id'] ) ) ) ) {
+		if ( !empty( $content ) || ( !empty( $attr['forum_id'] ) && ( !is_numeric( $attr['forum_id'] ) || !bbp_is_forum( $attr['forum_id'] ) ) ) )
 			return $content;
-		}
 
 		// Unset globals
 		$this->unset_globals();
 
 		// If forum id is set, use the 'bbp_single_forum' query name
-		if ( ! empty( $attr['forum_id'] ) ) {
+		if ( !empty( $attr['forum_id'] ) ) {
 
 			// Set the global current_forum_id for future requests
 			bbpress()->current_forum_id = $forum_id = bbp_get_forum_id( $attr['forum_id'] );
@@ -412,18 +425,18 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific reply ID in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_reply( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( ! empty( $content ) || ( empty( $attr['id'] ) || ! is_numeric( $attr['id'] ) ) ) {
+		if ( !empty( $content ) || ( empty( $attr['id'] ) || !is_numeric( $attr['id'] ) ) )
 			return $content;
-		}
 
 		// Unset globals
 		$this->unset_globals();
@@ -433,21 +446,20 @@ class BBP_Shortcodes {
 		$forum_id = bbp_get_reply_forum_id( $reply_id );
 
 		// Bail if ID passed is not a reply
-		if ( ! bbp_is_reply( $reply_id ) ) {
+		if ( !bbp_is_reply( $reply_id ) )
 			return $content;
-		}
 
 		// Reset the queries if not in theme compat
-		if ( ! bbp_is_theme_compat_active() ) {
+		if ( !bbp_is_theme_compat_active() ) {
 
 			$bbp = bbpress();
 
-			// Reset necessary forum_query attributes for reply loop to function
+			// Reset necessary forum_query attributes for replys loop to function
 			$bbp->forum_query->query_vars['post_type'] = bbp_get_forum_post_type();
 			$bbp->forum_query->in_the_loop             = true;
 			$bbp->forum_query->post                    = get_post( $forum_id );
 
-			// Reset necessary reply_query attributes for reply loop to function
+			// Reset necessary reply_query attributes for replys loop to function
 			$bbp->reply_query->query_vars['post_type'] = bbp_get_reply_post_type();
 			$bbp->reply_query->in_the_loop             = true;
 			$bbp->reply_query->post                    = get_post( $reply_id );
@@ -473,7 +485,9 @@ class BBP_Shortcodes {
 	 * Display the reply form in an output buffer and return to ensure
 	 * post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
+	 *
+	 * @uses get_template_part()
 	 */
 	public function display_reply_form() {
 
@@ -493,7 +507,7 @@ class BBP_Shortcodes {
 	 * Display a tag cloud of all topic tags in an output buffer and return to
 	 * ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3110)
+	 * @since bbPress (r3110)
 	 *
 	 * @return string
 	 */
@@ -521,18 +535,18 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific topic tag in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3110)
+	 * @since bbPress (r3110)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_topics_of_tag( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( ! empty( $content ) || ( empty( $attr['id'] ) || ! is_numeric( $attr['id'] ) ) ) {
+		if ( !empty( $content ) || ( empty( $attr['id'] ) || !is_numeric( $attr['id'] ) ) )
 			return $content;
-		}
 
 		// Unset globals
 		$this->unset_globals();
@@ -559,8 +573,11 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific topic tag in an output buffer
 	 * and return to ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3346)
+	 * @since bbPress (r3346)
 	 *
+	 * @param array $attr
+	 * @param string $content
+	 * @uses get_template_part()
 	 * @return string
 	 */
 	public function display_topic_tag_form() {
@@ -584,18 +601,19 @@ class BBP_Shortcodes {
 	 * Display the contents of a specific view in an output buffer and return to
 	 * ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.0.0 bbPress (r3031)
+	 * @since bbPress (r3031)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses get_template_part()
+	 * @uses bbp_single_forum_description()
 	 * @return string
 	 */
 	public function display_view( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( empty( $attr['id'] ) ) {
+		if ( empty( $attr['id'] ) )
 			return $content;
-		}
 
 		// Set passed attribute to $view_id for clarity
 		$view_id = $attr['id'];
@@ -625,7 +643,9 @@ class BBP_Shortcodes {
 	 * Display the search form in an output buffer and return to ensure
 	 * post/page contents are displayed first.
 	 *
-	 * @since 2.3.0 bbPress (r4585)
+	 * @since bbPress (r4585)
+	 *
+	 * @uses get_template_part()
 	 */
 	public function display_search_form() {
 
@@ -648,15 +668,17 @@ class BBP_Shortcodes {
 	 * Display the contents of search results in an output buffer and return to
 	 * ensure that post/page contents are displayed first.
 	 *
-	 * @since 2.3.0 bbPress (r4579)
+	 * @since bbPress (r4579)
 	 *
 	 * @param array $attr
 	 * @param string $content
+	 * @uses bbp_search_query()
+	 * @uses get_template_part()
 	 */
 	public function display_search( $attr, $content = '' ) {
 
 		// Sanity check required info
-		if ( ! empty( $content ) ) {
+		if ( !empty( $content ) ) {
 			return $content;
 		}
 
@@ -694,7 +716,7 @@ class BBP_Shortcodes {
 	/**
 	 * Display a login form
 	 *
-	 * @since 2.0.0 bbPress (r3302)
+	 * @since bbPress (r3302)
 	 *
 	 * @return string
 	 */
@@ -707,11 +729,10 @@ class BBP_Shortcodes {
 		$this->start( 'bbp_login' );
 
 		// Output templates
-		if ( ! is_user_logged_in() ) {
+		if ( !is_user_logged_in() )
 			bbp_get_template_part( 'form',     'user-login' );
-		} else {
+		else
 			bbp_get_template_part( 'feedback', 'logged-in'  );
-		}
 
 		// Return contents of output buffer
 		return $this->end();
@@ -720,7 +741,7 @@ class BBP_Shortcodes {
 	/**
 	 * Display a register form
 	 *
-	 * @since 2.0.0 bbPress (r3302)
+	 * @since bbPress (r3302)
 	 *
 	 * @return string
 	 */
@@ -733,11 +754,10 @@ class BBP_Shortcodes {
 		$this->start( 'bbp_register' );
 
 		// Output templates
-		if ( ! is_user_logged_in() ) {
+		if ( !is_user_logged_in() )
 			bbp_get_template_part( 'form',     'user-register' );
-		} else {
+		else
 			bbp_get_template_part( 'feedback', 'logged-in'     );
-		}
 
 		// Return contents of output buffer
 		return $this->end();
@@ -746,7 +766,7 @@ class BBP_Shortcodes {
 	/**
 	 * Display a lost password form
 	 *
-	 * @since 2.0.0 bbPress (r3302)
+	 * @since bbPress (r3302)
 	 *
 	 * @return string
 	 */
@@ -759,11 +779,10 @@ class BBP_Shortcodes {
 		$this->start( 'bbp_lost_pass' );
 
 		// Output templates
-		if ( ! is_user_logged_in() ) {
+		if ( !is_user_logged_in() )
 			bbp_get_template_part( 'form',     'user-lost-pass' );
-		} else {
+		else
 			bbp_get_template_part( 'feedback', 'logged-in'      );
-		}
 
 		// Return contents of output buffer
 		return $this->end();
@@ -774,9 +793,9 @@ class BBP_Shortcodes {
 	/**
 	 * Display forum statistics
 	 *
-	 * @since 2.3.0 bbPress (r4509)
+	 * @since bbPress (r4509)
 	 *
-	 * @return string
+	 * @return shring
 	 */
 	public function display_stats() {
 
@@ -796,7 +815,7 @@ class BBP_Shortcodes {
 	/**
 	 * Display a breadcrumb
 	 *
-	 * @since 2.0.0 bbPress (r3302)
+	 * @since bbPress (r3302)
 	 *
 	 * @return string
 	 */
@@ -820,7 +839,7 @@ class BBP_Shortcodes {
 	/**
 	 * Filter the query for the topic index
 	 *
-	 * @since 2.1.0 bbPress (r3637)
+	 * @since bbPress (r3637)
 	 *
 	 * @param array $args
 	 * @return array
@@ -835,7 +854,7 @@ class BBP_Shortcodes {
 	/**
 	 * Filter the query for topic tags
 	 *
-	 * @since 2.1.0 bbPress (r3637)
+	 * @since bbPress (r3637)
 	 *
 	 * @param array $args
 	 * @return array

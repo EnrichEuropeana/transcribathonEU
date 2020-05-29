@@ -12,18 +12,19 @@
  */
 
 // Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 
 /** Mapping *******************************************************************/
 
 /**
  * Returns an array of capabilities based on the role that is being requested.
  *
- * @since 2.0.0 bbPress (r2994)
+ * @since bbPress (r2994)
  *
  * @todo Map all of these and deprecate
  *
  * @param string $role Optional. Defaults to The role to load caps for
+ * @uses apply_filters() Allow return value to be filtered
  *
  * @return array Capabilities for $role
  */
@@ -45,7 +46,6 @@ function bbp_get_caps_for_role( $role = '' ) {
 				'moderate'              => true,
 				'throttle'              => true,
 				'view_trash'            => true,
-				'assign_moderators'     => true,
 
 				// Forum caps
 				'publish_forums'        => true,
@@ -91,7 +91,6 @@ function bbp_get_caps_for_role( $role = '' ) {
 				'moderate'              => true,
 				'throttle'              => true,
 				'view_trash'            => true,
-				'assign_moderators'     => true,
 
 				// Forum caps
 				'publish_forums'        => true,
@@ -206,14 +205,13 @@ function bbp_get_caps_for_role( $role = '' ) {
 			break;
 	}
 
-	// Filter & return
 	return apply_filters( 'bbp_get_caps_for_role', $caps, $role );
 }
 
 /**
  * Adds capabilities to WordPress user roles.
  *
- * @since 2.0.0 bbPress (r2608)
+ * @since bbPress (r2608)
  */
 function bbp_add_caps() {
 
@@ -230,7 +228,7 @@ function bbp_add_caps() {
 /**
  * Removes capabilities from WordPress user roles.
  *
- * @since 2.0.0 bbPress (r2608)
+ * @since bbPress (r2608)
  */
 function bbp_remove_caps() {
 
@@ -245,16 +243,35 @@ function bbp_remove_caps() {
 }
 
 /**
- * Get the available roles, minus the dynamic roles that come with bbPress
+ * Get the $wp_roles global without needing to declare it everywhere
  *
- * @since 2.4.0 bbPress (r5064)
+ * @since bbPress (r4293)
  *
+ * @global WP_Roles $wp_roles
+ * @return WP_Roles
+ */
+function bbp_get_wp_roles() {
+	global $wp_roles;
+
+	// Load roles if not set
+	if ( ! isset( $wp_roles ) )
+		$wp_roles = new WP_Roles();
+
+	return $wp_roles;
+}
+
+/**
+ * Get the available roles minus bbPress's dynamic roles
+ *
+ * @since bbPress (r5064)
+ *
+ * @uses bbp_get_wp_roles() To load and get the $wp_roles global
  * @return array
  */
 function bbp_get_blog_roles() {
 
 	// Get WordPress's roles (returns $wp_roles global)
-	$wp_roles = bbp_get_wp_roles();
+	$wp_roles  = bbp_get_wp_roles();
 
 	// Apply the WordPress 'editable_roles' filter to let plugins ride along.
 	//
@@ -263,7 +280,6 @@ function bbp_get_blog_roles() {
 	$the_roles = isset( $wp_roles->roles ) ? $wp_roles->roles : false;
 	$all_roles = apply_filters( 'editable_roles', $the_roles );
 
-	// Filter & return
 	return apply_filters( 'bbp_get_blog_roles', $all_roles, $wp_roles );
 }
 
@@ -274,25 +290,26 @@ function bbp_get_blog_roles() {
  *
  * We do this to avoid adding these values to the database.
  *
- * Note: bbPress is purposely assertive here, overwriting any keys & values
- * that may already exist in the $wp_roles array.
+ * @since bbPress (r4290)
  *
- * @since 2.2.0 bbPress (r4290)
+ * @param WP_Roles $wp_roles The main WordPress roles global
  *
- * @param WP_Roles $wp_roles The array of WP_Role objects that was initialized
- *
+ * @uses bbp_get_wp_roles() To load and get the $wp_roles global
+ * @uses bbp_get_dynamic_roles() To get and add bbPress's roles to $wp_roles
  * @return WP_Roles The main $wp_roles global
  */
 function bbp_add_forums_roles( $wp_roles = null ) {
 
-	// Get the dynamic roles
-	$bbp_roles = bbp_get_dynamic_roles();
+	// Attempt to get global roles if not passed in & not mid-initialization
+	if ( ( null === $wp_roles ) && ! doing_action( 'wp_roles_init' ) ) {
+		$wp_roles = bbp_get_wp_roles();
+	}
 
 	// Loop through dynamic roles and add them to the $wp_roles array
-	foreach ( $bbp_roles as $role_id => $details ) {
-		$wp_roles->roles[ $role_id ]        = $details;
-		$wp_roles->role_objects[ $role_id ] = new WP_Role( $role_id, $details['capabilities'] );
-		$wp_roles->role_names[ $role_id ]   = $details['name'];
+	foreach ( bbp_get_dynamic_roles() as $role_id => $details ) {
+		$wp_roles->roles[$role_id]        = $details;
+		$wp_roles->role_objects[$role_id] = new WP_Role( $role_id, $details['capabilities'] );
+		$wp_roles->role_names[$role_id]   = $details['name'];
 	}
 
 	// Return the modified $wp_roles array
@@ -302,13 +319,16 @@ function bbp_add_forums_roles( $wp_roles = null ) {
 /**
  * Helper function to add filter to option_wp_user_roles
  *
- * @since 2.2.0 bbPress (r4363)
- * @deprecated 2.6.0 bbPress (r6105)
+ * @since bbPress (r4363)
  *
  * @see _bbp_reinit_dynamic_roles()
+ *
+ * @global WPDB $wpdb Used to get the database prefix
  */
 function bbp_filter_user_roles_option() {
-	$role_key = bbp_db()->prefix . 'user_roles';
+	global $wpdb;
+
+	$role_key = $wpdb->prefix . 'user_roles';
 
 	add_filter( 'option_' . $role_key, '_bbp_reinit_dynamic_roles' );
 }
@@ -325,12 +345,11 @@ function bbp_filter_user_roles_option() {
  * Also note that if using the $wp_user_roles global non-database approach,
  * bbPress does not have an intercept point to add its dynamic roles.
  *
- * @see bbp_switch_to_site()
- * @see bbp_restore_current_site()
+ * @see switch_to_blog()
+ * @see restore_current_blog()
  * @see WP_Roles::_init()
  *
- * @since 2.2.0 bbPress (r4363)
- * @deprecated 2.6.0 bbPress (r6105)
+ * @since bbPress (r4363)
  *
  * @internal Used by bbPress to reinitialize dynamic roles on blog switch
  *
@@ -339,7 +358,7 @@ function bbp_filter_user_roles_option() {
  */
 function _bbp_reinit_dynamic_roles( $roles = array() ) {
 	foreach ( bbp_get_dynamic_roles() as $role_id => $details ) {
-		$roles[ $role_id ] = $details;
+		$roles[$role_id] = $details;
 	}
 	return $roles;
 }
@@ -357,42 +376,57 @@ function _bbp_reinit_dynamic_roles( $roles = array() ) {
  * only editors or authors. This filter allows admins to delegate
  * user management.
  *
- * @since 2.2.0 bbPress (r4284)
- * @since 2.6.0 bbPress (r6117) Use bbpress()->roles
+ * @since bbPress (r4284)
  *
  * @return array
  */
 function bbp_get_dynamic_roles() {
+	return (array) apply_filters( 'bbp_get_dynamic_roles', array(
 
-	// Defaults
-	$to_array = array();
-	$roles    = bbpress()->roles;
+		// Keymaster
+		bbp_get_keymaster_role() => array(
+			'name'         => 'Keymaster',
+			'capabilities' => bbp_get_caps_for_role( bbp_get_keymaster_role() )
+		),
 
-	// Convert WP_Roles objects to arrays
-	foreach ( $roles as $role_id => $wp_role ) {
-		$to_array[ $role_id ] = (array) $wp_role;
-	}
+		// Moderator
+		bbp_get_moderator_role() => array(
+			'name'         => 'Moderator',
+			'capabilities' => bbp_get_caps_for_role( bbp_get_moderator_role() )
+		),
 
-	// Filter & return
-	return (array) apply_filters( 'bbp_get_dynamic_roles', $to_array, $roles );
+		// Participant
+		bbp_get_participant_role() => array(
+			'name'         => 'Participant',
+			'capabilities' => bbp_get_caps_for_role( bbp_get_participant_role() )
+		),
+
+		// Spectator
+		bbp_get_spectator_role() => array(
+			'name'         => 'Spectator',
+			'capabilities' => bbp_get_caps_for_role( bbp_get_spectator_role() )
+		),
+
+		// Blocked
+		bbp_get_blocked_role() => array(
+			'name'         => 'Blocked',
+			'capabilities' => bbp_get_caps_for_role( bbp_get_blocked_role() )
+		)
+	) );
 }
 
 /**
  * Gets a translated role name from a role ID
  *
- * @since 2.3.0 bbPress (r4792)
- * @since 2.6.0 bbPress (r6117) Use bbp_translate_user_role()
+ * @since bbPress (r4792)
  *
  * @param string $role_id
  * @return string Translated role name
  */
 function bbp_get_dynamic_role_name( $role_id = '' ) {
 	$roles = bbp_get_dynamic_roles();
-	$role  = isset( $roles[ $role_id ] )
-		? bbp_translate_user_role( $roles[ $role_id ]['name'] )
-		: '';
+	$role  = isset( $roles[$role_id] ) ? bbp_translate_user_role( $roles[$role_id]['name'] ) : '';
 
-	// Filter & return
 	return apply_filters( 'bbp_get_dynamic_role_name', $role, $role_id, $roles );
 }
 
@@ -402,10 +436,10 @@ function bbp_get_dynamic_role_name( $role_id = '' ) {
  * This used to use array_diff_assoc() but it randomly broke before 2.2 release.
  * Need to research what happened, and if there's a way to speed this up.
  *
- * @since 2.2.0 bbPress (r4303)
+ * @since bbPress (r4303)
  *
  * @param array $all_roles All registered roles
- * @return array
+ * @return array 
  */
 function bbp_filter_blog_editable_roles( $all_roles = array() ) {
 
@@ -417,7 +451,7 @@ function bbp_filter_blog_editable_roles( $all_roles = array() ) {
 
 			// If keys match, unset
 			if ( $wp_role === $bbp_role ) {
-				unset( $all_roles[ $wp_role ] );
+				unset( $all_roles[$wp_role] );
 			}
 		}
 	}
@@ -428,89 +462,80 @@ function bbp_filter_blog_editable_roles( $all_roles = array() ) {
 /**
  * The keymaster role for bbPress users
  *
- * @since 2.2.0 bbPress (r4284)
+ * @since bbPress (r4284)
  *
+ * @uses apply_filters() Allow override of hardcoded keymaster role
  * @return string
  */
 function bbp_get_keymaster_role() {
-
-	// Filter & return
 	return apply_filters( 'bbp_get_keymaster_role', 'bbp_keymaster' );
 }
 
 /**
  * The moderator role for bbPress users
  *
- * @since 2.0.0 bbPress (r3410)
+ * @since bbPress (r3410)
  *
+ * @uses apply_filters() Allow override of hardcoded moderator role
  * @return string
  */
 function bbp_get_moderator_role() {
-
-	// Filter & return
 	return apply_filters( 'bbp_get_moderator_role', 'bbp_moderator' );
 }
 
 /**
  * The participant role for registered user that can participate in forums
  *
- * @since 2.0.0 bbPress (r3410)
+ * @since bbPress (r3410)
  *
+ * @uses apply_filters() Allow override of hardcoded participant role
  * @return string
  */
 function bbp_get_participant_role() {
-
-	// Filter & return
 	return apply_filters( 'bbp_get_participant_role', 'bbp_participant' );
 }
 
 /**
  * The spectator role is for registered users without any capabilities
  *
- * @since 2.1.0 bbPress (r3860)
+ * @since bbPress (r3860)
  *
+ * @uses apply_filters() Allow override of hardcoded spectator role
  * @return string
  */
 function bbp_get_spectator_role() {
-
-	// Filter & return
 	return apply_filters( 'bbp_get_spectator_role', 'bbp_spectator' );
 }
 
 /**
  * The blocked role is for registered users that cannot spectate or participate
  *
- * @since 2.2.0 bbPress (r4284)
+ * @since bbPress (r4284)
  *
+ * @uses apply_filters() Allow override of hardcoded blocked role
  * @return string
  */
 function bbp_get_blocked_role() {
-
-	// Filter & return
 	return apply_filters( 'bbp_get_blocked_role', 'bbp_blocked' );
 }
+
+/** Deprecated ****************************************************************/
 
 /**
  * Adds bbPress-specific user roles.
  *
- * @since 2.0.0 bbPress (r2741)
- *
- * @deprecated 2.2.0 bbPress (r4164)
+ * @since bbPress (r2741)
+ * @deprecated since version 2.2
  */
 function bbp_add_roles() {
-	_doing_it_wrong( 'bbp_add_roles', esc_html__( 'Editable forum roles no longer exist.', 'bbpress' ), '2.2' );
+	_doing_it_wrong( 'bbp_add_roles', __( 'Editable forum roles no longer exist.', 'bbpress' ), '2.2' );
 }
 
 /**
- * Removes bbPress-specific user roles from the `wp_user_roles` array.
+ * Removes bbPress-specific user roles.
  *
- * This is currently only used when updating, uninstalling, or resetting bbPress.
- *
- * @see	bbp_admin_reset_handler()
- * @see bbp_do_uninstall()
- * @see bbp_version_updater()
- *
- * @since 2.0.0 bbPress (r2741)
+ * @since bbPress (r2741)
+ * @deprecated since version 2.2
  */
 function bbp_remove_roles() {
 

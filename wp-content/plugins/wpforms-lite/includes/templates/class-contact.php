@@ -3,7 +3,11 @@
 /**
  * Contact form template.
  *
- * @since 1.0.0
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.0.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Template_Contact extends WPForms_Template {
 

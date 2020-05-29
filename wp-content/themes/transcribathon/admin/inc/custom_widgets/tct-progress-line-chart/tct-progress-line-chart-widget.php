@@ -30,9 +30,8 @@ class _TCT_Progress_Line_Chart_Widget extends SiteOrigin_Widget {
 					'options' => array(
 						'Transcribers' => __( 'Transcribers', 'tct-progress-line-chart-widget (backend)','transcribathon'),
 						'Stories completed' => __( 'Stories completed', 'tct-progress-line-chart-widget (backend)','transcribathon'),
-						'Documents started' => __( 'Documents started', 'tct-progress-line-chart-widget (backend)','transcribathon'),
+						'Documents in progress' => __( 'Documents in progress', 'tct-progress-line-chart-widget (backend)','transcribathon'),
 						'Documents completed' => __( 'Documents completed', 'tct-progress-line-chart-widget (backend)','transcribathon'),
-						'Transcribed characters' => __( 'Transcribed characters', 'tct-progress-line-chart-widget (backend)','transcribathon'),
 
 					)
 				)

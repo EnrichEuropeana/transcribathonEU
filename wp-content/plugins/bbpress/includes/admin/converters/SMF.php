@@ -1,27 +1,21 @@
 <?php
 
 /**
- * bbPress SMF Converter
- *
- * @package bbPress
- * @subpackage Converters
- */
-
-/**
  * Implementation of SMF Forum converter.
  *
- * @since 2.5.0 bbPress (r5189)
- *
- * @link Codex Docs https://codex.bbpress.org/import-forums/smf
+ * @since bbPress (r5189)
+ * @link Codex Docs http://codex.bbpress.org/import-forums/smf
  */
 class SMF extends BBP_Converter_Base {
 
 	/**
 	 * Main Constructor
 	 *
+	 * @uses SMF::setup_globals()
 	 */
-	public function __construct() {
+	function __construct() {
 		parent::__construct();
+		$this->setup_globals();
 	}
 
 	/**
@@ -29,20 +23,14 @@ class SMF extends BBP_Converter_Base {
 	 */
 	public function setup_globals() {
 
-		// Setup smiley URL & path
-		$this->bbcode_parser_properties = array(
-			'smiley_url' => false,
-			'smiley_dir' => false
-		);
-
 		/** Forum Section ******************************************************/
 
-		// Old forum id (Stored in postmeta)
+		// Forum id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'boards',
 			'from_fieldname' => 'id_board',
 			'to_type'        => 'forum',
-			'to_fieldname'   => '_bbp_old_forum_id'
+			'to_fieldname'   => '_bbp_forum_id'
 		);
 
 		// Forum parent id (If no parent, then 0, Stored in postmeta)
@@ -50,7 +38,7 @@ class SMF extends BBP_Converter_Base {
 			'from_tablename'  => 'boards',
 			'from_fieldname'  => 'id_parent',
 			'to_type'         => 'forum',
-			'to_fieldname'    => '_bbp_old_forum_parent_id'
+			'to_fieldname'    => '_bbp_forum_parent_id'
 		);
 
 		// Forum topic count (Stored in postmeta)
@@ -119,20 +107,6 @@ class SMF extends BBP_Converter_Base {
 			'to_fieldname'   => 'menu_order'
 		);
 
-		// Forum type (Set a default value 'forum', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_forum_type',
-			'default'      => 'forum'
-		);
-
-		// Forum status (Set a default value 'open', Stored in postmeta)
-		$this->field_map[] = array(
-			'to_type'      => 'forum',
-			'to_fieldname' => '_bbp_status',
-			'default'      => 'open'
-		);
-
 		// Forum dates.
 		$this->field_map[] = array(
 			'to_type'      => 'forum',
@@ -155,35 +129,14 @@ class SMF extends BBP_Converter_Base {
 			'default'      => date('Y-m-d H:i:s')
 		);
 
-		/** Forum Subscriptions Section ***************************************/
-
-		// Subscribed forum ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'log_notify',
-			'from_fieldname'  => 'id_board',
-			'from_expression' => 'WHERE log_notify.id_board != 0',
-			'to_type'         => 'forum_subscriptions',
-			'to_fieldname'    => '_bbp_forum_subscriptions'
-		);
-
-		// Subscribed user ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'log_notify',
-			'from_fieldname'  => 'id_member',
-			'from_expression' => 'WHERE log_notify.id_board != 0',
-			'to_type'         => 'forum_subscriptions',
-			'to_fieldname'    => 'user_id',
-			'callback_method' => 'callback_userid'
-		);
-
 		/** Topic Section ******************************************************/
 
-		// Old topic id (Stored in postmeta)
+		// Topic id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'topics',
 			'from_fieldname' => 'id_topic',
 			'to_type'        => 'topic',
-			'to_fieldname'   => '_bbp_old_topic_id'
+			'to_fieldname'   => '_bbp_topic_id'
 		);
 
 		// Topic reply count (Stored in postmeta)
@@ -220,26 +173,6 @@ class SMF extends BBP_Converter_Base {
 			'to_type'         => 'topic',
 			'to_fieldname'    => 'post_author',
 			'callback_method' => 'callback_userid'
-		);
-
-		// Topic author name (Stored in postmeta as _bbp_anonymous_name)
-		$this->field_map[] = array(
-			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'poster_name',
-			'join_tablename'  => 'topics',
-			'join_type'       => 'LEFT',
-			'join_expression' => 'ON topics.id_first_msg = messages.id_msg',
-			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_topic_author_name_id'
-		);
-
-		// Is the topic anonymous (Stored in postmeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'topics',
-			'from_fieldname'  => 'id_member_started',
-			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_is_topic_anonymous_id',
-			'callback_method' => 'callback_check_anonymous'
 		);
 
 		// Topic Author ip (Stored in postmeta)
@@ -303,16 +236,16 @@ class SMF extends BBP_Converter_Base {
 			'from_tablename'  => 'topics',
 			'from_fieldname'  => 'locked',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_closed_status_id',
+			'to_fieldname'    => 'post_status',
 			'callback_method' => 'callback_topic_status'
 		);
 
-		// Sticky status (Stored in postmeta)
+		// Sticky status (Stored in postmeta))
 		$this->field_map[] = array(
 			'from_tablename'  => 'topics',
 			'from_fieldname'  => 'is_sticky',
 			'to_type'         => 'topic',
-			'to_fieldname'    => '_bbp_old_sticky_status_id',
+			'to_fieldname'    => '_bbp_old_sticky_status',
 			'callback_method' => 'callback_sticky_status'
 		);
 
@@ -374,35 +307,14 @@ class SMF extends BBP_Converter_Base {
 		 * SMF v2.0.4 Forums do not support topic tags out of the box
 		 */
 
-		/** Topic Subscriptions Section ***************************************/
+		/** Reply Section ******************************************************/
 
-		// Subscribed topic ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'log_notify',
-			'from_fieldname'  => 'id_topic',
-			'from_expression' => 'WHERE log_notify.id_topic != 0',
-			'to_type'         => 'topic_subscriptions',
-			'to_fieldname'    => '_bbp_subscriptions'
-		);
-
-		// Subscribed user ID (Stored in usermeta)
-		$this->field_map[] = array(
-			'from_tablename'  => 'log_notify',
-			'from_fieldname'  => 'id_member',
-			'from_expression' => 'WHERE log_notify.id_topic != 0',
-			'to_type'         => 'topic_subscriptions',
-			'to_fieldname'    => 'user_id',
-			'callback_method' => 'callback_userid'
-		);
-
-		/** Reply Section *****************************************************/
-
-		// Old reply id (Stored in postmeta)
+		// Reply id (Stored in postmeta)
 		$this->field_map[] = array(
 			'from_tablename'  => 'messages',
 			'from_fieldname'  => 'id_msg',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_reply_id'
+			'to_fieldname'    => '_bbp_post_id'
 		);
 
 		// Reply parent forum id (If no parent, then 0. Stored in postmeta)
@@ -443,21 +355,22 @@ class SMF extends BBP_Converter_Base {
 			'callback_method' => 'callback_userid'
 		);
 
-		// Reply author name (Stored in postmeta as _bbp_anonymous_name)
+		// Reply title.
 		$this->field_map[] = array(
-			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'poster_name',
-			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_reply_author_name_id'
+			'from_tablename' => 'messages',
+			'from_fieldname' => 'subject',
+			'to_type'        => 'reply',
+			'to_fieldname'   => 'post_title',
+			'callback_method' => 'callback_reply_title'
 		);
 
-		// Is the reply anonymous (Stored in postmeta)
+		// Reply slug (Clean name to avoid conflicts)
 		$this->field_map[] = array(
 			'from_tablename'  => 'messages',
-			'from_fieldname'  => 'id_member',
+			'from_fieldname'  => 'subject',
 			'to_type'         => 'reply',
-			'to_fieldname'    => '_bbp_old_is_reply_anonymous_id',
-			'callback_method' => 'callback_check_anonymous'
+			'to_fieldname'    => 'post_name',
+			'callback_method' => 'callback_slug'
 		);
 
 		// Reply content.
@@ -510,15 +423,15 @@ class SMF extends BBP_Converter_Base {
 
 		/** User Section ******************************************************/
 
-		// Store old user id (Stored in usermeta)
+		// Store old User id (Stored in usermeta)
 		$this->field_map[] = array(
 			'from_tablename' => 'members',
 			'from_fieldname' => 'id_member',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_old_user_id'
+			'to_fieldname'   => '_bbp_user_id'
 		);
 
-		// Store old user password (Stored in usermeta serialized with salt)
+		// Store old User password (Stored in usermeta serialized with salt)
 		$this->field_map[] = array(
 			'from_tablename'  => 'members',
 			'from_fieldname'  => 'passwd',
@@ -588,7 +501,7 @@ class SMF extends BBP_Converter_Base {
 			'from_tablename' => 'members',
 			'from_fieldname' => 'aim',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_smf_user_aim'
+			'to_fieldname'   => 'aim'
 		);
 
 		// User Yahoo (Stored in usermeta)
@@ -596,7 +509,7 @@ class SMF extends BBP_Converter_Base {
 			'from_tablename' => 'members',
 			'from_fieldname' => 'yim',
 			'to_type'        => 'user',
-			'to_fieldname'   => '_bbp_smf_user_yim'
+			'to_fieldname'   => 'yim'
 		);
 
 		// Store ICQ (Stored in usermeta)
@@ -656,7 +569,8 @@ class SMF extends BBP_Converter_Base {
 	 * This method allows us to indicates what is or is not converted for each
 	 * converter.
 	 */
-	public function info() {
+	public function info()
+	{
 		return '';
 	}
 
@@ -665,7 +579,8 @@ class SMF extends BBP_Converter_Base {
 	 * way when we authenticate it we can get it out of the database
 	 * as one value. Array values are auto sanitized by WordPress.
 	 */
-	public function callback_savepass( $field, $row ) {
+	public function callback_savepass( $field, $row )
+	{
 		$pass_array = array( 'hash' => $field, 'username' => $row['member_name'] );
 		return $pass_array;
 	}
@@ -674,13 +589,14 @@ class SMF extends BBP_Converter_Base {
 	 * This method is to take the pass out of the database and compare
 	 * to a pass the user has typed in.
 	 */
-	public function authenticate_pass( $password, $serialized_pass ) {
+	public function authenticate_pass( $password, $serialized_pass )
+	{
 		$pass_array = unserialize( $serialized_pass );
 		return ( $pass_array['hash'] === sha1( strtolower( $pass_array['username'] ) . $password ) ? true : false );
 	}
 
 	/**
-	 * Translate the post status from SMF v2.0.4 numerics to WordPress's strings.
+	 * Translate the post status from SMF v2.0.4 numeric's to WordPress's strings.
 	 *
 	 * @param int $status SMF v2.0.4 numeric topic status
 	 * @return string WordPress safe
@@ -700,7 +616,7 @@ class SMF extends BBP_Converter_Base {
 	}
 
 	/**
-	 * Translate the topic sticky status type from SMF v2.0.4 numerics to WordPress's strings.
+	 * Translate the topic sticky status type from SMF v2.0.4 numeric's to WordPress's strings.
 	 *
 	 * @param int $status SMF v2.0.4 numeric forum type
 	 * @return string WordPress safe
@@ -728,6 +644,17 @@ class SMF extends BBP_Converter_Base {
 	public function callback_topic_reply_count( $count = 1 ) {
 		$count = absint( (int) $count - 1 );
 		return $count;
+	}
+
+	/**
+	 * Set the reply title
+	 *
+	 * @param string $title SMF v2.0.4 topic title of this reply
+	 * @return string Prefixed topic title, or empty string
+	 */
+	public function callback_reply_title( $title = '' ) {
+		$title = !empty( $title ) ? __( 'Re: ', 'bbpress' ) . html_entity_decode( $title ) : '';
+		return $title;
 	}
 
 	/**
@@ -779,9 +706,9 @@ class SMF extends BBP_Converter_Base {
 		$SMF_markup = preg_replace( '/\[\/td\]/', '</td>', $SMF_markup );
 
 		// Replace '[list]' with '<ul>'
-		$SMF_markup = preg_replace( '/\[list\]/',     '<ul>',                      $SMF_markup );
+		$phpbb_uid = preg_replace( '/\[list\]/',     '<ul>',          $phpbb_uid );
 		// Replace '[liist type=decimal]' with '<ol type="a">'
-		$SMF_markup = preg_replace( '/\[list\ type=decimal\]/',   '<ol type="a">', $SMF_markup );
+		$phpbb_uid = preg_replace( '/\[list\ type=decimal\]/',   '<ol type="a">', $phpbb_uid );
 		// Replace '[li]' with '<li>'
 		$SMF_markup = preg_replace( '/\[li\]/',   '<li>',  $SMF_markup );
 		// Replace '[/li]' with '</li>'
@@ -793,7 +720,7 @@ class SMF extends BBP_Converter_Base {
 		$SMF_markup = preg_replace( '/\[\/tt\]/', '</tt>', $SMF_markup );
 
 		// Replace '<br />' with '<br>'
-		$SMF_markup = preg_replace( '/\<br \/\>/', '<br>', $SMF_markup );
+		$SMF_markup = preg_replace( '/\<br \/\>/',   '<br>',  $SMF_markup );
 
 		// Replace '[size=$1]' with '<span style="font-size:$1%;">$3</span>'
 		$SMF_markup = preg_replace( '/\[size=(.*?)\]/', '<span style="font-size:$1">', $SMF_markup );
@@ -801,12 +728,16 @@ class SMF extends BBP_Converter_Base {
 		$SMF_markup = preg_replace( '/\[\/size\]/',     '</span>',                     $SMF_markup );
 
 		// Replace non-break space '&nbsp;' with space ' '
-		$SMF_markup = preg_replace( '/&nbsp;/', ' ', $SMF_markup );
+		$SMF_markup = preg_replace ( '/&nbsp;/', ' ', $SMF_markup );
 
 		// Now that SMF custom HTML has been stripped put the cleaned HTML back in $field
 		$field = $SMF_markup;
 
 		// Parse out any bbCodes in $field with the BBCode 'parser.php'
-		return parent::callback_html( $field );
+		require_once( bbpress()->admin->admin_dir . 'parser.php' );
+		$bbcode = BBCode::getInstance();
+		$bbcode->enable_smileys = false;
+		$bbcode->smiley_regex   = false;
+		return html_entity_decode( $bbcode->Parse( $field ) );
 	}
 }

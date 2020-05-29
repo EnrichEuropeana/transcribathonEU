@@ -84,12 +84,8 @@
 
 	.sow-round-image-frame {
 		border-radius: @image_size;
-	}
-
-	.sow-round-image-frame, .sow-image-wrapper-shape-square {
 		width: @image_size;
 		height: @image_size;
-		max-width: 100%;
 		
 		@media screen and (max-width: @tablet_width) {
 			width: @tablet_image_size;
@@ -119,6 +115,16 @@
 					img {
 						margin: 0 auto;
 						max-width: 100%;
+						height: auto;
+
+						@media screen and (max-width: @tablet_width) {
+							width: @tablet_image_size;
+						}
+
+						@media screen and (max-width: @mobile_width) {
+							width: @mobile_image_size;
+						}
+
 					}
 				}
 
@@ -135,6 +141,7 @@
 					padding: @testimonial_padding @testimonial_padding @testimonial_padding @testimonial_padding*2;
 
 					img {
+						width: @image_size;
 						margin: 0 auto;
 						max-width: 100%;
 						height: auto;
@@ -157,6 +164,7 @@
 				padding: @testimonial_padding;
 
 				img {
+					width: @image_size;
 					height: auto;
 				}
 			}

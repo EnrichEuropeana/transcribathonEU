@@ -56,7 +56,13 @@
 .metaslider .slide.post_feed .CodeMirror-wrap .CodeMirror-scroll {
     height: 117px
 }
-
+.metaslider .slide.post_feed #template_tags {
+    position: absolute;
+    z-index: 4;
+    width: 90px;
+    right: 5px;
+    top: 5px;
+}
 .metaslider .embed-link-settings {
     background: white
 }

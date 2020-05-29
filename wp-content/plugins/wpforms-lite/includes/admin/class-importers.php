@@ -3,7 +3,11 @@
 /**
  * Load the different form importers.
  *
- * @since 1.4.2
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.4.2
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2017, WPForms LLC
  */
 class WPForms_Importers {
 

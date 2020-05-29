@@ -13,31 +13,29 @@ if ( ! class_exists( 'UM' ) ) {
 	 * @method UM_Followers_API Followers_API()
 	 * @method UM_Friends_API Friends_API()
 	 * @method UM_Instagram_API Instagram_API()
-	 * @method UM_Mailchimp Mailchimp()
+	 * @method UM_Mailchimp_API Mailchimp_API()
 	 * @method UM_Messaging_API Messaging_API()
-	 * @method UM_myCRED myCRED()
-	 * @method UM_Notices Notices()
+	 * @method UM_myCRED_API myCRED_API()
+	 * @method UM_Notices_API Notices_API()
 	 * @method UM_Notifications_API Notifications_API()
-	 * @method UM_Online Online()
+	 * @method UM_Online_API Online_API()
 	 * @method UM_Profile_Completeness_API Profile_Completeness_API()
-	 * @method UM_reCAPTCHA reCAPTCHA()
-	 * @method UM_Reviews Reviews()
+	 * @method UM_reCAPTCHA_API reCAPTCHA_API()
+	 * @method UM_Reviews_API Reviews_API()
 	 * @method UM_Activity_API Activity_API()
 	 * @method UM_Social_Login_API Social_Login_API()
-	 * @method UM_User_Tags User_Tags()
+	 * @method UM_User_Tags_API User_Tags_API()
 	 * @method UM_Verified_Users_API Verified_Users_API()
 	 * @method UM_WooCommerce_API WooCommerce_API()
-	 * @method UM_Terms_Conditions Terms_Conditions()
-	 * @method UM_Private_Content Private_Content()
-	 * @method UM_User_Locations User_Locations()
+	 * @method UM_Terms_Conditions_API Terms_Conditions_API()
+	 * @method UM_Private_Content_API Private_Content_API()
+	 * @method UM_User_Location_API User_Location_API()
 	 * @method UM_Photos_API Photos_API()
 	 * @method UM_Groups Groups()
 	 * @method UM_Frontend_Posting Frontend_Posting()
 	 * @method UM_Notes Notes()
 	 * @method UM_User_Bookmarks User_Bookmarks()
 	 * @method UM_Unsplash Unsplash()
-	 * @method UM_ForumWP ForumWP()
-	 * @method UM_Profile_Tabs Profile_Tabs()
 	 */
 	final class UM extends UM_Functions {
 
@@ -193,7 +191,7 @@ if ( ! class_exists( 'UM' ) ) {
 				}
 
 				$this->is_filtering = 0;
-				$this->honeypot = 'um_request';
+				$this->honeypot = 'request';
 
 				// textdomain loading
 				$this->localize();
@@ -518,10 +516,8 @@ if ( ! class_exists( 'UM' ) ) {
 				$this->admin_upgrade()->init_packages_ajax_handlers();
 				$this->admin_gdpr();
 				$this->columns();
-				$this->admin()->notices();
+				$this->notices();
 				$this->admin_navmenu();
-				$this->access();
-				$this->plugin_updater();
 				$this->theme_updater();
 			} elseif ( $this->is_request( 'admin' ) ) {
 				$this->admin();
@@ -531,12 +527,12 @@ if ( ! class_exists( 'UM' ) ) {
 				$this->columns();
 				$this->admin_enqueue();
 				$this->metabox();
-				$this->admin()->notices();
+				$this->notices();
 				$this->users();
 				$this->dragdrop();
+				$this->plugin_updater();
 				$this->admin_gdpr();
 				$this->admin_navmenu();
-				$this->plugin_updater();
 				$this->theme_updater();
 			} elseif ( $this->is_request( 'frontend' ) ) {
 				$this->enqueue();
@@ -546,6 +542,7 @@ if ( ! class_exists( 'UM' ) ) {
 				$this->register();
 				$this->user_posts();
 				$this->access();
+				$this->members();
 				$this->logout();
 			}
 
@@ -565,33 +562,12 @@ if ( ! class_exists( 'UM' ) ) {
 			$this->mobile();
 			$this->external_integrations();
 			$this->gdpr();
-			$this->member_directory();
 
 			//if multisite networks active
 			if ( is_multisite() ) {
 				$this->multisite();
 			}
 
-		}
-
-
-		/**
-		 * @since 2.1.0
-		 *
-		 * @return um\core\Member_Directory()
-		 */
-		function member_directory() {
-			if ( empty( $this->classes['member_directory'] ) ) {
-
-				$search_in_table = $this->options()->get( 'member_directory_own_table' );
-
-				if ( ! empty( $search_in_table ) ) {
-					$this->classes['member_directory'] = new um\core\Member_Directory_Meta();
-				} else {
-					$this->classes['member_directory'] = new um\core\Member_Directory();
-				}
-			}
-			return $this->classes['member_directory'];
 		}
 
 
@@ -861,6 +837,19 @@ if ( ! class_exists( 'UM' ) ) {
 				$this->classes['admin_metabox'] = new um\admin\core\Admin_Metabox();
 			}
 			return $this->classes['admin_metabox'];
+		}
+
+
+		/**
+		 * @since 2.0
+		 *
+		 * @return um\admin\core\Admin_Notices()
+		 */
+		function notices() {
+			if ( empty( $this->classes['admin_notices'] ) ) {
+				$this->classes['admin_notices'] = new um\admin\core\Admin_Notices();
+			}
+			return $this->classes['admin_notices'];
 		}
 
 
@@ -1237,6 +1226,20 @@ if ( ! class_exists( 'UM' ) ) {
 		/**
 		 * @since 2.0
 		 *
+		 * @return um\core\Chart
+		 */
+		function chart() {
+			if ( empty( $this->classes['chart'] ) ) {
+				$this->classes['chart'] = new um\core\Chart();
+			}
+
+			return $this->classes['chart'];
+		}
+
+
+		/**
+		 * @since 2.0
+		 *
 		 * @return um\core\Builtin
 		 */
 		function builtin() {
@@ -1332,15 +1335,11 @@ if ( ! class_exists( 'UM' ) ) {
 
 
 		/**
-		 * @deprecated 2.1.0
-		 *
 		 * @since 2.0
 		 *
 		 * @return um\core\Members
 		 */
 		function members() {
-			um_deprecated_function( 'UM()->members()', '2.1.0', 'UM()->member_directory()' );
-
 			if ( empty( $this->classes['members'] ) ) {
 				$this->classes['members'] = new um\core\Members();
 			}
@@ -1418,11 +1417,10 @@ if ( ! class_exists( 'UM' ) ) {
 			return $this->classes['mobile'];
 		}
 
-
 		/**
 		 * @since 2.0.44
 		 *
-		 * @return um\core\Multisite
+		 * @return um\lib\mobiledetect\Um_Mobile_Detect
 		 */
 		function multisite() {
 
@@ -1432,7 +1430,6 @@ if ( ! class_exists( 'UM' ) ) {
 
 			return $this->classes['multisite'];
 		}
-
 
 		/**
 		 * Include files with hooked filters/actions
@@ -1452,6 +1449,7 @@ if ( ! class_exists( 'UM' ) ) {
 			require_once 'core/um-actions-register.php';
 			require_once 'core/um-actions-profile.php';
 			require_once 'core/um-actions-account.php';
+			require_once 'core/um-actions-members.php';
 			require_once 'core/um-actions-global.php';
 			require_once 'core/um-actions-user.php';
 			require_once 'core/um-actions-save-profile.php';
@@ -1463,7 +1461,7 @@ if ( ! class_exists( 'UM' ) ) {
 			require_once 'core/um-filters-navmenu.php';
 			require_once 'core/um-filters-avatars.php';
 			require_once 'core/um-filters-user.php';
-
+			require_once 'core/um-filters-members.php';
 			require_once 'core/um-filters-profile.php';
 			require_once 'core/um-filters-account.php';
 			require_once 'core/um-filters-misc.php';

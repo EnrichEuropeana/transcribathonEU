@@ -1,17 +1,17 @@
 [
     {
         "name": "solarium/solarium",
-        "version": "4.2.0",
-        "version_normalized": "4.2.0.0",
+        "version": "4.1.0",
+        "version_normalized": "4.1.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/solariumphp/solarium.git",
-            "reference": "20cf9e906a4e8e4a29c1ff48a2b145fa31d1064d"
+            "reference": "4dfd71fefb307cac1ec394b672f2f57256752e4b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/solariumphp/solarium/zipball/20cf9e906a4e8e4a29c1ff48a2b145fa31d1064d",
-            "reference": "20cf9e906a4e8e4a29c1ff48a2b145fa31d1064d",
+            "url": "https://api.github.com/repos/solariumphp/solarium/zipball/4dfd71fefb307cac1ec394b672f2f57256752e4b",
+            "reference": "4dfd71fefb307cac1ec394b672f2f57256752e4b",
             "shasum": ""
         },
         "require": {
@@ -28,11 +28,11 @@
         "suggest": {
             "minimalcode/search": "Query builder compatible with Solarium, allows simplified solr-query handling"
         },
-        "time": "2018-11-24T09:20:30+00:00",
+        "time": "2018-08-09T13:01:25+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "4.1.x-dev"
+                "dev-4.0.x": "4.0.x-dev"
             }
         },
         "installation-source": "dist",
@@ -61,41 +61,41 @@
     },
     {
         "name": "symfony/event-dispatcher",
-        "version": "v3.3.6",
-        "version_normalized": "3.3.6.0",
+        "version": "v4.1.4",
+        "version_normalized": "4.1.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/event-dispatcher.git",
-            "reference": "67535f1e3fd662bdc68d7ba317c93eecd973617e"
+            "reference": "bfb30c2ad377615a463ebbc875eba64a99f6aa3e"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/67535f1e3fd662bdc68d7ba317c93eecd973617e",
-            "reference": "67535f1e3fd662bdc68d7ba317c93eecd973617e",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/bfb30c2ad377615a463ebbc875eba64a99f6aa3e",
+            "reference": "bfb30c2ad377615a463ebbc875eba64a99f6aa3e",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.5.9"
+            "php": "^7.1.3"
         },
         "conflict": {
-            "symfony/dependency-injection": "<3.3"
+            "symfony/dependency-injection": "<3.4"
         },
         "require-dev": {
             "psr/log": "~1.0",
-            "symfony/config": "~2.8|~3.0",
-            "symfony/dependency-injection": "~3.3",
-            "symfony/expression-language": "~2.8|~3.0",
-            "symfony/stopwatch": "~2.8|~3.0"
+            "symfony/config": "~3.4|~4.0",
+            "symfony/dependency-injection": "~3.4|~4.0",
+            "symfony/expression-language": "~3.4|~4.0",
+            "symfony/stopwatch": "~3.4|~4.0"
         },
         "suggest": {
             "symfony/dependency-injection": "",
             "symfony/http-kernel": ""
         },
-        "time": "2017-06-09T14:53:08+00:00",
+        "time": "2018-07-26T09:10:45+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "3.3-dev"
+                "dev-master": "4.1-dev"
             }
         },
         "installation-source": "dist",

@@ -1,21 +1,9 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit;
 
 
-/**
- * Class UM_reCAPTCHA
- */
-class UM_reCAPTCHA {
-
-
-	/**
-	 * @var
-	 */
+class UM_reCAPTCHA_API {
 	private static $instance;
 
-
-	/**
-	 * @return UM_reCAPTCHA
-	 */
 	static public function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -23,37 +11,23 @@ class UM_reCAPTCHA {
 		return self::$instance;
 	}
 
-
-	/**
-	 * UM_reCAPTCHA constructor.
-	 */
 	function __construct() {
 		// Global for backwards compatibility.
 		$GLOBALS['um_recaptcha'] = $this;
-		add_filter( 'um_call_object_reCAPTCHA', array( &$this, 'get_this' ) );
-		add_filter( 'um_settings_default_values', array( &$this, 'default_settings' ), 10, 1 );
+		add_filter( 'um_call_object_reCAPTCHA_API', array( &$this, 'get_this' ) );
 
+		//if ( UM()->is_request( 'frontend' ) )
+		//    $this->enqueue();
 
-		if ( UM()->is_request( 'admin' ) ) {
-			$this->admin();
-		}
+		if ( UM()->is_request( 'admin' ) )
+			$this->notices();
 
 		add_action( 'plugins_loaded', array( &$this, 'init' ), 0 );
-	}
 
-	/**
-	 * @return $this
-	 */
-	function get_this() {
-		return $this;
+		add_filter( 'um_settings_default_values', array( &$this, 'default_settings' ), 10, 1 );
 	}
 
 
-	/**
-	 * @param $defaults
-	 *
-	 * @return array
-	 */
 	function default_settings( $defaults ) {
 		$defaults = array_merge( $defaults, $this->setup()->settings_defaults );
 		return $defaults;
@@ -71,6 +45,11 @@ class UM_reCAPTCHA {
 	}
 
 
+	function get_this() {
+		return $this;
+	}
+
+
 	/**
 	 * @return um_ext\um_recaptcha\core\reCAPTCHA_Enqueue()
 	 */
@@ -83,13 +62,13 @@ class UM_reCAPTCHA {
 
 
 	/**
-	 * @return um_ext\um_recaptcha\admin\reCAPTCHA_Admin()
+	 * @return um_ext\um_recaptcha\core\reCAPTCHA_Notices()
 	 */
-	function admin() {
-		if ( empty( UM()->classes['um_recaptcha_admin'] ) ) {
-			UM()->classes['um_recaptcha_admin'] = new um_ext\um_recaptcha\admin\reCAPTCHA_Admin();
+	function notices() {
+		if ( empty( UM()->classes['um_recaptcha_notices'] ) ) {
+			UM()->classes['um_recaptcha_notices'] = new um_ext\um_recaptcha\core\reCAPTCHA_Notices();
 		}
-		return UM()->classes['um_recaptcha_admin'];
+		return UM()->classes['um_recaptcha_notices'];
 	}
 
 
@@ -97,8 +76,14 @@ class UM_reCAPTCHA {
 	 * Init
 	 */
 	function init() {
+
 		// Actions
 		require_once um_recaptcha_path . 'includes/core/actions/um-recaptcha-form.php';
+		require_once um_recaptcha_path . 'includes/core/actions/um-recaptcha-admin.php';
+		
+		// Filters
+		require_once um_recaptcha_path . 'includes/core/filters/um-recaptcha-settings.php';
+
 	}
 
 
@@ -112,29 +97,24 @@ class UM_reCAPTCHA {
 	function captcha_allowed( $args ) {
 		$enable = false;
 		
-		$your_sitekey = UM()->options()->get( 'g_recaptcha_sitekey' );
-		$your_secret = UM()->options()->get( 'g_recaptcha_secretkey' );
-		$recaptcha = UM()->options()->get( 'g_recaptcha_status' );
+		$your_sitekey = UM()->options()->get('g_recaptcha_sitekey');
+		$your_secret = UM()->options()->get('g_recaptcha_secretkey');
+		$recaptcha = UM()->options()->get('g_recaptcha_status');
 		
-		if ( $recaptcha ) {
+		if ( $recaptcha )
 			$enable = true;
-		}
 		
-		if ( isset( $args['g_recaptcha_status'] ) && $args['g_recaptcha_status'] ) {
+		if ( isset( $args['g_recaptcha_status'] ) && $args['g_recaptcha_status'] )
 			$enable = true;
-		}
 		
-		if ( isset( $args['g_recaptcha_status'] ) && ! $args['g_recaptcha_status'] ) {
+		if ( isset( $args['g_recaptcha_status'] ) && ! $args['g_recaptcha_status'] )
 			$enable = false;
-		}
 		
-		if ( ! $your_sitekey || ! $your_secret ) {
+		if ( ! $your_sitekey || ! $your_secret )
 			$enable = false;
-		}
 
-		if ( isset( $args['mode'] ) && $args['mode'] == 'password' && ! UM()->options()->get( 'g_recaptcha_password_reset' ) ) {
+		if ( isset( $args['mode'] ) && $args['mode'] == 'password' && ! UM()->options()->get( 'g_recaptcha_password_reset' ) )
 			$enable = false;
-		}
 
 		return ( $enable == false ) ? false : true;
 	}
@@ -144,6 +124,6 @@ class UM_reCAPTCHA {
 add_action( 'plugins_loaded', 'um_init_recaptcha', -10, 1 );
 function um_init_recaptcha() {
 	if ( function_exists( 'UM' ) ) {
-		UM()->set_class( 'reCAPTCHA', true );
+		UM()->set_class( 'reCAPTCHA_API', true );
 	}
 }

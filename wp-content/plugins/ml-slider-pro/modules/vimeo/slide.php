@@ -17,12 +17,12 @@ class MetaVimeoSlide extends MetaSlide {
 
         if (is_admin()) {
             add_filter("media_upload_tabs", array($this, 'custom_media_upload_tab_name'), 999, 1);
+            add_action("metaslider_save_{$this->identifier}_slide", array($this, 'save_slide'), 5, 3);
             add_action("media_upload_{$this->identifier}", array($this, 'get_iframe'));
             add_action("wp_ajax_create_{$this->identifier}_slide", array($this, 'ajax_create_slide'));
             add_action("metaslider_register_admin_styles", array($this, 'register_admin_styles'), 10, 1);
         }
-		
-		add_action("metaslider_save_{$this->identifier}_slide", array($this, 'save_slide'), 5, 3);
+
         add_filter("metaslider_get_{$this->identifier}_slide", array($this, 'get_slide'), 10, 2);
 
     }
@@ -213,7 +213,7 @@ class MetaVimeoSlide extends MetaSlide {
         $row .= "       </div>";
         $row .= "    </td>";
         $row .= "    <td class='col-2'>";
-        $row .= "       <div class='metaslider-ui-inner flex flex-col h-full'>";
+        $row .= "       <div class='metaslider-ui-inner'>";
 
         if ( method_exists( $this, 'get_admin_slide_tabs_html' ) ) {
             $row .= $this->get_admin_slide_tabs_html();
@@ -250,7 +250,7 @@ class MetaVimeoSlide extends MetaSlide {
                             <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][title]' {$title_checked}/><span>" . __('Show the title on the video', 'ml-slider-pro') ."</span></label></li>
                             <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][byline]' {$byline_checked}/><span>" . __('Show the user byline on the video', 'ml-slider-pro') ."</span></label></li>
                             <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][portrait]' {$portrait_checked}/><span>" . __('Show the user portrait on the video', 'ml-slider-pro') ."</span></label></li>
-                            <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][autoPlay]' {$autoPlay_checked}/><span>" . __('Auto play (may require video to be muted)&lrm;', 'ml-slider-pro') ."</span></label></li>
+                            <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][autoPlay]' {$autoPlay_checked}/><span>" . __('Auto play (may require video to be muted)', 'ml-slider-pro') ."</span></label></li>
                             <li><label><input type='checkbox' name='attachment[{$slide_id}][settings][mute]' {$mute_checked}/><span>" . __('Mute', 'ml-slider-pro') ."</span></label></li>
                         </ul>"; // vantage backwards compatibility";
 
@@ -501,7 +501,7 @@ class MetaVimeoSlide extends MetaSlide {
      */
     public function get_responsive_vimeo_javascript($javascript, $slider_id) {
 
-        $autoplay = filter_var($this->settings['autoPlay'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+        $autoplay = filter_var($this->settings['autoPlay'], FILTER_VALIDATE_BOOLEAN);
 
 		$html = "$('#metaslider_{$slider_id} iframe.vimeo').each(function() {
 				var autoplay = false;

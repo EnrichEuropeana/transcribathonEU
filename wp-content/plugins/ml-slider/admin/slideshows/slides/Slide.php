@@ -70,17 +70,6 @@ class MetaSlider_Slide {
 	}
 
     /**
-	 * Used to update the modified date of the slideshow parent post type
-	 * 
-	 * @return null
-	 */
-	public function __destruct() {
-		if ($this->slideshow_id) {
-			wp_update_post(array('ID' => $this->slideshow_id));
-		}
-	}
-
-    /**
 	 * Used to access the instance
 	 * 
 	 * @param mixed $slideshow_id - ID of the slideshow

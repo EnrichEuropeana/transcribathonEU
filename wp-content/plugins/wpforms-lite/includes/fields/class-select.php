@@ -3,7 +3,11 @@
 /**
  * Dropdown field.
  *
- * @since 1.0.0
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.0.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Field_Select extends WPForms_Field {
 
@@ -73,9 +77,6 @@ class WPForms_Field_Select extends WPForms_Field {
 			'class' => array(),
 			'data'  => array(),
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
-			'attr'  => array(
-				'name' => "wpforms[fields][{$field_id}]",
-			),
 		);
 
 		// Set properties.
@@ -266,9 +267,7 @@ class WPForms_Field_Select extends WPForms_Field {
 		$container = $field['properties']['input_container'];
 
 		$field_placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
-		if ( ! empty( $field['required'] ) ) {
-			$container['attr']['required'] = 'required';
-		}
+		$field_required    = ! empty( $field['required'] ) ? ' required' : '';
 
 		$choices     = $field['properties']['inputs'];
 		$has_default = false;
@@ -283,9 +282,11 @@ class WPForms_Field_Select extends WPForms_Field {
 
 		// Preselect default if no other choices were marked as default.
 		printf(
-			'<select %s>',
-			wpforms_html_attributes( $container['id'], $container['class'], $container['data'], $container['attr'] )
-		);
+			'<select name="wpforms[fields][%d]" %s %s>',
+			(int) $field['id'],
+			wpforms_html_attributes( $container['id'], $container['class'], $container['data'] ),
+			$field_required
+		); // WPCS: XSS ok.
 
 		// Optional placeholder.
 		if ( ! empty( $field_placeholder ) ) {
@@ -310,7 +311,7 @@ class WPForms_Field_Select extends WPForms_Field {
 	}
 
 	/**
-	 * Format and sanitize field.
+	 * Formats and sanitizes field.
 	 *
 	 * @since 1.0.2
 	 *

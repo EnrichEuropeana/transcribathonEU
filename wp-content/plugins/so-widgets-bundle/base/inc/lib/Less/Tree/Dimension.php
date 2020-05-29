@@ -166,6 +166,7 @@ class Less_Tree_Dimension extends Less_Tree{
 			if( isset(Less_Tree_UnitConversions::$angle[$conversions]) ){
 				$derivedConversions = array( 'angle' => $conversions );
 			}
+			
 			$conversions = $derivedConversions;
 		}
 

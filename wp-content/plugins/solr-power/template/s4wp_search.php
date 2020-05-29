@@ -107,7 +107,7 @@ if ( ! isset( $results['results'] ) || null === $results['results'] ) {
 				$result['authorlink'],
 				$result['author'],
 				get_the_category_list( ', ', '', $result['id'] ),
-				gmdate( 'm/d/Y', strtotime( $result['date'] ) ),
+				date( 'm/d/Y', strtotime( $result['date'] ) ),
 				$result['comment_link'],
 				$result['numcomments']
 			);

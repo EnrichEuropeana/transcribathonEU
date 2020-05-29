@@ -1,4 +1,4 @@
-/* global wpforms_admin, jconfirm, wpCookies, Choices, List */
+/* global wp, _, wpforms_admin, jconfirm, wpCookies, Choices, List */
 
 ;(function($) {
 
@@ -134,12 +134,6 @@
 				});
 			});
 
-			// Lity lightbox.
-			WPFormsAdmin.initLity();
-
-			// Flyout Menu.
-			WPFormsAdmin.initFlyoutMenu();
-
 			// Action available for each binding.
 			$( document ).trigger( 'wpformsReady' );
 		},
@@ -174,7 +168,7 @@
 				args.noChoicesText = wpforms_admin.choicesjs_no_choices;
 				args.itemSelectText = wpforms_admin.choicesjs_item_select;
 
-				$this.data( 'choicesjs', new Choices( $this[0], args ) );
+				new Choices( $this[0], args );
 			});
 		},
 
@@ -322,10 +316,10 @@
 				event.preventDefault();
 
 				// Handle cookie.
-				if ( wpCookies.get( 'wpforms_entry_hide_empty' ) === 'true' ) {
+				if ( wpCookies.get( 'wpforms_entry_hide_empty' ) === 'true') {
 
 					// User was hiding empty fields, so now display them.
-					wpCookies.remove( 'wpforms_entry_hide_empty' );
+					wpCookies.remove('wpforms_entry_hide_empty');
 					$( this ).text( wpforms_admin.entry_empty_fields_hide );
 				} else {
 
@@ -334,7 +328,7 @@
 					$( this ).text( wpforms_admin.entry_empty_fields_show );
 				}
 
-				$( '.wpforms-entry-field.empty, .wpforms-edit-entry-field.empty' ).toggle();
+				$( '.wpforms-entry-field.empty' ).toggle();
 			});
 
 			// Display notes editor.
@@ -480,11 +474,10 @@
 
 				event.preventDefault();
 
-				var $this  = $( this ),
-					task   = '',
-					total  = Number( $( '#wpforms-entries-list .starred-num' ).text() ),
-					id     = $this.data( 'id' ),
-					formId = $this.data( 'form-id' );
+				var $this = $( this ),
+					task  = '',
+					total = Number( $( '#wpforms-entries-list .starred-num' ).text() ),
+					id    = $this.data( 'id' );
 
 				if ( $this.hasClass( 'star' ) ) {
 					task = 'star';
@@ -502,8 +495,7 @@
 					task    : task,
 					action  : 'wpforms_entry_list_star',
 					nonce   : wpforms_admin.nonce,
-					entryId : id,
-					formId  : formId,
+					entry_id: id
 				};
 				$.post( wpforms_admin.ajax_url, data );
 			});
@@ -534,8 +526,7 @@
 					task    : task,
 					action  : 'wpforms_entry_list_read',
 					nonce   : wpforms_admin.nonce,
-					entryId : id,
-					formId  : $this.data( 'form-id' ),
+					entry_id: id
 				};
 				$.post( wpforms_admin.ajax_url, data );
 			});
@@ -578,7 +569,7 @@
 				var $entriesList = $( '#wpforms-entries-list' );
 
 				// Works on entry list page only.
-				if ( ! $entriesList.length || $entriesList.find( '.wpforms-dash-widget' ).length ) {
+				if ( ! $entriesList.length ) {
 					return;
 				}
 
@@ -659,10 +650,8 @@
 
 					$( '.jconfirm-content-pane, .jconfirm-box' ).css( 'overflow','visible' );
 
-					choices.passedElement.element.addEventListener( 'change', function() {
-
-						// Without `true` parameter dropdown will be hidden together with modal window when `Enter` is pressed.
-						choices.hideDropdown( true );
+					choices.passedElement.addEventListener( 'change', function() {
+						choices.hideDropdown();
 					}, false );
 				},
 				buttons: {
@@ -698,7 +687,7 @@
 
 				event.preventDefault();
 
-				var video = '<div class="video-container"><iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/o2nE1P74WxQ?rel=0&amp;showinfo=0&amp;autoplay=1" frameborder="0" allowfullscreen></iframe></div>';
+				var video = '<div class="video-container"><iframe width="1280" height="720" src="https://www.youtube-nocookie.com/embed/yDyvSGV7tP4?rel=0&amp;showinfo=0&amp;autoplay=1" frameborder="0" allowfullscreen></iframe></div>';
 
 				$.dialog({
 					title: false,
@@ -952,26 +941,6 @@
 							}
 						},
 						effect: 'appear'
-					},
-					// reCAPTCHA > Score Threshold.
-					{
-						conditions: {
-							element:   'input[name=recaptcha-type]:checked',
-							type:      'value',
-							operator:  '=',
-							condition: 'v3'
-						},
-						actions: {
-							if: {
-								element: '#wpforms-setting-row-recaptcha-v3-threshold',
-								action:	 'show'
-							},
-							else : {
-								element: '#wpforms-setting-row-recaptcha-v3-threshold',
-								action:	 'hide'
-							}
-						},
-						effect: 'appear'
 					}
 				] );
 			});
@@ -1037,7 +1006,7 @@
 			});
 
 			// Integration individual display toggling.
-			$( document ).on( 'click', '.wpforms-settings-provider:not(.focus-out) .wpforms-settings-provider-header', function( event ) {
+			$( document ).on( 'click', '.wpforms-settings-provider-header', function( event ) {
 
 				event.preventDefault();
 
@@ -1304,7 +1273,7 @@
 				buttonLabel = $btn.text(),
 				$provider   = $btn.closest( '.wpforms-settings-provider' ),
 				data        = {
-					action  : 'wpforms_settings_provider_add_' + $btn.data( 'provider' ),
+					action  : 'wpforms_settings_provider_add',
 					data    : $btn.closest( 'form' ).serialize(),
 					provider: $btn.data( 'provider' ),
 					nonce   : wpforms_admin.nonce
@@ -1355,7 +1324,7 @@
 			var $this = $( el ),
 				$provider = $this.parents('.wpforms-settings-provider'),
 				data = {
-					action  : 'wpforms_settings_provider_disconnect_' + $this.data( 'provider' ),
+					action  : 'wpforms_settings_provider_disconnect',
 					provider: $this.data( 'provider' ),
 					key     : $this.data( 'key'),
 					nonce   : wpforms_admin.nonce
@@ -1497,13 +1466,8 @@
 
 				if ( res.success ){
 					$btn.before( '<div class="wpforms-alert wpforms-alert-success">' + res.data.msg + '</div>' );
-				}
-
-				if ( ! res.success && res.data.msg ) {
+				} else {
 					$btn.before( '<div class="wpforms-alert wpforms-alert-danger">' + res.data.msg + '</div>' );
-				}
-
-				if ( ! res.success && res.data.debug ) {
 					$btn.before( '<div class="wpforms-ssl-error pre-error">' + res.data.debug + '</div>' );
 				}
 
@@ -1765,92 +1729,6 @@
 					}
 				}
 			});
-		},
-
-		/**
-		 * Element bindings for Flyout Menu.
-		 *
-		 * @since 1.5.7
-		 */
-		initFlyoutMenu: function() {
-
-			// Flyout Menu Elements.
-			var $flyoutMenu    = $( '#wpforms-flyout' );
-
-			if ( $flyoutMenu.length === 0 ) {
-				return;
-			}
-
-			var	$head   = $flyoutMenu.find( '.wpforms-flyout-head' ),
-				$sullie = $head.find( 'img' ),
-				menu    = {
-					state: 'inactive',
-					srcInactive: $sullie.attr( 'src' ),
-					srcActive: $sullie.data( 'active' ),
-				};
-
-			// Click on the menu head icon.
-			$head.on( 'click', function( e ) {
-
-				e.preventDefault();
-
-				if ( menu.state === 'active' ) {
-					$flyoutMenu.removeClass( 'opened' );
-					$sullie.attr( 'src', menu.srcInactive );
-					menu.state = 'inactive';
-				} else {
-					$flyoutMenu.addClass( 'opened' );
-					$sullie.attr( 'src', menu.srcActive );
-					menu.state = 'active';
-				}
-			} );
-
-			// Page elements and other values.
-			var $wpfooter = $( '#wpfooter' );
-
-			if ( $wpfooter.length === 0 ) {
-				return;
-			}
-
-			var	$overlap       = $( '#wpforms-overview, #wpforms-entries-list' ),
-				wpfooterTop    = $wpfooter.offset().top,
-				wpfooterBottom = wpfooterTop + $wpfooter.height(),
-				overlapBottom  = $overlap.length > 0 ? $overlap.offset().top + $overlap.height() + 85 : 0;
-
-			// Hide menu if scrolled down to the bottom of the page.
-			$( window ).on( 'resize scroll', _.debounce( function( e ) {
-
-				var viewTop = $( window ).scrollTop(),
-					viewBottom = viewTop + $( window ).height();
-
-				if ( wpfooterBottom <= viewBottom && wpfooterTop >= viewTop && overlapBottom > viewBottom ) {
-					$flyoutMenu.addClass( 'out' );
-				} else {
-					$flyoutMenu.removeClass( 'out' );
-				}
-			}, 50 ) );
-
-			$( window ).trigger( 'scroll' );
-		},
-
-		/**
-		 * Lity improvements.
-		 *
-		 * @since 1.5.8
-		 */
-		initLity: function() {
-
-			// Use `data-lity-srcset` opener's attribute for add srcset to full image in opened lightbox.
-			$( document ).on( 'lity:ready', function( event, instance ) {
-
-				var $el     = instance.element(),
-					$opener = instance.opener(),
-					srcset = typeof $opener !== 'undefined' ? $opener.data( 'lity-srcset' ) : '';
-
-				if ( typeof srcset !== 'undefined' && srcset !== '' ) {
-					$el.find( '.lity-content img' ).attr( 'srcset', srcset );
-				}
-			} );
 		},
 
 		//--------------------------------------------------------------------//

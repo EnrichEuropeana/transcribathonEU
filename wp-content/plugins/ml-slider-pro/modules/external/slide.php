@@ -193,7 +193,7 @@ class MetaExternalSlide extends MetaSlide {
         $row .= "       </div>";
         $row .= "    </td>";
         $row .= "    <td class='col-2'>";
-        $row .= "       <div class='metaslider-ui-inner flex flex-col h-full'>";
+        $row .= "       <div class='metaslider-ui-inner'>";
 
         if (method_exists($this, 'get_admin_slide_tabs_html')) {
             $row .= $this->get_admin_slide_tabs_html();

@@ -7,18 +7,11 @@
  * @subpackage Theme
  */
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
 ?>
 
-<div id="bbpress-forums" class="bbpress-wrapper">
+<div id="bbpress-forums">
 
 	<?php bbp_breadcrumb(); ?>
-
-	<?php bbp_topic_subscription_link(); ?>
-
-	<?php bbp_topic_favorite_link(); ?>
 
 	<?php do_action( 'bbp_template_before_single_topic' ); ?>
 
@@ -51,8 +44,6 @@ defined( 'ABSPATH' ) || exit;
 		<?php bbp_get_template_part( 'form', 'reply' ); ?>
 
 	<?php endif; ?>
-
-	<?php bbp_get_template_part( 'alert', 'topic-lock' ); ?>
 
 	<?php do_action( 'bbp_template_after_single_topic' ); ?>
 

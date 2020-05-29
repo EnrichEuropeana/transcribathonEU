@@ -1,8 +1,4 @@
 <?php
-
-// include required files
-include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
-
 // get Document data from API
 function _TCT_get_document_data( $atts ) {   
     //include theme directory for text hovering
@@ -177,20 +173,13 @@ function _TCT_get_document_data( $atts ) {
 $content .= "<div id='total-storypg' class='storypg-container'>";
     $content .= "<div class='main-storypg'>";
                 $content .= "<div class='storypg-info'>";
-                    $storyTitle = explode(" || ", $storyData['dcTitle']);
-                    foreach ($storyTitle as $singleTitle) {
-                        $content .= "<h1 class='storypg-title'>";
-                            $content .= $singleTitle;
-                        $content .= "</h1>";
-                    }
-
-                    $content .= "<strong style='text-transform: capitalize;'>Description</strong>";
-                    $storyDescription = explode(" || ", $storyData['dcDescription']);
-                    foreach ($storyDescription as $singleDescription) {
-                        $content .= "<div class='story-page-description-paragraph'>";
-                            $content .= $singleDescription; 
-                        $content .= "</div>";
-                    }
+                    $content .= "<h1 class='storypg-title'>";
+                        $content .= $storyData['dcTitle'];
+                    $content .= "</h1>";
+                    $content .= "<strong>Description</strong>";
+                    $content .= "<div class='story-page-description-paragraph'>";
+                        $content .= $storyData['dcDescription']; 
+                    $content .= "</div>";
                 $content .= "</div>";
 
             //Status Chart
@@ -303,54 +292,16 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                                                 $content .= $fields[$key];
                                             $content .= "</dt>\n";
                                             $content .= "<dd>";
-                                                $valueList = explode(" || ", $value);
-                                                $valueList = array_unique($valueList);
-                                                $i = 0;
-                                                foreach ($valueList as $singleValue) {
-                                                    if ($singleValue != "") {
-                                                        if ($i == 0) {
-                                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                                                $content .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
-                                                            }
-                                                            else {
-                                                                $content .= $singleValue;
-                                                            }
-                                                        }
-                                                        else {
-                                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                                                $content .= "</br>";
-                                                                $content .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
-                                                            }
-                                                            else {
-                                                                $content .= "</br>";
-                                                                $content .= $singleValue;
-                                                            }
-                                                        }
-                                                    }
-                                                    $i += 1;
+                                                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                                                    $content .= "<a href=\"".$value."\">".$value."</a>";
+                                                }
+                                                else {
+                                                    $content .= $value;
                                                 }
                                             $content .= "</dd>\n";
                                         $content .= "</dl>\n";
                                     }
                                 }
-                                $location = "";
-                                if ($storyData['PlaceName'] != null && $storyData['PlaceName'] != "") {
-                                    $location .= $storyData['PlaceName'];
-                                }
-                                if ($storyData['PlaceLatitude'] != null && $storyData['PlaceLatitude'] != "" && $storyData['PlaceLongitude'] != null && $storyData['PlaceLongitude'] != "") {
-                                    $location .= " (".$storyData['PlaceLatitude'].", ".$storyData['PlaceLongitude'].")";
-                                }
-                                if ($location != "") {
-                                    $content .= "<dl>\n";
-                                        $content .= "<dt>";
-                                            $content .= "Location: ";
-                                        $content .= "</dt>\n";
-                                        $content .= "<dd>";
-                                            $content .= $location;
-                                        $content .= "</dd>\n";
-                                    $content .= "</dl>\n";
-                                }
-
                             $content .= "</div>\n";
 
             $content .= "</div>";
@@ -368,51 +319,32 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
 							    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
 							    var map = new mapboxgl.Map({
 							      container: 'storyMap',
-							      style: 'mapbox://styles/fandf/ck4birror0dyh1dlmd25uhp6y',
-							      center: [13, 46],
-							      zoom: 2.8
+							      style: 'mapbox://styles/fandf/cjnpzoia60m4y2rp5cvoq9t8z',
+							      center: [62.8, -21],
+							      zoom: 1
 							    });
-								var bounds = new mapboxgl.LngLatBounds();
 							map.addControl(new mapboxgl.NavigationControl());
 							
-                            fetch('/tp-api/stories/' + storyId)
-                            .then(function(response) {
-                                return response.json();
-                            })
-                            .then(function(places) {
-                                console.log(places);
-                                if(places.length > 0) {
-                                    places[0].Items.forEach(function(marker) {
-                                        marker.Places.forEach(function(place) {
-                                            var el = document.createElement('div');
-                                            el.className = 'marker savedMarker';
-                                            var popup = new mapboxgl.Popup({offset: 25, closeButton: false})
-                                            .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + (place.Name || \"\") + '</div><div class=\"comment\">' + (place.Comment || \"\") + '</div>' + '<a class=\"item-link\" href=\"' + home_url + '/documents/story/item/?story=' + places[0].StoryId + '&item=' + marker.ItemId + '\">' + marker.Title + '</a></div></div>');
-                                            bounds.extend([place.Longitude, place.Latitude]);
-                                            new mapboxgl.Marker({element: el, anchor: 'bottom'})
-                                            .setLngLat([place.Longitude, place.Latitude])
-                                            .setPopup(popup)
-                                            .addTo(map);
-                                        });
-                                    });
-                                    // add story location to the map
+								fetch('/dev/tp-api/stories/' + storyId)
+							                        .then(function(response) {
+							                          return response.json();
+							                        })
+							                        .then(function(places) {
+							                          console.log(places);
+							                          places[0].Items.forEach(function(marker) {
+											marker.Places.forEach(function(place) {
+							                            var el = document.createElement('div');
+							                            el.className = 'marker savedMarker fas fa-map-marker-alt';
+										      var popup = new mapboxgl.Popup({offset: 25})
+        										.setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + place.Name + '</div><div class=\"comment\">' + place.Comment + '</div>' + '<a class=\"item-link\" href=\"http://europeana.fresenia.man.poznan.pl/dev/documents/story/item/?story=' + places[0].StoryId + '&item=' + marker.ItemId + '\">' + marker.Title + '</a></div></div>');
 
-                                    if (places[0].PlaceLongitude != 0 || places[0].PlaceLongitude != 0) {
-                                        var el = document.createElement('div');
-                                        el.className = 'marker savedMarker storyMarker';
-                                        var popup = new mapboxgl.Popup({offset: 25, closeButton: false})
-                                        .setHTML('<div class=\"popupWrapper\"><div class=\"story-location-header\">Story Location</div><div class=\"title\">' + places[0].dcTitle + '</div><div class=\"name\">' + places[0].PlaceName + '</div></div>');
-                                        bounds.extend([places[0].PlaceLongitude, places[0].PlaceLatitude]);
-        
-                                        new mapboxgl.Marker({element: el, anchor: 'bottom'})
-                                        .setLngLat([places[0].PlaceLongitude, places[0].PlaceLatitude])
-                                        .setPopup(popup)
-                                        .addTo(map);
-
-                                        map.fitBounds(bounds, {padding: {top: 50, bottom:20, left: 20, right: 20}});
-                                    }
-                                }
-                            });
+							                            new mapboxgl.Marker({element: el, anchor: 'bottom'})
+							                              .setLngLat([place.Longitude, place.Latitude])
+										      .setPopup(popup)
+							                              .addTo(map);
+											});
+							                          });
+                      						  });
 							  
 						});
     						</script>";

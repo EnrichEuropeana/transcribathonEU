@@ -46,13 +46,13 @@ class MetaSlider_Theme_Base {
 		add_action('metaslider_register_public_styles', array($this, 'enqueue_assets'));
 
 		// override the arrows markup
-		add_filter('metaslider_flex_slider_parameters', array($this, 'update_parameters'), 99, 3);
-		add_filter('metaslider_responsive_slider_parameters', array($this, 'update_parameters'), 99, 3);
-		add_filter('metaslider_nivo_slider_parameters', array($this, 'update_parameters'), 99, 3);
-		add_filter('metaslider_coin_slider_parameters', array($this, 'update_parameters'), 99, 3);
+		add_filter('metaslider_flex_slider_parameters', array($this, 'update_parameters'), 10, 3);
+		add_filter('metaslider_responsive_slider_parameters', array($this, 'update_parameters'), 10, 3);
+		add_filter('metaslider_nivo_slider_parameters', array($this, 'update_parameters'), 10, 3);
+		add_filter('metaslider_coin_slider_parameters', array($this, 'update_parameters'), 10, 3);
 
 		// Pro - override the arrows markup for the filmstrip
-		add_filter('metaslider_flex_slider_filmstrip_parameters', array($this, 'update_parameters'), 99, 3);
+		add_filter('metaslider_flex_slider_filmstrip_parameters', array($this, 'update_parameters'), 10, 3);
 
 		// Adds classes for thumbnails and filmstrip navigation
 		add_filter('metaslider_css_classes', array($this, 'slider_classes'), 20, 3);

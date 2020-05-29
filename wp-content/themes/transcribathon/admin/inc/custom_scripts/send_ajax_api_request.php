@@ -40,6 +40,5 @@ if(isset($_POST['type']) && isset($_POST['url'])){
     $response = array ();
     $response['content'] = "".$result;
     $response['code'] = "".$httpcode;
-    $response['post'] = "".$data['PropertyValue'];
     echo json_encode($response);
 }

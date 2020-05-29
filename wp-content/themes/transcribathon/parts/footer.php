@@ -22,10 +22,7 @@
 </footer><!-- #colophon .site-footer -->
 
 <footer class="_tct_footer">
-	<span class="main-footer-bottom-left">
-		<a href=<?php echo network_home_url()."terms-of-use/" ?> target= "_blank">Terms of Use</a>
-		<a href=<?php echo network_home_url()."legal-disclosure/" ?> target= "_blank">Legal Disclosure - Impressum</a>
-	</span>
-	<strong class="main-footer-bottom-right">Developed by Facts & Files 2019</strong>
+
+	<strong class="rights-footer"><i class="far fa-copyright"></i> 2019 Facts & Files</strong>
 
 </footer>

@@ -87,7 +87,7 @@ Licensed under MIT License
 
             function noop(e) {
                 e.stopPropagation();
-                e.preventDefault(); 
+                e.preventDefault();
             };
 
             function startDragging(e) {

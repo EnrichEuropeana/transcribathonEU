@@ -7,12 +7,9 @@
  * @subpackage Theme
  */
 
-// Exit if accessed directly
-defined( 'ABSPATH' ) || exit;
-
 ?>
 
-<div id="bbpress-forums" class="bbpress-wrapper">
+<div id="bbpress-forums">
 
 	<?php bbp_breadcrumb(); ?>
 
@@ -34,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
 
 		<?php endif; ?>
 
-		<?php if ( ! bbp_is_forum_category() && bbp_has_topics() ) : ?>
+		<?php if ( !bbp_is_forum_category() && bbp_has_topics() ) : ?>
 
 			<?php bbp_get_template_part( 'pagination', 'topics'    ); ?>
 
@@ -44,7 +41,7 @@ defined( 'ABSPATH' ) || exit;
 
 			<?php bbp_get_template_part( 'form',       'topic'     ); ?>
 
-		<?php elseif ( ! bbp_is_forum_category() ) : ?>
+		<?php elseif ( !bbp_is_forum_category() ) : ?>
 
 			<?php bbp_get_template_part( 'feedback',   'no-topics' ); ?>
 

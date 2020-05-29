@@ -9,9 +9,6 @@
  * Template Name: Full Width Page header bar
  */
 
-// include required files
-include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
-
 get_header(); ?>
 
 	<div id="primary-full-width-header" class="content-area">
@@ -22,7 +19,6 @@ get_header(); ?>
 				<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
 					<div class="entry-main">
-						<?php echo do_shortcode( '[tutorial_menu]' ); ?>
 
 						<?php do_action('vantage_entry_main_top') ?>
 

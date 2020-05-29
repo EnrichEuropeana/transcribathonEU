@@ -13,11 +13,12 @@
 		function vimeoVidId( url ) {
 		  // look for a string with 'vimeo', then whatever, then a 
 		  // forward slash and a group of digits.
-		  var match = /(vimeo(pro)?\.com)\/(?:[^\d]+)?(\d+)\??(.*)?$/.exec(url);
+		  var match = /vimeo.*\/(\d+)/i.exec( url );
+
 		  // if the match isn't null (i.e. it matched)
 		  if ( match ) {
 		    // the grouped/matched digits from the regex
-		    return match[3];
+		    return match[1];
 		  }
 
 		  return false;
@@ -55,23 +56,15 @@
 			e.preventDefault();
 			var vimeo_id = vimeoVidId($('.vimeo_url').val());
 
-			if (vimeo_id) {
-				var APP = window.parent.metaslider.app.MetaSlider;
-				// APP comes from the free version which holds some generic translations
-				APP && APP.notifyInfo('metaslider/creating-slides', APP.sprintf(
-					APP.__('Preparing %s slide...', 'ml-slider'),
-				'1'), true);
-
+			if (vimeo_id) {				
 				var data = {
 					action: 'create_vimeo_slide',
 					video_id: vimeo_id,
 					slider_id: window.parent.metaslider_slider_id
 				};
-				
+
 				jQuery.post(ajaxurl, data, function(response) {
 					window.parent.jQuery(".metaslider table#metaslider-slides-list").append(response);
-					var APP = window.parent.metaslider.app.MetaSlider;
-					APP && APP.notifySuccess('metaslider/slides-created', null, true);
 					window.parent.jQuery(".media-modal-close").click();
 				});
 			}

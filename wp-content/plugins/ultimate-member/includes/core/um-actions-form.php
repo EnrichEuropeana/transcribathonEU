@@ -262,117 +262,6 @@ add_action( 'um_submit_form_errors_hook', 'um_submit_form_errors_hook', 10 );
 
 
 /**
- * Error processing: Conditions
- * @staticvar int     $counter
- * @param     array   $condition
- * @param     array   $fields
- * @param     array   $args
- * @param     boolean $reset
- * @return    boolean
- * @throws    Exception
- */
-function um_check_conditions_on_submit( $condition, $fields, $args, $reset = false ) {
-	static $counter = 0;
-	if ( $reset ) {
-		$counter = 0;
-	}
-	$continue = false;
-
-	list( $visibility, $parent_key, $op, $parent_value ) = $condition;
-
-	if ( ! isset( $args[ $parent_key ] ) ) {
-		$continue = true;
-		return $continue;
-	}
-
-	if ( ! empty( $fields[ $parent_key ]['conditions'] ) ) {
-		foreach ( $fields[ $parent_key ]['conditions'] as $parent_condition ) {
-			if ( 64 > $counter++ ) {
-				$continue = um_check_conditions_on_submit( $parent_condition, $fields, $args );
-			} else {
-				throw new Exception( 'Endless recursion in the function ' . __FUNCTION__, 512 );
-			}
-			if ( ! empty( $continue ) ) {
-				return $continue;
-			}
-		}
-	}
-
-	$cond_value = ( $fields[ $parent_key ]['type'] == 'radio' ) ? $args[ $parent_key ][0] : $args[ $parent_key ];
-
-	if ( $visibility == 'hide' ) {
-		if ( $op == 'empty' ) {
-			if ( empty( $cond_value ) ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'not empty' ) {
-			if ( ! empty( $cond_value ) ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'equals to' ) {
-			if ( $cond_value == $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'not equals' ) {
-			if ( $cond_value != $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'greater than' ) {
-			if ( $cond_value > $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'less than' ) {
-			if ( $cond_value < $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'contains' ) {
-			if ( is_string( $cond_value ) && strstr( $cond_value, $parent_value ) ) {
-				$continue = true;
-			}
-			if( is_array( $cond_value ) && in_array( $parent_value, $cond_value ) ) {
-				$continue = true;
-			}
-		}
-	} elseif ( $visibility == 'show' ) {
-		if ( $op == 'empty' ) {
-			if ( ! empty( $cond_value ) ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'not empty' ) {
-			if ( empty( $cond_value ) ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'equals to' ) {
-			if ( $cond_value != $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'not equals' ) {
-			if ( $cond_value == $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'greater than' ) {
-			if ( $cond_value <= $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'less than' ) {
-			if ( $cond_value >= $parent_value ) {
-				$continue = true;
-			}
-		} elseif ( $op == 'contains' ) {
-			if ( is_string( $cond_value ) && ! strstr( $cond_value, $parent_value ) ) {
-				$continue = true;
-			}
-			if( is_array( $cond_value ) && !in_array( $parent_value, $cond_value ) ) {
-				$continue = true;
-			}
-		}
-	}
-
-	return $continue;
-}
-
-
-/**
  * Error processing hook : standard
  *
  * @param $args
@@ -384,18 +273,11 @@ function um_submit_form_errors_hook_( $args ) {
 	$um_profile_photo = um_profile('profile_photo');
 
 	if ( get_post_meta( $form_id, '_um_profile_photo_required', true ) && ( empty( $args['profile_photo'] ) && empty( $um_profile_photo ) ) ) {
-		UM()->form()->add_error('profile_photo', __( 'Profile Photo is required.', 'ultimate-member' ) );
+		UM()->form()->add_error('profile_photo', sprintf(__('%s is required.','ultimate-member'), 'Profile Photo' ) );
 	}
 
 	if ( ! empty( $fields ) ) {
 		foreach ( $fields as $key => $array ) {
-
-			if ( $mode == 'profile' ) {
-				$restricted_fields = UM()->fields()->get_restricted_fields_for_edit();
-				if ( is_array( $restricted_fields ) && in_array( $key, $restricted_fields ) ) {
-					continue;
-				}
-			}
 
 			if ( isset( $array['public']  ) && -2 == $array['public'] && ! empty( $array['roles'] ) && is_user_logged_in() ) {
 				$current_user_roles = um_user( 'roles' );
@@ -429,37 +311,100 @@ function um_submit_form_errors_hook_( $args ) {
 			$array = apply_filters( 'um_get_custom_field_array', $array, $fields );
 
 			if ( ! empty( $array['conditions'] ) ) {
-				try {
-					foreach ( $array['conditions'] as $condition ) {
-						$continue = um_check_conditions_on_submit( $condition, $fields, $args, true );
-						if ( $continue === true ) {
-							continue 2;
+				foreach ( $array['conditions'] as $condition ) {
+					list( $visibility, $parent_key, $op, $parent_value ) = $condition;
+
+					if ( ! isset( $args[ $parent_key ] ) ) {
+						continue;
+					}
+
+					$cond_value = ( $fields[ $parent_key ]['type'] == 'radio' ) ? $args[ $parent_key ][0] : $args[ $parent_key ];
+
+					if ( $visibility == 'hide' ) {
+						if ( $op == 'empty' ) {
+							if ( empty( $cond_value ) ) {
+								continue 2;
+							}
+						} elseif ( $op == 'not empty' ) {
+							if ( ! empty( $cond_value ) ) {
+								continue;
+							}
+						} elseif ( $op == 'equals to' ) {
+							if ( $cond_value == $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'not equals' ) {
+							if ( $cond_value != $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'greater than' ) {
+							if ( $cond_value > $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'less than' ) {
+							if ( $cond_value < $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'contains' ) {
+							if ( is_string( $cond_value ) && strstr( $cond_value, $parent_value ) ) {
+								continue;
+							}
+							if( is_array( $cond_value ) && in_array( $parent_value, $cond_value ) ) {
+								continue;
+							}
+						}
+					} elseif ( $visibility == 'show' ) {
+						if ( $op == 'empty' ) {
+							if ( ! empty( $cond_value ) ) {
+								continue;
+							}
+						} elseif ( $op == 'not empty' ) {
+							if ( empty( $cond_value ) ) {
+								continue;
+							}
+						} elseif ( $op == 'equals to' ) {
+							if ( $cond_value != $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'not equals' ) {
+							if ( $cond_value == $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'greater than' ) {
+							if ( $cond_value <= $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'less than' ) {
+							if ( $cond_value >= $parent_value ) {
+								continue;
+							}
+						} elseif ( $op == 'contains' ) {
+							if ( is_string( $cond_value ) && ! strstr( $cond_value, $parent_value ) ) {
+								continue;
+							}
+							if( is_array( $cond_value ) && !in_array( $parent_value, $cond_value ) ) {
+								continue;
+							}
 						}
 					}
-				} catch ( Exception $e ) {
-					UM()->form()->add_error( $key, sprintf( __( '%s - wrong conditions.', 'ultimate-member' ), $array['title'] ) );
-					$notice = '<div class="um-field-error">' . sprintf( __( '%s - wrong conditions.', 'ultimate-member' ), $array['title'] ) . '</div><!-- ' . $e->getMessage() . ' -->';
-					add_action( 'um_after_profile_fields', function() use ( $notice ) {
-						echo $notice;
-					}, 900 );
 				}
 			}
 
-			if ( isset( $array['type'] ) && $array['type'] == 'checkbox' && isset( $array['required'] ) && $array['required'] == 1 && ! isset( $args[ $key ] ) ) {
-				UM()->form()->add_error( $key, sprintf( __( '%s is required.', 'ultimate-member' ), $array['title'] ) );
+			if ( isset( $array['type'] ) && $array['type'] == 'checkbox' && isset( $array['required'] ) && $array['required'] == 1 && !isset( $args[$key] ) ) {
+				UM()->form()->add_error($key, sprintf(__('%s is required.','ultimate-member'), $array['title'] ) );
 			}
 
-			if ( isset( $array['type'] ) && $array['type'] == 'radio' && isset( $array['required'] ) && $array['required'] == 1 && ! isset( $args[ $key ] ) && ! in_array( $key, array( 'role_radio', 'role_select' ) ) ) {
-				UM()->form()->add_error( $key, sprintf( __( '%s is required.', 'ultimate-member'), $array['title'] ) );
+			if ( isset( $array['type'] ) && $array['type'] == 'radio' && isset( $array['required'] ) && $array['required'] == 1 && !isset( $args[$key] ) && !in_array($key, array('role_radio','role_select') ) ) {
+				UM()->form()->add_error($key, sprintf(__('%s is required.','ultimate-member'), $array['title'] ) );
 			}
 
-			if ( isset( $array['type'] ) && $array['type'] == 'multiselect' && isset( $array['required'] ) && $array['required'] == 1 && ! isset( $args[ $key ] ) && ! in_array( $key, array( 'role_radio', 'role_select' ) ) ) {
-				UM()->form()->add_error( $key, sprintf( __( '%s is required.', 'ultimate-member' ), $array['title'] ) );
+			if ( isset( $array['type'] ) && $array['type'] == 'multiselect' && isset( $array['required'] ) && $array['required'] == 1 && !isset( $args[$key] ) && !in_array($key, array('role_radio','role_select') ) ) {
+				UM()->form()->add_error($key, sprintf(__('%s is required.','ultimate-member'), $array['title'] ) );
 			}
 
 			if ( $key == 'role_select' || $key == 'role_radio' ) {
-				if ( isset( $array['required'] ) && $array['required'] == 1 && ( ! isset( $args['role'] ) || empty( $args['role'] ) ) ) {
-					UM()->form()->add_error( 'role', __( 'Please specify account type.', 'ultimate-member' ) );
+				if ( isset( $array['required'] ) && $array['required'] == 1 && ( !isset( $args['role'] ) || empty( $args['role'] ) ) ) {
+					UM()->form()->add_error('role', __('Please specify account type.','ultimate-member') );
 				}
 			}
 
@@ -486,86 +431,86 @@ function um_submit_form_errors_hook_( $args ) {
 			 */
 			do_action( 'um_add_error_on_form_submit_validation', $array, $key, $args );
 
-			if ( ! empty( $array['required'] ) ) {
-				if ( ! isset( $args[ $key ] ) || $args[ $key ] == '' || $args[ $key ] == 'empty_file' ) {
-					if ( empty( $array['label'] ) ) {
-						UM()->form()->add_error( $key, __( 'This field is required', 'ultimate-member' ) );
-					} else {
-						UM()->form()->add_error( $key, sprintf( __( '%s is required', 'ultimate-member' ), $array['label'] ) );
-					}
-				}
-			}
-
 			if ( isset( $args[ $key ] ) ) {
 
+				if ( isset( $array['required'] ) && $array['required'] == 1 ) {
+					if ( ! isset( $args[$key] ) || $args[$key] == '' || $args[$key] == 'empty_file') {
+						if( empty( $array['label'] ) ) {
+							UM()->form()->add_error($key, __('This field is required','ultimate-member') );
+						} else {
+							UM()->form()->add_error($key, sprintf( __('%s is required','ultimate-member'), $array['label'] ) );
+						}
+					}
+				}
+
 				if ( isset( $array['max_words'] ) && $array['max_words'] > 0 ) {
-					if ( str_word_count( $args[ $key ], 0, "éèàôù" ) > $array['max_words'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'You are only allowed to enter a maximum of %s words', 'ultimate-member' ), $array['max_words'] ) );
+					if ( str_word_count( $args[$key], 0, "éèàôù" ) > $array['max_words'] ) {
+						UM()->form()->add_error($key, sprintf(__('You are only allowed to enter a maximum of %s words','ultimate-member'), $array['max_words']) );
 					}
 				}
 
 				if ( isset( $array['min_chars'] ) && $array['min_chars'] > 0 ) {
-					if ( $args[ $key ] && strlen( utf8_decode( $args[ $key ] ) ) < $array['min_chars'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'Your %s must contain at least %s characters', 'ultimate-member' ), $array['label'], $array['min_chars'] ) );
+					if ( $args[$key] && strlen( utf8_decode( $args[$key] ) ) < $array['min_chars'] ) {
+						UM()->form()->add_error($key, sprintf(__('Your %s must contain at least %s characters','ultimate-member'), $array['label'], $array['min_chars']) );
 					}
 				}
 
 				if ( isset( $array['max_chars'] ) && $array['max_chars'] > 0 ) {
-					if ( $args[ $key ] && strlen( utf8_decode( $args[ $key ] ) ) > $array['max_chars'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'Your %s must contain less than %s characters', 'ultimate-member' ), $array['label'], $array['max_chars'] ) );
+					if ( $args[$key] && strlen( utf8_decode( $args[$key] ) ) > $array['max_chars'] ) {
+						UM()->form()->add_error($key, sprintf(__('Your %s must contain less than %s characters','ultimate-member'), $array['label'], $array['max_chars']) );
 					}
 				}
-
-				$profile_show_html_bio = UM()->options()->get( 'profile_show_html_bio' );
-
-				if ( $profile_show_html_bio == 1 && $key !== 'description' ) {
+                     
+				$profile_show_html_bio = UM()->options()->get('profile_show_html_bio');
+					
+				if(  $profile_show_html_bio == 1 && $key !== "description" ){
 					if ( isset( $array['html'] ) && $array['html'] == 0 ) {
-						if ( wp_strip_all_tags( $args[ $key ] ) != trim( $args[ $key ] ) ) {
-							UM()->form()->add_error( $key, __( 'You can not use HTML tags here', 'ultimate-member' ) );
+						if ( wp_strip_all_tags( $args[$key] ) != trim( $args[$key] ) ) {
+							UM()->form()->add_error($key, __('You can not use HTML tags here','ultimate-member') );
 						}
 					}
 				}
 
 				if ( isset( $array['force_good_pass'] ) && $array['force_good_pass'] == 1 ) {
-					if ( ! UM()->validation()->strong_pass( $args[ $key ] ) ) {
-						UM()->form()->add_error( $key, __('Your password must contain at least one lowercase letter, one capital letter and one number', 'ultimate-member' ) );
+					if ( ! UM()->validation()->strong_pass( $args[$key] ) ) {
+						UM()->form()->add_error($key, __('Your password must contain at least one lowercase letter, one capital letter and one number','ultimate-member') );
 					}
 				}
 
 				if ( isset( $array['force_confirm_pass'] ) && $array['force_confirm_pass'] == 1 ) {
-					if ( $args[ 'confirm_' . $key ] == '' && ! UM()->form()->has_error( $key ) ) {
-						UM()->form()->add_error( 'confirm_' . $key , __( 'Please confirm your password', 'ultimate-member' ) );
+					if ( $args[ 'confirm_' . $key] == '' && ! UM()->form()->has_error($key) ) {
+						UM()->form()->add_error( 'confirm_' . $key , __('Please confirm your password','ultimate-member') );
 					}
-					if ( $args[ 'confirm_' . $key ] != $args[$key] && !UM()->form()->has_error( $key ) ) {
-						UM()->form()->add_error( 'confirm_' . $key , __( 'Your passwords do not match', 'ultimate-member' ) );
+					if ( $args[ 'confirm_' . $key] != $args[$key] && !UM()->form()->has_error($key) ) {
+						UM()->form()->add_error( 'confirm_' . $key , __('Your passwords do not match','ultimate-member') );
 					}
 				}
 
 				if ( isset( $array['min_selections'] ) && $array['min_selections'] > 0 ) {
-					if ( ( ! isset( $args[ $key ] ) ) || ( isset( $args[ $key ] ) && is_array( $args[ $key ] ) && count( $args[ $key ] ) < $array['min_selections'] ) ) {
-						UM()->form()->add_error($key, sprintf( __( 'Please select at least %s choices', 'ultimate-member' ), $array['min_selections'] ) );
+					if ( ( !isset($args[$key]) ) || ( isset( $args[$key] ) && is_array($args[$key]) && count( $args[$key] ) < $array['min_selections'] ) ) {
+						UM()->form()->add_error($key, sprintf(__('Please select at least %s choices','ultimate-member'), $array['min_selections'] ) );
 					}
 				}
 
 				if ( isset( $array['max_selections'] ) && $array['max_selections'] > 0 ) {
-					if ( isset( $args[ $key ] ) && is_array( $args[ $key ] ) && count( $args[ $key ] ) > $array['max_selections'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'You can only select up to %s choices', 'ultimate-member' ), $array['max_selections'] ) );
+					if ( isset( $args[$key] ) && is_array($args[$key]) && count( $args[$key] ) > $array['max_selections'] ) {
+						UM()->form()->add_error($key, sprintf(__('You can only select up to %s choices','ultimate-member'), $array['max_selections'] ) );
 					}
 				}
 
 				if ( isset( $array['min'] ) && is_numeric( $args[ $key ] ) ) {
 					if ( isset( $args[ $key ] )  && $args[ $key ] < $array['min'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'Minimum number limit is %s', 'ultimate-member' ), $array['min'] ) );
+						UM()->form()->add_error( $key, sprintf(__('Minimum number limit is %s','ultimate-member'), $array['min'] ) );
 					}
 				}
 
 				if ( isset( $array['max'] ) && is_numeric( $args[ $key ] )  ) {
 					if ( isset( $args[ $key ] ) && $args[ $key ] > $array['max'] ) {
-						UM()->form()->add_error( $key, sprintf( __( 'Maximum number limit is %s', 'ultimate-member' ), $array['max'] ) );
+						UM()->form()->add_error( $key, sprintf(__('Maximum number limit is %s','ultimate-member'), $array['max'] ) );
 					}
 				}
 
-				if ( ! empty( $array['validate'] ) ) {
+				if ( isset( $array['validate'] ) && !empty( $array['validate'] ) ) {
 
 					switch( $array['validate'] ) {
 
@@ -596,75 +541,74 @@ function um_submit_form_errors_hook_( $args ) {
 							break;
 
 						case 'numeric':
-							if ( $args[ $key ] && ! is_numeric( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'Please enter numbers only in this field', 'ultimate-member' ) );
+							if ( $args[$key] && !is_numeric( $args[$key] ) ) {
+								UM()->form()->add_error($key, __('Please enter numbers only in this field','ultimate-member') );
 							}
 							break;
 
 						case 'phone_number':
-							if ( ! UM()->validation()->is_phone_number( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'Please enter a valid phone number', 'ultimate-member' ) );
+							if ( ! UM()->validation()->is_phone_number( $args[$key] ) ) {
+								UM()->form()->add_error($key, __('Please enter a valid phone number','ultimate-member') );
 							}
 							break;
 
 						case 'youtube_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'youtube.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'youtube.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'soundcloud_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'soundcloud.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'soundcloud.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'facebook_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'facebook.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'facebook.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'twitter_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'twitter.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'twitter.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'instagram_url':
-
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'instagram.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'instagram.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'google_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'plus.google.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'plus.google.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'linkedin_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'linkedin.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'linkedin.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'vk_url':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'vk.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'vk.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
 						case 'url':
-							if ( ! UM()->validation()->is_url( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'Please enter a valid URL', 'ultimate-member' ) );
+							if ( ! UM()->validation()->is_url( $args[$key] ) ) {
+								UM()->form()->add_error($key, __('Please enter a valid URL','ultimate-member') );
 							}
 							break;
 
 						case 'skype':
-							if ( ! UM()->validation()->is_url( $args[ $key ], 'skype.com' ) ) {
-								UM()->form()->add_error( $key, sprintf( __( 'Please enter a valid %s username or profile URL', 'ultimate-member' ), $array['label'] ) );
+							if ( ! UM()->validation()->is_url( $args[$key], 'skype.com' ) ) {
+								UM()->form()->add_error($key, sprintf(__('Please enter a valid %s username or profile URL','ultimate-member'), $array['label'] ) );
 							}
 							break;
 
@@ -676,7 +620,7 @@ function um_submit_form_errors_hook_( $args ) {
 								UM()->form()->add_error( $key, __( 'Your username is already taken', 'ultimate-member' ) );
 							} elseif ( is_email( $args[ $key ] ) ) {
 								UM()->form()->add_error( $key, __( 'Username cannot be an email', 'ultimate-member' ) );
-							} elseif ( ! UM()->validation()->safe_username( $args[ $key ] ) ) {
+							} elseif ( ! UM()->validation()->safe_username( $args[$key] ) ) {
 								UM()->form()->add_error( $key, __( 'Your username contains invalid characters', 'ultimate-member' ) );
 							}
 
@@ -684,14 +628,14 @@ function um_submit_form_errors_hook_( $args ) {
 
 						case 'unique_username_or_email':
 
-							if ( $args[ $key ] == '' ) {
-								UM()->form()->add_error( $key, __( 'You must provide a username', 'ultimate-member' ) );
-							} elseif ( $mode == 'register' && username_exists( sanitize_user( $args[ $key ] ) ) ) {
-								UM()->form()->add_error( $key, __( 'Your username is already taken', 'ultimate-member' ) );
-							} elseif ( $mode == 'register' && email_exists( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'This email is already linked to an existing account', 'ultimate-member' ) );
-							} elseif ( ! UM()->validation()->safe_username( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'Your username contains invalid characters', 'ultimate-member' ) );
+							if ( $args[$key] == '' ) {
+								UM()->form()->add_error($key,  __('You must provide a username','ultimate-member') );
+							} else if ( $mode == 'register' && username_exists( sanitize_user( $args[$key] ) ) ) {
+								UM()->form()->add_error($key, __('Your username is already taken','ultimate-member') );
+							} else if ( $mode == 'register' && email_exists( $args[$key] ) ) {
+								UM()->form()->add_error($key,  __('This email is already linked to an existing account','ultimate-member') );
+							} else if ( ! UM()->validation()->safe_username( $args[$key] ) ) {
+								UM()->form()->add_error($key,  __('Your username contains invalid characters','ultimate-member') );
 							}
 
 							break;
@@ -700,95 +644,84 @@ function um_submit_form_errors_hook_( $args ) {
 
 							$args[ $key ] = trim( $args[ $key ] );
 
-							if ( in_array( $key, array( 'user_email' ) ) ) {
+							if ( in_array( $key, array('user_email') ) ) {
 
-								if ( ! isset( $args['user_id'] ) ){
+								if( ! isset( $args['user_id'] ) ){
 									$args['user_id'] = um_get_requested_user();
 								}
 
 								$email_exists =  email_exists( $args[ $key ] );
 
-								if ( $args[ $key ] == '' && in_array( $key, array( 'user_email' ) ) ) {
-									UM()->form()->add_error( $key, __( 'You must provide your email', 'ultimate-member' ) );
-								} elseif ( in_array( $mode, array( 'register' ) ) && $email_exists  ) {
-									UM()->form()->add_error( $key, __( 'This email is already linked to an existing account', 'ultimate-member' ) );
-								} elseif ( in_array( $mode, array( 'profile' ) ) && $email_exists && $email_exists != $args['user_id']  ) {
-									UM()->form()->add_error( $key, __( 'This email is already linked to an existing account', 'ultimate-member' ) );
-								} elseif ( !is_email( $args[ $key ] ) ) {
-									UM()->form()->add_error( $key, __( 'This is not a valid email', 'ultimate-member') );
-								} elseif ( ! UM()->validation()->safe_username( $args[ $key ] ) ) {
-									UM()->form()->add_error( $key,  __( 'Your email contains invalid characters', 'ultimate-member' ) );
+								if ( $args[ $key ] == '' && in_array( $key, array('user_email') ) ) {
+									UM()->form()->add_error( $key, __('You must provide your email','ultimate-member') );
+								} else if ( in_array( $mode, array('register') )  && $email_exists  ) {
+									UM()->form()->add_error($key, __('This email is already linked to an existing account','ultimate-member') );
+								} else if ( in_array( $mode, array('profile') )  && $email_exists && $email_exists != $args['user_id']  ) {
+									UM()->form()->add_error( $key, __('This email is already linked to an existing account','ultimate-member') );
+								} else if ( !is_email( $args[ $key ] ) ) {
+									UM()->form()->add_error( $key, __('This is not a valid email','ultimate-member') );
+								} else if ( ! UM()->validation()->safe_username( $args[ $key ] ) ) {
+									UM()->form()->add_error( $key,  __('Your email contains invalid characters','ultimate-member') );
 								}
 
 							} else {
 
-								if ( $args[ $key ] != '' && ! is_email( $args[ $key ] ) ) {
-									UM()->form()->add_error( $key, __( 'This is not a valid email', 'ultimate-member' ) );
-								} elseif ( $args[ $key ] != '' && email_exists( $args[ $key ] ) ) {
-									UM()->form()->add_error( $key, __( 'This email is already linked to an existing account', 'ultimate-member' ) );
-								} elseif ( $args[ $key ] != '' ) {
-
-									$users = get_users( 'meta_value=' . $args[ $key ] );
+								if ( $args[ $key ] != '' && !is_email( $args[ $key ] ) ) {
+									UM()->form()->add_error( $key, __('This is not a valid email','ultimate-member') );
+								} else if ( $args[ $key ] != '' && email_exists( $args[ $key ] ) ) {
+									UM()->form()->add_error($key, __('This email is already linked to an existing account','ultimate-member') );
+								} else if ( $args[ $key ] != '' ) {
+										
+									$users = get_users('meta_value='.$args[ $key ]);
 
 									foreach ( $users as $user ) {
-										if ( $user->ID != $args['user_id'] ) {
-											UM()->form()->add_error( $key, __( 'This email is already linked to an existing account', 'ultimate-member' ) );
+										if( $user->ID != $args['user_id'] ){
+											UM()->form()->add_error( $key, __('This email is already linked to an existing account','ultimate-member') );
 										}
 									}
 
+										
 								}
 
-							}
-
-							break;
-
-						case 'is_email':
-
-							$args[ $key ] = trim( $args[ $key ] );
-
-							if ( $args[ $key ] != '' && ! is_email( $args[ $key ] ) ) {
-								UM()->form()->add_error( $key, __( 'This is not a valid email', 'ultimate-member' ) );
 							}
 
 							break;
 
 						case 'unique_value':
 
-							if ( $args[ $key ] != '' ) {
+							if ( $args[$key] != '' ) {
 
 								$args_unique_meta = array(
-									'meta_key'      => $key,
-									'meta_value'    => $args[ $key ],
-									'compare'       => '=',
-									'exclude'       => array( $args['user_id'] ),
+									'meta_key' => $key,
+									'meta_value' => $args[ $key ],
+									'compare' => '=',
+									'exclude' => array( $args['user_id'] ),
 								);
 
 								$meta_key_exists = get_users( $args_unique_meta );
 
 								if ( $meta_key_exists ) {
-									UM()->form()->add_error( $key , __( 'You must provide a unique value', 'ultimate-member' ) );
+									UM()->form()->add_error( $key , __('You must provide a unique value','ultimate-member') );
 								}
 							}
 							break;
 							
 						case 'alphabetic':
 
-							if ( $args[ $key ] != '' ) {
+							if ( $args[$key] != '' ) {
 
-								if ( ! preg_match( '/^\p{L}+$/u', str_replace( ' ', '', $args[ $key ] ) ) ) {
-									UM()->form()->add_error( $key, __( 'You must provide alphabetic letters', 'ultimate-member' ) );
+								if( ! ctype_alpha( str_replace(' ', '', $args[$key] ) ) ){
+									UM()->form()->add_error( $key , __('You must provide alphabetic letters','ultimate-member') );
 								}
-								
 							}
-
 							break;
 
 						case 'lowercase':
 
-							if ( $args[ $key ] != '' ) {
+							if ( $args[$key] != '' ) {
 
-								if ( ! ctype_lower( str_replace(' ', '', $args[ $key ] ) ) ) {
-									UM()->form()->add_error( $key , __( 'You must provide lowercase letters.', 'ultimate-member' ) );
+								if( ! ctype_lower( str_replace(' ', '',$args[$key] ) ) ){
+									UM()->form()->add_error( $key , __('You must provide lowercase letters.','ultimate-member') );
 								}
 							}
 
@@ -801,12 +734,13 @@ function um_submit_form_errors_hook_( $args ) {
 			}
 
 			if ( isset( $args['description'] ) ) {
-				$max_chars = UM()->options()->get( 'profile_bio_maxchars' );
-				$profile_show_bio = UM()->options()->get( 'profile_show_bio' );
+					
+				$max_chars = UM()->options()->get('profile_bio_maxchars');
+				$profile_show_bio = UM()->options()->get('profile_show_bio');
 
-				if ( $profile_show_bio ) {
-					if ( strlen( utf8_decode( str_replace( array( "\r\n", "\n", "\r\t", "\t" ), ' ', $args['description'] ) ) ) > $max_chars && $max_chars ) {
-						UM()->form()->add_error( 'description', sprintf( __( 'Your user description must contain less than %s characters', 'ultimate-member' ), $max_chars ) );
+				if( $profile_show_bio ){
+					if ( strlen( utf8_decode( $args['description'] ) ) > $max_chars && $max_chars  ) {
+						UM()->form()->add_error('description', sprintf(__('Your user description must contain less than %s characters','ultimate-member'), $max_chars ) );
 					}
 				}
 

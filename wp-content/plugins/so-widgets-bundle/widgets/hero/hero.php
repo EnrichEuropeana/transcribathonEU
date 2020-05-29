@@ -172,12 +172,6 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 						'default' => 'default',
 					),
 
-					'vertically_align' => array(
-						'type' => 'checkbox',
-						'label' => __( 'Vertically center align slide contents', 'so-widgets-bundle' ),
-						'description' => __( 'For perfect centering, consider setting the Extra top padding setting to 0 when enabling this setting.', 'so-widgets-bundle' ),
-					),
-
 					'padding' => array(
 						'type' => 'measurement',
 						'label' => __('Top and bottom padding', 'so-widgets-bundle'),
@@ -218,7 +212,6 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 					'heading_size' => array(
 						'type' => 'measurement',
 						'label' => __('Heading size', 'so-widgets-bundle'),
-						'description' => __( 'Enter the h1 font size. h2 - h6 will be proportionally sized based on this value.', 'so-widgets-bundle' ),
 						'default' => '38px',
 					),
 
@@ -238,7 +231,7 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 
 					'fittext_compressor' => array(
 						'type' => 'number',
-						'label' => __( 'FitText compressor strength', 'so-widgets-bundle' ),
+						'label' => __( 'FitText Compressor Strength', 'so-widgets-bundle' ),
 						'description' => __( 'The higher the value, the more your headings will be scaled down. Values above 1 are allowed.', 'so-widgets-bundle' ),
 						'default' => 0.85,
 						'state_handler' => array(
@@ -286,7 +279,7 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 
 					'link_color_hover' => array(
 						'type' => 'color',
-						'label' => __( 'Link hover color', 'so-widgets-bundle' )
+						'label' => __( 'Link Hover Color', 'so-widgets-bundle' )
 					),
 
 				)
@@ -381,10 +374,6 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 	function get_less_variables($instance) {
 		$less = array();
 
-		if ( empty( $instance ) ) {
-			return $less;
-		}
-
 		// Slider navigation controls
 		$less['nav_color_hex'] = $instance['controls']['nav_color_hex'];
 		$less['nav_size'] = $instance['controls']['nav_size'];
@@ -406,8 +395,6 @@ class SiteOrigin_Widget_Hero_Widget extends SiteOrigin_Widget_Base_Slider {
 		foreach ( $meas_options as $key => $val ) {
 			$less[ $key ] = $this->add_default_measurement_unit( $val );
 		}
-
-		$less['vertically_align'] = empty( $instance['design']['vertically_align'] ) ? 'false' : 'true';
 
 		$less['heading_shadow'] = intval( $instance['design']['heading_shadow'] );
 		$less['heading_color'] = $instance['design']['heading_color'];

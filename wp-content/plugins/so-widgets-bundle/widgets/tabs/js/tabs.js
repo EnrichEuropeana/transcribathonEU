@@ -119,12 +119,10 @@ jQuery( function ( $ ) {
 			if ( useAnchorTags ) {
 				var updateSelectedTab = function () {
 					if ( window.location.hash ) {
-						var anchors = window.location.hash.substring(1).split( ',' );
+						var anchors = window.location.hash.replace( '#', '' ).split( ',' );
 						anchors.forEach( function ( anchor ) {
-							var tab = $tabs.filter( function ( index, element ) {
-								return decodeURI( anchor ) === decodeURI( $( element ).data( 'anchor' ) );
-							} );
-							if ( tab.length > 0 ) {
+							var tab = $tabs.filter( '[data-anchor="' + anchor + '"]' );
+							if ( tab ) {
 								selectTab( tab, true );
 							}
 						} );

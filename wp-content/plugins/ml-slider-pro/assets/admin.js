@@ -1,9 +1,6 @@
-window.jQuery(function($) {
-	window.metaslider.app.EventManager.$on("metaslider/app-loaded", function (e) {
+jQuery(document).ready(function($) {
 
-	var $ = window.jQuery;
-	
-	// Enable the correct options for this slider type
+    // Enable the correct options for this slider type
     var checkSlideCompatibility = function(slider) {
         // slides - set red background on incompatible slides
         jQuery("#compatibilityWarning").remove();
@@ -26,26 +23,45 @@ window.jQuery(function($) {
 
     checkSlideCompatibility(jQuery('.metaslider .select-slider:checked').attr('rel'));
 
-    function loadCodeMirror(textarea) {
+    /**
+     * Load code Mirror
+     *
+     * @param {integer} textarea_id Text area ID
+     */
+    function loadCodeMirror(textarea_id) {
 
-		$(textarea).each(function() {
-			$(this).hide().siblings('.CodeMirror').remove();
+        $('#' + textarea_id).hide().siblings('.CodeMirror').remove();
 
-			CodeMirror.fromTextArea(this, {
-				tabMode: 'indent',
-				mode: 'xml',
-				lineNumbers: true,
-				lineWrapping: true,
-				theme: 'monokai',
-				onChange: function(cm) {
-					cm.save();
-				}
-			});
-		})
-	}
-	
-	loadCodeMirror($('.metaslider-ui .wysiwyg'));
-	window.metaslider.app.EventManager.$on("metaslider/slides-created", function() { loadCodeMirror($('.metaslider-ui .wysiwyg')); });
+        var codeMirror = CodeMirror.fromTextArea(document.getElementById(textarea_id), {
+            tabMode: 'indent',
+            mode: 'xml',
+            lineNumbers: true,
+            lineWrapping: true,
+            theme: 'monokai',
+            onChange: function(cm) {
+                cm.save();
+            }
+        });
+    }//end loadCodeMirror()
+
+
+    $(".metaslider").on('click', ".slide.layer_slide li[rel='tab-4']", function() {
+        var tabs = $(this).parent().siblings('.tabs-content');
+        var textarea_id = $('.tab-4 textarea', tabs).attr('id');
+        setTimeout(loadCodeMirror(textarea_id), 50);
+    });
+
+    $('.slide.post_feed .wysiwyg').each(function() {
+        var textarea_id = $(this).attr('id');
+        setTimeout(loadCodeMirror(textarea_id), 50);
+    });
+
+	$(".metaslider table#metaslider-slides-list").live("slideAdded", function(event) {
+        $('.slide.post_feed .wysiwyg').each(function() {
+            var textarea_id = $(this).attr('id');
+            setTimeout(loadCodeMirror(textarea_id), 50);
+        });
+    });
 
     $(".metaslider").on('change', '.external input.extimgurl', function() {
         var val = $(this).val();
@@ -82,21 +98,32 @@ window.jQuery(function($) {
         codeMirror.focus();
     });
 
-	var updateDatepicker = function() {
-		$('.metaslider .datepicker').datepicker({
-			dateFormat:'yy-mm-dd',
-		}).on('focus', function(e){
-			if ($(this).datepicker('widget').offset().top > $(this).offset().top) {
-				$(this).datepicker('widget').addClass('bottom');
-				$(this).datepicker('widget').removeClass('top');
-			} else {
-				$(this).datepicker('widget').addClass('top');
-				$(this).datepicker('widget').removeClass('bottom');
-			}
-		});
-	}
-	updateDatepicker();
-	window.metaslider.app.EventManager.$on('metaslider/slides-created', function() { updateDatepicker(); });
+    
+    $('.metaslider .datepicker').datepicker({
+        dateFormat:'yy-mm-dd',
+    }).on('focus', function(e){
+        if ($(this).datepicker('widget').offset().top > $(this).offset().top) {
+            $(this).datepicker('widget').addClass('bottom');
+            $(this).datepicker('widget').removeClass('top');
+        } else {
+            $(this).datepicker('widget').addClass('top');
+            $(this).datepicker('widget').removeClass('bottom');
+        }
+    }); 
+
+    $(document).on('metaslider/slides-added', function(e){
+        $('.metaslider .datepicker').datepicker({
+            dateFormat:'yy-mm-dd'
+        }).on('focus', function(e){
+            if ($(this).datepicker('widget').offset().top > $(this).offset().top) {
+                $(this).datepicker('widget').addClass('bottom');
+                $(this).datepicker('widget').removeClass('top');
+            } else {
+                $(this).datepicker('widget').addClass('top');
+                $(this).datepicker('widget').removeClass('bottom');
+            }
+        });
+    });
 
     /**
      * Set Hiden slide class on page load
@@ -104,6 +131,5 @@ window.jQuery(function($) {
     $(".metaslider button.hide-slide input[type=checkbox]").each(function(i) {
         $(this).closest('tr.slide').toggleClass('slide-is-hidden', $(this).is(':checked'));
     });
-
-});
+    
 });

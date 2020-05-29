@@ -1,12 +1,6 @@
 # BEGIN WordPress
-
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteCond %{HTTPS} !=on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
-Redirect 301 /password-reset/ https://transcribathon.eu/wp-login.php?action=lostpassword
-
-
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
 
@@ -19,7 +13,6 @@ RewriteRule ^ - [L]
 RewriteRule ^(wp-(content|admin|includes).*) $1 [L]
 RewriteRule ^(.*\.php)$ wp/$1 [L]
 RewriteRule . index.php [L]
-
 </IfModule>
 
 # END WordPress

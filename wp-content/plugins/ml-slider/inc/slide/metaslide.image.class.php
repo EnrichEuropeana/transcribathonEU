@@ -251,7 +251,7 @@ class MetaImageSlide extends MetaSlide {
         // slide row HTML
         $row  = "<tr id='slide-{$this->slide->ID}' class='slide image flex responsive nivo coin' data-attachment-id='{$attachment_id}'>
                     <td class='col-1'>
-                        <div class='metaslider-ui-controls ui-sortable-handle rtl:pl-0 rtl:pr-3'>
+                        <div class='metaslider-ui-controls ui-sortable-handle'>
                         <h4 class='slide-details'>{$slide_label}</h4>";
                         if (metaslider_this_is_trash($this->slide)) {
                             $row .= '<div class="row-actions trash-btns">';
@@ -272,7 +272,7 @@ class MetaImageSlide extends MetaSlide {
 					<td class='col-2'>".
 					// For now this is the entry point for a slide since you cant wrap around table elements.
 					"<metaslider-slide id='{$this->slide->ID}' inline-template>
-                        <div class='metaslider-ui-inner flex flex-col h-full'>
+                        <div class='metaslider-ui-inner'>
                             " . $this->get_admin_slide_tabs_html() . "
                             <input type='hidden' name='attachment[{$this->slide->ID}][type]' value='image' />
                             <input type='hidden' class='menu_order' name='attachment[{$this->slide->ID}][menu_order]' value='{$this->slide->menu_order}' />

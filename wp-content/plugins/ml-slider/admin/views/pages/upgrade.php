@@ -10,10 +10,10 @@ foreach ($our_plugins as $plugin) {
 // If they have any plugins missing, make room for ads
 $width = (in_array(false, $installed_plugins, true)) ? 'metaslider_half_width' : ''
 ?>
-<div class="flex p-6 mb-16">
+<div>
     <div class="metaslider_col <?php echo $width; ?>">
-        <h2 class="font-light text-xl mb-2">MetaSlider <?php _e("Comparison Chart", 'ml-slider');?></h2>
-        <table class="metaslider_feat_table shadow">
+        <h2 class="ms-addon-headers">MetaSlider <?php _e("Comparison Chart", 'ml-slider');?></h2>
+        <table class="metaslider_feat_table">
             <thead>
                 <tr>
                     <th></th>
@@ -127,11 +127,11 @@ $width = (in_array(false, $installed_plugins, true)) ? 'metaslider_half_width' :
 
         // If any return false, that means they don't have all the plugins
         if (in_array(false, $installed_plugins, true)) { ?>
-            <h2 class="font-light text-xl mb-2"><?php _e("More Professional-Quality Plugins for your Website", 'ml-slider');?></h2>
+            <h2 class="ms-addon-headers"><?php _e("More Professional-Quality Plugins for your Website", 'ml-slider');?></h2>
         <?php } 
         
         if (!$installed_plugins['updraftplus']) {?>
-        <div class="postbox shadow">
+        <div class="postbox">
             <div class="inside">
                 <?php
                 echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=updraftplus'), 'install-plugin_updraftplus'), null, '<img class="addons" alt="'.esc_attr("UpdraftPlus").'" src="'. esc_url(METASLIDER_ADMIN_URL.'images/features/updraftplus_logo.png') .'">');
@@ -147,31 +147,38 @@ $width = (in_array(false, $installed_plugins, true)) ? 'metaslider_half_width' :
         </div>
         <?php }
         if (!$installed_plugins['updraftcentral']) {?>
-        <div class="postbox shadow">
+        <div class="postbox">
             <div class="inside">
                 <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=updraftcentral'), 'install-plugin_updraftcentral'), null, '<img class="addons" alt="'.esc_attr_x("UpdraftCentral Dashboard", 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider').'" src="'. METASLIDER_ADMIN_URL.'images/features/updraftcentral_logo.png' .'">');
                 echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=updraftcentral'), 'install-plugin_updraftcentral'), null, '<h3>'._x('UpdraftCentral – save hours managing multiple WP sites from one place', 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider').'</h3>', 'other-plugin-title'); ?>
                 <p><?php _ex("If you manage a few WordPress sites, you need UpdraftCentral.", 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider');?></p>
-                <p><?php _ex("UpdraftCentral is a powerful tool that allows you to efficiently manage, update, backup multiple websites from just one location. You can also manage users and comments on all the sites at once, and through its central login feature, you can access each WP-dashboard with a single click.", 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider'); ?></p>
+                <p><?php _ex("UpdraftCentral is a powerful tool that allows you to efficiently manage, update, backup and even restore multiple websites from just one location. You can also manage users and comments on all the sites at once, and through its central login feature, you can access each WP-dashboard with a single click.", 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider'); ?></p>
                 <p><?php _ex("With a wide range of useful features, including automated backup schedules and sophisticated one click updates, UpdraftCentral is sure to boost to your productivity and save you time.", 'Keep the plugin name "UpdraftCentral" when possible', 'ml-slider'); ?></p>
                 <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=updraftcentral'), 'install-plugin_updraftcentral'), __('Try for free', 'ml-slider')); ?>
             </div>
         </div>
         <?php }
         if (!$installed_plugins['wp-optimize']) {?>
-        <div class="postbox shadow">
+        <div class="postbox">
             <div class="inside">
                 <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=wp-optimize'), 'install-plugin_wp-optimize'), null, '<img class="addons" alt="'.esc_attr_x("WP-Optimize", 'Keep the plugin name "WP-Optimize" when possible', 'ml-slider').'" src="'. METASLIDER_ADMIN_URL.'images/features/wpo_logo.png' .'">');
-                echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=wp-optimize'), 'install-plugin_wp-optimize'), null, '<h3>'._x('WP-Optimize - Clean, Compress, Cache.', 'Keep the plugin name "WP-Optimize" when possible', 'ml-slider').'</h3>', 'other-plugin-title'); ?>
-                <div>
-				<?php _e('It does it in three clever ways:', 'ml-slider'); ?>
-				<ul class="ml-4 mt-2 list-disc">
-					<li><?php _e('It allows you to clean and optimize your database.', 'ml-slider'); ?></li>
-					<li><?php _e('It gives you the option to compress your images.', 'ml-slider'); ?></li>
-					<li><?php _e('It allows you cache your pages, for super fast load times (read more caching information below).', 'ml-slider'); ?></li>
-				</ul>
-				<p><?php _e('Extensive tests show the cache feature alone can make WordPress sites faster than any other caching plugin available. But when you combine the cache with the database and image optimizing features, the difference with alternative solutions is significant.', 'ml-slider'); ?></p>
+                echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=wp-optimize'), 'install-plugin_wp-optimize'), null, '<h3>'._x('Wp-Optimize – faster, fitter, cleaner WP sites for optimal performance.', 'Keep the plugin name "WP-Optimize" when possible', 'ml-slider').'</h3>', 'other-plugin-title'); ?>
+                <p><?php _ex("WP-Optimize, the #1 optimization plugin, keeps your WordPress site at prime speed by cleaning the database without the need for phpMyAdmin.", 'Keep the plugin name "WP-Optimize" when possible', 'ml-slider'); ?></p>
+                <p><?php _ex("Incredibly simple to use, WP-Optimize clears out old webpage revisions, spam, trash and unapproved comments, all of which take up megabytes of valuable space and leave your database sluggish and ultimately unfit for purpose.", 'Keep the plugin name "WP-Optimize" when possible', 'ml-slider'); ?></p>
+                <p><?php _ex("WP-Optimize has a load of valuable features, including automated weekly clean up scheduling, the retention of a set number of weeks’ data, a display of how much space can be cleared, the enabling / disabling of trackbacks and comments for all published posts, and an ‘administrators only’ security feature.", 'ml-slider'); ?></p>
                 <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=wp-optimize'), 'install-plugin_wp-optimize'), __('Try for free', 'ml-slider')); ?>
+            </div>
+        </div>
+        <?php }
+        if (!$installed_plugins['keyy']) {?>
+        <div class="postbox">
+            <div class="inside">
+                <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=keyy'), 'install-plugin_keyy'), null, '<img class="addons" alt="'.esc_attr_x("Keyy Two-Factor Authentication", 'Keep the plugin name "Keyy" when possible', 'ml-slider').'" src="'. METASLIDER_ADMIN_URL.'images/features/keyy_logo.png' .'">');
+                echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=keyy'), 'install-plugin_keyy'), null, '<h3>'._x('Keyy – instant &amp; secure logins with a wave of your phone', 'Keep the plugin name "Keyy" when possible', 'ml-slider').'</h3>', 'other-plugin-title'); ?>
+                <p><?php _ex("Keyy is a unique 2-factor authentication plugin that allows you to log in to your website with just a wave of your smartphone. It represents the ultimate UX, doing away with the need for usernames, passwords and other 2FA tokens.", 'Keep the plugin name "Keyy" when possible', 'ml-slider');?></p>
+                <p><?php _ex("Using innovative RSA public-key cryptography, Keyy is highly secure and prevents password-based hacking risks such as brute-forcing, key-logging, shoulder-surfing and connection sniffing.", 'Keep the plugin name "Keyy" when possible', 'ml-slider'); ?></p>
+                <p><?php _ex("Logging in with Keyy is simple. Once users have installed the app onto their smartphone and secured it using a fingerprint or 4-number pin, they just open the app, point it at the moving on-screen barcode and voila!", 'Keep the plugin name "Keyy" when possible', 'ml-slider'); ?></p>
+                <?php echo metaslider_optimize_url(wp_nonce_url(self_admin_url('update.php?action=install-plugin&plugin=keyy'), 'install-plugin_keyy'), __('Try for free', 'ml-slider')); ?>
             </div>
         </div>
         <?php } ?>

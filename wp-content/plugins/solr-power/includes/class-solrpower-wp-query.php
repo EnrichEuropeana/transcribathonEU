@@ -60,13 +60,6 @@ class SolrPower_WP_Query {
 	public $query;
 
 	/**
-	 * Highlighted field snippets
-	 *
-	 * @var array
-	 */
-	public $highlighting;
-
-	/**
 	 * Grab instance of object.
 	 *
 	 * @return SolrPower_WP_Query
@@ -206,9 +199,6 @@ class SolrPower_WP_Query {
 		if ( $search->getFacetSet() ) {
 			$this->facets = $search->getFacetSet()->getFacets();
 		}
-
-		$this->highlighting = $search->getHighlighting();
-
 		$search = $search->getData();
 
 		$search_header        = $search['responseHeader'];
@@ -266,23 +256,6 @@ class SolrPower_WP_Query {
 				if ( 'post_id' === $key ) {
 					$post->ID = $value;
 					continue;
-				}
-
-				if ( 'solr_id' === $key ) {
-					if ( $this->highlighting ) {
-						$highlighted_doc = $this->highlighting->getResult( $value );
-
-						if ( $highlighted_doc ) {
-								$snippet = '';
-
-							foreach ( $highlighted_doc as $field => $highlight ) {
-								$snippet .= implode( ' ... ', $highlight );
-							}
-
-								$post->excerpt = $snippet;
-								continue;
-						}
-					}
 				}
 
 				$post->$key = $value;
@@ -433,7 +406,6 @@ class SolrPower_WP_Query {
 	function parse_facets( $query ) {
 		$plugin_s4wp_settings = solr_options();
 		$default_operator     = ( isset( $plugin_s4wp_settings['s4wp_default_operator'] ) ) ? $plugin_s4wp_settings['s4wp_default_operator'] : 'OR';
-		$facet_operator       = apply_filters( 'solr_facet_operator', $default_operator );
 
 		$facets = $query->get( 'facet' );
 		if ( ! $facets ) {
@@ -443,7 +415,7 @@ class SolrPower_WP_Query {
 			if ( is_array( $this->fq ) && ! empty( $this->fq ) ) {
 				$return = $this->fq;
 
-				return implode( ' ' . $facet_operator . ' ', $return );
+				return implode( ' ' . $default_operator . ' ', $return );
 			}
 
 			return array();
@@ -461,7 +433,7 @@ class SolrPower_WP_Query {
 		// Additional Filter Query.
 		$return = array_merge( $return, $this->fq );
 
-		return implode( ' ' . $facet_operator . ' ', $return );
+		return implode( ' ' . $default_operator . ' ', $return );
 
 	}
 
@@ -491,7 +463,7 @@ class SolrPower_WP_Query {
 			'post__not_in' => '-ID',
 			'name'         => 'post_name',
 		);
-		if ( ! $query->is_search() && ! $query->get( 'solr_integrate' ) ) {
+		if ( ! $query->get( 's' ) && ! $query->get( 'solr_integrate' ) ) {
 			return '';
 		}
 
@@ -968,7 +940,7 @@ class SolrPower_WP_Query {
 				} else {
 					$the_date = strtotime( $the_date );
 					$the_date = ( ( isset( $dq['inclusive'] ) && $dq['inclusive'] ) || $inclusive ) ? $the_date : strtotime( '-1 second', $the_date );
-					$the_date = gmdate( 'Y-m-d H:i:s', $the_date );
+					$the_date = date( 'Y-m-d H:i:s', $the_date );
 					$the_date = SolrPower_Sync::get_instance()->format_date( $the_date );
 					$column   = ( isset( $dq['column'] ) ) ? $dq['column'] : 'post_date';
 
@@ -990,7 +962,7 @@ class SolrPower_WP_Query {
 
 					$the_date = strtotime( $the_date );
 					$the_date = ( ( isset( $dq['inclusive'] ) && $dq['inclusive'] ) || $inclusive ) ? $the_date : strtotime( '+1 second', $the_date );
-					$the_date = gmdate( 'Y-m-d H:i:s', $the_date );
+					$the_date = date( 'Y-m-d H:i:s', $the_date );
 					$the_date = SolrPower_Sync::get_instance()->format_date( $the_date );
 					$column   = ( isset( $dq['column'] ) ) ? $dq['column'] : 'post_date';
 
@@ -1026,7 +998,7 @@ class SolrPower_WP_Query {
 			&& array_key_exists( 'day', $dq ) )
 		) {
 
-			$the_date = gmdate( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-' . $dq['day'] ) );
+			$the_date = date( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-' . $dq['day'] ) );
 
 			switch ( $type ) {
 				case 'before':
@@ -1052,11 +1024,11 @@ class SolrPower_WP_Query {
 					return '(year_i:[* TO ' . $year . '])';
 				}
 				if ( ! isset( $dq['day'] ) ) {
-					$the_date = gmdate( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
+					$the_date = date( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
 					if ( ( isset( $dq['inclusive'] ) && true === $dq['inclusive'] )
 						|| true === $inclusive
 					) {
-						$the_date = gmdate( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
+						$the_date = date( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
 					}
 
 					return '(' . $column . ':' . '[* TO ' . $the_date . 'T00:00:00Z])';
@@ -1071,19 +1043,19 @@ class SolrPower_WP_Query {
 					return '(year_i:[' . $year . ' TO *])';
 				}
 				if ( ! isset( $dq['day'] ) ) {
-					$the_date = gmdate( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
+					$the_date = date( 'Y-m-d', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
 					if ( ( isset( $dq['inclusive'] ) && false === $dq['inclusive'] )
 						|| false === $inclusive
 					) {
-						$the_date = gmdate( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
-						$the_date = gmdate( 'Y-m-d', strtotime( '+1 Day', strtotime( $the_date ) ) );
+						$the_date = date( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-01' ) );
+						$the_date = date( 'Y-m-d', strtotime( '+1 Day', strtotime( $the_date ) ) );
 					}
 
 					return '(' . $column . ':' . '[' . $the_date . 'T00:00:00Z TO *])';
 				} else {
-					$the_date = gmdate( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-' . $dq['day'] ) );
+					$the_date = date( 'Y-m-t', strtotime( $dq['year'] . '-' . $dq['month'] . '-' . $dq['day'] ) );
 					if ( ( isset( $dq['inclusive'] ) && $dq['inclusive'] ) || $inclusive ) {
-						$the_date = gmdate( 'Y-m-d', strtotime( '+1 Day', strtotime( $the_date ) ) );
+						$the_date = date( 'Y-m-d', strtotime( '+1 Day', strtotime( $the_date ) ) );
 					}
 
 					return '(' . $column . ':' . '[' . $the_date . 'T00:00:00Z TO *])';

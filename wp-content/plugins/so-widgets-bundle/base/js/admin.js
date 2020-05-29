@@ -733,30 +733,15 @@ var sowbForms = window.sowbForms || {};
 				var $parentRepeater = $el.closest('.siteorigin-widget-field-repeater');
 				var itemTop = $el.find('> .siteorigin-widget-field-repeater-item-top');
 				var itemLabel = $parentRepeater.data('item-label');
-				var defaultLabel = $el.parents('.siteorigin-widget-field-repeater').data('item-name');
-				if ( itemLabel && ( itemLabel.hasOwnProperty( 'selector' ) || itemLabel.hasOwnProperty( 'selectorArray' ) ) ) {
+				if (itemLabel && itemLabel.selector) {
 					var updateLabel = function () {
-						var functionName, txt, selectorRow;
-						if ( itemLabel.hasOwnProperty( 'selectorArray' ) ) {
-							for ( var i = 0 ; i < itemLabel.selectorArray.length ; i++ ) {
-								selectorRow = itemLabel.selectorArray[ i ];
-								functionName = ( selectorRow.hasOwnProperty( 'valueMethod' ) && selectorRow.valueMethod ) ? selectorRow.valueMethod : 'val';
-								txt = $el.find( selectorRow.selector )[ functionName ]();
-								if ( txt ) {
-									break;
-								}
-							}
-						} else {
-							functionName = ( itemLabel.hasOwnProperty( 'valueMethod' ) && itemLabel.valueMethod ) ? itemLabel.valueMethod : 'val';
-							txt = $el.find( itemLabel.selector )[ functionName ]();
-						}
+						var functionName = ( itemLabel.hasOwnProperty('valueMethod') && itemLabel.valueMethod ) ? itemLabel.valueMethod : 'val';
+						var txt = $el.find(itemLabel.selector)[functionName]();
 						if (txt) {
 							if (txt.length > 80) {
 								txt = txt.substr(0, 79) + '...';
 							}
 							itemTop.find('h4').text(txt);
-						} else {
-							itemTop.find('h4').text(defaultLabel);
 						}
 					};
 					updateLabel();
@@ -797,13 +782,13 @@ var sowbForms = window.sowbForms || {};
 						$item.remove();
 						$s.sortable( "refresh" ).trigger( 'updateFieldPositions' );
 						$( window ).resize();
-						$parentRepeater.trigger( 'change' );
 					};
 					if ( params && params.silent ) {
 						removeItem();
 					} else if ( confirm( soWidgets.sure ) ) {
 						$item.slideUp('fast', removeItem );
 					}
+					$el.trigger( 'change' );
 				});
 				itemTop.find('.siteorigin-widget-field-copy').click(function (e) {
 					e.preventDefault();
@@ -1260,7 +1245,6 @@ var sowbForms = window.sowbForms || {};
 			
 			if ( triggerChange ) {
 				$$.trigger( 'change' );
-				this.dispatchEvent(new Event('change', {bubbles: true, cancelable: true}));
 			}
 		});
 	};
@@ -1334,9 +1318,7 @@ var sowbForms = window.sowbForms || {};
 	if ( $body.hasClass('block-editor-page') ) {
 		// Setup new widgets when they're previewed in the block editor.
 		$(document).on('panels_setup_preview', function () {
-			if (window.hasOwnProperty('sowb')) {
-				$( sowb ).trigger( 'setup_widgets', { preview: true } );
-			}
+			$( sowb ).trigger( 'setup_widgets', { preview: true } );
 		});
 	}
 

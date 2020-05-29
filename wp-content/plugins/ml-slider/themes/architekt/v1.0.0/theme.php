@@ -29,7 +29,10 @@ class MetaSlider_Theme_Architekt extends MetaSlider_Theme_Base {
 	 * 
 	 * @var string
 	 */
-	public $slider_parameters = array();
+	public $slider_parameters = array( 
+		"prevText" => "'<i class=\"left\"></i>'",
+		"nextText" => "'<i class=\"right\"></i>'"
+	);
 
 	/**
 	 * Enqueues theme specific styles and scripts

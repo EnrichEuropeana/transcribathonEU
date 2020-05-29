@@ -15,7 +15,7 @@ function _TCT_item_page_test( $atts ) {
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = home_url()."/tp-api/items/?ItemId=".$_GET['item'];
+        $url = network_home_url()."/tp-api/items/?ItemId=".$_GET['item'];
         $requestType = "GET";
     
         // Execude http request
@@ -25,7 +25,7 @@ function _TCT_item_page_test( $atts ) {
         $imageData = json_decode($result, true);
         $imageData = $imageData[0];
         // Set request parameters for story data
-        $url = home_url()."/tp-api/stories/".$imageData['StoryId'];
+        $url = network_home_url()."/tp-api/stories/".$imageData['StoryId'];
         $requestType = "GET";
     
         // Execude http request
@@ -39,8 +39,8 @@ function _TCT_item_page_test( $atts ) {
         $content = "";
         
         // Image viewer
-        //$imageViewer = "";
-        //    $imageViewer .= "<img src='".$imageData['ImageLink']."'>";
+        $imageViewer = "";
+            $imageViewer .= "<img src='".$imageData['ImageLink']."'>";
         // Editor tab
         $editorTab = "";
             $currentStatus = $imageData['CompletionStatusId'];

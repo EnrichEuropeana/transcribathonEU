@@ -77,29 +77,81 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 			$topusrs = json_decode($result, true);
 			
 		}else{ // Invdl
-			// Set request parameters for image data
-			$url = home_url()."/tp-api/rankings/userCount?campaign=".$cp;
-			$requestType = "GET";
-
-			// Execude http request
-			include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
-
-			// Save image data
-			$alltops = json_decode($result, true);
-			if((int)$alltops <= $base){
-				$base = (floor(((int)$alltops-1) / $limit)) * $limit;
+			/*
+			$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.userid) AS total FROM ".$wpdb->prefix."campaign_transcriptionprogress prg JOIN ".$wpdb->prefix."users usr ON usr.ID=prg.userid WHERE prg.campaignid='".$cp."'",ARRAY_A );
+				if((int)$alltops[0]['total'] <= $base){
+					$base = (floor(((int)$alltops[0]['total']-1) / $limit)) * $limit;
+				}
+				$query = "SELECT prg.userid,prg.campaignid,
+						(
+						SELECT GROUP_CONCAT(tShort) AS shortname 
+						FROM ".$wpdb->prefix."teams t 
+						JOIN ".$wpdb->prefix."user_teams ut 
+						ON t.team_id = ut.team_id WHERE ut.user_id = prg.userid
+						) AS teams,
+						SUM(prg.amount)AS useramnt,
+						usr.display_name,
+						(SELECT
+							(SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements
+							  WHERE (e_type='keywords' OR e_type='language-tag' OR e_type = 'theatre-tag' OR e_type = 'additional-source'  OR e_type='overall-category' OR e_type='document-tag') AND userid = prg.userid)
+							+ (SELECT COUNT(DISTINCT docid) FROM ".$wpdb->prefix."campaign_enrichements yt WHERE yt.e_type = 'item-description' AND yt.e_note is not null AND yt.teamid=prg.teamid)
+						) AS enrichements, 
+						FLOOR(
+							(CASE 
+								WHEN SUM(prg.amount) >=11000 THEN (20 + (((SUM(prg.amount)-10000)/1000)*7))
+								WHEN SUM(prg.amount) >=10000 THEN 20
+								WHEN SUM(prg.amount) >=7500 THEN 15
+								WHEN SUM(prg.amount) >=5000 THEN 10
+								WHEN SUM(prg.amount) >=1000 THEN 5
+								WHEN SUM(prg.amount) >=500 THEN 3 
+								WHEN SUM(prg.amount) >=200 THEN 1 
+								ELSE 0
+							 END)
+						) AS c_miles, 
+						FLOOR((SELECT enrichements)/20) AS e_miles, 
+						FLOOR(
+							(SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements cenr WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.teamid=prg.teamid)/10
+						) AS l_miles, 
+						(FLOOR(
+							(CASE 
+								WHEN SUM(prg.amount) >=11000 THEN (20 + (((SUM(prg.amount)-10000)/1000)*7))
+								WHEN SUM(prg.amount) >=10000 THEN 20
+								WHEN SUM(prg.amount) >=7500 THEN 15
+								WHEN SUM(prg.amount) >=5000 THEN 10
+								WHEN SUM(prg.amount) >=1000 THEN 5
+								WHEN SUM(prg.amount) >=500 THEN 3 
+								WHEN SUM(prg.amount) >=200 THEN 1 
+								ELSE 0
+							 END)
+						)) + (SELECT e_miles) + (SELECT l_miles) AS umiles, 
+						(
+						SELECT SUM(ttl.amount) 
+						FROM ".$wpdb->prefix."user_transcriptionprogress ttl 
+						WHERE ttl.userid=prg.userid
+						) AS totalchars,
+						(
+						SELECT COUNT(*) 
+						FROM CSMcH_campaign_enrichements cenr 
+						WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.userid=prg.userid
+						) AS locations
+						FROM ".$wpdb->prefix."campaign_transcriptionprogress prg 
+						LEFT JOIN CSMcH_users usr 
+						ON usr.ID=prg.userid 
+						WHERE prg.campaignid='".$cp."' and prg.userid != 1802
+						GROUP BY prg.userid 
+						ORDER BY useramnt DESC
+						LIMIT ".$base.",".$limit;
+			
+			if(is_user_logged_in() && get_current_user_id() == 1){	
+			//$dquery = "SELECT prg.teamid,SUM(prg.amount) AS teamamnt, tm.post_title, tm.post_type, tm.post_name, (SELECT COUNT(DISTINCT utm.user_id) FROM ".$wpdb->prefix."user_teams utm WHERE utm.team_id=prg.teamid) AS members, ( SUM(prg.amount)/ (SELECT COUNT(DISTINCT utm.user_id) FROM ".$wpdb->prefix."user_teams utm WHERE utm.team_id=prg.teamid)) AS relamount, (SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements cenr WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.teamid=prg.teamid) AS locations, ((SELECT((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements WHERE (e_type='keywords' OR e_type='language-tag' OR e_type = 'theatre-tag' OR e_type = 'additional-source'  OR e_type='overall-category' OR e_type='document-tag') AND teamid = prg.teamid) ))+(select count(DISTINCT docid) FROM ".$wpdb->prefix."campaign_enrichements yt WHERE yt.e_type = 'item-description' AND CHAR_LENGTH(yt.e_note) > 0 AND yt.teamid=prg.teamid)) AS enrichements , FLOOR((CASE WHEN SUM(prg.amount) > 199 AND SUM(prg.amount) < 500 THEN 1 WHEN SUM(prg.amount) > 499 AND SUM(prg.amount) < 1000 THEN 3 WHEN SUM(prg.amount) > 999 AND SUM(prg.amount) < 5000 THEN 5 WHEN SUM(prg.amount) > 4999 AND SUM(prg.amount) < 7500 THEN 10 WHEN SUM(prg.amount) > 7499 AND SUM(prg.amount) < 10000 THEN 15 WHEN SUM(prg.amount) > 9999 AND SUM(prg.amount) < 11000 THEN 20 ELSE (20 + (((SUM(prg.amount)-10000)/1000)*7)) END)) AS c_miles, FLOOR(((SELECT((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements WHERE (e_type='keywords' OR e_type='language-tag' OR e_type = 'theatre-tag' OR e_type = 'additional-source'  OR e_type='overall-category' OR e_type='document-tag') AND teamid = prg.teamid) ))+(select count(DISTINCT docid) FROM ".$wpdb->prefix."campaign_enrichements yt WHERE yt.e_type = 'item-description' AND CHAR_LENGTH(yt.e_note) > 0 AND yt.teamid=prg.teamid))/20) AS e_miles, FLOOR((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements cenr WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.teamid=prg.teamid)/10) AS l_miles, (FLOOR((CASE WHEN SUM(prg.amount) > 199 AND SUM(prg.amount) < 500 THEN 1 WHEN SUM(prg.amount) > 499 AND SUM(prg.amount) < 1000 THEN 3 WHEN SUM(prg.amount) > 999 AND SUM(prg.amount) < 5000 THEN 5 WHEN SUM(prg.amount) > 4999 AND SUM(prg.amount) < 7500 THEN 10 WHEN SUM(prg.amount) > 7499 AND SUM(prg.amount) < 10000 THEN 15 WHEN SUM(prg.amount) > 9999 AND SUM(prg.amount) < 11000 THEN 20 ELSE (20 + (((SUM(prg.amount)-10000)/1000)*7)) END)) + FLOOR(((SELECT((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements WHERE (e_type='keywords' OR e_type='language-tag' OR e_type = 'theatre-tag' OR e_type = 'additional-source'  OR e_type='overall-category' OR e_type='document-tag') AND teamid = prg.teamid) ))+(select count(DISTINCT docid) FROM ".$wpdb->prefix."campaign_enrichements yt WHERE yt.e_type = 'item-description' AND CHAR_LENGTH(yt.e_note) > 0 AND yt.teamid=prg.teamid))/20) + FLOOR((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements cenr WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.teamid=prg.teamid)/10)) AS totalmiles, ((FLOOR((CASE WHEN SUM(prg.amount) > 199 AND SUM(prg.amount) < 500 THEN 1 WHEN SUM(prg.amount) > 499 AND SUM(prg.amount) < 1000 THEN 3 WHEN SUM(prg.amount) > 999 AND SUM(prg.amount) < 5000 THEN 5 WHEN SUM(prg.amount) > 4999 AND SUM(prg.amount) < 7500 THEN 10 WHEN SUM(prg.amount) > 7499 AND SUM(prg.amount) < 10000 THEN 15 WHEN SUM(prg.amount) > 9999 AND SUM(prg.amount) < 11000 THEN 20 ELSE (20 + (((SUM(prg.amount)-10000)/1000)*7)) END)) + FLOOR(((SELECT((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements WHERE (e_type='keywords' OR e_type='language-tag' OR e_type = 'theatre-tag' OR e_type = 'additional-source'  OR e_type='overall-category' OR e_type='document-tag') AND teamid = prg.teamid) ))+(select count(DISTINCT docid) FROM ".$wpdb->prefix."campaign_enrichements yt WHERE yt.e_type = 'item-description' AND CHAR_LENGTH(yt.e_note) > 0 AND yt.teamid=prg.teamid))/20) + FLOOR((SELECT COUNT(*) FROM ".$wpdb->prefix."campaign_enrichements cenr WHERE cenr.e_type='location' AND cenr.e_action ='new' AND cenr.teamid=prg.teamid)/10))/(SELECT COUNT(DISTINCT utm.user_id) FROM ".$wpdb->prefix."user_teams utm WHERE utm.team_id=prg.teamid) ) AS relmiles FROM ".$wpdb->prefix."campaign_transcriptionprogress prg LEFT JOIN ".$wpdb->prefix."posts tm ON tm.ID = prg.teamid WHERE prg.campaignid='".$cp."' GROUP BY prg.teamid ORDER BY relmiles DESC LIMIT ".$base.",".$limit;
+						
+			//echo "debug<br />".$query;			
+						
 			}
 			
-
-			// Set request parameters for image data
-			$url = home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit."&campaign=".$cp;
-			$requestType = "GET";
-
-			// Execude http request
-			include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
-
-			// Save image data
-			$topusrs = json_decode($result, true);
+			
+			$topusrs = $wpdb->get_results($query,ARRAY_A);
+		*/
 		}
 	}else{
 		if($subject === "teams"){  // team
@@ -168,13 +220,13 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$team['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$team['TranscriptionCharacters']))."</span>\n";
 						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$team['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$team['Locations']))."</span>\n";
 						$enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$team['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$team['Enrichments']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2>".$team['TeamName']."</h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
+						echo "<span class=\"rang\">".$i."</span><h2><a href=\"teams/".$team['TeamName']."\">".$team['TeamName']."</a></h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
 						
 						
 					}else{
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Character per member', '%s Characters per member', (float)$team['Miles'], 'transcribathon'  ) ), number_format_i18n((float)$team['Miles']))."</span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character in total', '%s Characters in total', (int)$team['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$team['TranscriptionCharacters']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2>".$team['TeamName']."</h2><p>".$miles." | ".$chars."</p></li>\n";
+						echo "<span class=\"rang\">".$i."</span><h2><a href=\"teams/".$team['TeamName']."\">".$team['TeamName']."</a></h2><p>".$miles." | ".$chars."</p></li>\n";
 					}
 					$i++;
 				}
@@ -196,12 +248,6 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					}
 					*/
 					if($kind === "campaign"){
-						$miles = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
-						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$usr['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Locations']))."</span>\n";
-						$enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$usr['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Enrichments']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
-						
 						/*
 						if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile in this campaign', '%s Miles in this campaign', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
@@ -214,10 +260,10 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
 						if ($aut != null) {
-							echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+							echo "<span class=\"rang\">".$i."</span><h2><a href=\"/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
 						}
 						else {
-							echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+							echo "<span class=\"rang\">".$i."</span><h2><a href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
 						}
 					}
 					$i++;

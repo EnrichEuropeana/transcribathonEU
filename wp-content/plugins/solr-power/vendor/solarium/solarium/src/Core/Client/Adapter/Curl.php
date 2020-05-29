@@ -72,9 +72,7 @@ class Curl extends Configurable implements AdapterInterface
     public function createHandle($request, $endpoint)
     {
         // @codeCoverageIgnoreStart
-        $baseUri = $request->getIsServerRequest() ? $endpoint->getServerUri() : $endpoint->getCoreBaseUri();
-        $uri = $baseUri.$request->getUri();
-
+        $uri = $endpoint->getBaseUri().$request->getUri();
         $method = $request->getMethod();
         $options = $this->createOptions($request, $endpoint);
 
@@ -134,16 +132,6 @@ class Curl extends Configurable implements AdapterInterface
             curl_setopt($handler, CURLOPT_CUSTOMREQUEST, 'HEAD');
         } elseif (Request::METHOD_DELETE == $method) {
             curl_setopt($handler, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        } elseif (Request::METHOD_PUT == $method) {
-            curl_setopt($handler, CURLOPT_CUSTOMREQUEST, 'PUT');
-
-            if ($request->getFileUpload()) {
-                $helper = new AdapterHelper();
-                $data = $helper->buildUploadBodyFromRequest($request);
-                curl_setopt($handler, CURLOPT_POSTFIELDS, $data);
-            } else {
-                curl_setopt($handler, CURLOPT_POSTFIELDS, $request->getRawData());
-            }
         } else {
             throw new InvalidArgumentException("unsupported method: $method");
         }

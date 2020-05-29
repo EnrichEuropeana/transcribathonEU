@@ -389,7 +389,7 @@ class MetaSlide {
 
         $tabs = apply_filters('metaslider_slide_tabs', $this->get_admin_tabs(), $this->slide, $this->slider, $this->settings);
 
-        $return = "<div class='tabs-content flex-grow'>";
+        $return = "<div class='tabs-content'>";
 
         foreach ( $tabs as $id => $tab ) {
 
@@ -397,7 +397,7 @@ class MetaSlide {
 
             $hidden = $pos != 0 ? "style='display: none;'" : "";
 
-            $return .= "<div class='h-full tab tab-{$pos}' {$hidden}>{$tab['content']}</div>";
+            $return .= "<div class='tab tab-{$pos}' {$hidden}>{$tab['content']}</div>";
 
         }
 

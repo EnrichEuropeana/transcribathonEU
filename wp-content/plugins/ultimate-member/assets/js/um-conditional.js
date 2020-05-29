@@ -35,12 +35,9 @@ function um_get_field_default_value( $dom ) {
 			if ($dom.find('input[type=checkbox]:checked').length >= 1) {
 
 				if ($dom.find('input[type=checkbox]:checked').length > 1) {
-					var arr_values = [];
-                    arr_values.push( default_value );
 					$dom.find('input[type=checkbox]:checked').each(function () {
-						arr_values.push( jQuery(this).val() );
+						default_value = default_value + jQuery(this).val() + ' ';
 					});
-					default_value = arr_values;
 				} else {
 					default_value = $dom.find('input[type=checkbox]:checked').val();
 				}
@@ -207,18 +204,12 @@ function um_in_array(needle, haystack, strict){
  * @param  object  $dom
  * @param  boolean is_single_update
  */
-function um_apply_conditions( $dom, is_single_update ) {
+function um_apply_conditions($dom, is_single_update) {
 	var operators = ['empty', 'not empty', 'equals to', 'not equals', 'greater than', 'less than', 'contains'];
-	if ( ! $dom.parents('.um-field[data-key]').length ) {
-		return;
-	}
 	var key = $dom.parents('.um-field[data-key]').data('key');
-	var conditions = um_field_conditions[ key ];
-	if ( typeof conditions === 'undefined' ) {
-		return;
-	}
+	var conditions = um_field_conditions[key];
 
-	var live_field_value = um_get_field_data( $dom );
+	var live_field_value = um_get_field_data($dom);
 
 	var $owners = {};
 	var $owners_values = {};
@@ -390,7 +381,6 @@ function um_field_restore_default_value( $dom ) {
 
 		case 'checkbox':
 
-				
 			if ( $dom.find('input[type=checkbox]:checked').length >= 1 ) {
 
 				$dom.find('input[type=checkbox]:checked').removeAttr('checked');
@@ -412,7 +402,7 @@ function um_field_restore_default_value( $dom ) {
 					cbox_elem.closest('.um-field-checkbox').find('i').removeClass('um-icon-android-checkbox-outline-blank');
 					cbox_elem.closest('.um-field-checkbox').find('i').addClass('um-icon-android-checkbox-outline');
 					cbox_elem.closest('.um-field-checkbox').addClass('active');
-                }
+				}
 
 			}
 

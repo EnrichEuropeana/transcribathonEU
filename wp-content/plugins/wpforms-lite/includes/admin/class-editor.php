@@ -3,7 +3,11 @@
 /**
  * Functionality related to the admin TinyMCE editor.
  *
- * @since 1.0.0
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.0.0
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Admin_Editor {
 
@@ -24,10 +28,6 @@ class WPForms_Admin_Editor {
 	 * @param string $editor_id
 	 */
 	public function media_button( $editor_id ) {
-
-		if ( ! \wpforms_current_user_can( 'view_forms' ) ) {
-			return;
-		}
 
 		// Provide the ability to conditionally disable the button, so it can be
 		// disabled for custom fields or front-end use such as bbPress. We default

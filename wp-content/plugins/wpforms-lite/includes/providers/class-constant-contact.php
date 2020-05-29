@@ -3,7 +3,11 @@
 /**
  * Constant Contact integration.
  *
- * @since 1.3.6
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.3.6
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2017, WPForms LLC
  */
 class WPForms_Constant_Contact extends WPForms_Provider {
 

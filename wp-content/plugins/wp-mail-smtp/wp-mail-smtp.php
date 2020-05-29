@@ -20,13 +20,10 @@ spl_autoload_register( function ( $class ) {
 		return;
 	}
 
-	/*
-	 * This folder can be both "wp-mail-smtp" and "wp-mail-smtp-pro".
-	 */
-	$plugin_dir = basename( __DIR__ );
+	$plugin_folder = 'wp-mail-smtp';
 
 	// Default directory for all code is plugin's /src/.
-	$base_dir = plugin_dir_path( __DIR__ ) . '/' . $plugin_dir . '/src/';
+	$base_dir = plugin_dir_path( __DIR__ ) . '/' . $plugin_folder . '/src/';
 
 	// Get the relative class name.
 	$relative_class = substr( $class, strlen( $plugin_space ) + 1 );

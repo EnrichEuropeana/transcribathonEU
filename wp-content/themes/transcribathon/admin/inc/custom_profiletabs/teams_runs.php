@@ -7,8 +7,8 @@ Description: Creates the 'Teams & runs' tab of profile tab
 function _TCT_teamsandruns_tab( $atts ) {  
 echo  "<style type='text/css'>
 
-.tct_hd h1{text-transform:none; line-height:1.2; font-weight:500; letter-spacing:0.2; font-size:1.8rem !important; margin-bottom:0px !important; padding-bottom:0px !important;}
-.tct_hd h3{text-transform:none; line-height:1.2; font-weight:300; letter-spacing:0.3; color:#333; font-size:1.5rem !important; margin-top:0px !important; padding-top:0px !important; margin-bottom:0px !important;}
+.tct_hd h1{text-transform:none; line-height:1.2; font-weight:500; letter-spacing:0.2; font-size:2.3rem !important; margin-bottom:0px !important; padding-bottom:0px !important;}
+.tct_hd h3{text-transform:none; line-height:1.2; font-weight:300; letter-spacing:0.3; color:#333; font-size:2rem !important; margin-top:0px !important; padding-top:0px !important; margin-bottom:0px !important;}
 .tct_hd h1+h3{margin-top:0px !important; padding-top:5px !important;}
 .tct_hd{padding-bottom:20px !important;}
 
@@ -78,7 +78,7 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 					echo "<p class=\"smallloading\"></p>\n";
 				echo "</div>\n";*/
 		
-				
+		
 				// TO COME
 				
 			echo "</div>\n";

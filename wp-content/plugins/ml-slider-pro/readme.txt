@@ -1,50 +1,18 @@
 === MetaSlider Pro ===
 
 Requires at least: 3.5
-Tested up to: 5.3
-Stable tag: 2.16.0
+Tested up to: 5.2
+Stable tag: 2.13.2
 Requires PHP: 5.2
 
-Extends MetaSlider, adding features such as video slides, layer slides and include additional CSS.
+Extends MetaSlider, allowing slides to be opened in a lightbox.
 
 == Changelog ==
 
-= 2.16.0 - 2019/Dec/23 =
-
-* FEATURE: Allow daily time constraints on scheduled slides
-
-= 2.15.2 - 2019/Dec/5 =
-
-* FIX: Fixes an issue where YouTube URL wouldn't update properly
-* FIX: Fixes an issue where the "lazy load" option on YouTube remained on
-
-= 2.15.1 - 2019/Oct/4 =
-
-* FEATURE: Allows YouTube to be loaded from a different domain
-* TWEAK: Adds various UI and RTL enhancements
-* TWEAK: Removes internal options from post feed code snippet list
-* FIX: Fixes an issue where the calendar and time helper don't show
-* FIX: Fixes an issue where the post feed slide would not render on initial add
-
-= 2.15.0 - 2019/Oct/17 =
-
-* FIX: Fixes Vimeo issue when slideshow has autoplay disabled
-* FIX: Updates RTL language styles to address layout breaks
-* FIX: Adds additional attribute required by iOS for background video autoplay
-* FIX: Adds origin fix for YouTube videos loading in iframe
-* TWEAK: Updates classname on layer container to avoid a CSS conflict
-
-= 2.14.0 - 2019/July/26 =
-
-* TWEAK: Removes is_admin requirement when saving slides
-* FEATURE: Adds a CSS manager module to allow users to add custom CSS
-* FIX: Fixes scheduling query when another plugin/theme alters the initial query
-
 = 2.13.2 - 2019/Mar/21 =
 
-* FIX: Fixes a bug where some Vimeo video URLs render wrong video because of the wrong regex used
 * FIX: Fixes a bug where Nivo Slider captions disappear
-* TWEAK: Removes some ancient code for compatibility with PHP < 5.1
+* TWEAK: Removed some ancient code for compatibility with PHP < 5.1
 
 = 2.13.1 - 2019/Mar/20 =
 
@@ -352,4 +320,4 @@ Layer Slide scaling JS extracted to it's own jQuery plugin
 - Initial Version
 
 == Upgrade Notice ==
-* 2.16.0 : Feature: allow daily time constraints on scheduled slides. A recommended update for all.
+* 2.13.2 : Update now if you are using NivoSlider and your captions disappeared

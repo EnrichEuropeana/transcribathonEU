@@ -3,7 +3,11 @@
 /**
  * Suggestion form template.
  *
- * @since 1.1.3.2
+ * @package    WPForms
+ * @author     WPForms
+ * @since      1.1.3.2
+ * @license    GPL-2.0+
+ * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Template_Suggestion extends WPForms_Template {
 

@@ -183,20 +183,16 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 		 * @param $action
 		 */
 		function duplicate_form( $action ) {
-			if ( ! is_admin() || ! current_user_can('manage_options') ) {
-				die();
-			}
-			if ( ! isset( $_REQUEST['post_id'] ) || ! is_numeric( $_REQUEST['post_id'] ) ) {
-				die();
-			}
+			if ( ! is_admin() || ! current_user_can('manage_options') ) die();
+			if ( ! isset( $_REQUEST['post_id'] ) || ! is_numeric( $_REQUEST['post_id'] ) ) die();
 
-			$post_id = absint( $_REQUEST['post_id'] );
+			$post_id = $_REQUEST['post_id'];
 
 			$n = array(
-				'post_type'     => 'um_form',
-				'post_title'    => sprintf( __( 'Duplicate of %s', 'ultimate-member' ), get_the_title( $post_id ) ),
-				'post_status'   => 'publish',
-				'post_author'   => get_current_user_id(),
+				'post_type' 	  	=> 'um_form',
+				'post_title'		=> sprintf( __( 'Duplicate of %s', 'ultimate-member' ), get_the_title( $post_id ) ),
+				'post_status'		=> 'publish',
+				'post_author'   	=> get_current_user_id(),
 			);
 
 			$n_id = wp_insert_post( $n );
@@ -214,10 +210,10 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 
 			}
 
-			delete_post_meta( $n_id, '_um_core' );
+			delete_post_meta($n_id, '_um_core');
 
-			$url = admin_url( 'edit.php?post_type=um_form' );
-			$url = add_query_arg( 'update', 'form_duplicated', $url );
+			$url = admin_url('edit.php?post_type=um_form');
+			$url = add_query_arg('update','form_duplicated',$url);
 
 			exit( wp_redirect( $url ) );
 
@@ -245,19 +241,13 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 		 * @param $action
 		 */
 		function user_action( $action ) {
-			if ( ! is_admin() || ! current_user_can( 'edit_users' ) ) {
-				die();
-			}
-			if ( ! isset( $_REQUEST['sub'] ) ) {
-				die();
-			}
-			if ( ! isset( $_REQUEST['user_id'] ) ) {
-				die();
-			}
+			if ( !is_admin() || !current_user_can( 'edit_users' ) ) die();
+			if ( !isset( $_REQUEST['sub'] ) ) die();
+			if ( !isset($_REQUEST['user_id']) ) die();
 
-			um_fetch_user( absint( $_REQUEST['user_id'] ) );
+			um_fetch_user( $_REQUEST['user_id'] );
 
-			$subaction = sanitize_key( $_REQUEST['sub'] );
+			$subaction = $_REQUEST['sub'];
 
 			/**
 			 * UM hook
@@ -278,7 +268,7 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 			 * }
 			 * ?>
 			 */
-			do_action( 'um_admin_user_action_hook', $subaction );
+			do_action( "um_admin_user_action_hook", $subaction );
 			/**
 			 * UM hook
 			 *
@@ -300,7 +290,7 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 
 			um_reset_user();
 
-			wp_redirect( add_query_arg( 'update', 'user_updated', admin_url( '?page=ultimatemember' ) ) );
+			wp_redirect( add_query_arg( 'update', 'user_updated', admin_url('?page=ultimatemember') ) );
 			exit;
 
 		}
@@ -327,8 +317,6 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 		 */
 		function admin_init() {
 			if ( is_admin() && current_user_can( 'manage_options' ) && ! empty( $_REQUEST['um_adm_action'] ) ) {
-				$action = sanitize_key( $_REQUEST['um_adm_action'] );
-
 				/**
 				 * UM hook
 				 *
@@ -348,7 +336,7 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 				 * }
 				 * ?>
 				 */
-				do_action( 'um_admin_do_action__', $action );
+				do_action( "um_admin_do_action__", $_REQUEST['um_adm_action'] );
 				/**
 				 * UM hook
 				 *
@@ -368,7 +356,7 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 				 * }
 				 * ?>
 				 */
-				do_action( "um_admin_do_action__{$action}", $action );
+				do_action( "um_admin_do_action__{$_REQUEST['um_adm_action']}", $_REQUEST['um_adm_action'] );
 			}
 		}
 
@@ -443,19 +431,6 @@ if ( ! class_exists( 'um\admin\Admin' ) ) {
 				$parent_file = 'ultimatemember';
 			}
 			return $parent_file;
-		}
-
-
-		/**
-		 * @since 2.0
-		 *
-		 * @return core\Admin_Notices()
-		 */
-		function notices() {
-			if ( empty( UM()->classes['admin_notices'] ) ) {
-				UM()->classes['admin_notices'] = new core\Admin_Notices();
-			}
-			return UM()->classes['admin_notices'];
 		}
 	}
 }

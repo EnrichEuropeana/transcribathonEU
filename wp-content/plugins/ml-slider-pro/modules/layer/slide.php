@@ -16,16 +16,16 @@ class MetaLayerSlide extends MetaSlide {
      */
     public function __construct() {
 
-		if (is_admin()) {
-			add_filter("metaslider_advanced_settings", array($this, 'add_downscale_only_setting'), 10, 2);
-			add_action("wp_ajax_create_{$this->identifier}_slide", array($this, 'ajax_create_slide'));
-			add_action("metaslider_register_admin_scripts", array($this, 'register_admin_scripts'), 10, 1);
-			add_action("metaslider_register_admin_styles", array($this, 'register_admin_styles'), 10, 1);
-			add_filter("media_view_strings", array($this, 'custom_media_uploader_tabs'), 10, 1);
-		}
+        if ( is_admin() ) {
+            add_filter( "metaslider_advanced_settings", array( $this, 'add_downscale_only_setting' ), 10, 2 );
+            add_action( "metaslider_save_{$this->identifier}_slide", array( $this, 'save_slide' ), 5, 3 );
+            add_action( "wp_ajax_create_{$this->identifier}_slide", array( $this, 'ajax_create_slide' ) );
+            add_action( "metaslider_register_admin_scripts", array( $this, 'register_admin_scripts' ), 10, 1 );
+            add_action( 'metaslider_register_admin_styles', array( $this, 'register_admin_styles' ), 10, 1 );
+            add_filter( 'media_view_strings', array( $this, 'custom_media_uploader_tabs' ), 10, 1 );
+        }
 
-		add_action("metaslider_save_{$this->identifier}_slide", array($this, 'save_slide'), 5, 3);
-        add_filter("metaslider_get_{$this->identifier}_slide", array($this, 'get_slide'), 10, 2);
+        add_filter( "metaslider_get_{$this->identifier}_slide", array( $this, 'get_slide' ), 10, 2 );
     }
 
     /**
@@ -231,7 +231,7 @@ class MetaLayerSlide extends MetaSlide {
         $row .= "       </div>";
         $row .= "    </td>";
         $row .= "    <td class='col-2'>";
-        $row .= "       <div class='metaslider-ui-inner flex flex-col h-full'>";
+        $row .= "       <div class='metaslider-ui-inner'>";
         
         if ( method_exists( $this, 'get_admin_slide_tabs_html' ) ) {
             $row .= $this->get_admin_slide_tabs_html();
@@ -292,7 +292,7 @@ class MetaLayerSlide extends MetaSlide {
                         <div class='row'><label>" . __("WebM Source", "ml-slider-pro") . "</label></div>
                         <input class='url' type='text' name='attachment[{$slide_id}][webm]' placeholder='" . __("URL", 'ml-slider-pro') . "' value='{$webm}' />";
 
-        $source_tab = "<textarea class='h-full' id='editor{$slide_id}' name='attachment[{$slide_id}][html]'>{$html}</textarea>";
+        $source_tab = "<textarea class='wysiwyg' id='editor{$slide_id}' name='attachment[{$slide_id}][html]'>{$html}</textarea>";
 
         $tabs = array(
             'general' => array(
@@ -471,9 +471,8 @@ class MetaLayerSlide extends MetaSlide {
             // 'poster' => $url, // we're loading the slide background behind the video. the poster renders oddly for a split second.
             'width' => $this->settings['width'],
             'height' => $this->settings['height'],
-			'muted' => 'true',
-			'autoplay' => 'true',
-			'playsinline' => 'true',
+            'muted' => 'muted',
+            'autoplay' => 'autoplay',
             'style' => 'position: absolute; top: 0; left: 0; width: 100%; height: auto;'
         );
 

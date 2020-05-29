@@ -2,7 +2,7 @@
 /*
 Plugin Name: SiteOrigin CSS
 Description: An advanced CSS editor from SiteOrigin.
-Version: 1.2.5
+Version: 1.2.4
 Author: SiteOrigin
 Author URI: https://siteorigin.com
 Plugin URI: https://siteorigin.com/css/
@@ -14,7 +14,7 @@ Text Domain: so-css
 // Handle the legacy CSS editor that came with SiteOrigin themes
 include plugin_dir_path( __FILE__ ) . 'inc/legacy.php';
 
-define( 'SOCSS_VERSION', '1.2.5' );
+define( 'SOCSS_VERSION', '1.2.4' );
 define( 'SOCSS_JS_SUFFIX', '.min' );
 
 /**
@@ -374,6 +374,7 @@ class SiteOrigin_CSS {
 		$home_url = add_query_arg( 'so_css_preview', '1', $init_url );
 		
 		wp_localize_script( 'siteorigin-custom-css', 'socssOptions', array(
+			'themeCSS' => SiteOrigin_CSS::single()->get_theme_css(),
 			'homeURL' => $home_url,
 			'postCssUrlRoot' => wp_nonce_url( admin_url('admin-ajax.php?action=socss_get_post_css'), 'get_post_css' ),
 			'getRevisionsListAjaxUrl' => wp_nonce_url( admin_url('admin-ajax.php?action=socss_get_revisions_list'), 'get_revisions_list' ),

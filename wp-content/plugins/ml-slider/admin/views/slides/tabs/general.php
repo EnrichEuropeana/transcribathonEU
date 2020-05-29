@@ -6,11 +6,10 @@
 	$image_description = (esc_textarea($attachment->post_content));
 
 	// Deprecate inherit_image_caption by deleting it and setting the source as the image 
-	if (filter_var(get_post_meta($this->slide->ID, 'ml-slider_inherit_image_caption', true), FILTER_VALIDATE_BOOLEAN)) {
+	if ($use_image_caption = (bool) get_post_meta($this->slide->ID, 'ml-slider_inherit_image_caption', true)) {
 		update_post_meta($this->slide->ID, 'ml-slider_caption_source', 'image-caption');
 		delete_post_meta($this->slide->ID, 'ml-slider_inherit_image_caption');
 	}
-
 
 	$caption_source = get_post_meta($this->slide->ID, 'ml-slider_caption_source', true); ?>
 	<metaslider-caption
@@ -24,7 +23,7 @@
 	$target = get_post_meta($slide_id, 'ml-slider_new_window', true) ? 'checked=checked' : ''; 
 ?>
 <div class="row has-right-checkbox">
-	<input class="url" data-lpignore="true" type="text" name="attachment[<?php echo $slide_id; ?>][url]" placeholder="<?php _e("URL", "ml-slider"); ?>" value="<?php echo $url; ?>" />
+	<input class="url" type="text" name="attachment[<?php echo $slide_id; ?>][url]" placeholder="<?php _e("URL", "ml-slider"); ?>" value="<?php echo $url; ?>" />
 	<div class="input-label right new_window">
 		<label><?php _e("Open in a new window", "ml-slider"); ?> <input autocomplete="off" tabindex="0" type="checkbox" name="attachment[<?php echo $slide_id; ?>][new_window]" <?php echo $target; ?> /></label>
 	</div>
