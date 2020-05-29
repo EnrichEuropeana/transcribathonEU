@@ -1,3 +1,6 @@
+<?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
+
+
 <div class="um-admin-metabox">
 
 	<script type="text/javascript">
@@ -52,7 +55,7 @@
 	$role_capabilities = ! empty( $role['wp_capabilities'] ) ? array_keys( $role['wp_capabilities'] ) : array( 'read' );
 
 	if ( ! empty( $_GET['id'] ) ) {
-		$role = get_role( $_GET['id'] );
+		$role = get_role( sanitize_key( $_GET['id'] ) );
 	}
 
 	$all_caps = array();
@@ -73,16 +76,16 @@
 	}
 
 	UM()->admin_forms( array(
-		'class'		=> 'um-role-wp-capabilities',
-		'prefix_id'	=> 'role',
+		'class'     => 'um-role-wp-capabilities',
+		'prefix_id' => 'role',
 		'fields'    => array(
 			array(
-				'id'       		=> 'wp_capabilities',
-				'type'     		=> 'multi_checkbox',
+				'id'            => 'wp_capabilities',
+				'type'          => 'multi_checkbox',
 				'options'       => $fields,
 				'value'         => ! empty( $role_capabilities ) ? $role_capabilities : array(),
-				'columns'	    => 3,
-				'without_label'	=> true,
+				'columns'       => 3,
+				'without_label' => true,
 			)
 		)
 	) )->render_form(); ?>

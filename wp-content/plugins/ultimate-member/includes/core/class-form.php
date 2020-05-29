@@ -27,11 +27,15 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 
 
 		/**
+		 * @var null
+		 */
+		var $post_form = null;
+
+
+		/**
 		 * Form constructor.
 		 */
 		function __construct() {
-
-			$this->post_form = null;
 
 			$this->form_suffix = null;
 
@@ -39,9 +43,9 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 
 			$this->processing = null;
 
-			add_action('template_redirect', array(&$this, 'form_init'), 2);
+			add_action( 'template_redirect', array( &$this, 'form_init' ), 2 );
 
-			add_action('init', array(&$this, 'field_declare'), 10);
+			add_action( 'init', array( &$this, 'field_declare' ), 10 );
 
 		}
 
@@ -99,10 +103,27 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 			$form_fields = UM()->fields()->get_fields();
 			$arr_options['fields'] = $form_fields;
 
-			if ( $arr_options['post']['members_directory'] == 'yes' ) {
+			if ( isset( $arr_options['post']['members_directory'] ) && $arr_options['post']['members_directory'] == 'yes' ) {
 				$ajax_source_func = $_POST['child_callback'];
-				if( function_exists( $ajax_source_func ) ){
-					$arr_options['items'] = call_user_func( $ajax_source_func, $arr_options['field']['parent_dropdown_relationship']  );
+				if ( function_exists( $ajax_source_func ) ) {
+					$arr_options['items'] = call_user_func( $ajax_source_func, $arr_options['field']['parent_dropdown_relationship'] );
+
+					global $wpdb;
+
+					$values_array = $wpdb->get_col( $wpdb->prepare(
+						"SELECT DISTINCT meta_value 
+						FROM $wpdb->usermeta 
+						WHERE meta_key = %s AND 
+						      meta_value != ''",
+						$arr_options['post']['child_name']
+					) );
+
+					if ( ! empty( $values_array ) ) {
+						$arr_options['items'] = array_intersect( $arr_options['items'], $values_array );
+					} else {
+						$arr_options['items'] = array();
+					}
+
 					wp_send_json( $arr_options );
 				}
 			} else {
@@ -135,7 +156,7 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 					);
 				}
 
-				if( isset( $_POST['child_callback'] ) && ! empty( $_POST['child_callback'] ) && isset( $form_fields[ $_POST['child_name'] ] )  ){
+				if ( ! empty( $_POST['child_callback'] ) && isset( $form_fields[ $_POST['child_name'] ] ) ) {
 
 					$ajax_source_func = $_POST['child_callback'];
 
@@ -146,13 +167,13 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 
 						$arr_options['field'] = $form_fields[ $_POST['child_name'] ];
 
-						if( function_exists( $ajax_source_func ) ){
-							$arr_options['items'] = call_user_func( $ajax_source_func, $arr_options['field']['parent_dropdown_relationship']  );
+						if ( function_exists( $ajax_source_func ) ) {
+							$arr_options['items'] = call_user_func( $ajax_source_func, $arr_options['field']['parent_dropdown_relationship'] );
 						}
 
 					} else {
 						$arr_options['status'] = 'error';
-						$arr_options['message'] = __( 'This is not possible for security reasons.','ultimate-member');
+						$arr_options['message'] = __( 'This is not possible for security reasons.', 'ultimate-member' );
 					}
 
 				}
@@ -211,6 +232,40 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 			}
 		}
 
+		/**
+		 * Appends field notices
+		 * @param string $key
+		 * @param string $notice
+		 */
+		function add_notice( $key, $notice ) {
+			if ( ! isset( $this->notices[ $key ] ) ){
+				/**
+				 * UM hook
+				 *
+				 * @type filter
+				 * @title um_submit_form_notice
+				 * @description Change notice text on submit form
+				 * @input_vars
+				 * [{"var":"$notice","type":"string","desc":"notice String"},
+				 * {"var":"$key","type":"string","desc":"notice Key"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage
+				 * <?php add_filter( 'um_submit_form_notice', 'function_name', 10, 2 ); ?>
+				 * @example
+				 * <?php
+				 * add_filter( 'um_submit_form_notice', 'my_submit_form_notice', 10, 2 );
+				 * function my_submit_form_notice( $notice, $key ) {
+				 *     // your code here
+				 *     return $notice;
+				 * }
+				 * ?>
+				 */
+				$notice = apply_filters( 'um_submit_form_notice', $notice, $key );
+				$this->notices[ $key ] = $notice;
+			}
+		}
+
 
 		/**
 		 * If a form has errors
@@ -218,8 +273,21 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 		 * @return boolean
 		 */
 		function has_error( $key ) {
-			if ( isset( $this->errors[$key] ) )
+			if ( isset( $this->errors[ $key ] ) ) {
 				return true;
+			}
+			return false;
+		}
+
+		/**
+		 * If a form has notices/info
+		 * @param  string  $key
+		 * @return boolean
+		 */
+		function has_notice( $key ) {
+			if ( isset( $this->notices[ $key ] ) ) {
+				return true;
+			}
 			return false;
 		}
 
@@ -227,7 +295,7 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 		/**
 		 * Declare all fields
 		 */
-		function field_declare(){
+		function field_declare() {
 			if ( isset( UM()->builtin()->custom_fields ) ) {
 				$this->all_fields = UM()->builtin()->custom_fields;
 			} else {
@@ -237,11 +305,11 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 
 
 		/**
-		 * Validate form
+		 * Validate form on submit
 		 */
 		function form_init() {
 			if ( isset( $_SERVER['REQUEST_METHOD'] ) ) {
-				$http_post = ('POST' == $_SERVER['REQUEST_METHOD']);
+				$http_post = ( 'POST' == $_SERVER['REQUEST_METHOD'] );
 			} else {
 				$http_post = 'POST';
 			}
@@ -267,7 +335,7 @@ if ( ! class_exists( 'um\core\Form' ) ) {
 				 * }
 				 * ?>
 				 */
-				do_action( "um_before_submit_form_post", $_POST );
+				do_action( 'um_before_submit_form_post', $_POST );
 
 				$this->form_id = $_POST['form_id'];
 				$this->form_status = get_post_status( $this->form_id );

@@ -53,7 +53,12 @@ class SolrPower_Sync {
 			add_action( 'make_spam_blog', array( $this, 'delete_blog' ) );
 			add_action( 'unspam_blog', array( $this, 'handle_activate_blog' ) );
 			add_action( 'delete_blog', array( $this, 'delete_blog' ) );
-			add_action( 'wpmu_new_blog', array( $this, 'handle_activate_blog' ) );
+			// WP 5.1 and higher.
+			if ( function_exists( 'wp_insert_site' ) ) {
+				add_action( 'wp_insert_site', array( $this, 'handle_activate_blog' ) );
+			} else {
+				add_action( 'wpmu_new_blog', array( $this, 'handle_activate_blog' ) );
+			}
 		}
 	}
 
@@ -63,8 +68,6 @@ class SolrPower_Sync {
 	 * @param integer $post_id ID for the post.
 	 */
 	function handle_modified( $post_id ) {
-		global $current_blog;
-
 		$post_info  = get_post( $post_id );
 		$post_types = SolrPower::get_post_types();
 
@@ -78,7 +81,7 @@ class SolrPower_Sync {
 			return;
 		}
 		// make sure this blog is not private or a spam if indexing on a multisite install.
-		if ( is_multisite() && ( 1 != $current_blog->public || 1 == $current_blog->spam || 1 == $current_blog->archived ) ) {
+		if ( is_multisite() && $this->is_private_blog() ) {
 			return;
 		}
 		$docs   = array();
@@ -115,9 +118,10 @@ class SolrPower_Sync {
 	/**
 	 * Handle the blog activation event.
 	 *
-	 * @param integer $blogid ID for the blog.
+	 * @param object|integer $site Site object or simply its id.
 	 */
-	function handle_activate_blog( $blogid ) {
+	function handle_activate_blog( $site ) {
+		$blogid = is_object( $site ) ? $site->id : $site;
 		$this->load_blog_all( $blogid );
 	}
 
@@ -138,6 +142,17 @@ class SolrPower_Sync {
 		} catch ( Exception $e ) {
 			echo esc_html( $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Check whether a blog is private
+	 *
+	 * @return boolean
+	 */
+	protected static function is_private_blog() {
+		global $current_blog;
+
+		return apply_filters( 'solr_is_private_blog', ( 1 != $current_blog->public || 1 == $current_blog->spam || 1 == $current_blog->archived ), $current_blog );
 	}
 
 	/**
@@ -273,26 +288,26 @@ class SolrPower_Sync {
 			$doc->setField( 'displaymodified', $post_info->post_modified );
 
 			$post_time = strtotime( $post_info->post_date );
-			$doc->setField( 'year_i', date( 'Y', $post_time ) );
-			$doc->setField( 'month_i', date( 'm', $post_time ) );
-			$doc->setField( 'day_i', date( 'd', $post_time ) );
-			$doc->setField( 'week_i', date( 'W', $post_time ) );
-			$doc->setField( 'dayofweek_i', ( date( 'w', $post_time ) + 1 ) );
-			$doc->setField( 'dayofweek_iso_i', date( 'w', $post_time ) );
-			$doc->setField( 'hour_i', date( 'H', $post_time ) );
-			$doc->setField( 'minute_i', date( 'i', $post_time ) );
-			$doc->setField( 'second_i', date( 's', $post_time ) );
+			$doc->setField( 'year_i', gmdate( 'Y', $post_time ) );
+			$doc->setField( 'month_i', gmdate( 'm', $post_time ) );
+			$doc->setField( 'day_i', gmdate( 'd', $post_time ) );
+			$doc->setField( 'week_i', gmdate( 'W', $post_time ) );
+			$doc->setField( 'dayofweek_i', ( gmdate( 'w', $post_time ) + 1 ) );
+			$doc->setField( 'dayofweek_iso_i', gmdate( 'w', $post_time ) );
+			$doc->setField( 'hour_i', gmdate( 'H', $post_time ) );
+			$doc->setField( 'minute_i', gmdate( 'i', $post_time ) );
+			$doc->setField( 'second_i', gmdate( 's', $post_time ) );
 
 			$post_time = strtotime( $post_info->post_modified );
-			$doc->setField( 'post_modified_year_i', date( 'Y', $post_time ) );
-			$doc->setField( 'post_modified_month_i', date( 'm', $post_time ) );
-			$doc->setField( 'post_modified_day_i', date( 'd', $post_time ) );
-			$doc->setField( 'post_modified_week_i', date( 'W', $post_time ) );
-			$doc->setField( 'post_modified_dayofweek_i', ( date( 'w', $post_time ) + 1 ) );
-			$doc->setField( 'post_modified_dayofweek_iso_i', date( 'w', $post_time ) );
-			$doc->setField( 'post_modified_hour_i', date( 'H', $post_time ) );
-			$doc->setField( 'post_modified_minute_i', date( 'i', $post_time ) );
-			$doc->setField( 'post_modified_second_i', date( 's', $post_time ) );
+			$doc->setField( 'post_modified_year_i', gmdate( 'Y', $post_time ) );
+			$doc->setField( 'post_modified_month_i', gmdate( 'm', $post_time ) );
+			$doc->setField( 'post_modified_day_i', gmdate( 'd', $post_time ) );
+			$doc->setField( 'post_modified_week_i', gmdate( 'W', $post_time ) );
+			$doc->setField( 'post_modified_dayofweek_i', ( gmdate( 'w', $post_time ) + 1 ) );
+			$doc->setField( 'post_modified_dayofweek_iso_i', gmdate( 'w', $post_time ) );
+			$doc->setField( 'post_modified_hour_i', gmdate( 'H', $post_time ) );
+			$doc->setField( 'post_modified_minute_i', gmdate( 'i', $post_time ) );
+			$doc->setField( 'post_modified_second_i', gmdate( 's', $post_time ) );
 
 			$doc->setField( 'post_status', $post_info->post_status );
 			$doc->setField( 'post_parent', $post_info->post_parent );
@@ -327,7 +342,8 @@ class SolrPower_Sync {
 			$taxonomies = (array) get_taxonomies(
 				array(
 					'_builtin' => false,
-				), 'names'
+				),
+				'names'
 			);
 			foreach ( $taxonomies as $parent ) {
 				$terms = get_the_terms( $post_info->ID, $parent );

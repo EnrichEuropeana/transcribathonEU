@@ -13,6 +13,7 @@ get_header(); ?>
 
 	<div id="primary-full-width" class="content-area">
 		<div id="content" class="site-content" role="main">
+        	<?php echo do_shortcode( '[tutorial_menu]' ); ?>
 
 			<?php while ( have_posts() ) : the_post(); ?>
 

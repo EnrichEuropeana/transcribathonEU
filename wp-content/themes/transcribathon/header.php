@@ -20,6 +20,16 @@
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/wp-content/themes/transcribathon/images/apple-touch-icon-72x72-precomposed.png" />
 	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/wp-content/themes/transcribathon/images/apple-touch-icon-114x114-precomposed.png" />
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/wp-content/themes/transcribathon/images/apple-touch-icon-144x144-precomposed.png" />
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-163155192-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-163155192-1');
+</script>
+
 	<?php wp_head(); ?>
 </head>
 

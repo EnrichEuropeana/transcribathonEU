@@ -89,7 +89,6 @@
 	position: relative;
 }
 
-
 #filterContainer {
 	position: absolute;
   top: 168px;
@@ -258,7 +257,7 @@
 
 /* fix for fullscreen inline editor */
 body > div.tox.tox-tinymce.tox-tinymce-inline.tox-toolbar-dock-transition.tox-toolbar-dock-fadein {
-  z-index: 999999;
+  z-index: 999;
 }
 
 body > div.tox.tox-silver-sink.tox-tinymce-aux {
@@ -301,9 +300,9 @@ i.mce-i-missing {
 
 i.mce-i-unsure:before {
   content: "\f128";
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Pro";
   font-style: normal;
-  font-weight: normal;
+  font-weight: bold;
   color: #444;
   font-size: 1.2em;
   position: relative;
@@ -316,9 +315,9 @@ i.mce-i-unsure {
 
 i.mce-i-pos-in-text:before {
   content: '\f129';
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Pro";
   font-style: normal;
-  font-weight: normal;
+  font-weight: bold;
   color: #444;
   font-size: 1.2em;
   position: relative;
@@ -329,7 +328,6 @@ i.mce-i-pos-in-text {
 }
 
 #mytoolbar-transcription {
-  height: 30px;
 }
 
 /* TODO wrong place, helper for mapbox map */
@@ -351,13 +349,26 @@ i.mce-i-pos-in-text {
 	font-size: 18px;
 }
 
+.mapboxgl-popup .popupWrapper .title {
+	margin-right: 18px;
+	font-weight: 500;
+}
+
+.mapboxgl-popup .popupWrapper .title a {
+	color: #0C7DA7;
+}
+
 .mapboxgl-popup .popupWrapper .name {
 	margin-right: 18px;
-	font-weight: 600;
+	font-weight: 500;
+	font-size: 14px;
+	color: #474747;
 }
 
 .mapboxgl-popup .popupWrapper .comment {
 	font-style: italic;
+	font-size: 14px;
+	color: #474747;
 }
 
 #all-places-map {
@@ -366,7 +377,8 @@ i.mce-i-pos-in-text {
 }
 
 svg.mapboxgl-ctrl-geocoder--icon-search {
-	left: 90%;
+  left: 90%;
+  top: 3px;
 }
 
 #storyMap {
@@ -385,7 +397,8 @@ svg.mapboxgl-ctrl-geocoder--icon-search {
 
 .mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
 	width: 100%;
-	box-shadow: none;
+  box-shadow: none;
+  max-width: 100%;
 }
 
 span.tct-uncertain::after {
@@ -397,7 +410,6 @@ span.tct-uncertain::after {
     height: 20px;
 
 }
-
 
 span.tct-uncertain::before {
 
@@ -415,8 +427,7 @@ span.tct-uncertain {
     background: #ffeea2;
 }
 
-span.pos-in-text
-{
+span.pos-in-text {
     color: #fff;
     background: #999;
     font-weight: 400;
@@ -438,3 +449,45 @@ span.pos-in-text::after {
     width: 9px;
     height: 20px;
 }
+
+/* image selection */
+#selection-tab {
+	display: block;
+	position: absolute;
+	top: 75px;
+}
+
+.rect {
+	border: 6px solid black;
+}
+
+.mapboxgl-marker.savedMarker {
+	background: url(../images/map/location%20icon.svg);
+	background-size: contain;
+	height: 40px;
+	width: 40px;
+}
+
+.mapboxgl-marker.savedMarker.storyMarker {
+	background: url(../images/map/selected%20location%20icon.svg);
+}
+
+.marker.newMarker {
+	background: url(../images/map/selected%20location%20icon.svg);
+	background-size: contain;
+	height: 40px;
+	width: 40px;
+}
+
+body .mapboxgl-popup-content {
+	border-radius: 10px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.popupWrapper .border:last-child {
+	display: none;
+}
+
+
+

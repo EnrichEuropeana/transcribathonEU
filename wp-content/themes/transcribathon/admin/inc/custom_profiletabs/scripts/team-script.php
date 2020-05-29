@@ -471,6 +471,8 @@ if(isset($_POST['q']) && $_POST['q'] === "chk-tm-cd"):
 		// Execude http request
 		include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
 
+		$ex = json_decode($result, true);
+
 		if(sizeof($ex)>0 && isset($ex[0]['TeamId']) && $ex[0]['TeamId'] != ""){
 			$alreadyMember = false;
 			foreach ($ex[0]['Users'] as $user) {

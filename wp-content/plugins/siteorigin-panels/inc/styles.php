@@ -36,6 +36,8 @@ class SiteOrigin_Panels_Styles {
 
 		// Filtering specific attributes
 		add_filter( 'siteorigin_panels_css_row_margin_bottom', array( $this, 'filter_row_bottom_margin' ), 10, 2 );
+		add_filter( 'siteorigin_panels_css_cell_mobile_margin_bottom', array( $this, 'filter_row_cell_bottom_margin' ), 10, 5 );
+		add_filter( 'siteorigin_panels_css_row_mobile_margin_bottom', array( $this, 'filter_row_mobile_bottom_margin' ), 10, 2 );
 		add_filter( 'siteorigin_panels_css_row_gutter', array( $this, 'filter_row_gutter' ), 10, 2 );
 		add_filter( 'siteorigin_panels_css_widget_css', array( $this, 'filter_widget_style_css' ), 10, 2 );
 	}
@@ -117,11 +119,13 @@ class SiteOrigin_Panels_Styles {
 			'priority'    => 7,
 			'multiple'    => true
 		);
+		
+		// Mobile layout fields
 
 		$fields['mobile_padding'] = array(
 			'name'        => __( 'Mobile Padding', 'siteorigin-panels' ),
 			'type'        => 'measurement',
-			'group'       => 'layout',
+			'group'       => 'mobile_layout',
 			'description' => __( 'Padding when on mobile devices.', 'siteorigin-panels' ),
 			'priority'    => 8,
 			'multiple'    => true
@@ -153,6 +157,7 @@ class SiteOrigin_Panels_Styles {
 				'tile'              => __( 'Tiled Image', 'siteorigin-panels' ),
 				'cover'             => __( 'Cover', 'siteorigin-panels' ),
 				'center'            => __( 'Centered, with original size', 'siteorigin-panels' ),
+				'contain'           => __( 'Contain', 'siteorigin-panels' ),
 				'fixed'             => __( 'Fixed', 'siteorigin-panels' ),
 				'parallax'          => __( 'Parallax', 'siteorigin-panels' ),
 				'parallax-original' => __( 'Parallax (Original Size)', 'siteorigin-panels' ),
@@ -259,7 +264,25 @@ class SiteOrigin_Panels_Styles {
 				'priority' => 17,
 			);
 		}
-
+		
+		// Add the mobile layout fields
+		
+		$fields['mobile_bottom_margin'] = array(
+			'name'        => __( 'Mobile Bottom Margin', 'siteorigin-panels' ),
+			'type'        => 'measurement',
+			'group'       => 'mobile_layout',
+			'description' => sprintf( __( 'Space below the row on mobile devices. Default is %spx.', 'siteorigin-panels' ), siteorigin_panels_setting( 'margin-bottom' ) ),
+			'priority'    => 5,
+		);
+		
+		$fields['mobile_cell_margin'] = array(
+			'name'        => __( 'Mobile Cell Margins', 'siteorigin-panels' ),
+			'type'        => 'measurement',
+			'group'       => 'mobile_layout',
+			'description' => sprintf( __( 'Vertical space between cells in a collapsed mobile row. Default is %spx.', 'siteorigin-panels' ), siteorigin_panels_setting( 'margin-bottom' ) ),
+			'priority'    => 5,
+		);
+		
 		return $fields;
 	}
 
@@ -447,6 +470,9 @@ class SiteOrigin_Panels_Styles {
 					case 'cover':
 						$css[ 'background-position' ] = 'center center';
 						$css[ 'background-size' ] = 'cover';
+						break;
+					case 'contain':
+						$css[ 'background-size' ] = 'contain';
 						break;
 					case 'center':
 						$css[ 'background-position' ] = 'center center';
@@ -660,10 +686,50 @@ class SiteOrigin_Panels_Styles {
 
 		return $css;
 	}
-
+	
+	/**
+	 * Add in custom styles for the row's bottom margin
+	 *
+	 * @param $margin
+	 * @param $grid
+	 *
+	 * @return mixed
+	 */
 	static function filter_row_bottom_margin( $margin, $grid ) {
 		if ( ! empty( $grid['style']['bottom_margin'] ) ) {
 			$margin = $grid['style']['bottom_margin'];
+		}
+
+		return $margin;
+	}
+	
+	/**
+	 * Add in custom styles for spacing between cells in a row.
+	 *
+	 * @param $margin
+	 * @param $cell
+	 *
+	 * @return mixed
+	 */
+	static function filter_row_cell_bottom_margin($margin, $cell, $ci, $row, $ri){
+		if ( ! empty( $row['style']['mobile_cell_margin'] ) ) {
+			$margin = $row['style']['mobile_cell_margin'];
+		}
+		
+		return $margin;
+	}
+	
+	/**
+	 * Add in custom styles for a row's mobile bottom margin
+	 *
+	 * @param $margin
+	 * @param $grid
+	 *
+	 * @return mixed
+	 */
+	static function filter_row_mobile_bottom_margin( $margin, $grid ) {
+		if ( ! empty( $grid['style']['mobile_bottom_margin'] ) ) {
+			$margin = $grid['style']['mobile_bottom_margin'];
 		}
 
 		return $margin;

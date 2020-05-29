@@ -1,0 +1,26 @@
+{
+    "require": {
+        "solarium/solarium": "^5.0",
+        "wpackagist-theme/twentynineteen":"*",
+        "johnpbloch/wordpress": ">=5.1",
+        "wpackagist-plugin/bbpress": ">=2.5.12"
+    },
+    "repositories":[
+        {
+            "type":"composer",
+            "url":"https://wpackagist.org"
+        }
+    ],
+
+    "type": "project",
+    "config": {
+        "vendor-dir": "content/vendor"
+    },
+    "extra": {
+        "wordpress-install-dir": "wp",
+        "installer-paths": {
+            "content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "content/themes/{$name}/": ["type:wordpress-theme"]
+        }
+    }
+}

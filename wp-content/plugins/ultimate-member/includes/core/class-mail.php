@@ -406,7 +406,7 @@ if ( ! class_exists( 'um\core\Mail' ) ) {
 			}
 
 			$this->attachments = null;
-			$this->headers = 'From: '. UM()->options()->get('mail_from') .' <'. UM()->options()->get('mail_from_addr') .'>' . "\r\n";
+			$this->headers = 'From: '. stripslashes( UM()->options()->get('mail_from') ) .' <'. UM()->options()->get('mail_from_addr') .'>' . "\r\n";
 
 			/**
 			 * UM hook
@@ -435,7 +435,10 @@ if ( ! class_exists( 'um\core\Mail' ) ) {
 			add_filter( 'um_template_tags_replaces_hook', array( UM()->mail(), 'add_replace_placeholder' ), 10, 1 );
 
 			$subject = apply_filters( 'um_email_send_subject', UM()->options()->get( $template . '_sub' ), $template );
-			$this->subject = um_convert_tags( $subject , $args );
+
+			$subject = wp_unslash( um_convert_tags( $subject , $args ) );
+
+			$this->subject = html_entity_decode( $subject, ENT_QUOTES, 'UTF-8' ); 
 
 			$this->message = $this->prepare_template( $template, $args );
 
@@ -607,7 +610,7 @@ if ( ! class_exists( 'um\core\Mail' ) ) {
 			$replace_placeholders[] = um_user_profile_url();
 			$replace_placeholders[] = get_bloginfo( 'url' );
 			$replace_placeholders[] = um_admin_email();
-			$replace_placeholders[] = um_user_submitted_registration();
+			$replace_placeholders[] = um_user_submitted_registration_formatted();
 			$replace_placeholders[] = um_get_core_page( 'login' );
 			$replace_placeholders[] = esc_html__( 'Your set password', 'ultimate-member' );
 			$replace_placeholders[] = um_user( 'account_activation_link' );

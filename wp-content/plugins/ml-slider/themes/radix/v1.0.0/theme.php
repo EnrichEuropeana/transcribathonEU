@@ -26,8 +26,8 @@ class MetaSlider_Theme_Radix extends MetaSlider_Theme_Base {
 	 * @var string
 	 */
 	public $slider_parameters = array(
-		"prevText" => "'<i class=\"left\"></i>'",
-		"nextText" => "'<i class=\"right\"></i>'"
+		"prevText" => "''",
+		"nextText" => "''"
 	);
 
 

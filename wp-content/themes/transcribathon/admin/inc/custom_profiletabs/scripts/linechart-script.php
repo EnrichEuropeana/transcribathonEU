@@ -91,15 +91,14 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			//$content .=  $query;
 
 			// Set request parameters
-			$url = network_home_url()."/tp-api/transcriptions?WP_UserId=".$_POST['uid']."";
+			$url = network_home_url()."/tp-api/scores?UserId=".$_POST['uid']."&ScoreType=Transcription";
 			$requestType = "GET";
 
 			// Execude http request
 			include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
 
 			// Display data
-			$transcriptions = json_decode($result, true);
-			$chars = $transcriptions;
+			$scores = json_decode($result, true);
 			$hours = array();
 			$days = array();
 			$months = array();
@@ -108,11 +107,11 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			$d = array();
 			$m = array();
             $y = array();
-			foreach($chars as $char){
-				$years[date('Y',strtotime($char['Timestamp']))] += strlen($char['Text']);
-				$months[date('Ym',strtotime($char['Timestamp']))] += strlen($char['Text']);
-				$days[date('Ymd',strtotime($char['Timestamp']))] += strlen($char['Text']);
-				$hours[date('YmdH',strtotime($char['Timestamp']))] += strlen($char['Text']);
+			foreach($scores as $score){
+				$years[date('Y',strtotime($score['Timestamp']))] += $score['Amount'];
+				$months[date('Ym',strtotime($score['Timestamp']))] += $score['Amount'];
+				$days[date('Ymd',strtotime($score['Timestamp']))] += $score['Amount'];
+				$hours[date('YmdH',strtotime($score['Timestamp']))] += $score['Amount'];
 				
             }
 			

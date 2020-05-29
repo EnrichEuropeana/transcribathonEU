@@ -7,14 +7,39 @@ define( 'SOLR_PATH', '/home/enrich/solr-7.7.1/bin/solr' );
 // define constants
 define('CHILD_TEMPLATE_DIR', dirname( get_bloginfo('stylesheet_url')) );
 define( 'TCT_THEME_DIR_PATH', plugin_dir_path( __FILE__ ) );
+/* Disable WordPress Admin Bar for all users but admins. */
+show_admin_bar(false);
+// change url of login logo link
+add_filter( 'login_headerurl', 'custom_loginlogo_url');
 
+function custom_loginlogo_url($url) {
 
+return 'https://transcribathon.eu';
+
+}
+function my_login_logo_one() { 
+    ?> 
+    <style type="text/css"> 
+    body.login div#login h1 a {
+    background-image: none, url(https://transcribathon.eu/wp-content/uploads/2020/02/transcribathon.png);
+    margin: 0;
+    background-size: unset;
+    width: 100%;
+    }
+    body.login div#login h1 a :focus{
+        outline:none;
+    }
+    </style>
+    <?php 
+    } add_action( 'login_enqueue_scripts', 'my_login_logo_one' );
 // Custom Theme-Settings for Transcribathon
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_themesettings/tct-themesettings.php');
 
 // ### ADMIN PAGES ### //
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/teams-admin-page.php'); // Adds teams admin page
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/campaigns-admin-page.php'); // Adds campaigns admin page
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/documents-admin-page.php'); // Adds documents admin page
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/datasets-admin-page.php'); // Adds documents admin page
 
 // Custom shortcodes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
@@ -22,29 +47,40 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_slider.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/solr_test.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_item_slider.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_menu.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/documents_map.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/team.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/contributions.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/achievements.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
 
 // Custom posts
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-news/tct-news.php'); // Adds custom post-type: news
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-tutorial/tct-tutorial.php'); // Adds custom post-type: news
-
 // Image settings
 add_image_size( 'news-image', 300, 200, true );
 // Image settings
-add_image_size( 'tutorial-image', 800, 400, true );
-
+add_image_size( 'tutorial-image', 1600, 800, true );
 
 // Embedd custom Javascripts and CSS
 function embedd_custom_javascripts_and_css() {
     global $post;
      if (!is_admin() && $GLOBALS['pagenow'] != 'wp-login.php') {
         /* jQuery */
-        wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( 'jquery' );	
 
+        /* custom JS and CSS*/
+        /* openseadragon */
+        wp_enqueue_script( 'osd', CHILD_TEMPLATE_DIR . '/js/openseadragon.js');
+        /*osdSelection plugin*/
+        wp_enqueue_script('osdSelect', CHILD_TEMPLATE_DIR . '/js/openseadragonSelection.js');
+        
+           
+        wp_enqueue_script( 'custom', CHILD_TEMPLATE_DIR . '/js/custom.js');
+        wp_enqueue_style('child-style', get_stylesheet_directory_uri() .'/style.css', array('parent-style'));
+       
         /* Bootstrap CSS */
         wp_enqueue_style( 'bootstrap', CHILD_TEMPLATE_DIR . '/css/bootstrap.min.css');
         /* Bootstrap JS */
@@ -72,8 +108,6 @@ function embedd_custom_javascripts_and_css() {
         /* jQuery UI JS*/
         wp_enqueue_script( 'jQuery-UI' );
 
-        /* Openseadragon */
-        wp_enqueue_script( 'osd', CHILD_TEMPLATE_DIR . '/js/openseadragon.js');
 
       	/* TinyMCE */
       	wp_enqueue_script( 'tinymce', CHILD_TEMPLATE_DIR . '/js/tinymce/js/tinymce/tinymce.js');
@@ -95,9 +129,6 @@ function embedd_custom_javascripts_and_css() {
         /* jQuery pagination */
         wp_enqueue_script( 'pagination', CHILD_TEMPLATE_DIR . '/js/pagination.min.js');
 
-        /* custom JS and CSS*/
-        wp_enqueue_script( 'custom', CHILD_TEMPLATE_DIR . '/js/custom.js');
-        wp_enqueue_style('child-style', get_stylesheet_directory_uri() .'/style.css', array('parent-style'));
 
         /* custom.php containing theme color CSS */
         wp_register_style( 'custom-css', CHILD_TEMPLATE_DIR.'/css/custom.php');
@@ -112,7 +143,10 @@ function embedd_custom_javascripts_and_css() {
 
  wp_register_script( 'my-script', '/myscript_url' );
  wp_enqueue_script( 'my-script' );
- $translation_array = array( 'home_url' => home_url() );
+ $translation_array = array( 
+                        'home_url' => home_url(),
+                        'network_home_url' => network_home_url() 
+                    );
  //after wp_enqueue_script
  wp_localize_script( 'my-script', 'WP_URLs', $translation_array );
 
@@ -166,6 +200,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-colcontent/tct-col
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-boxes/tct-boxes-widget.php'); // Adds the widget for feature boxes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-button/tct-button-widget.php'); // Adds the widget for a preformatted button
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-barchart/tct-barchart-widget.php'); // Adds the widget for a preformatted button
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-numbers/tct-numbers-widget.php'); // Adds the widget for a preformatted button
 
 function add_custom_widget_collection($folders){
     $folders[] = CHILD_TEMPLATE_DIR.'admin/inc/custom_widgets/';
@@ -212,8 +247,6 @@ function transfer_new_user( $user_id, $args ) {
     include TCT_THEME_DIR_PATH.'admin/inc/custom_scripts/send_api_request.php';
 }
 
-
-
 // ### Functions ### //
 function tct_generatePassword($passwordlength = 8,$numNonAlpha = 0,$numNumberChars = 0, $useCapitalLetter = false ) {
     $numberChars = '123456789';
@@ -237,3 +270,19 @@ function tct_generatePassword($passwordlength = 8,$numNonAlpha = 0,$numNumberCha
     $stack = str_shuffle ( $stack );
     return $stack;
 } 
+
+/*
+add_action( 'wp_enqueue_scripts', 'enqueue_theme_css' );
+
+
+function enqueue_theme_css()
+{
+    wp_enqueue_style(
+        'default',
+        '/wp-content/themes/vantage/style.css'
+    );
+    wp_enqueue_style(
+        'default',
+        '/wp-content/themes/transcribathon/scss/style.css'
+    );
+}*/

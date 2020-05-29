@@ -22,16 +22,15 @@ class MetaPostFeedSlide extends MetaSlide {
      */
     public function hooks() {
 
-        if ( is_admin() ) {
-            add_filter( "media_upload_tabs", array( $this, "custom_media_upload_tab_name" ), 999, 1 );
-            add_action( "metaslider_save_{$this->identifier}_slide", array( $this, "save_slide" ), 5, 3 );
-            add_action( "media_upload_{$this->identifier}", array( $this, "get_iframe" ) );
-            add_action( "wp_ajax_create_{$this->identifier}_slide", array( $this, "ajax_create_slide" ) );
-            add_action( "metaslider_register_admin_styles", array( $this, "register_admin_styles" ), 10, 1 );
+        if (is_admin()) {
+            add_filter("media_upload_tabs", array($this, "custom_media_upload_tab_name"), 999, 1);
+            add_action("media_upload_{$this->identifier}", array($this, "get_iframe"));
+            add_action("wp_ajax_create_{$this->identifier}_slide", array($this, "ajax_create_slide"));
+            add_action("metaslider_register_admin_styles", array($this, "register_admin_styles"), 10, 1);
         }
-
-        add_filter( "metaslider_get_{$this->identifier}_slide", array( $this, "get_slide" ), 10, 2 );
-
+		
+		add_action("metaslider_save_{$this->identifier}_slide", array($this, "save_slide"), 5, 3);
+        add_filter("metaslider_get_{$this->identifier}_slide", array($this, "get_slide"), 10, 2);
     }
 
     /**
@@ -125,7 +124,7 @@ class MetaPostFeedSlide extends MetaSlide {
         $row .= "       </div>";
         $row .= "    </td>";
         $row .= "    <td class='col-2'>";
-        $row .= "       <div class='metaslider-ui-inner'>";
+        $row .= "       <div class='metaslider-ui-inner flex flex-col h-full'>";
 
         if (method_exists($this, 'get_admin_slide_tabs_html')) {
             $row .= $this->get_admin_slide_tabs_html();
@@ -328,7 +327,7 @@ class MetaPostFeedSlide extends MetaSlide {
         $options = apply_filters("metaslider_post_feed_template_tags", $options);
 
         // start building the HTML
-        $html = "<select name='template_tags' id='template_tags'>";
+        $html = "<select name='template_tags' id='template_tags' class='mb-2'>";
 
         $html .= "<option disabled='disabled' selected='selected' id='insert_tag'>" . __("Insert Tag", 'ml-slider-pro') . "</option>";
 
@@ -336,17 +335,17 @@ class MetaPostFeedSlide extends MetaSlide {
             $html .= "<option value='{$value}'>{$title}</option>";
         }
 
-        // add in all custom fields as tag options
-        $html .= "<optgroup label='" . __("Custom Fields", 'ml-slider-pro') . "'>";
-
-        foreach ($this->get_custom_fields() as $key) {
-            $html .= "<option value='{{$key}}'>{$key}</option>";
-        }
-
-        $html .= "</optgroup>";
+		// add in all custom fields as tag options
+		$custom_fields = $this->get_custom_fields();
+		if (!empty($custom_fields)) {
+			$html .= "<optgroup label='" . __("Custom Fields", 'ml-slider-pro') . "'>";
+			foreach ($custom_fields as $key) {
+				$html .= "<option value='{{$key}}'>{$key}</option>";
+			}
+			$html .= "</optgroup>";
+		}
 
         $html .= "</select>";
-
         return $html;
     }
 
@@ -452,12 +451,16 @@ class MetaPostFeedSlide extends MetaSlide {
             $html .= "<option value='{$value}' {$selected}>{$title}</option>";
         }
 
-        $html .= "<optgroup label='Custom Fields'>";
-        foreach ( $this->get_custom_fields() as $key ) {
-            $selected = $key == $selected_option ? "selected='selected'" : "";
-            $html .= "<option value='{$key}' {$selected}>{$key}</option>";
-        }
-        $html .= "</optgroup>";
+		$custom_fields = $this->get_custom_fields();
+		if (!empty($custom_fields)) {
+			$html .= "<optgroup label='Custom Fields'>";
+			foreach ($custom_fields as $key) {
+				$selected = $key == $selected_option ? "selected='selected'" : "";
+				$html .= "<option value='{$key}' {$selected}>{$key}</option>";
+			}
+			$html .= "</optgroup>";
+		}
+
         $html .= "</select>";
 
         return $html;

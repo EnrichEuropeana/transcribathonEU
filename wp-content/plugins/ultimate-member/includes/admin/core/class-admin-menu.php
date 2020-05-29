@@ -3,8 +3,10 @@ namespace um\admin\core;
 
 
 use \RecursiveDirectoryIterator;
-// Exit if accessed directly.
+
+
 if ( ! defined( 'ABSPATH' ) ) exit;
+
 
 if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 
@@ -189,7 +191,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 		function um_roles_pages() {
 			if ( empty( $_GET['tab'] ) ) {
 				include_once um_path . 'includes/admin/core/list-tables/roles-list-table.php';
-			} elseif ( $_GET['tab'] == 'add' || $_GET['tab'] == 'edit' ) {
+			} elseif ( sanitize_key( $_GET['tab'] ) == 'add' || sanitize_key( $_GET['tab'] ) == 'edit' ) {
 				include_once um_path . 'includes/admin/templates/role/role-edit.php';
 			} else {
 				um_js_redirect( add_query_arg( array( 'page' => 'um_roles' ), get_admin_url( 'admin.php' ) ) );
@@ -214,7 +216,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 			wp_enqueue_script( 'postbox' );
 
 			/** custom metaboxes for dashboard defined here **/
-			add_meta_box( 'um-metaboxes-contentbox-1', __( 'Users Overview','ultimate-member' ), array( &$this, 'users_overview' ), $this->pagehook, 'core', 'core' );
+			add_meta_box( 'um-metaboxes-contentbox-1', __( 'Users Overview', 'ultimate-member' ), array( &$this, 'users_overview' ), $this->pagehook, 'core', 'core' );
 
 			add_meta_box( 'um-metaboxes-mainbox-1', __( 'Latest from our blog', 'ultimate-member' ), array( &$this, 'um_news' ), $this->pagehook, 'normal', 'core' );
 
@@ -223,7 +225,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 			add_meta_box( 'um-metaboxes-sidebox-2', __( 'User Cache', 'ultimate-member' ), array( &$this, 'user_cache' ), $this->pagehook, 'side', 'core' );
 
 			//If there are active and licensed extensions - show metabox for upgrade it
-			$exts = UM()->plugin_updater()->um_get_active_plugins();
+			$exts = UM()->plugin_updater()->get_active_plugins();
 			if ( 0 < count( $exts ) ) {
 				add_meta_box( 'um-metaboxes-sidebox-3', __( 'Upgrade\'s Manual Request', 'ultimate-member' ), array( &$this, 'upgrade_request' ), $this->pagehook, 'side', 'core' );
 			}
@@ -283,7 +285,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 				$size = 0;
 
 				foreach( new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $directory ) ) as $file ) {
-					$size+=$file->getSize();
+					$size += $file->getSize();
 				}
 				return round ( $size / 1048576, 2);
 			}
@@ -296,8 +298,9 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 		 */
 		function admin_page() {
 
-			$page = $_REQUEST['page'];
-			if ( $page == 'ultimatemember' && ! isset( $_REQUEST['um-addon'] ) ) { ?>
+			$page = ! empty( $_REQUEST['page'] ) ? sanitize_key( $_REQUEST['page'] ) : '';
+
+			if ( $page == 'ultimatemember' ) { ?>
 
 				<div id="um-metaboxes-general" class="wrap">
 
@@ -328,7 +331,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Menu' ) ) {
 					//<![CDATA[
 					jQuery(document).ready( function($) {
 						// postboxes setup
-						postboxes.add_postbox_toggles('<?php echo $this->pagehook; ?>');
+						postboxes.add_postbox_toggles('<?php echo esc_js( $this->pagehook ); ?>');
 					});
 					//]]>
 				</script>

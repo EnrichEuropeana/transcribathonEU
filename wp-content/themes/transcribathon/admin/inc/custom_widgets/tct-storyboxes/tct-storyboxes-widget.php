@@ -27,16 +27,21 @@ class _TCT_Storyboxes_Widget extends SiteOrigin_Widget {
 	
 	
 	function modify_form( $instance) {
-		$utags = get_terms(array('taxonomy' => 'tct_usertags', 'hide_empty' => false,'orderby'=>'name','order'=>'ASC'));
-		$utag_options = array();
-		foreach ( $utags  as $utag ) {
-			$utag_options[$utag->term_id] = esc_html($utag->name);  
+		$url = home_url()."/tp-api/datasets";
+		$requestType = "GET";
+		include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+		$datasets = json_decode($result, true);
+		foreach ( $datasets  as $dataset ) {
+			$dataset_options[$dataset['DatasetId']] = esc_html($dataset['Name']);  
 		}
-		$ltags = get_terms(array('taxonomy' => 'tct_languages', 'hide_empty' => false,'orderby'=>'name','order'=>'ASC'));
-		$ltag_options = array();
-		$ltag_options['-'] = '-';
-		foreach ( $ltags  as $ltag ) {
-			$ltag_options[$ltag->term_id] = esc_html($ltag->name);  
+
+		$url = home_url()."/tp-api/storyPropertyLists/`dc:language`";
+		$requestType = "GET";
+		include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+		$languages = json_decode($result, true);
+
+		foreach ( $languages  as $language ) {
+			$language_options[$language['Name']] = esc_html($language['Name']);  
 		}
 		
 		$instance['tct-storyboxes-headline'] = array(
@@ -54,20 +59,30 @@ class _TCT_Storyboxes_Widget extends SiteOrigin_Widget {
 			'optional' => true,
 		);
 		
-		$instance['tct-storyboxes-utags'] = array(
+		$instance['tct-storyboxes-datasets'] = array(
 			'type' => 'select',
-			'label' => _x('OR select user-tags, the story (or it\'s items) should contain', 'storyboxes-widget (backend)','transcribathon'),
+			'label' => _x('Dataset', 'storyboxes-widget (backend)','transcribathon'),
 			'description' => _x('You can select multiple entries by holding STRG or Apple-Key while selecting. Attention - selecting more will probably cause more output: it displays all stories which contain at least one of the tags - either themselves or their items', 'storyboxes-widget (backend)','transcribathon'),
 			'multiple' => true,
-			'options' => $utag_options,
+			'options' => $dataset_options,
 			'optional' => true,
 		);
-		$instance['tct-storyboxes-ltags'] = array(
+		$instance['tct-storyboxes-AndOr'] = array(
+			'type' => 'select',
+			'label' => _x('AND/OR', 'storyboxes-widget (backend)','transcribathon'),
+			'multiple' => false,
+			'options' => [
+				"AND"=> "AND",
+				"OR"=> "OR"
+			],
+			'optional' => false,
+		);
+		$instance['tct-storyboxes-languages'] = array(
 			'type' => 'select',
 			'label' => _x('Restrict output by language', 'storyboxes-widget (backend)','transcribathon'),
 			'description' => _x('You may want to restrict the output by language. To do so, please select a language from the dropdown.', 'storyboxes-widget (backend)','transcribathon'),
-			'multiple' => false,
-			'options' => $ltag_options,
+			'multiple' => true,
+			'options' => $language_options,
 			'optional' => true,
 		);
 		

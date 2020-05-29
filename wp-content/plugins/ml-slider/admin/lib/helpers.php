@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) die('No direct access.');
  * @param  string $name name of the plugin 'ml-slider'
  * @return bool|string - will return path, ex. 'ml-slider/ml-slider.php'
  */
-function metaslider_plugin_is_installed($name) {
+function metaslider_plugin_is_installed($name = 'ml-slider') {
     if (!function_exists('get_plugins')) include_once(ABSPATH.'wp-admin/includes/plugin.php');
 	foreach (get_plugins() as $plugin => $data) {
 		if ($data['TextDomain'] == $name)
@@ -198,7 +198,7 @@ function metaslider_optimize_url($url, $text, $html = null, $class = '') {
     if (!empty($html)) {
 	    return sprintf('<a class="%1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), $html);
     } else {
-	    return sprintf('<a class="%1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), htmlspecialchars($text));
+	    return sprintf('<a class="text-blue-dark underline %1$s" href="%2$s">%3$s</a>', esc_attr($class), esc_attr($url), htmlspecialchars($text));
     }
 }
 

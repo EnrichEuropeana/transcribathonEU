@@ -18,14 +18,37 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 		 * Rewrite constructor.
 		 */
 		function __construct() {
+			if ( ! defined( 'DOING_AJAX' ) ) {
+				add_filter( 'wp_loaded', array( $this, 'maybe_flush_rewrite_rules' ) );
+			}
+
 			//add rewrite rules
-			add_filter( 'query_vars', array(&$this, 'query_vars'), 10, 1 );
+			add_filter( 'query_vars', array( &$this, 'query_vars' ), 10, 1 );
 			add_filter( 'rewrite_rules_array', array( &$this, '_add_rewrite_rules' ), 10, 1 );
-			add_action( 'init', array( &$this, 'rewrite_rules'), 100000000 );
+
+			add_action( 'template_redirect', array( &$this, 'redirect_author_page' ), 9999 );
+			add_action( 'template_redirect', array( &$this, 'locate_user_profile' ), 9999 );
+		}
 
 
-			add_action( 'template_redirect', array( &$this, 'redirect_author_page'), 9999 );
-			add_action( 'template_redirect', array( &$this, 'locate_user_profile'), 9999 );
+		/**
+		 * Update "flush" option for reset rules on wp_loaded hook
+		 */
+		function reset_rules() {
+			update_option( 'um_flush_rewrite_rules', 1 );
+		}
+
+
+		/**
+		 * Reset Rewrite rules if need it.
+		 *
+		 * @return void
+		 */
+		function maybe_flush_rewrite_rules() {
+			if ( get_option( 'um_flush_rewrite_rules' ) ) {
+				flush_rewrite_rules( false );
+				delete_option( 'um_flush_rewrite_rules' );
+			}
 		}
 
 
@@ -72,32 +95,24 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 				if ( isset( $user->post_name ) ) {
 
 					$user_slug = $user->post_name;
+					$newrules[ $user_slug . '/([^/]+)/?$' ] = 'index.php?page_id=' . $user_page_id . '&um_user=$matches[1]';
+				}
 
-					$add_lang_code = '';
-					$language_code = '';
+				if ( UM()->external_integrations()->is_wpml_active() ) {
+					global $sitepress;
 
-					if ( function_exists('icl_object_id') || function_exists('icl_get_current_language') ) {
+					$active_languages = $sitepress->get_active_languages();
 
-						if ( function_exists('icl_get_current_language') ) {
-							$language_code = icl_get_current_language();
-						} elseif( function_exists('icl_object_id') && defined('ICL_LANGUAGE_CODE') ) {
-							$language_code = ICL_LANGUAGE_CODE;
-						}
+					foreach ( $active_languages as $language_code => $language ) {
 
-						// User page translated slug
-						$lang_post_id = icl_object_id( $user->ID, 'post', FALSE, $language_code );
+						$lang_post_id = wpml_object_id_filter( $user_page_id, 'post', false, $language_code );
 						$lang_post_obj = get_post( $lang_post_id );
-						if( isset( $lang_post_obj->post_name ) ){
+
+						if ( isset( $lang_post_obj->post_name ) && $lang_post_obj->post_name != $user->post_name ) {
 							$user_slug = $lang_post_obj->post_name;
+							$newrules[ $user_slug . '/([^/]+)/?$' ] = 'index.php?page_id=' . $lang_post_id . '&um_user=$matches[1]&lang=' . $language_code;
 						}
-
-						if(  $language_code != icl_get_default_language() ){
-							$add_lang_code = $language_code;
-						}
-
 					}
-
-					$newrules[ $user_slug.'/([^/]+)/?$' ] = 'index.php?page_id='.$user_page_id.'&um_user=$matches[1]&lang='.$add_lang_code;
 				}
 			}
 
@@ -109,75 +124,28 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 				if ( isset( $account->post_name ) ) {
 
 					$account_slug = $account->post_name;
-
-					$add_lang_code = '';
-					$language_code = '';
-
-					if ( function_exists('icl_object_id') || function_exists('icl_get_current_language') ) {
-
-						if ( function_exists('icl_get_current_language') ){
-							$language_code = icl_get_current_language();
-						} elseif( function_exists('icl_object_id') && defined('ICL_LANGUAGE_CODE') ) {
-							$language_code = ICL_LANGUAGE_CODE;
-						}
-
-						// Account page translated slug
-						$lang_post_id = icl_object_id( $account->ID, 'post', FALSE, $language_code );
-						$lang_post_obj = get_post( $lang_post_id );
-						if ( isset( $lang_post_obj->post_name ) ){
-							$account_slug = $lang_post_obj->post_name;
-						}
-
-						if ( $language_code != icl_get_default_language() ) {
-							$add_lang_code = $language_code;
-						}
-
-					}
-
-					$newrules[ $account_slug.'/([^/]+)?$' ] = 'index.php?page_id='.$account_page_id.'&um_tab=$matches[1]&lang='.$add_lang_code;
-
+					$newrules[ $account_slug . '/([^/]+)?$' ] = 'index.php?page_id=' . $account_page_id . '&um_tab=$matches[1]';
 				}
 
+				if ( UM()->external_integrations()->is_wpml_active() ) {
+					global $sitepress;
+
+					$active_languages = $sitepress->get_active_languages();
+
+					foreach ( $active_languages as $language_code => $language ) {
+
+						$lang_post_id = wpml_object_id_filter( $account_page_id, 'post', false, $language_code );
+						$lang_post_obj = get_post( $lang_post_id );
+
+						if ( isset( $lang_post_obj->post_name ) && $lang_post_obj->post_name != $account->post_name ) {
+							$account_slug = $lang_post_obj->post_name;
+							$newrules[ $account_slug . '/([^/]+)/?$' ] = 'index.php?page_id=' . $lang_post_id . '&um_user=$matches[1]&lang=' . $language_code;
+						}
+					}
+				}
 			}
 
 			return $newrules + $rules;
-		}
-
-
-		/**
-		 * Setup rewrite rules
-		 */
-		function rewrite_rules() {
-
-			if ( isset( UM()->config()->permalinks['user'] ) && isset( UM()->config()->permalinks['account'] ) ) {
-
-				/**
-				 * UM hook
-				 *
-				 * @type filter
-				 * @title um_rewrite_flush_rewrite_rules
-				 * @description Enable flushing rewrite rules
-				 * @input_vars
-				 * [{"var":"$stop_flush","type":"bool","desc":"Stop flushing rewrite rules"}]
-				 * @change_log
-				 * ["Since: 2.0"]
-				 * @usage
-				 * <?php add_filter( 'um_rewrite_flush_rewrite_rules', 'function_name', 10, 1 ); ?>
-				 * @example
-				 * <?php
-				 * add_filter( 'um_rewrite_flush_rewrite_rules', 'my_rewrite_flush_rewrite_rules', 10, 1 );
-				 * function my_rewrite_flush_rewrite_rules( $stop_flush ) {
-				 *     // your code here
-				 *     return $stop_flush;
-				 * }
-				 * ?>
-				 */
-				if ( ! apply_filters( 'um_rewrite_flush_rewrite_rules', UM()->options()->get( 'um_flush_stop' ) ) ) {
-					flush_rewrite_rules( true );
-				}
-
-			}
-
 		}
 
 
@@ -197,9 +165,7 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 		 * Locate/display a profile
 		 */
 		function locate_user_profile() {
-			global $post;
-
-			if ( um_queried_user() && um_is_core_page('user') ) {
+			if ( um_queried_user() && um_is_core_page( 'user' ) ) {
 
 				if ( UM()->options()->get( 'permalink_base' ) == 'user_login' ) {
 
@@ -214,9 +180,9 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 							"fields" => 'ids',
 							'meta_query' => array(
 								array(
-									'key'		=>  'um_user_profile_url_slug_'.$permalink_base,
-									'value'		=> strtolower( um_queried_user() ),
-									'compare'	=> '='
+									'key'       =>  'um_user_profile_url_slug_' . $permalink_base,
+									'value'     => strtolower( um_queried_user() ),
+									'compare'   => '='
 								)
 							),
 							'number'    => 1
@@ -230,19 +196,21 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 					}
 
 					// Try nice name
-					if ( !$user_id ) {
+					if ( ! $user_id ) {
 						$slug = um_queried_user();
-						$slug = str_replace('.','-',$slug);
+						$slug = str_replace( '.', '-', $slug );
 						$the_user = get_user_by( 'slug', $slug );
 						if ( isset( $the_user->ID ) ){
 							$user_id = $the_user->ID;
 						}
 
-						if ( ! $user_id )
+						if ( ! $user_id ) {
 							$user_id = UM()->user()->user_exists_by_email_as_username( um_queried_user() );
+						}
 
-						if ( ! $user_id )
+						if ( ! $user_id ) {
 							$user_id = UM()->user()->user_exists_by_email_as_username( $slug );
+						}
 
 					}
 
@@ -250,12 +218,10 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 
 				if ( UM()->options()->get( 'permalink_base' ) == 'user_id' ) {
 					$user_id = UM()->user()->user_exists_by_id( um_queried_user() );
-
 				}
 
-				if ( in_array( UM()->options()->get( 'permalink_base' ), array('name','name_dash','name_dot','name_plus') ) ) {
+				if ( in_array( UM()->options()->get( 'permalink_base' ), array( 'name', 'name_dash', 'name_dot', 'name_plus' ) ) ) {
 					$user_id = UM()->user()->user_exists_by_name( um_queried_user() );
-
 				}
 
 				/** USER EXISTS SET USER AND CONTINUE **/
@@ -291,7 +257,7 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 
 				}
 
-			} else if ( um_is_core_page( 'user' ) ) {
+			} elseif ( um_is_core_page( 'user' ) ) {
 
 				if ( is_user_logged_in() ) { // just redirect to their profile
 
@@ -330,7 +296,7 @@ if ( ! class_exists( 'um\core\Rewrite' ) ) {
 					 * ?>
 					 */
 					$redirect_to = apply_filters( 'um_locate_user_profile_not_loggedin__redirect', home_url() );
-					if ( ! empty( $redirect_to ) ){
+					if ( ! empty( $redirect_to ) ) {
 						exit( wp_redirect( $redirect_to ) );
 					}
 

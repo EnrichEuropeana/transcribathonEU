@@ -44,7 +44,8 @@ class SolrPower {
 		add_filter( 'plugin_action_links', array( $this, 'plugin_settings_link' ), 10, 2 );
 		add_filter( 'debug_bar_panels', array( $this, 'add_panel' ) );
 		add_action(
-			'widgets_init', function () {
+			'widgets_init',
+			function () {
 				register_widget( 'SolrPower_Facet_Widget' );
 			}
 		);
@@ -68,7 +69,7 @@ class SolrPower {
 		if ( ! defined( 'SOLR_PATH' ) ) {
 			$schema_message = SolrPower_Api::get_instance()->submit_schema();
 			if ( strpos( $schema_message, 'Error' ) ) {
-				wp_die( 'Submitting the schema failed with the message ' . esc_html( $error_message ) );
+				wp_die( 'Submitting the schema failed with the message ' . esc_html( $schema_message ) );
 			}
 		}
 		SolrPower_Options::get_instance()->initalize_options();
@@ -87,7 +88,8 @@ class SolrPower {
 
 		if ( getenv( 'PANTHEON_ENVIRONMENT' ) !== false && getenv( 'PANTHEON_INDEX_HOST' ) === false ) {
 			$return_value = wp_kses(
-				__( 'Before you can activate this plugin, you must first <a href="https://pantheon.io/docs/articles/sites/apache-solr/">activate Solr</a> in your Pantheon Dashboard.', 'solr-for-wordpress-on-pantheon' ), array(
+				__( 'Before you can activate this plugin, you must first <a href="https://pantheon.io/docs/articles/sites/apache-solr/">activate Solr</a> in your Pantheon Dashboard.', 'solr-for-wordpress-on-pantheon' ),
+				array(
 					'a' => array(
 						'href' => array(),
 					),
@@ -278,7 +280,9 @@ class SolrPower {
 		$allow_ajax   = isset( $solr_options['allow_ajax'] ) ? boolval( $solr_options['allow_ajax'] ) : false;
 		$div_id       = isset( $solr_options['ajax_div_id'] ) ? esc_html( $solr_options['ajax_div_id'] ) : false;
 		wp_localize_script(
-			'Solr_Facet', 'solr', array(
+			'Solr_Facet',
+			'solr',
+			array(
 				'ajaxurl'           => admin_url( 'admin-ajax.php' ),
 				'allow_ajax'        => $allow_ajax,
 				'search_results_id' => $div_id,
@@ -294,7 +298,8 @@ class SolrPower {
 	public function ajax_search() {
 		// Strip out admin-ajax from pagination links.
 		add_filter(
-			'paginate_links', function ( $url ) {
+			'paginate_links',
+			function ( $url ) {
 				$url = str_replace( 'wp-admin/admin-ajax.php', '', $url );
 				$url = remove_query_arg( 'action', $url );
 
@@ -312,13 +317,13 @@ class SolrPower {
 		$paged = filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_STRING );
 		$paged = ( false === $paged || null === $paged ) ? 1 : absint( $paged );
 
-		$args = array(
+		$args  = array(
 			's'              => filter_input( INPUT_GET, 's', FILTER_SANITIZE_STRING ),
 			'facets'         => filter_input( INPUT_GET, 'facet', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY ),
 			'posts_per_page' => get_option( 'posts_per_page' ),
 			'paged'          => $paged,
 		);
-
+		$args  = apply_filters( 'solr_power_ajax_search_query_args', $args );
 		$query = new WP_Query( $args );
 		$query->get_posts();
 
@@ -374,7 +379,8 @@ class SolrPower {
 	 */
 	public static function get_post_types() {
 		return apply_filters(
-			'solr_post_types', get_post_types(
+			'solr_post_types',
+			get_post_types(
 				array(
 					'exclude_from_search' => false,
 				)

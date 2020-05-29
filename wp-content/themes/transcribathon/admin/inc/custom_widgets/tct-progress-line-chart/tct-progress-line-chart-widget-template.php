@@ -1,4 +1,6 @@
 <?php
+// include required files
+include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 global $wpdb;
 $myid = uniqid(rand()).date('YmdHis');
 $base = 0;
@@ -24,26 +26,53 @@ if (isset($instance['tct-progress-line-chart-headline']) && trim($instance['tct-
   
  // $content .= '<canvas id="myChart" width="400" height="400"></canvas>';
 
+ $url = home_url()."/tp-api/progress/".strtolower(str_replace(" ", "", $instance['tct-progress-line-chart-headline']));
+ $requestType = "GET";
+
+ // Execude request
+ include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+
+ // Display data
+ $progressData = json_decode($result, true);
+
+ $dates = array();
+ $amounts = array();
+ $amount = 0;
+
+ foreach($progressData as $data) {
+  $amount += $data['Amount'];
+  array_push($dates, $data['Year']."/".$data['Month']);
+  array_push($amounts, $amount);
+ }
   
  
   
  $chartId = str_replace(" ", "", $instance['tct-progress-line-chart-headline']);
- $content .= '<canvas id="lineChart'.$chartId.'"  width="400" height="400" display="inline"></canvas>';
+ $content .= '<canvas id="lineChart'.$chartId.'"  width="800" height="400" display="inline"></canvas>';
 
   $content .= '</div>';
 
   $content .= "<script>
-  
-              var ctx = document.getElementById('lineChart".$chartId."');
+              var dates = [];
+              var amounts = [];
+              var amount = 0;";
+              
+              foreach($progressData as $data) {
+                $content .= "amount += ".$data['Amount'].";";
+                $content .= "dates.push(\"".$data['Year']." / ".$data['Month']."\");";
+                $content .= "amounts.push(amount);";
+              }
+                
+  $content .= "var ctx = document.getElementById('lineChart".$chartId."');
               var lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                  labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                  labels: dates,
                   datasets: [{
                       label: '',
                       lineTension: 0,
                       borderColor: 'rgba(9, 97, 129, 1)',
-                      data: [12, 19, 3, 5, 2, 3],
+                      data: amounts,
                       backgroundColor: 'rgba(9, 97, 129, 0.4)',
                       borderWidth: 1
                   }]

@@ -11,8 +11,9 @@
  */
 function um_edit_label_all_fields( $label, $data ) {
 	$asterisk = UM()->options()->get( 'form_asterisk' );
-	if ( $asterisk && isset( $data['required'] ) && $data['required'] == 1 )
-		$label = $label . '<span class="um-req" title="'.__('Required','ultimate-member').'">*</span>';
+	if ( $asterisk && isset( $data['required'] ) && $data['required'] == 1 ) {
+		$label = $label . '<span class="um-req" title="' . esc_attr__( 'Required', 'ultimate-member' ) . '">*</span>';
+	}
 
 	return $label;
 }
@@ -25,11 +26,11 @@ add_filter( 'um_edit_label_all_fields', 'um_edit_label_all_fields', 10, 2 );
  * @param $value
  * @param $data
  *
- * @return string|void
+ * @return string
  */
 function um_profile_field_filter_hook__soundcloud_track( $value, $data ) {
 
-	if ( !is_numeric( $value ) ) {
+	if ( ! is_numeric( $value ) ) {
 		return __( 'Invalid soundcloud track ID', 'ultimate-member' );
 	}
 
@@ -51,7 +52,7 @@ add_filter( 'um_profile_field_filter_hook__soundcloud_track', 'um_profile_field_
  * @return bool|string
  */
 function um_profile_field_filter_hook__youtube_video( $value, $data ) {
-	if( empty( $value ) ){
+	if ( empty( $value ) ) {
 		return '';
 	}
 	$value = ( strstr( $value, 'http') || strstr( $value, '://' ) ) ? um_youtube_id_from_url( $value ) : $value;
@@ -60,7 +61,7 @@ function um_profile_field_filter_hook__youtube_video( $value, $data ) {
 					</div>';
 
 	return $value;
-	}
+}
 add_filter( 'um_profile_field_filter_hook__youtube_video', 'um_profile_field_filter_hook__youtube_video', 99, 2 );
 
 
@@ -95,6 +96,9 @@ add_filter( 'um_profile_field_filter_hook__vimeo_video', 'um_profile_field_filte
  * @return string
  */
 function um_profile_field_filter_hook__googlemap( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	$value = '<div class="um-googlemap">
 					<iframe width="600" height="450" frameborder="0" style="border:0" src="https://maps.google.it/maps?q=' . urlencode( $value ) . '&output=embed"></iframe>
 				</div>';
@@ -113,8 +117,11 @@ add_filter( 'um_profile_field_filter_hook__googlemap', 'um_profile_field_filter_
  */
 
 function um_profile_field_filter_hook__user_registered( $value, $data ) {
-	$value = strtotime($value);
-	$value = sprintf(__('Joined %s','ultimate-member'), date_i18n('F d, Y', $value) );
+	if ( ! $value ) {
+		return '';
+	}
+	$value = strtotime( $value );
+	$value = sprintf( __( 'Joined %s', 'ultimate-member' ), date_i18n( get_option( 'date_format' ), $value ) );
 	return $value;
 }
 add_filter( 'um_profile_field_filter_hook__user_registered', 'um_profile_field_filter_hook__user_registered', 99, 2 );
@@ -129,6 +136,9 @@ add_filter( 'um_profile_field_filter_hook__user_registered', 'um_profile_field_f
  * @return string
  */
 function um_profile_field_filter_hook__last_login( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	//$value = sprintf( __('Last login: %s','ultimate-member'), um_user_last_login( um_user('ID') ) );
 	$value = um_user_last_login( um_user( 'ID' ) );
 	return $value;
@@ -146,6 +156,9 @@ add_filter( 'um_profile_field_filter_hook___um_last_login', 'um_profile_field_fi
  * @return mixed|string|void
  */
 function um_profile_field_filter_hook__textarea( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	if ( isset( $data['html'] ) && $data['html'] == 1 ) {
 		return $value;
 	}
@@ -186,10 +199,14 @@ add_filter( 'um_profile_field_filter_hook__textarea', 'um_profile_field_filter_h
  * @return mixed|string
  */
 function um_profile_field_filter_hook__time( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	$value = UM()->datetime()->format( $value, $data['format'] );
 
-	$value = str_replace('am', 'a.m.', $value );
-	$value = str_replace('pm', 'p.m.', $value );
+	$value = str_replace( 'am', 'a.m.', $value );
+	$value = str_replace( 'pm', 'p.m.', $value );
+
 	return $value;
 }
 add_filter( 'um_profile_field_filter_hook__time', 'um_profile_field_filter_hook__time', 99, 2 );
@@ -204,10 +221,14 @@ add_filter( 'um_profile_field_filter_hook__time', 'um_profile_field_filter_hook_
  * @return string
  */
 function um_profile_field_filter_hook__date( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	if ( isset( $data['pretty_format'] ) && $data['pretty_format'] == 1 ) {
 		$value = UM()->datetime()->get_age( $value );
 	} else {
-		$value = date_i18n( $data['format'], strtotime( $value ) );
+		$format = empty( $data['format_custom'] ) ? $data['format'] : $data['format_custom'];
+		$value = date_i18n( $format, strtotime( $value ) );
 	}
 
 	return $value;
@@ -223,6 +244,9 @@ add_filter( 'um_profile_field_filter_hook__date', 'um_profile_field_filter_hook_
  * @return string
  */
 function um_profile_field_filter_hook__file( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	$file_type = wp_check_filetype( $value );
 	$uri = UM()->files()->get_download_link( UM()->fields()->set_id, $data['metakey'], um_user( 'ID' ) );
 
@@ -270,6 +294,9 @@ add_filter( 'um_profile_field_filter_hook__file', 'um_profile_field_filter_hook_
  * @return string
  */
 function um_profile_field_filter_hook__image( $value, $data ) {
+	if ( ! $value ) {
+		return '';
+	}
 	$uri = UM()->files()->get_download_link( UM()->fields()->set_id, $data['metakey'], um_user( 'ID' ) );
 	$title = ( isset( $data['title'] ) ) ? $data['title'] : __( 'Untitled photo', 'ultimate-member' );
 
@@ -310,7 +337,9 @@ add_filter( 'um_profile_field_filter_hook__image', 'um_profile_field_filter_hook
  * @return string
  */
 function um_profile_field_filter_hook__( $value, $data, $type = '' ) {
-	if ( !$value ) return '';
+	if ( ! $value ) {
+		return '';
+	}
 
 	if ( ( isset( $data['validate'] ) && $data['validate'] != '' && strstr( $data['validate'], 'url' ) ) || ( isset( $data['type'] ) && $data['type'] == 'url' ) ) {
 		$alt = ( isset( $data['url_text'] ) && !empty( $data['url_text'] ) ) ? $data['url_text'] : $value;
@@ -333,7 +362,7 @@ function um_profile_field_filter_hook__( $value, $data, $type = '' ) {
 			if ( $data['validate'] == 'vk_url' ) 			$value = 'https://vk.com/' . $value;
 		}
 
-		
+
 		if ( isset( $data['validate'] ) && $data['validate'] == 'skype' ) {
 
 			$value = $value;
@@ -351,20 +380,21 @@ function um_profile_field_filter_hook__( $value, $data, $type = '' ) {
 	}
 
 	if ( isset( $data['validate'] ) && $data['validate'] == 'skype' ) {
-		
+
 		$value = str_replace('https://','',$value );
 		$value = str_replace('http://','',$value );
-		
+
 		$data['url_target'] = ( isset( $data['url_target'] ) ) ? $data['url_target'] : '_blank';
 		$value = '<a href="'. 'skype:'.$value.'?chat'.'" title="'.$value.'" target="'.$data['url_target'].'" ' . $url_rel . '>'.$value.'</a>';
 
-	} 
-	
-	if ( !is_array( $value ) ) {
-		if ( is_email( $value ) )
+	}
+
+	if ( ! is_array( $value ) ) {
+		if ( is_email( $value ) ) {
 			$value = '<a href="mailto:'. $value.'" title="'.$value.'">'.$value.'</a>';
+		}
 	} else {
-		$value = implode(', ', $value);
+		$value = implode( ', ', $value );
 	}
 
 	$value = str_replace('https://https://','https://',$value);
@@ -521,15 +551,16 @@ add_filter('um_profile_field_filter_hook__','um_force_utf8_fields', 9, 3 );
  * @uses   hook filter: um_is_selected_filter_value
  */
 function um_is_selected_filter_value( $value ) {
-	if ( ! UM()->options()->get('um_force_utf8_strings') )
+	if ( ! UM()->options()->get( 'um_force_utf8_strings' ) ) {
 		return $value;
+	}
 
 	$value = um_force_utf8_string( $value );
 
 	return $value;
 }
-add_filter( 'um_is_selected_filter_value','um_is_selected_filter_value', 1, 9 );
-add_filter( 'um_select_dropdown_dynamic_option_value','um_is_selected_filter_value', 1, 10 );
+add_filter( 'um_is_selected_filter_value','um_is_selected_filter_value', 9, 1 );
+add_filter( 'um_select_dropdown_dynamic_option_value','um_is_selected_filter_value', 10, 1 );
 
 /**
  * Filter select dropdown to use UTF-8 encoding
@@ -539,9 +570,10 @@ add_filter( 'um_select_dropdown_dynamic_option_value','um_is_selected_filter_val
  * @return array
  * @uses   hook filter: um_select_dropdown_dynamic_options
  */
-function um_select_dropdown_dynamic_options_to_utf8( $options, $data ){
-	if ( ! UM()->options()->get( 'um_force_utf8_strings' ) )
+function um_select_dropdown_dynamic_options_to_utf8( $options, $data ) {
+	if ( ! UM()->options()->get( 'um_force_utf8_strings' ) ) {
 		return $options;
+	}
 
 	foreach ( $options as $key => $value ) {
 		$options[ $key ] = um_force_utf8_string( $value );
@@ -549,7 +581,7 @@ function um_select_dropdown_dynamic_options_to_utf8( $options, $data ){
 
 	return $options;
 }
-add_filter( 'um_select_dropdown_dynamic_options','um_select_dropdown_dynamic_options_to_utf8', 2, 10 );
+add_filter( 'um_select_dropdown_dynamic_options','um_select_dropdown_dynamic_options_to_utf8', 10, 2 );
 
 
 /**
@@ -580,12 +612,8 @@ add_filter( 'um_field_non_utf8_value', 'um_field_non_utf8_value' );
  * @uses   hook filter: um_select_dropdown_dynamic_options, um_multiselect_options
  */
 function um_select_dropdown_dynamic_callback_options( $options, $data ) {
-
-	if( isset( $data['custom_dropdown_options_source'] ) && ! empty( $data['custom_dropdown_options_source'] ) ){
-
-		if( function_exists( $data['custom_dropdown_options_source'] ) ){
-			$options = call_user_func( $data['custom_dropdown_options_source'] );
-		}
+	if ( ! empty( $data['custom_dropdown_options_source'] ) && function_exists( $data['custom_dropdown_options_source'] ) ) {
+		$options = call_user_func( $data['custom_dropdown_options_source'] );
 	}
 
 	return $options;
@@ -604,7 +632,7 @@ add_filter( 'um_multiselect_options','um_select_dropdown_dynamic_callback_option
  */
 
 function um_option_match_callback_view_field( $value, $data ) {
-	if( ! empty( $data['custom_dropdown_options_source'] ) ){
+	if ( ! empty( $data['custom_dropdown_options_source'] ) ) {
 		return UM()->fields()->get_option_value_from_callback( $value, $data, $data['type'] );
 	}
 
@@ -658,13 +686,83 @@ function um_profile_field_filter_xss_validation( $value, $data, $type = '' ) {
 		$value = stripslashes( $value );
 		$data['validate'] = isset( $data['validate'] ) ? $data['validate'] : '';
 
-		if( 'text' == $type && ! in_array( $data['validate'], array( 'unique_email' ) ) || 'password' == $type ) {
+		if ( 'text' == $type && ! in_array( $data['validate'], array( 'unique_email' ) ) || 'password' == $type ) {
 			$value = esc_attr( $value );
-		} elseif( $type == 'url' ) {
+		} elseif ( $type == 'url' ) {
 			$value = esc_url( $value );
 		} elseif ( 'textarea' == $type ) {
 			if ( empty( $data['html'] ) ) {
 				$value =  wp_kses_post( $value );
+			}
+		} elseif ( 'rating' == $type ) {
+			if ( ! is_numeric( $value ) ) {
+				$value = 0;
+			} else {
+				if ( $data['number'] == 5 ) {
+					if ( ! in_array( $value, range( 1, 5 ) ) ) {
+						$value = 0;
+					}
+				} elseif ( $data['number'] == 10 ) {
+					if ( ! in_array( $value, range( 1, 10 ) ) ) {
+						$value = 0;
+					}
+				}
+			}
+		} elseif ( 'select' == $type || 'radio' == $type ) {
+
+			/**
+			 * UM hook
+			 *
+			 * @type filter
+			 * @title um_select_option_value
+			 * @description Enable options pair by field $data
+			 * @input_vars
+			 * [{"var":"$options_pair","type":"null","desc":"Enable pairs"},
+			 * {"var":"$data","type":"array","desc":"Field Data"}]
+			 */
+			$option_pairs = apply_filters( 'um_select_options_pair', null, $data );
+
+			$arr = $data['options'];
+			if ( $option_pairs ) {
+				$arr = array_keys( $data['options'] );
+			}
+
+			if ( ! empty( $arr ) && ! in_array( $value, array_map( 'trim', $arr ) ) && empty( $data['custom_dropdown_options_source'] ) ) {
+				$value = '';
+			} else {
+				if ( $option_pairs ) {
+					$value = $data['options'][ $value ];
+				}
+			}
+		}
+	} elseif ( ! empty( $value ) && is_array( $value ) ) {
+		if ( 'multiselect' == $type || 'checkbox' == $type ) {
+
+			/**
+			 * UM hook
+			 *
+			 * @type filter
+			 * @title um_select_option_value
+			 * @description Enable options pair by field $data
+			 * @input_vars
+			 * [{"var":"$options_pair","type":"null","desc":"Enable pairs"},
+			 * {"var":"$data","type":"array","desc":"Field Data"}]
+			 */
+			$option_pairs = apply_filters( 'um_select_options_pair', null, $data );
+
+			$arr = $data['options'];
+			if ( $option_pairs ) {
+				$arr = array_keys( $data['options'] );
+			}
+
+			if ( ! empty( $arr ) && empty( $data['custom_dropdown_options_source'] ) ) {
+				$value = array_intersect( $value, array_map( 'trim', $arr ) );
+			}
+
+			if ( $option_pairs ) {
+				foreach ( $value as &$val ) {
+					$val = $data['options'][ $val ];
+				}
 			}
 		}
 	}

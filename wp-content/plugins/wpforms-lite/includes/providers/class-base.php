@@ -3,11 +3,7 @@
 /**
  * Provider class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 abstract class WPForms_Provider {
 
@@ -48,7 +44,7 @@ abstract class WPForms_Provider {
 	public $priority = 10;
 
 	/**
-	 * Holds the API connections.
+	 * Store the API connections.
 	 *
 	 * @since 1.0.0
 	 *
@@ -113,10 +109,10 @@ abstract class WPForms_Provider {
 		add_action( 'wpforms_providers_panel_content', array( $this, 'builder_output' ), $this->priority );
 
 		// Remove provider from Settings Integrations tab.
-		add_action( 'wp_ajax_wpforms_settings_provider_disconnect', array( $this, 'integrations_tab_disconnect' ) );
+		add_action( "wp_ajax_wpforms_settings_provider_disconnect_{$this->slug}", array( $this, 'integrations_tab_disconnect' ) );
 
 		// Add new provider from Settings Integrations tab.
-		add_action( 'wp_ajax_wpforms_settings_provider_add', array( $this, 'integrations_tab_add' ) );
+		add_action( "wp_ajax_wpforms_settings_provider_add_{$this->slug}", array( $this, 'integrations_tab_add' ) );
 
 		// Add providers sections to the Settings Integrations tab.
 		add_action( 'wpforms_settings_providers', array( $this, 'integrations_tab_options' ), $this->priority, 2 );
@@ -157,7 +153,7 @@ abstract class WPForms_Provider {
 		check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 		// Check for permissions.
-		if ( ! wpforms_current_user_can() ) {
+		if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
 			wp_send_json_error(
 				array(
 					'error' => esc_html__( 'You do not have permission', 'wpforms-lite' ),
@@ -1057,7 +1053,7 @@ abstract class WPForms_Provider {
 	}
 
 	/**
-	 * Wraps the builder content with the required markup.
+	 * Wrap the builder content with the required markup.
 	 *
 	 * @since 1.0.0
 	 */
@@ -1076,8 +1072,7 @@ abstract class WPForms_Provider {
 					data-provider="<?php echo esc_attr( $this->slug ); ?>"
 					data-type="<?php echo esc_attr( strtolower( $this->type ) ); ?>">
 					<?php
-					printf(
-						/* translators: %s - Provider type. */
+					printf( /* translators: %s - Provider type. */
 						esc_html__( 'Add New %s', 'wpforms-lite' ),
 						esc_html( $this->type )
 					);
@@ -1239,7 +1234,7 @@ abstract class WPForms_Provider {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $active Array of active connections.
+	 * @param array $active   Array of active connections.
 	 * @param array $settings Array of all connections settings.
 	 */
 	public function integrations_tab_options( $active, $settings ) {

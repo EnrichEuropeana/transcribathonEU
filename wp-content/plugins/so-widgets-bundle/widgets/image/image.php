@@ -1,7 +1,7 @@
 <?php
 /*
 Widget Name: Image
-Description: A very simple image widget.
+Description: A simple image widget with massive power.
 Author: SiteOrigin
 Author URI: https://siteorigin.com
 Documentation: https://siteorigin.com/widgets-bundle/image-widget-documentation/
@@ -185,12 +185,15 @@ class SiteOrigin_Widget_Image_Widget extends SiteOrigin_Widget {
 
 
 	function get_less_variables($instance){
+		if ( empty( $instance ) ) {
+			return array();
+		}
 		return array(
 			'title_alignment' => ! empty( $instance['title_align'] ) ? $instance['title_align'] : '',
 			'image_alignment' => $instance['align'],
 			'image_max_width' => ! empty( $instance['bound'] ) ? '100%' : '',
 			'image_height' => ! empty( $instance['bound'] ) ? 'auto' : '',
-			'image_width' => ! empty( $instance['full_width'] ) ? '100%' : ( ! empty( $instance['bound'] ) ? 'inherit' : '' ),
+			'image_width' => ! empty( $instance['full_width'] ) ? '100%' : '',
 		);
 	}
 

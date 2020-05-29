@@ -3,11 +3,7 @@
 /**
  * Setup panel.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 
@@ -42,7 +38,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Settings panel primary content.
+	 * Output the Settings panel primary content.
 	 *
 	 * @since 1.0.0
 	 */
@@ -90,7 +86,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 				printf(
 					wp_kses(
 						/* translators: %1$s - WPForms.com URL to a template suggestion, %2$s - WPForms.com URL to a doc about custom templates. */
-						__( 'Have a suggestion for a new template? <a href="%1$s" target="_blank" rel="noopener noreferrer">We\'d love to hear it</a>. Also, you can <a href="%1$s" target="_blank" rel="noopener noreferrer">create your own templates</a>!', 'wpforms-lite' ),
+						__( 'Have a suggestion for a new template? <a href="%1$s" target="_blank" rel="noopener noreferrer">We\'d love to hear it</a>. Also, you can <a href="%2$s" target="_blank" rel="noopener noreferrer">create your own templates</a>!', 'wpforms-lite' ),
 						array(
 							'a' => array(
 								'href'   => array(),

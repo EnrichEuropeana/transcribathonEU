@@ -51,7 +51,6 @@ function _TCT_item_page( $atts ) {
                             #transcription-selected-languages.language-selected ul li {
                                 background: ".$theme_sets['vantage_general_link_hover_color']." ;
                                 color: #ffffff;
-                                filter: brightness(1.3);
                             }
                                                     
                             .item-page-slider button.slick-prev.slick-arrow:hover {
@@ -67,12 +66,10 @@ function _TCT_item_page( $atts ) {
                             }              
                             .language-item-select{
                                 background: ".$theme_sets['vantage_general_link_hover_color']." ;
-                                filter: brightness(1.2);
                                 width: 15em;
                             }      
                             .language-select-selected{
                                 background: ".$theme_sets['vantage_general_link_hover_color']." ;
-                                filter: brightness(1.2);
                                 width: 15em;
                             }
                             .tutorial-window-slider button.slick-arrow{
@@ -175,14 +172,23 @@ function _TCT_item_page( $atts ) {
                     $content .=      '<span class="item-login-close">&times;</span>';
                 $content .=  '</div>';
                 $content .=  '<div class="item-page-login-popup-body">';
-                    $content .= do_shortcode('[ultimatemember form_id="40"]');
+                    $login_post = get_posts( array(
+                        'name'    => 'default-login',
+                        'post_type'    => 'um_form',
+                    ));
+                    $content .= do_shortcode('[ultimatemember form_id="'.$login_post[0]->ID.'"]');
                 $content .= '</div>';
                 $content .= '<div class="item-page-login-popup-footer theme-color-background">';
                 $content .= '</div>';
             $content .= '</div>';
         $content .= '</div>';
 
-        // Loced warning
+        // Large spinner
+        $content .= '<div class="full-spinner-container">';
+            $content .= '<div class="spinner-full"></div>';
+        $content .= '</div>';
+
+        // Locked warning
         $content .= "<div id='locked-warning-container'>";
             $content .= "<div class='locked-warning-popup'>";
                 $content .= '<i id="close-locked-window" class="fas fa-times view-switcher-icons theme-color" 
@@ -196,33 +202,6 @@ function _TCT_item_page( $atts ) {
             $content .= "</div>";
         $content .= "</div>";
 
-        // Image viewer
-        $imageViewer = "";
-                $imageViewer .= '<div id="openseadragon">';  
-                    $imageViewer .= '<div class="buttons" id="buttons">';
-                        $imageViewer .= '<div id="zoom-in" class="theme-color theme-color-hover"><i class="far fa-plus"></i></div>';
-                        $imageViewer .= '<div id="zoom-out" class="theme-color theme-color-hover"><i class="far fa-minus"></i></div>';
-                        $imageViewer .= '<div id="home" title="View full image" class="theme-color theme-color-hover"><i class="far fa-home"></i></div>';
-                        $imageViewer .= '<div id="full-width" title="Fit image width to frame" class="theme-color theme-color-hover"><i class="far fa-arrows-alt-h"></i></div>';
-                        $imageViewer .= '<div id="rotate-right" class="theme-color theme-color-hover"><i class="far fa-redo"></i></div>';
-                        $imageViewer .= '<div id="rotate-left" class="theme-color theme-color-hover"><i class="far fa-undo"></i></div>';
-                        $imageViewer .= '<div id="filterButton" title="Edit image" class="theme-color theme-color-hover"><i class="far fa-sliders-h"></i></div>';
-                        $imageViewer .= '<div id="full-page" title="Full screen" class="theme-color theme-color-hover"><i class="far fa-expand-arrows-alt"></i></div>';
-                    $imageViewer .= '</div>';
-                    $imageViewer .= '<div class="buttons new-grid-button" id="buttons">';
-                        if($isLoggedIn) {
-                            if ($locked) {
-                                $imageViewer .= '<div id="transcribeLock" class="theme-color theme-color-hover"><i class="far fa-lock"></i></div>';
-                            }
-                            else {
-                                $imageViewer .= '<div id="transcribe" title="Enrich item" class="theme-color theme-color-hover"><i class="far fa-pen"></i></div>';
-                            }
-                        } else {
-                            $imageViewer .= '<div id="transcribe-locked" class="theme-color theme-color-hover"><i class="far fa-pen" id="lock-login"></i></div>';
-                        }
-                        //$imageViewer .= '<div id="transcribe locked"><i class="far fa-lock" id="lock-login"></i></div>';
-                    $imageViewer .= '</div>';
-                $imageViewer .= '</div>';
 
         // Editor tab
         $editorTab = "";
@@ -360,19 +339,19 @@ function _TCT_item_page( $atts ) {
                     //status-changer
                     $editorTab .= "<div class='item-page-section-headline-right-site'>";
                         $editorTab .= '<div id="transcription-status-changer" class="status-changer section-status-changer login-required">';
-                            if (current_user_can('administrator')) {
+                            //if (current_user_can('administrator')) {
                                 $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
                                                     style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';"
                                                     onclick="event.stopPropagation(); document.getElementById(\'transcription-status-dropdown\').classList.toggle(\'show\')"></i>';
-                            }
+                            /*}
                             else {
                                 $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
                                                     style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';">
                                                     </i>';
-                            }
+                            }*/
                             $editorTab .= '<div id="transcription-status-dropdown" class="sub-status status-dropdown-content">';
 
-                                foreach ($statusTypes as $statusType) {
+                            /*    foreach ($statusTypes as $statusType) {
                                     if ($itemData['TranscriptionStatusId'] == $statusType['CompletionStatusId']) {
                                         $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
                                                             onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
@@ -383,6 +362,22 @@ function _TCT_item_page( $atts ) {
                                         $editorTab .= "<div class='status-dropdown-option'
                                                             onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
                                         $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                    }
+                                }*/
+
+                                foreach ($statusTypes as $statusType) {
+                                    if ($statusType['CompletionStatusId'] != 4 || current_user_can('administrator')) {
+                                        if ($itemData['TranscriptionStatusId'] == $statusType['CompletionStatusId']) {
+                                            $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                                                onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                            $editorTab .= "<i class='fal fa-circle' style='color: transparent;
+                                                                background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'>
+                                                            </i>".$statusType['Name']."</div>";
+                                        } else {
+                                            $editorTab .= "<div class='status-dropdown-option'
+                                                                onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                            $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                        }
                                     }
                                 }
                             $editorTab .= '</div>';
@@ -444,7 +439,7 @@ function _TCT_item_page( $atts ) {
                                     $transcriptionLanguages = $transcriptionData[0]['Languages'];
                                             foreach($transcriptionLanguages as $transcriptionLanguage) {
                                                 $editorTab .= "<li class='theme-colored-data-box'>";
-                                                    $editorTab .= $transcriptionLanguage['Name'];
+                                                    $editorTab .= $transcriptionLanguage['Name']." (".$transcriptionLanguage['NameEnglish'].")";
                                                     $editorTab .= '<script>
                                                                 jQuery("#transcription-language-selector option[value=\''.$transcriptionLanguage['LanguageId'].'\'").prop("disabled", true)
                                                             </script>';
@@ -456,6 +451,14 @@ function _TCT_item_page( $atts ) {
                         $editorTab .= '</div>';
 
                         $editorTab .= '<div class="transcription-metadata-container">';
+
+                        $editorTab .= "<button disabled class='item-page-save-button language-tooltip' id='transcription-update-button' 
+                                                onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id()."
+                                                        , \"".$statusTypes[1]['ColorCode']."\", ".sizeof($progressData).")'>";
+                            $editorTab .= "SAVE"; // save transcription
+                            $editorTab .= "<span class='language-tooltip-text'>Please select a language</span>";
+                        $editorTab .= "</button>";
+
                         $editorTab .= '<div id="no-text-selector">';
                             $editorTab .= '<label class="square-checkbox-container login-required">';
                                 $editorTab .= '<span>No Text</span>';
@@ -469,13 +472,6 @@ function _TCT_item_page( $atts ) {
                                 $editorTab .= '<span class="theme-color-background item-checkmark checkmark"></span>';
                             $editorTab .= '</label>';
                         $editorTab .= '</div>';
-
-                        $editorTab .= "<button disabled class='item-page-save-button language-tooltip' id='transcription-update-button' 
-                                                onClick='updateItemTranscription(".$itemData['ItemId'].", ".get_current_user_id()."
-                                                        , \"".$statusTypes[1]['ColorCode']."\", ".sizeof($progressData).")'>";
-                            $editorTab .= "SAVE"; // save transcription
-                            $editorTab .= "<span class='language-tooltip-text'>Please select a language</span>";
-                        $editorTab .= "</button>";
                         $editorTab .= '<div id="item-transcription-spinner-container" class="spinner-container spinner-container-right">';
                             $editorTab .= '<div class="spinner"></div>';
                         $editorTab .= "</div>";
@@ -497,26 +493,28 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '</div>';
                 //status-changer
                 $editorTab .= '<div id="description-status-changer" class="status-changer section-status-changer login-required">';
-                    if (current_user_can('administrator')) {
+                    //if (current_user_can('administrator')) {
                         $editorTab .= '<i id="description-status-indicator" class="fal fa-circle status-indicator"
                                             style="color: '.$itemData['DescriptionStatusColorCode'].'; background-color:'.$itemData['DescriptionStatusColorCode'].';"
                                             onclick="event.stopPropagation(); document.getElementById(\'description-status-dropdown\').classList.toggle(\'show\')"></i>';
-                    }
+                    /*}
                     else {
                         $editorTab .= '<i id="description-status-indicator" class="fal fa-circle status-indicator"
                                             style="color: '.$itemData['DescriptionStatusColorCode'].'; background-color:'.$itemData['DescriptionStatusColorCode'].';">
                                         </i>';
-                    }
+                    }*/
                     $editorTab .= '<div id="description-status-dropdown" class="sub-status status-dropdown-content">';
                         foreach ($statusTypes as $statusType) {
-                            if ($itemData['DescriptionStatusId'] == $statusType['CompletionStatusId']) {
-                                $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
-                                                    onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                            } else {
-                                $editorTab .= "<div class='status-dropdown-option'
-                                                    onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                            if ($statusType['CompletionStatusId'] != 4 || current_user_can('administrator')) {
+                                if ($itemData['DescriptionStatusId'] == $statusType['CompletionStatusId']) {
+                                    $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                                        onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                    $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                } else {
+                                    $editorTab .= "<div class='status-dropdown-option'
+                                                        onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'DescriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                    $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                }
                             }
                         }
                     $editorTab .= '</div>';
@@ -548,7 +546,7 @@ function _TCT_item_page( $atts ) {
                                     $editorTab .= $category['PropertyValue'];
                                     $editorTab .= '<input class="category-checkbox" id="type-'.$category['PropertyValue'].'-checkbox" type="checkbox" '.$checked.'
                                                         name="'.$category['PropertyValue'].'"value="'.$category['PropertyId'].'"
-                                                        onClick="addItemProperty('.$_GET['item'].', '.get_current_user_id().', this)">';
+                                                        onClick="addItemProperty('.$_GET['item'].', '.get_current_user_id().', \'category\', \''.$statusTypes[1]['ColorCode'].'\', '.sizeof($progressData).', this)">';
                                     $editorTab .= '<span  class="theme-color-background item-checkmark checkmark"></span>';
                                 $editorTab .= '</label>';
                             }
@@ -557,7 +555,7 @@ function _TCT_item_page( $atts ) {
 
                         $editorTab .= '<textarea id="item-page-description-text" class="login-required" name="description" rows="4">';
                             if ($itemData['Description'] != null) {
-                                $editorTab .= $itemData['Description'];
+                                $editorTab .= htmlspecialchars($itemData['Description'], ENT_QUOTES, 'UTF-8');
                             }
                         $editorTab .= '</textarea>';
 
@@ -606,7 +604,8 @@ function _TCT_item_page( $atts ) {
                     $editorTab .= '</div>';
                 $editorTab .= '</div>';
 
-                // Transcription history
+                // Transcription 
+
             $editorTab .= '<div class="item-page-section">';
                 $editorTab .= '<div class="item-page-section-headline-container collapse-headline item-page-section-collapse-headline collapse-controller" data-toggle="collapse" href="#transcription-history"
                                             onClick="jQuery(this).find(\'.collapse-icon\').toggleClass(\'fa-caret-circle-down\')
@@ -618,7 +617,29 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '</div>';
                 $editorTab .= '<div style="clear: both;"></div>';
                 $editorTab .= "<div id=\"transcription-history\" class=\"collapse\">";
-                $i = 0;
+
+		$user = get_userdata($currentTranscription['WP_UserId']);
+                $editorTab .= '<div class="transcription-toggle" data-toggle="collapse" data-target="#transcription-0">';
+                   $editorTab .='<i class="fas fa-calendar-day" style= "margin-right: 6px;"></i>';
+                   $date = strtotime($currentTranscription["Timestamp"]);
+                   $editorTab .= '<span class="day-n-time">';
+                        $editorTab .= $currentTranscription["Timestamp"];
+                   $editorTab .= '</span>';
+                   $editorTab .= '<i class="fas fa-user-alt" style="margin: 0 6px;"></i>';
+                   $editorTab .= '<span class="day-n-time">';
+                        $editorTab .= '<a target=\"_blank\" href="'.network_home_url().'profile/'.$user->data->user_nicename.'">';
+                            $editorTab .= $user->data->user_nicename;
+                        $editorTab .= '</a>';
+                    $editorTab .= '</span>';
+                    $editorTab .= '<i class="fas fa-angle-down" style= "float:right;"></i>';
+                $editorTab .= '</div>';                   
+		$editorTab .= '<div id="transcription-0" class="collapse transcription-history-collapse-content">';
+                    $editorTab .= '<p>';
+                        $editorTab .= $currentTranscription['TextNoTags'];
+                    $editorTab .= '</p>';
+                $editorTab .= '</div>';
+
+                $i = 1;                    
                 foreach ($transcriptionList as $transcription) {
                     $user = get_userdata($transcription['WP_UserId']);
                     $editorTab .= '<div class="transcription-toggle" data-toggle="collapse" data-target="#transcription-'.$i.'">';
@@ -629,7 +650,7 @@ function _TCT_item_page( $atts ) {
                         $editorTab .= '</span>';
                         $editorTab .= '<i class="fas fa-user-alt" style="margin: 0 6px;"></i>';
                         $editorTab .= '<span class="day-n-time">';
-                            $editorTab .= '<a target=\"_blank\" href="'.network_home_url().'/profile/'.$user->data->user_nicename.'">';
+                            $editorTab .= '<a target=\"_blank\" href="'.network_home_url().'profile/'.$user->data->user_nicename.'">';
                                 $editorTab .= $user->data->user_nicename;
                             $editorTab .= '</a>';
                         $editorTab .= '</span>';
@@ -641,8 +662,8 @@ function _TCT_item_page( $atts ) {
                             $editorTab .= $transcription['TextNoTags'];
                         $editorTab .= '</p>';
                         $editorTab .= "<input class='transcription-comparison-button theme-color-background' type='button'
-                                            onClick='compareTranscription(".json_encode($transcriptionList[$i]['TextNoTags'])."
-                                                        , ".json_encode($currentTranscription['TextNoTags']).",".$i.")'
+                                            onClick='compareTranscription(".htmlentities(json_encode($transcriptionList[$i]['TextNoTags']), ENT_QUOTES)."
+                                                        , ".htmlentities(json_encode($currentTranscription['TextNoTags']), ENT_QUOTES).",".$i.")'
                                             value='Compare to current transcription'>";
                         $editorTab .= '<div id="transcription-comparison-output-'.$i.'" class="transcription-comparison-output"></div>';
                     $editorTab .= '</div>';
@@ -697,16 +718,53 @@ function _TCT_item_page( $atts ) {
                                 $infoTab .= $fields[$key].": ";
                             $infoTab .= "</span>";
                             $infoTab .= "<span class='item-page-property-value'>";
-                                if (filter_var($value, FILTER_VALIDATE_URL)) {
-                                    $infoTab .= "<a href=\"".$value."\" target=\"_blank\" rel=\"noopener noreferrer\">".$value."</a>";
+                            $valueList = explode(" || ", $value);
+                            $valueList = array_unique($valueList);
+                            $i = 0;
+                            foreach ($valueList as $singleValue) {
+                                if ($singleValue != "") {
+                                    if ($i == 0) {
+                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                        }
+                                        else {
+                                            $infoTab .= $singleValue;
+                                        }
+                                    }
+                                    else {
+                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                            $infoTab .= "</br>";
+                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                        }
+                                        else {
+                                            $infoTab .= "</br>";
+                                            $infoTab .= $singleValue;
+                                        }
+                                    }
                                 }
-                                else {
-                                    $infoTab .= $value;
-                                }
+                                $i += 1;
+                            }
                                 
                             $infoTab .= "</span></br>";
                         $infoTab .= "</p>";
                     }
+                }
+                $location = "";
+                if ($storyData['PlaceName'] != null && $storyData['PlaceName'] != "") {
+                    $location .= $storyData['PlaceName'];
+                }
+                if ($storyData['PlaceLatitude'] != null && $storyData['PlaceLatitude'] != "" && $storyData['PlaceLongitude'] != null && $storyData['PlaceLongitude'] != "") {
+                    $location .= " (".$storyData['PlaceLatitude'].", ".$storyData['PlaceLongitude'].")";
+                }
+                if ($location != "") {
+                    $infoTab .= "<p class='item-page-property'>";
+                        $infoTab .= "<span class='item-page-property-key' style='font-weight:bold;'>";
+                            $infoTab .= "Location: ";
+                        $infoTab .= "</span>";
+                        $infoTab .= "<span class='item-page-property-value'>";
+                            $infoTab .= $location;
+                        $infoTab .= "</span></br>";
+                    $infoTab .= "</p>";
                 }
             $infoTab .= "</div>";
         $infoTab .= "</div>";
@@ -723,33 +781,35 @@ function _TCT_item_page( $atts ) {
            
             $taggingTab .= "<div class='item-page-section-headline-container collapse-headline collapse-controller login-required' data-toggle='collapse' href='#location-input-section'>";
                 $taggingTab .= "<i class='fal fa-map-marker-alt theme-color' style='padding-right: 3px; font-size: 17px; margin-right:8px;'></i>";
-                $taggingTab .= "<h4 class='theme-color item-page-section-headline' title='Click to add a location'>";
+                $taggingTab .= "<h4 id='location-position' class='theme-color item-page-section-headline' title='Click to add a location'>";
                     $taggingTab .= "Locations";
-                    $taggingTab .= '<i class="fas fa-plus-circle" style="margin-left:5px; font-size:15px;"></i>';
+                    $taggingTab .= '<i class="fas fa-plus-circle" style="margin-left:5px; font-size:15px; position: absolute; top: 10px;"></i>';
                 $taggingTab .= "</h4>";
 
                 //status-changer
                 $taggingTab .= "<div class='item-page-section-headline-right-site'>";
                     $taggingTab .= '<div id="location-status-changer" class="status-changer section-status-changer login-required">';
-                        if (current_user_can('administrator')) {
+                        //if (current_user_can('administrator')) {
                             $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator"
                                                 style="color: '.$itemData['LocationStatusColorCode'].'; background-color:'.$itemData['LocationStatusColorCode'].';"
                                                 onclick="event.stopPropagation(); document.getElementById(\'location-status-dropdown\').classList.toggle(\'show\')"></i>';
-                        }
+                        /*}
                         else {
                             $taggingTab .= '<i id="location-status-indicator" class="fal fa-circle status-indicator"
                                                 style="color: '.$itemData['LocationStatusColorCode'].'; background-color:'.$itemData['LocationStatusColorCode'].';"></i>';
-                        }
+                        }*/
                         $taggingTab .= '<div id="location-status-dropdown" class="sub-status status-dropdown-content">';
                             foreach ($statusTypes as $statusType) {
-                                if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) {
-                                    $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
-                                                        onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                    $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                                } else {
-                                    $taggingTab .= "<div class='status-dropdown-option'
-                                                        onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                    $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                if ($statusType['CompletionStatusId'] != 4 || current_user_can('administrator')) {
+                                    if ($itemData['LocationStatusId'] == $statusType['CompletionStatusId']) {
+                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                    } else {
+                                        $taggingTab .= "<div class='status-dropdown-option'
+                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'LocationStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                    }
                                 }
                             }
                         $taggingTab .= '</div>';
@@ -759,20 +819,29 @@ function _TCT_item_page( $atts ) {
                         
 
             $taggingTab .= '<div id="location-input-section" class="collapse">';
-                $taggingTab .= '<div class="location-input-section-top">';
+
+                $taggingTab .= '<div class="location-input-section-second">';
                     $taggingTab .= '<div class="location-input-name-container location-input-container">';
-                        $taggingTab .= '<label>Location Name:</label>';
                         $taggingTab .= '<span class="required-field">*</span>';
                         $taggingTab .= '<br/>';
                         //$taggingTab .= '<input type="text" name="" placeholder="">';
                     $taggingTab .= '</div>';
-                    $taggingTab .= '<div class="location-input-coordinates-container location-input-container">';
+                $taggingTab .= '</div>';
+
+                $taggingTab .= '<div class="location-input-section-top">';
+                    $taggingTab .= '<div id="location-name-display" style="margin-right: 16px;" class="location-display location-name-container location-input-container">';
+                        $taggingTab .= '<label>Location Name:</label>';
+                        $taggingTab .=    '<span class="required-field">*</span>';
+                        $taggingTab .=    '<br/>';
+                        $taggingTab .=    '<input type="text" name="" placeholder="e.g.: Berlin">';
+                    $taggingTab .= '</div>';
+                    $taggingTab .= '<div class="location-display location-input-coordinates-container location-input-container">';
                         $taggingTab .=    '<label>Coordinates: </label>';
                         $taggingTab .=    '<span class="required-field">*</span>';
                         $taggingTab .=    '<br/>';
                         $taggingTab .=    '<input type="text" name="" placeholder="e.g.: 10.0123, 15.2345">';
                     $taggingTab .= '</div>';
-                    $taggingTab .= "<div style='clear:both;'></div>";
+                    $taggingTab .= '<div style="clear:both;"></div>';
                 $taggingTab .= '</div>';
 
                 $taggingTab .= '<div class="location-input-description-container location-input-container">';
@@ -784,9 +853,9 @@ function _TCT_item_page( $atts ) {
                     $taggingTab .= '<label>WikiData Reference:
                     <i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Identify this location by searching its name or code on Wikidata"></i></label><br/>';
                     $taggingTab .= '<input type="text" id="lgns" placeholder="" name="">';
-                    $taggingTab .= '<a id="geonames-search-button" href="">';
-                        $taggingTab .= '<i class="far fa-search"></i>';
-                    $taggingTab .= '</a>';
+                    //$taggingTab .= '<a id="geonames-search-button" href="">';
+                        //$taggingTab .= '<i class="far fa-search"></i>';
+                    //$taggingTab .= '</a>';
                 $taggingTab .= '</div>';
 
                 $taggingTab .= "<div class='form-buttons-right'>";
@@ -826,12 +895,20 @@ function _TCT_item_page( $atts ) {
                              $taggingTab .= '<span>';
                                  $taggingTab .= 'Description: ';
                                  $taggingTab .= $comment;
-                             $taggingTab .= '</span>';
-                             $taggingTab .= '<i class="edit-item-data-icon fas fa-pencil theme-color-hover login-required" 
+                             $taggingTab .= '</span></br>';
+                             $taggingTab .= '<span>';
+                                $taggingTab .= 'Wikidata: ';
+                                $taggingTab .= '<a href="http://www.wikidata.org/wiki/'.$place['WikidataId'].'" style="text-decoration: none;" target="_blank">'.$place['WikidataName'].', '.$place['WikidataId'].'</a>';
+                         $taggingTab .= '</span></br>'; 
+                         $taggingTab .= '<div style="display:flex;"><span style="width:86%;"></span>';
+                            $taggingTab .= '<span style="width:14%;">';
+                             $taggingTab .= '<i class="login-required edit-item-data-icon fas fa-pencil theme-color-hover login-required" 
                                                  onClick="openLocationEdit('.$place['PlaceId'].')"></i>';
-                             $taggingTab .= '<i class="edit-item-data-icon fas fa-trash-alt theme-color-hover login-required" 
+                             $taggingTab .= '<i class="login-required edit-item-data-icon fas fa-trash-alt theme-color-hover login-required" 
                                                  onClick="deleteItemData(\'places\', '.$place['PlaceId'].', '.$_GET['item'].', \'place\', '.get_current_user_id().')"></i>';
-                         $taggingTab .= '</div>';
+                        
+                        $taggingTab .= '</span></div>'; 
+                        $taggingTab .= '</div>';
 
                          $taggingTab .= '<div id="location-data-edit-'.$place['PlaceId'].'" class="location-data-edit-container">';
                             $taggingTab .= '<div class="location-input-section-top">';
@@ -843,22 +920,27 @@ function _TCT_item_page( $atts ) {
                                     $taggingTab .=    '<label>Coordinates: </label>';
                                     $taggingTab .=    '<span class="required-field">*</span>';
                                     $taggingTab .=    '<br/>';
-                                    $taggingTab .=    '<input type="text" value="'.$place['Latitude'].','.$place['Longitude'].'" name="" placeholder="">';
+                                    $taggingTab .=    '<input type="text" value="'.htmlspecialchars($place['Latitude'], ENT_QUOTES, 'UTF-8').','.htmlspecialchars($place['Longitude'], ENT_QUOTES, 'UTF-8').'" name="" placeholder="">';
                                 $taggingTab .= '</div>';
                                 $taggingTab .= "<div style='clear:both;'></div>";
                             $taggingTab .= '</div>';
 
                             $taggingTab .= '<div class="location-input-description-container location-input-container">';
                                 $taggingTab .= '<label>Description:<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this location, e.g. the building name, or its significance to the item"></i></label><br/>';
-                                $taggingTab .= '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc">'.$comment.'</textarea>';
+                                $taggingTab .= '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc">'.htmlspecialchars($comment, ENT_QUOTES, 'UTF-8').'</textarea>';
                             $taggingTab .= '</div>';
 
-                            $taggingTab .= '<div id="location-input-geonames-search-container" class="location-input-container location-search-container">';
+                            $taggingTab .= '<div class="location-input-geonames-container location-input-container location-search-container">';
                                 $taggingTab .= '<label>WikiData:</label><br/>';
-                                $taggingTab .= '<input type="text" id="lgns" placeholder="" name="">';
-                                $taggingTab .= '<a id="geonames-search-button" href="">';
-                                    $taggingTab .= '<i class="far fa-search"></i>';
-                                $taggingTab .= '</a>';
+                                if ($place['WikidataName'] != "NULL" && $place['WikidataId'] != "NULL") {
+                                    $taggingTab .= '<input type="text" placeholder="" name="" value="'.htmlspecialchars($place['WikidataId'], ENT_QUOTES, 'UTF-8').'; '.htmlspecialchars($place['WikidataName'], ENT_QUOTES, 'UTF-8').'">';
+                                }
+                                else {
+                                    $taggingTab .= '<input type="text" placeholder="" name="">';
+                                }
+                                //$taggingTab .= '<a id="geonames-search-button" href="">';
+                                //    $taggingTab .= '<i class="far fa-search"></i>';
+                                //$taggingTab .= '</a>';
                             $taggingTab .= '</div>';
             
                             $taggingTab .= "<div class='form-buttons-right'>";
@@ -896,25 +978,27 @@ function _TCT_item_page( $atts ) {
                         //status-changer
                     $taggingTab .= "<div class='item-page-section-headline-right-site'>";
                         $taggingTab .= '<div id="tagging-status-changer" class="status-changer section-status-changer login-required">';
-                            if (current_user_can('administrator')) {
+                            //if (current_user_can('administrator')) {
                                 $taggingTab .= '<i id="tagging-status-indicator" class="fal fa-circle status-indicator"
                                                     style="color: '.$itemData['TaggingStatusColorCode'].'; background-color:'.$itemData['TaggingStatusColorCode'].';"
                                                     onclick="event.stopPropagation(); document.getElementById(\'tagging-status-dropdown\').classList.toggle(\'show\')"></i>';
-                            }
+                            /*}
                             else {
                                 $taggingTab .= '<i id="tagging-status-indicator" class="fal fa-circle status-indicator"
                                                     style="color: '.$itemData['TaggingStatusColorCode'].'; background-color:'.$itemData['TaggingStatusColorCode'].';"></i>';
-                            }
+                            }*/
                             $taggingTab .= '<div id="tagging-status-dropdown" class="sub-status status-dropdown-content">';
                                 foreach ($statusTypes as $statusType) {
-                                    if ($itemData['TaggingStatusId'] == $statusType['CompletionStatusId']) {
-                                        $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
-                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TaggingtatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                                    } else {
-                                        $taggingTab .= "<div class='status-dropdown-option'
-                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TaggingStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                        $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                    if ($statusType['CompletionStatusId'] != 4 || current_user_can('administrator')) {
+                                        if ($itemData['TaggingStatusId'] == $statusType['CompletionStatusId']) {
+                                            $taggingTab .= "<div class='status-dropdown-option status-dropdown-option-current'
+                                                                onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TaggingtatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                            $taggingTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                        } else {
+                                            $taggingTab .= "<div class='status-dropdown-option'
+                                                                onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TaggingStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
+                                            $taggingTab .= "<i class='fal fa-circle' style='color: transparent;background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
+                                        }
                                     }
                                 }
                             $taggingTab .= '</div>';
@@ -930,12 +1014,12 @@ function _TCT_item_page( $atts ) {
                         $taggingTab .= '<label>';
                             $taggingTab .= 'Start Date';
                         $taggingTab .= '</label>';
-                        if ($itemData['DateStart'] != null) {
+                            if ($itemData['DateStartDisplay'] != null) {
                                 $startTimestamp = strtotime($itemData['DateStart']);
                                 $dateStart = date("d/m/Y", $startTimestamp);
                                 $taggingTab .= '<div class="item-date-display-container">';
                                     $taggingTab .= '<span type="text" id="startdateDisplay" class="item-date-display">';
-                                        $taggingTab .= $dateStart;
+                                        $taggingTab .= $itemData['DateStartDisplay'];
                                     $taggingTab .= '</span>';
                                     $taggingTab .= '<i class="edit-item-date edit-item-data-icon fas fa-pencil theme-color-hover login-required"></i>';
                                 $taggingTab .= '</div>';
@@ -950,7 +1034,7 @@ function _TCT_item_page( $atts ) {
                                     $taggingTab .= '<i class="edit-item-date edit-item-data-icon fas fa-pencil theme-color-hover login-required"></i>';
                                 $taggingTab .= '</div>';
                                 $taggingTab .= '<div class="item-date-input-container">';
-                                    $taggingTab .= '<input type="text" id="startdateentry" class="datepicker-input-field" placeholder="dd/mm/yyyy">';
+                                    $taggingTab .= '<input type="text" id="startdateentry" class="login-required datepicker-input-field" placeholder="dd/mm/yyyy">';
                                 $taggingTab .= '</div>';
                             }
                         $taggingTab .= "</div>";
@@ -958,12 +1042,12 @@ function _TCT_item_page( $atts ) {
                             $taggingTab .= '<label>';
                                 $taggingTab .= 'End Date';
                             $taggingTab .= '</label>';
-                            if ($itemData['DateEnd'] != null) {
+                            if ($itemData['DateEndDisplay'] != null) {
                                 $endTimestamp = strtotime($itemData['DateEnd']);
                                 $dateEnd = date("d/m/Y", $endTimestamp);
                                 $taggingTab .= '<div class="item-date-display-container">';
                                     $taggingTab .= '<span type="text" id="enddateDisplay" class="item-date-display">';
-                                        $taggingTab .= $dateEnd;
+                                        $taggingTab .= $itemData['DateEndDisplay'];
                                     $taggingTab .= '</span>';
                                     $taggingTab .= '<i class="edit-item-date edit-item-data-icon fas fa-pencil theme-color-hover login-required"></i>';
                                 $taggingTab .= '</div>';
@@ -979,7 +1063,7 @@ function _TCT_item_page( $atts ) {
                                     $taggingTab .= '<i class="edit-item-date edit-item-data-icon fas fa-pencil theme-color-hover login-required"></i>';
                                 $taggingTab .= '</div>';
                                 $taggingTab .= '<div class="item-date-input-container">';
-                                    $taggingTab .= '<input type="text" id="enddateentry" class="datepicker-input-field" placeholder="dd/mm/yyyy">';
+                                    $taggingTab .= '<input type="text" id="enddateentry" class="login-required datepicker-input-field" placeholder="dd/mm/yyyy">';
                                 $taggingTab .= '</div>';
                             }
                         $taggingTab .= "</div>";
@@ -1012,25 +1096,25 @@ function _TCT_item_page( $atts ) {
                     // add person form area
                     $taggingTab .= '<div class="collapse person-item-data-container" id="person-input-container">';
                         $taggingTab .= '<div class="person-input-names-container">';
-                            $taggingTab .= '<input type="text" id="person-firstName-input" class="person-input-field" name="" placeholder="First Name">';
-                            $taggingTab .= '<input type="text" id="person-lastName-input" class="person-input-field" name="" placeholder="Last Name">';
+                            $taggingTab .= '<input type="text" id="person-firstName-input" class="input-response person-input-field" name="" placeholder="First Name">';
+                            $taggingTab .= '<input type="text" id="person-lastName-input" class="input-response person-input-field" name="" placeholder="Last Name">';
                         $taggingTab .= '</div>'; 
 
+                        $taggingTab .= '<div class="person-description-input">';
+                            $taggingTab .= '<label>Description:<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i></label><br/>';
+                            $taggingTab .= '<input id="person-description-input-field" type="text" class="input-response person-input-field">';
+                        $taggingTab .= '</div>';
+
                         $taggingTab .= '<div class="person-location-birth-inputs">';
-                            $taggingTab .= '<input type="text" id="person-birthPlace-input"   class="person-input-field" name="" placeholder="Birth Location">';
-                            $taggingTab .= '<input type="text" id="person-birthDate-input" class="person-input-field datepicker-input-field" name="" placeholder="Birth: dd/mm/yyyy">';
+                            $taggingTab .= '<input type="text" id="person-birthPlace-input"   class="input-response person-input-field" name="" placeholder="Birth Location">';
+                            $taggingTab .= '<span class="input-response"><input type="text" id="person-birthDate-input" class="date-input-response person-input-field datepicker-input-field" name="" placeholder="Birth: dd/mm/yyyy"></span>';
                         $taggingTab .= '</div>'; 
 
                         $taggingTab .= '<div class="person-location-death-inputs">';
-                            $taggingTab .= '<input type="text" id="person-deathPlace-input" class="person-input-field" name="" placeholder="Death Location">';
-                            $taggingTab .= '<input type="text" id="person-deathDate-input" class="person-input-field datepicker-input-field" name="" placeholder="Death: dd/mm/yyyy">';
+                            $taggingTab .= '<input type="text" id="person-deathPlace-input" class="input-response person-input-field" name="" placeholder="Death Location">';
+                            $taggingTab .= '<span class="input-response"><input type="text" id="person-deathDate-input" class="date-input-response person-input-field datepicker-input-field" name="" placeholder="Death: dd/mm/yyyy"></span>';
                         $taggingTab .= '</div>';    
 
-                        $taggingTab .= '<div class="person-description-input">';
-                            $taggingTab .= '<label>Description:</label><br/>';
-                            $taggingTab .= '<input id="person-description-input-field" type="text" class="person-input-field">';
-                            $taggingTab .= '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i>';
-                        $taggingTab .= '</div>';
                         $taggingTab .= '<div class="form-buttons-right">';
                             $taggingTab .= "<button id='save-personinfo-button' class='theme-color-background edit-data-save-right' id='person-save-button' 
                                                 onClick='savePerson(".$itemData['ItemId'].", ".get_current_user_id()."
@@ -1129,7 +1213,32 @@ function _TCT_item_page( $atts ) {
                                 $taggingTab .= '<div id="person-data-output-'.$person['PersonId'].'" class="collapse">';
                                     $taggingTab .= '<div id="person-data-output-display-'.$person['PersonId'].'" class="person-data-output-content">';
                                         $taggingTab .= '<div>';
-                                            $taggingTab .= '<div class="person-data-output-birthDeath">';
+                                            $taggingTab .= '<table border="0">';
+                                                $taggingTab .= '<tr>';
+                                                    $taggingTab .= '<th></th>';
+                                                    $taggingTab .= '<th>Birth</th>';
+                                                    $taggingTab .= '<th>Death</th>';
+                                                $taggingTab .= '</tr>';
+                                                $taggingTab .= '<tr>';
+                                                    $taggingTab .= '<th>Date</th>';
+                                                    $taggingTab .= '<td>';
+                                                    $taggingTab .= $birthDate;
+                                                    $taggingTab .= '</td>';
+                                                    $taggingTab .= '<td>';
+                                                    $taggingTab .= $deathDate;
+                                                    $taggingTab .= '</td>';
+                                                $taggingTab .= '</tr>';
+                                                $taggingTab .= '<tr>';
+                                                    $taggingTab .= '<th>Location</th>';
+                                                    $taggingTab .= '<td>';
+                                                    $taggingTab .= $birthPlace;
+                                                    $taggingTab .= '</td>';
+                                                    $taggingTab .= '<td>';
+                                                    $taggingTab .= $deathPlace;
+                                                    $taggingTab .= '</td>';
+                                                $taggingTab .= '</tr>';
+                                            $taggingTab .= '</table>';
+                                            /*$taggingTab .= '<div class="person-data-output-birthDeath">';
                                                 $taggingTab .= '<span>';
                                                     $taggingTab .= 'Birth Location: ';
                                                     $taggingTab .= $birthPlace;
@@ -1153,16 +1262,16 @@ function _TCT_item_page( $atts ) {
     
                                                 $taggingTab .= '</br>';
                                             $taggingTab .= '</div>';
-                                            $taggingTab .= '<div style="clear:both;"></div>';  
+                                            $taggingTab .= '<div style="clear:both;"></div>';*/  
                                         $taggingTab .= '</div>';
                                         $taggingTab .= '<div class="person-data-output-button">';
                                                 $taggingTab .= '<span>';
                                                     $taggingTab .= 'Description: ';
                                                     $taggingTab .= $description;
                                                 $taggingTab .= '</span>';
-                                                $taggingTab .= '<i class="edit-item-data-icon fas fa-pencil theme-color-hover" 
+                                                $taggingTab .= '<i class="login-required edit-item-data-icon fas fa-pencil theme-color-hover" 
                                                                     onClick="openPersonEdit('.$person['PersonId'].')"></i>';
-                                                $taggingTab .= '<i class="edit-item-data-icon fas fa-trash-alt theme-color-hover" 
+                                                $taggingTab .= '<i class="login-required edit-item-data-icon fas fa-trash-alt theme-color-hover" 
                                                                     onClick="deleteItemData(\'persons\', '.$person['PersonId'].', '.$_GET['item'].', \'person\', '.get_current_user_id().')"></i>';
                                         $taggingTab .= '</div>';
                                         $taggingTab .= '<div style="clear:both;"></div>';  
@@ -1171,57 +1280,57 @@ function _TCT_item_page( $atts ) {
                                     $taggingTab .= '<div class="person-data-edit-container person-item-data-container" id="person-data-edit-'.$person['PersonId'].'">';
                                         $taggingTab .= '<div class="person-input-names-container">';
                                             if ($firstName != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-firstName-edit" class="person-input-field" placeholder="First Name" value="'.$firstName.'" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-firstName-edit" class="input-response person-input-field person-re-edit" placeholder="First Name" value="'.$firstName.'">';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-firstName-edit" class="person-input-field" placeholder="First Name" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-firstName-edit" class="input-response person-input-field person-re-edit" placeholder="First Name">';
                                             }
    
                                             if ($lastName != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-lastName-edit" class="person-input-field" value="'.$lastName.'" placeholder="Last Name" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-lastName-edit" class="input-response person-input-field person-re-edit" value="'.$lastName.'" placeholder="Last Name">';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-lastName-edit" class="person-input-field" placeholder="Last Name" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-lastName-edit" class="input-response person-input-field person-re-edit" placeholder="Last Name">';
                                             }
-                                        $taggingTab .= '</div>'; 
+                                        $taggingTab .= '</div>';
+                                        
+                                        $taggingTab .= '<div class="person-description-input">';
+                                            $taggingTab .= '<label>Description:<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i></label><br/>';
+                                            $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-description-edit" class="input-response person-edit-field" value="'.$description.'">';
+                                        $taggingTab .= '</div>';
    
                                         $taggingTab .= '<div class="person-location-birth-inputs">';
                                             if ($birthPlace != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthPlace-edit"   class="person-input-field" value="'.$birthPlace.'"  placeholder="Birth Location" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthPlace-edit"   class="input-response person-input-field person-re-edit" value="'.$birthPlace.'"  placeholder="Birth Location">';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthPlace-edit"   class="person-input-field" placeholder="Birth Location" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthPlace-edit"   class="input-response person-input-field person-re-edit" placeholder="Birth Location">';
                                             }
    
                                             if ($birthDate != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthDate-edit" class="person-input-field datepicker-input-field" value="'.$birthDate.'" placeholder="Birth: dd/mm/yyyy" style="width:10em;">';
+                                                $taggingTab .= '<span class="input-response"><input type="text" id="person-'.$person['PersonId'].'-birthDate-edit" class="date-input-response person-input-field datepicker-input-field person-re-edit" value="'.$birthDate.'" placeholder="Birth: dd/mm/yyyy"></span>';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-birthDate-edit" class="person-input-field datepicker-input-field" placeholder="Birth: dd/mm/yyyy" style="width:10em;">';
+                                                $taggingTab .= '<span class="input-response"><input type="text" id="person-'.$person['PersonId'].'-birthDate-edit" class="date-input-response person-input-field datepicker-input-field person-re-edit" placeholder="Birth: dd/mm/yyyy"></span>';
                                             }
                                         $taggingTab .= '</div>'; 
-   
+
                                         $taggingTab .= '<div class="person-location-death-inputs">';
                                             if ($deathPlace != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathPlace-edit"   class="person-input-field" value="'.$deathPlace.'" placeholder="Death Location" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathPlace-edit"   class="input-response person-input-field person-re-edit" value="'.$deathPlace.'" placeholder="Death Location">';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathPlace-edit"   class="person-input-field" placeholder="Death Location" style="width:10em;">';
+                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathPlace-edit"   class="input-response person-input-field person-re-edit" placeholder="Death Location">';
                                             }
    
                                             if ($deathDate != "") {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathDate-edit" class="person-input-field datepicker-input-field" value="'.$deathDate.'" placeholder="Death: dd/mm/yyyy" style="width:10em;">';
+                                                $taggingTab .= '<span class="input-response"><input type="text" id="person-'.$person['PersonId'].'-deathDate-edit" class="date-input-response person-input-field datepicker-input-field person-re-edit" value="'.$deathDate.'" placeholder="Death: dd/mm/yyyy"></span>';
                                             }
                                             else {
-                                                $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-deathDate-edit" class="person-input-field datepicker-input-field" placeholder="Death: dd/mm/yyyy" style="width:10em;">';
+                                                $taggingTab .= '<span class="input-response"><input type="text" id="person-'.$person['PersonId'].'-deathDate-edit" class="date-input-response person-input-field datepicker-input-field person-re-edit" placeholder="Death: dd/mm/yyyy"></span>';
                                             }
                                         $taggingTab .= '</div>';    
    
-                                        $taggingTab .= '<div class="person-description-input">';
-                                            $taggingTab .= '<label>Description:</label><br/>';
-                                            $taggingTab .= '<input type="text" id="person-'.$person['PersonId'].'-description-edit" class="person-edit-field" value="'.$description.'">';
-                                            $taggingTab .= '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i>';
-                                        $taggingTab .= '</div>';
                                         $taggingTab .= '<div class="form-buttons-right">';
                                             $taggingTab .= "<button class='edit-data-save-right theme-color-background' 
                                                                     onClick='editPerson(".$person['PersonId'].", ".$_GET['item'].", ".get_current_user_id().")'>";
@@ -1261,7 +1370,7 @@ function _TCT_item_page( $atts ) {
                 $taggingTab .= '<div id="keyword-input-container" class="collapse">';
                     $taggingTab .= '<input type="text" id="keyword-input" name="" placeholder="">';
                     $taggingTab .= "<button id='keyword-save-button' type='submit' class='theme-color-background'
-                                        onClick='saveKeyword(".$itemData['ItemId'].", ".get_current_user_id()."
+                                        onClick='saveKeyword(".htmlspecialchars($itemData['ItemId'], ENT_QUOTES, 'UTF-8').", ".get_current_user_id()."
                                         , \"".$statusTypes[1]['ColorCode']."\", ".sizeof($progressData).")'>";
                         $taggingTab .= 'SAVE';
                     $taggingTab .= '</button>';
@@ -1277,7 +1386,7 @@ function _TCT_item_page( $atts ) {
                         if ($property['PropertyType'] == "Keyword") {
                             $taggingTab .= '<li id="add-item-keyword" class="theme-color-background">';
                                         $taggingTab .= $property['PropertyValue'];
-                                    $taggingTab .= '<i class="delete-item-datas far fa-times"
+                                    $taggingTab .= '<i class="login-required delete-item-datas far fa-times"
                                                         onClick="deleteItemData(\'properties\', '.$property['PropertyId'].', '.$_GET['item'].', \'keyword\', '.get_current_user_id().')"></i>';
                             
                                   $taggingTab .= '</li>';
@@ -1287,8 +1396,8 @@ function _TCT_item_page( $atts ) {
                   $taggingTab .= '</div>';
               $taggingTab .= '</div>';
         
-
               $taggingTab .= '<hr>';
+              
                 //other sources metadata area
                 $taggingTab .= '<div id="item-page-link-container">';
                     //add source link collapse heading
@@ -1365,12 +1474,12 @@ function _TCT_item_page( $atts ) {
                                             $taggingTab .= '</div>';
                                             
                                             $taggingTab .= '<div id="link-'.$property['PropertyId'].'-url-input" class="link-url-input">';
-                                                $taggingTab .= '<input type="url" value="'.$property['PropertyValue'].'" placeholder="Enter URL here">';
+                                                $taggingTab .= '<input type="url" value="'.htmlspecialchars($property['PropertyValue'], ENT_QUOTES, 'UTF-8').'" placeholder="Enter URL here">';
                                             $taggingTab .= '</div>';
 
                                             $taggingTab .= '<div id="link-'.$property['PropertyId'].'-description-input" class="link-description-input">';
                                                 $taggingTab .= '<label>Additional description:</label><br/>';
-                                                $taggingTab .= '<textarea rows= "3" type="text" placeholder="" name="">'.$description.'</textarea>';
+                                                $taggingTab .= '<textarea rows= "3" type="text" placeholder="" name="">'.htmlspecialchars($description, ENT_QUOTES, 'UTF-8').'</textarea>';
                                             $taggingTab .= '</div>';
                                             $taggingTab .= "<div class='form-buttons-right'>";
                                                 $taggingTab .= "<button class='theme-color-background edit-data-save-right'
@@ -1456,7 +1565,6 @@ function _TCT_item_page( $atts ) {
 
         // <<< FULL VIEW >>> //
 
-        $content .= "<div id='full-view-container'>";
         // Top image slider
         $content .= "<div class='item-page-slider  top-slider-full-view full-width-header test-width'>";
             $i = 0;
@@ -1577,6 +1685,7 @@ $content .= "<script>
             if (width > 1920) {
                 slidesToShow = 13;
             }
+            var slideIndex = ".($initialSlide + 1).";
             var initialSlide = ".$initialSlide." - Math.floor(slidesToShow / 2);
             if (initialSlide < 1) {
                 initialSlide = 0;
@@ -1634,6 +1743,57 @@ $content .= "<script>
                 ]
             });
     </script>";
+    
+    // Image viewer
+    $imageViewer = "";
+            $imageViewer .= '<div id="openseadragon">';
+                $imageViewer .= "<div id=next-item-main-view>";
+                    if ($initialSlide < sizeof($storyData['Items']) - 1) {
+                        $imageViewer .= '<button id="viewer-next-item" 
+                                                onClick="switchItem('.$nextItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\', 
+                                                            '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($storyData['Items']).', 
+                                                            '.$firstItem.', '.$lastItem.')" 
+                                                type="button" style="cursor: pointer;">';
+                            $imageViewer .= '<a><i class="fas fa-chevron-right" style="font-size: 20px; color: black;"></i></a>';
+                        $imageViewer .= '</button>';
+                    }
+                $imageViewer .= "</div>";
+                $imageViewer .= "<div id=prev-item-main-view>";
+                    if ($initialSlide != 0) {
+                        $imageViewer .= '<button id="viewer-previous-item" 
+                                                onClick="switchItem('.$prevItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\',
+                                                            '.sizeof($progressData).', '.($initialSlide).', '.sizeof($storyData['Items']).', 
+                                                            '.$firstItem.', '.$lastItem.')" 
+                                                type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-left" style="font-size: 20px; color: black;"></i></a></button>';   
+                    } 
+                $imageViewer .= "</div>";
+                //viewer buttons out of fullscreen
+                $imageViewer .= '<div class="buttons" id="buttons">';
+                    $imageViewer .= '<div id="zoom-in" class="theme-color theme-color-hover"><i class="far fa-plus"></i></div>';
+                    $imageViewer .= '<div id="zoom-out" class="theme-color theme-color-hover"><i class="far fa-minus"></i></div>';
+                    $imageViewer .= '<div id="home" title="View full image" class="theme-color theme-color-hover"><i class="far fa-home"></i></div>';
+                    $imageViewer .= '<div id="full-width" title="Fit image width to frame" class="theme-color theme-color-hover"><i class="far fa-arrows-alt-h"></i></div>';
+                    $imageViewer .= '<div id="rotate-right" class="theme-color theme-color-hover"><i class="far fa-redo"></i></div>';
+                    $imageViewer .= '<div id="rotate-left" class="theme-color theme-color-hover"><i class="far fa-undo"></i></div>';
+                    $imageViewer .= '<div id="filterButton" title="Edit image" class="theme-color theme-color-hover"><i class="far fa-sliders-h"></i></div>';
+                    $imageViewer .= '<div id="full-page" title="Full screen" class="theme-color theme-color-hover"><i class="far fa-expand-arrows-alt"></i></div>';
+                $imageViewer .= '</div>';
+                $imageViewer .= '<div class="buttons new-grid-button" id="buttons">';
+                    if($isLoggedIn) {
+                        if ($locked) {
+                            $imageViewer .= '<div id="transcribeLock" class="theme-color theme-color-hover"><i class="far fa-lock"></i></div>';
+                        }
+                        else {
+                            $imageViewer .= '<div id="transcribe" title="Enrich item" class="theme-color theme-color-hover"><i class="far fa-pen"></i></div>';
+                        }
+                    } else {
+                        $imageViewer .= '<div id="transcribe-locked" class="theme-color theme-color-hover"><i class="far fa-pen" id="lock-login"></i></div>';
+                    }
+                    //$imageViewer .= '<div id="transcribe locked"><i class="far fa-lock" id="lock-login"></i></div>';
+                $imageViewer .= '</div>';
+            $imageViewer .= '</div>';
+
+        $content .= "<div id='full-view-container'>";
 
             $content .= '<div class="item-navigation-area">';
                 $content .= '<ul class="item-navigation-content-container left" style="">';
@@ -1641,25 +1801,29 @@ $content .= "<script>
                     $content .= '<li><i class="fal fa-angle-right"></i></li>';
                     $content .= '<li><span style="text-decoration:none;">';
                         $content .= '<a href="'.home_url().'/documents/story?story='.$itemData['StoryId'].'">';
-                            $content .= $storyData['dcTitle'];
+                            $content .= $itemData['Title'];
                         $content .= '</a>';
                     $content .= '</span></li>';
                     /*$content .= '<li><i class="fal fa-angle-right"></i></li>';
                     $content .= '<li><span>item number</span></li>';*/
                 $content .= '</ul>';
                 $content .= '<ul class="item-navigation-content-container right" style="">';
-                    if ($prevItem != null) {
-                        $content .= '<li><a title="first" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$firstItem.'"><i class="fal fa-angle-double-left"></i></a></li>';
-                        $content .=  '<li class="rgt"><a title="previous" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$prevItem.'"><i class="fal fa-angle-left"></i></a></li>';
-                    }
+                    $content .= '<div class="item-navigation-prev">';
+                        if ($prevItem != null) {
+                            $content .= '<li><a title="first" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$firstItem.'"><i class="fal fa-angle-double-left"></i></a></li>';
+                            $content .=  '<li class="rgt"><a title="previous" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$prevItem.'"><i class="fal fa-angle-left"></i></a></li>';
+                        }
+                    $content .= '</div>';
                     $content .=  '<li class="rgt">';
                         $content .= '<a title="Story:'.$storyData['dcTitle'].'" href="'.home_url().'/documents/story?story='.$storyData['StoryId'].'">';
                         $content .= '<i class="fal fa-book"></i></a>';
                     $content .= '</li>';
-                    if ($nextItem != null) {
-                        $content .= '<li class="rgt"><a title="next" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$nextItem.'"><i class="fal fa-angle-right"></i></a></li>';
-                        $content .= '<li class="rgt"><a title="last" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$lastItem.'"><i class="fal fa-angle-double-right"></i></a></li>';
-                    }
+                    $content .= '<div class="item-navigation-next">';
+                        if ($nextItem != null) {
+                            $content .= '<li class="rgt"><a title="next" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$nextItem.'"><i class="fal fa-angle-right"></i></a></li>';
+                            $content .= '<li class="rgt"><a title="last" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$lastItem.'"><i class="fal fa-angle-double-right"></i></a></li>';
+                        }
+                    $content .= '</div>';
                 $content .= '</ul>';
             $content .= '</div>';   
             $content .= "<div class='primary-full-width'>";
@@ -1672,9 +1836,9 @@ $content .= "<script>
 
                     //$content .= "<hr>";
 
-                    $content .= "<div id='full-view-comment'>";
+                    /*$content .= "<div id='full-view-comment'>";
                         $content .= $commentSection;
-                    $content .= "</div>";
+                    $content .= "</div>";*/
                 $content .= "</div>";
 
                 $content .= "<div id='full-view-right'>";
@@ -1705,6 +1869,25 @@ $content .= "<script>
             // Image section
             $content .= "<div id='item-image-section' class='panel-left'>";
                 $content .= '<div id="openseadragonFS">';
+                    $content .= "<div id=next-item-full-view>";
+                        if ($initialSlide < sizeof($storyData['Items']) - 1) {
+                            $content .= '<button id="viewer-next-item" 
+                                            onClick="switchItem('.$nextItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\', 
+                                                        '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($storyData['Items']).', 
+                                                        '.$firstItem.', '.$lastItem.')" 
+                                            type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-right" style="font-size: 20px; color: black;"></i></a></button>';
+                        }
+                    $content .= "</div>";
+                    $content .= "<div id=prev-item-full-view>";
+                        if ($initialSlide != 0) {
+                            $content .= '<button id="viewer-previous-item" 
+                                            onClick="switchItem('.$prevItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\',
+                                                        '.sizeof($progressData).', '.($initialSlide).', '.sizeof($storyData['Items']).', 
+                                                        '.$firstItem.', '.$lastItem.')"  
+                                            type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-left" style="font-size: 20px; color: black;"></i></a></button>';    
+                        }
+                    $content .= "</div>";
+                    // viewer buttons at fullscreen
                     $content .= '<div class="buttons" id="buttonsFS">';
                         $content .= '<div id="zoom-inFS" class="theme-color theme-color-hover"><i class="far fa-plus"></i></div>';
                         $content .= '<div id="zoom-outFS" class="theme-color theme-color-hover"><i class="far fa-minus"></i></div>';
@@ -1932,7 +2115,7 @@ $content .= "<script>
 
                     // Help tab
                     $content .= "<div id='help-tab' class='tabcontent' style='display:none;'>";
-                        $content .= do_shortcode('[tutorial_slider]');
+                        $content .= do_shortcode('[tutorial_item_slider]');
                     $content .= "</div>";
 
                     // Automatic enrichment tab
@@ -1949,6 +2132,22 @@ $content .= "<script>
                             handleSelector: "#item-splitter",
                             resizeHeight: false
                         });
+
+                        window.onscroll = function() {scrolluFunction()};
+                    
+                            function scrolluFunction() {
+                                if (document.body.scrollTop > 0 || document.documentElement.scrollTop > 0) {
+                                    document.getElementById("_transcribathon_partnerlogo").style.height = "56px";
+                                    document.getElementById("_transcribathon_partnerlogo").style.width = "56px";
+                                    document.getElementById("_transcribathon_partnerlogo").style.marginLeft = "33px";
+                                } 
+                                else {
+                                    document.getElementById("_transcribathon_partnerlogo").style.height = "56px";
+                                    document.getElementById("_transcribathon_partnerlogo").style.width = "56px"; 
+                                    document.getElementById("_transcribathon_partnerlogo").style.marginLeft = "33px";                   
+                                }
+                            }
+                            
                     </script>';
 
         $content .= "</div>

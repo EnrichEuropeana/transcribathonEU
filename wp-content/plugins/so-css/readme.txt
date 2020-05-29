@@ -1,12 +1,12 @@
 === SiteOrigin CSS ===
 Tags: css, design, edit, customize
 Requires at least: 3.9
-Tested up to: 5.0
-Stable tag: 1.2.4
-Build time: 2019-01-17T16:42:20-08:00
+Tested up to: 5.4
+Stable tag: 1.2.5
+Build time: 2020-02-05T09:22:01+02:00
 License: GPLv2 or later
 Contributors: gpriday
-Donate link: https://siteorigin.com/downloads/contribution/
+Donate link: https://siteorigin.com/downloads/premium/
 
 SiteOrigin CSS is the simple, yet powerful CSS editor for WordPress. It gives you visual controls that let you edit the look and feel of your site in real-time.
 
@@ -64,6 +64,12 @@ We're actively developing SiteOrigin CSS. Keep track of what's happening over on
 We offer free support on the [SiteOrigin support forums](https://siteorigin.com/thread/).
 
 == Changelog ==
+
+= 1.2.5 - 05 February 2020 =
+* Removed `themeCSS` localized script to prevent `preg_replace()` warning.
+* Minor form styling fixes.
+* Updated CSS NPM library.
+* Rebuilt minified files using new build script.
 
 = 1.2.4 - 17 January 2019 =
 * Prefix so-css for all codemirror assets.
