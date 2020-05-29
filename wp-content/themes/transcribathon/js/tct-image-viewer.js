@@ -1,7 +1,4 @@
-var home_url = WP_URLs.home_url;
-
 var tct_viewer = (function($, document, window) {
-	
 	var osdViewer,
 			osdViewerFS,
 			imageData,
@@ -50,10 +47,7 @@ var tct_viewer = (function($, document, window) {
 
 		jQuery('#closeFilterContainer').click(function() {
 			jQuery('#filterContainer').hide();
-		});
-		jQuery('#openseadragonFS #closeFilterContainer').click(function() {
-			jQuery('#openseadragonFS #filterContainer').hide();
-		});
+		})
 
 		jQuery('#full-pageFS').click(function() {
 			toggleFS();
@@ -87,18 +81,10 @@ var tct_viewer = (function($, document, window) {
 		});
 
 		jQuery('#transcribe').click(function() {
-			if(!jQuery(this).children('i').hasClass('locked')) {
-				toggleFS(); 
-				tinymce.EditorManager.get('item-page-transcription-text').focus();
+			if(!this[0].hasClass('locked')) {
+				toggleFS();
 				//TODO maximize
 			}
-		})
-
-		jQuery('#transcribeLockFS').click(function() {
-			lockWarning()
-		})
-		jQuery('#transcribeLock').click(function() {
-			lockWarning()
 		})
 
 		jQuery('#transcribeFS').click(function() {
@@ -112,20 +98,14 @@ var tct_viewer = (function($, document, window) {
 	getManifestUrl = function() {
 		jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
 		    'type': 'GET',
-		    'url': home_url + '/tp-api/items/' + getUrlParameter('item')
+		    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + getUrlParameter('item')
 			}, function(response) {
 			var response = JSON.parse(response);
 			if (response.code == "200") {
-				imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
-				imageLink = imageData['service']['@id'];
-                if (imageData['service']['@id'].substr(0, 4) == "http") {
-                    imageLink = imageData['service']['@id'];
-                }
-                else {
-                    imageLink = "http://" + imageData['service']['@id'];
-                }
-				imageHeight = imageData['height'];
-				imageWidth = imageData['width'];
+	      imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
+	      imageLink = imageData['service']['@id'];
+	      imageHeight = imageData['height'];
+	      imageWidth = imageData['width'];
 				initViewers();
 			}
 		});
@@ -404,8 +384,7 @@ var tct_viewer = (function($, document, window) {
 	    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure side-info | charmap | table',
 			resize: true,
 	    menubar: false,
-		browser_spellcheck: true,
-		object_resizing : false,
+	    browser_spellcheck: true,
 	    paste_auto_cleanup_on_paste : true,
 	    body_id: 'htranscriptor',
 			init_instance_callback: function (editor) {
@@ -419,19 +398,20 @@ var tct_viewer = (function($, document, window) {
         */
 			},
 			setup: function (editor) {
+				console.log('in setup');
 				editor.ui.registry.addIcon('missing', '<i class="mce-ico mce-i-missing"></i>');
-    			editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
+    		editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
 				editor.ui.registry.addIcon('info', '<i class="mce-ico mce-i-pos-in-text"></i>');
 
 				editor.ui.registry.addButton('missbut', {
-					tooltip: 'Insert an indicator for missing text',
+					title: 'Insert an indicator for missing text',
 					icon: 'missing',
 					onAction: function () {
 						editor.insertContent('<img src="/wp-content/themes/transcribathon/images/tinyMCEImages/missing.gif" style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\" />');
 						}
 				});
 				editor.ui.registry.addButton('unsure', {
-					tooltip: 'Mark selected as unclear',
+					title: 'Mark selected as unclear',
 					icon: 'unsure',
 					onAction: function () {
 						if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
@@ -452,7 +432,7 @@ var tct_viewer = (function($, document, window) {
 					}
 				});
         editor.ui.registry.addButton('side-info', {
-          tooltip: 'Add a comment',
+          title: 'Mark selected as side information',
           text: '',
           icon: 'info',
           onAction: function () {

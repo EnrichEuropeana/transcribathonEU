@@ -4,14 +4,13 @@ Shortcode: transcription_tab
 Description: Creates the transcription profile tab
 */
 function _TCT_transcription_tab( $atts ) {  
-    
-$theme_sets = get_theme_mods();
+    echo "<div class=\"section group \">\n";
         // Set request parameters for image data
         $requestData = array(
             'key' => 'testKey'
         );
-        $url = network_home_url()."/tp-api/profileStatistics/".get_current_user_id();
-        $requestType = "GET";
+        $url = network_home_url()."/tp-api/ProfileStatistics/".get_current_user_id();
+        $requestType = "POST";
 
         // Execude http request
         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
@@ -31,7 +30,7 @@ $theme_sets = get_theme_mods();
         echo "<div class=\"column-rgs span_1_of_5 alg_c\">\n";				
             echo "<div class=\"number-ball\">\n";
                 echo "<div class=\"theme-color-background number-ball-content\">\n";
-                    echo "<p>".number_format_i18n($profileStatistics['TranscriptionCharacters'])."</p>";
+                    echo "<p>".number_format_i18n($profileStatistics['Characters'])."</p>";
                     echo "<span>"._x('characters', 'Transcription-Tab on Profile', 'transcribathon'  )."</span>";
                 echo "</div>\n";
             echo "</div>\n";	
@@ -84,7 +83,7 @@ $theme_sets = get_theme_mods();
     
     // Display data
     $documents = json_decode($result, true);
-    
+
 	echo "<h2>"._x('Transcribed Documents','Transcription-Tab on Profile', 'transcribathon'  )."</h2>\n";
 		echo "<div id=\"doc-results profile\">\n";
             echo "<div class=\"tableholder\">\n";
@@ -99,7 +98,7 @@ $theme_sets = get_theme_mods();
                                     //$thumb_url = wp_get_attachment_image_src( get_post_thumbnail_id( $doc['docid'] ),'post-thumbnail');
                                     //$c = get_post_custom($doc['docid']);
                                         echo "<a href=\"https://europeana.fresenia.man.poznan.pl/documents/story/item?item=".$document['ItemId']."\">";
-                                        echo "<div class=\"dcholder\" style=\"background-image: url(".$document['ItemImageLink']."); \"><img src=\"".home_url()."documents/story/item?item=".$document['ItemId']."\" alt=\"\" /></div>\n";
+                                        echo "<div class=\"dcholder\" style=\"background-image: url(".$document['ItemImageLink']."); \"><img src=\"".$document['ItemImageLink']."\" alt=\"\" /></div>\n";
                                         echo "<h3 id= \"nopadmod\" class=\"nopad\">".$document['ItemTitle']."</h3>\n";
                                         echo "<p id= \"smalladinfo\" class=\"smallinfo\">";
                                         echo "Last time: ".date_i18n(get_option('date_format'),strtotime($document['Timestamp']))."<br />";

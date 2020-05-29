@@ -12,30 +12,22 @@ define( 'TCT_THEME_DIR_PATH', plugin_dir_path( __FILE__ ) );
 // Custom Theme-Settings for Transcribathon
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_themesettings/tct-themesettings.php');
 
-// ### ADMIN PAGES ### //
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/teams-admin-page.php'); // Adds teams admin page
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/campaigns-admin-page.php'); // Adds campaigns admin page
-
 // Custom shortcodes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_slider.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/solr_test.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/documents_map.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/transcriptions.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_profiletabs/teams_runs.php');
 
 // Custom posts
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-news/tct-news.php'); // Adds custom post-type: news
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-tutorial/tct-tutorial.php'); // Adds custom post-type: news
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_posts/tct-news.php'); // Adds custom post-type: news
+
 
 // Image settings
 add_image_size( 'news-image', 300, 200, true );
-// Image settings
-add_image_size( 'tutorial-image', 800, 400, true );
 
 
 // Embedd custom Javascripts and CSS
@@ -110,7 +102,7 @@ function embedd_custom_javascripts_and_css() {
  }
  add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
 
- wp_register_script( 'my-script', '/myscript_url' );
+ wp_register_script( 'my-script', 'myscript_url' );
  wp_enqueue_script( 'my-script' );
  $translation_array = array( 'home_url' => home_url() );
  //after wp_enqueue_script
@@ -165,16 +157,12 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-headline/tct-headl
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-colcontent/tct-colcontent-widget.php'); // Adds the widget for displaying content in different columns
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-boxes/tct-boxes-widget.php'); // Adds the widget for feature boxes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-button/tct-button-widget.php'); // Adds the widget for a preformatted button
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-barchart/tct-barchart-widget.php'); // Adds the widget for a preformatted button
 
 function add_custom_widget_collection($folders){
     $folders[] = CHILD_TEMPLATE_DIR.'admin/inc/custom_widgets/';
     return $folders;
 }
 add_filter('siteorigin_widgets_widget_folders', 'add_custom_widget_collection');
-
-
-
 
 
 // ### HOOKS ### //
@@ -196,44 +184,3 @@ function increase_upload( $bytes )
 {
   return 210000000; // 200 megabyte
 }
-
-add_action( 'um_registration_complete', 'transfer_new_user', 10, 2 );
-function transfer_new_user( $user_id, $args ) {
-    $url = home_url()."/tp-api/users";
-    $requestType = "POST";
-    $requestData = array(
-        'WP_UserId' => $user_id,
-        'Role' => "Member",
-        'WP_Role' => "Subscriber",
-        'Token' => "fdfsdkfjk"
-    );
-    
-    // Execude http request
-    include TCT_THEME_DIR_PATH.'admin/inc/custom_scripts/send_api_request.php';
-}
-
-
-
-// ### Functions ### //
-function tct_generatePassword($passwordlength = 8,$numNonAlpha = 0,$numNumberChars = 0, $useCapitalLetter = false ) {
-    $numberChars = '123456789';
-    $specialChars = '!$%&=?*-:;.,+~@_';
-    $secureChars = 'abcdefghjkmnpqrstuvwxyz';
-    $stack = '';
-    $stack = $secureChars;
-    if ( $useCapitalLetter == true )
-        $stack .= strtoupper ( $secureChars );
-    $count = $passwordlength - $numNonAlpha - $numNumberChars;
-    $temp = str_shuffle ( $stack );
-    $stack = substr ( $temp , 0 , $count );
-    if ( $numNonAlpha > 0 ) {
-        $temp = str_shuffle ( $specialChars );
-        $stack .= substr ( $temp , 0 , $numNonAlpha );
-    }
-    if ( $numNumberChars > 0 ) {
-        $temp = str_shuffle ( $numberChars );
-        $stack .= substr ( $temp , 0 , $numNumberChars );
-    }
-    $stack = str_shuffle ( $stack );
-    return $stack;
-} 

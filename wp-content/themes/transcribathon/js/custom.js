@@ -1,65 +1,6 @@
 var home_url = WP_URLs.home_url;
 
 jQuery ( document ).ready(function() {
-  jQuery(document).keydown(function(e) {
-    if (e.key === "Escape") {
-      if (jQuery('#item-page-login-container').css('display') != "none" || jQuery('#locked-warning-container').css('display') != "none") {
-        jQuery('#item-page-login-container').css('display', 'none')
-        jQuery('#locked-warning-container').css('display', 'none')
-      }
-      else if (jQuery('#image-view-container').css('display') != "none") {
-        switchItemPageView();
-      }
-    }
-  });
-  window.onmousedown = function(event) {
-    var loginModal = document.getElementById('item-page-login-container');
-    if (event.target == loginModal) {
-      loginModal.style.display = "none";
-    }
-    var lockedModal = document.getElementById('locked-warning-container');
-    if (event.target == lockedModal) {
-      lockedModal.style.display = "none";
-    }
-  }
-  window.click = function(event) {
-    if (!jQuery(event.target).hasClass('status-dropdown-content') && !jQuery(event.target).hasClass('status-indicator')) {
-      jQuery('.status-dropdown-content').removeClass('show')
-    } 
-  }
-  
-
-  var x, i, j, selElmnt, a, b, c;
-  /*look for any elements with the class "language-selector-background":*/
-  x = document.getElementsByClassName("language-selector-background");
-  for (i = 0; i < x.length; i++) {
-    selElmnt = x[i].getElementsByTagName("select")[0];
-    /*for each element, create a new DIV that will act as the selected item:*/
-    a = document.createElement("div");
-    a.setAttribute("class", "language-select-selected");
-    if (jQuery(selElmnt).parent().attr('id') == "description-language-selector") {
-      a.setAttribute("id", "description-language-custom-selector");
-    }
-    if (jQuery(selElmnt).parent().attr('id') == "transcription-language-selector") {
-      a.setAttribute("id", "transcription-language-custom-selector");
-    }
-
-    a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
-    x[i].appendChild(a);
-    /*for each element, create a new DIV that will contain the option list:*/
-    b = document.createElement("div");
-    b.setAttribute("class", "language-item-select select-hide");
-    for (j = 1; j < selElmnt.length; j++) {
-      /*for each option in the original select element,
-      create a new DIV that will act as an option item:*/
-      c = document.createElement("div");
-      c.setAttribute("class", "selected-option");
-      c.innerHTML = selElmnt.options[j].innerHTML;
-      b.appendChild(c);
-    }
-    x[i].appendChild(b);
-  }
-
   installEventListeners()
 
 });
@@ -71,205 +12,16 @@ function uninstallEventListeners() {
 }
 
 function installEventListeners() {
-   // test reinitialising map
-    var url_string = window.location.href;
-    var url = new URL(url_string);
-    var itemId = url.searchParams.get('item');
-    var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
-
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
-    if (jQuery('#full-view-map').length) {
-        var map = new mapboxgl.Map({
-          container: 'full-view-map',
-          style: 'mapbox://styles/fandf/cjnpzoia60m4y2rp5cvoq9t8z',
-          center: [16, 49],
-          zoom: 2.25
-        });
-        map.addControl(new mapboxgl.NavigationControl());
-        
-        fetch('/dev/tp-api/items/' + itemId)
-          .then(function(response) {
-            return response.json();
-          })
-          .then(function(places) {
-            console.log(places);
-            places[0].Places.forEach(function(marker) {
-              var el = document.createElement('div');
-              el.className = 'marker savedMarker fas fa-map-marker-alt';
-              var popup = new mapboxgl.Popup({offset: 25})
-              .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + marker.Name + '</div><div class=\"comment\">' + marker.Comment + '</div></div>');
-
-              new mapboxgl.Marker({element: el, anchor: 'bottom'})
-                .setLngLat([marker.Longitude, marker.Latitude])
-              .setPopup(popup)
-                .addTo(map);
-            })
-        });
-
-      var geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-              marker: false,
-	language: 'en-EN'
-      });
-      
-      geocoder.on('result', function(res) {
-        console.log(res);
-                      jQuery('#location-input-section').addClass('show');
-        jQuery('.location-input-name-container.location-input-container > input').val(res.result.place_name);
-        jQuery('#location-input-geonames-search-container > input').val(res.result['text_en-EN'] + ', ' + res.result.properties.wikidata);
-        var el = document.createElement('div');
-        el.className = 'marker';
-
-        var icon = document.createElement('i');
-        icon .className = 'fas fa-map-marker-plus';
-	if(typeof marker !== 'undefined') {
-		marker.remove();
-	}
-        marker = new mapboxgl.Marker({element: el, draggable: true, element: icon})
-          .setLngLat(res.result.geometry.coordinates)
-          .addTo(map);
-          var lngLat = marker.getLngLat();
-        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
-        marker.on('dragend', onDragEnd);
-      })
-      
-        //map.addControl(geocoder, 'bottom-left');
-	jQuery('.location-input-name-container.location-input-container')[0].appendChild(geocoder.onAdd(map));       
-	var marker;
-
-      jQuery('#addMarker').click(function() {
-        var el = document.createElement('div');
-        el.className = 'marker';
-      
-        // make a marker for each feature and add to the map
-        marker = new mapboxgl.Marker({element: el, draggable: true})
-          .setLngLat(map.getCenter())
-          .addTo(map);
-
-        marker.on('dragend', onDragEnd);
-      });
-
-      function onDragEnd() {
-        var lngLat = marker.getLngLat();
-        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
-      }  
-    }
-    
-  jQuery('#location-input-section > div:nth-child(4) > button:nth-child(1)').click(function() {
-    marker.setDraggable(false);
-    marker.getElement().classList.remove('fa-map-marker-plus');
-    marker.getElement().classList.add('fa-map-marker-alt');
-    marker.getElement().classList.add('savedMarker');
-    // set the popup
-    var name = jQuery('#location-input-section > div:nth-child(1) > div:nth-child(1) > input:nth-child(3)').val();
-    var desc = jQuery('#location-input-section > div:nth-child(2) > textarea:nth-child(3)').val();
-    var popup = new mapboxgl.Popup({offset: 25})
-            .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + name + '</div><div class=\"comment\">' + desc + '</div></div>');
-    marker.setPopup(popup);
-    console.log(marker._lngLat);
-  });
-
-
-  // When the user clicks the button, open the modal 
-  jQuery('#lock-login').click(function() {
-    jQuery('#item-page-login-container').css('display', 'block');
-  })
-  jQuery('#lock-loginFS').click(function() {
-    jQuery('#item-page-login-container').css('display', 'block');
-  })
-
-  // When the user clicks on <span> (x), close the modal
-  jQuery('.item-login-close').click(function() {
-    jQuery('#item-page-login-container').css('display', 'none');
-  })
-
-  jQuery('.login-required').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#login').length) {
-      event.preventDefault();
-      jQuery('#item-page-login-container').css('display', 'block');
-    }
-  })
-
-// ### Prevent locked functions ### 
-  jQuery('#mce-wrapper-transcription').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#transcribeLock').length) {
-      event.preventDefault();
-      lockWarning();
-    }
-  })
-  jQuery('#item-page-description-text').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#transcribeLock').length) {
-      event.preventDefault();
-      lockWarning();
-    }
-  })
-  jQuery('.edit-item-data-icon').mousedown(function(event) {
-    // Checks if document is locked
-    if (jQuery('#transcribeLock').length) {
-      event.preventDefault();
-      lockWarning();
-    }
-  })
-
-  var options = document.getElementsByClassName('selected-option');
-  for (var i = 0; i < options.length; i++) {
-    options[i].addEventListener("click", function(e) {
-      /*when an item is clicked, update the original select box,
-      and the selected item:*/
-      var y, i, k, s, h;
-      s = this.parentNode.parentNode.getElementsByTagName("select")[0];
-      h = this.parentNode.previousSibling;
-      for (i = 0; i < s.length; i++) {
-        if (s.options[i].innerHTML == this.innerHTML) {
-          s.selectedIndex = i;
-          h.innerHTML = this.innerHTML;
-          y = this.parentNode.getElementsByClassName("same-as-selected");
-          for (k = 0; k < y.length; k++) {
-            y[k].removeAttribute("class");
-          }
-          this.setAttribute("class", "same-as-selected");
-          break;
-        }
-      }
-      h.click();
-    });
-  }
-
-  var selectors = document.getElementsByClassName('language-select-selected');
-  for (var i = 0; i < selectors.length; i++) {
-    selectors[i].addEventListener("click", function(e) {
-        /*when the select box is clicked, close any other select boxes,
-        and open/close the current select box:*/
-        e.stopPropagation();
-        closeAllSelect(this);
-        this.nextSibling.classList.toggle("select-hide");
-        this.classList.toggle("select-arrow-active");
-        });
-  }
-  /*if the user clicks anywhere outside the select box,
-  then close all select boxes:*/
-  document.addEventListener("click", closeAllSelect);
-
   jQuery('.edit-item-date').click(function() {
-    if (jQuery('#transcribeLock').length) {
-      event.preventDefault();
-      lockWarning();
-    }
-    else {
-      jQuery(this).parent('.item-date-display-container').css('display', 'none')
-      jQuery(this).parent('.item-date-display-container').siblings('.item-date-input-container').css('display', 'block')
-    }
+    jQuery(this).parent('.item-date-display-container').css('display', 'none')
+    jQuery(this).parent('.item-date-display-container').siblings('.item-date-input-container').css('display', 'block')
   })
 
-  jQuery('.search-page-single-result-description').each(function() {
+  jQuery('.person-data-ouput-headline').each(function() {
     if (jQuery(this).prop('scrollHeight') > jQuery(this).prop('clientHeight')) {
       jQuery(this).siblings('span').css('display', '-webkit-inline-box');
     }
-  })  
+  })
 
   jQuery('.search-page-item-tab-button').click(function() {
     jQuery('#search-page-item-tab').css('display', 'block')
@@ -306,6 +58,14 @@ function installEventListeners() {
     jQuery(".search-page-single-result-info").addClass(".search-page-single-result-description");
   });
 
+  jQuery(document).keyup(function(e) {
+    if (e.key === "Escape") {
+       if (jQuery('#image-view-container').css('display') != "none") {
+         switchItemPageView();
+       }
+    }
+  });
+  
   var keyWordList = [];   
   jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'GET',
@@ -336,19 +96,17 @@ function installEventListeners() {
   })
 
   // New transcription langauge selected
-  jQuery('#transcription-language-custom-selector').siblings('.language-item-select').children('.selected-option').click(function(){
+  jQuery('#transcription-language-selector select').change(function(){
     jQuery('#no-text-selector').css('display','none');
     jQuery('#transcription-selected-languages ul').append(
             '<li>' 
               + jQuery('#transcription-language-selector option:selected').text() 
-              + '<i class="far fa-times" onClick="removeTranscriptionLanguage(' + jQuery('#transcription-language-selector option:selected').val() + ', this)"></i>'
+            + '<i class="far fa-times-circle" onClick="removeTranscriptionLanguage(' + jQuery('#transcription-language-selector option:selected').val() + ', this)"></i>'
             + '</li>');
     jQuery('#transcription-language-selector option:selected').prop("disabled", true);   
     var transcriptionText = jQuery('#item-page-transcription-text').text();     
     if(transcriptionText.length != 0) {
-      jQuery('#transcription-update-button').addClass('theme-color-background');
-      jQuery('#transcription-update-button').prop('disabled', false);
-      jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
+      jQuery('#transcription-update-button').css('display','block');
     }
   })
   
@@ -364,19 +122,14 @@ function installEventListeners() {
   jQuery('#description-area textarea').keyup(function() {
     var text = jQuery(this).val();
     var language = jQuery('#description-language-selector select').val();
-    if(text.length == 0) {
+    if(text.length == 0 || language == null) {
       jQuery('#description-update-button').css('display','none');
     } 
     else {
       jQuery('#description-update-button').css('display','block');
-      if (language != null) {
-        jQuery('#description-update-button').addClass('theme-color-background');
-        jQuery('#description-update-button').prop('disabled', false);
-        jQuery('#description-update-button .language-tooltip-text').css('display', 'none');
-      }
     }
   });
-  jQuery('#description-language-custom-selector').siblings('.language-item-select').children('.selected-option').click(function(){
+  jQuery('#description-language-selector select').change(function(){
     var text = jQuery('#description-area textarea').val();
     if(text.length == 0) {
       jQuery('#description-update-button').css('display','none');
@@ -391,16 +144,11 @@ function installEventListeners() {
     jQuery('#no-text-selector').css('display','none');
     var transcriptionText = jQuery('#item-page-transcription-text').text();
     var languages = jQuery('#transcription-selected-languages ul').children().length;
-    if(transcriptionText.length != 0) {
-      jQuery('#transcription-update-button').css('display', 'block');
-      if (languages > 0) {
-        jQuery('#transcription-update-button').addClass('theme-color-background');
-        jQuery('#transcription-update-button').prop('disabled', false);
-        jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
-      }
+    if(transcriptionText.length != 0 && languages > 0) {
+      jQuery('#transcription-update-button').css('display','block');
     }
     else {
-      jQuery('#transcription-update-button').css('display', 'none');
+      jQuery('#transcription-update-button').css('display','none');
     }
     if(transcriptionText.length == 0 && languages == 0) {
       jQuery('#no-text-selector').css('display','block');
@@ -412,13 +160,10 @@ function installEventListeners() {
     var transcriptionText = jQuery('#item-page-transcription-text').text();
     if (checked == true) {
       if(transcriptionText.length == 0) {
-        jQuery('#transcription-language-custom-selector select').attr("disabled", "disabled");
-        jQuery('#transcription-language-custom-selector select').addClass("disabled-dropdown");
+        jQuery('#transcription-language-selector select').attr("disabled", "disabled");
+        jQuery('#transcription-language-selector select').addClass("disabled-dropdown");
         tinymce.remove();
-        jQuery('#transcription-update-button').addClass('theme-color-background');
-        jQuery('#transcription-update-button').prop('disabled', false);
-        jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
-        jQuery('#transcription-update-button').css('display', 'block');
+        jQuery('#transcription-update-button').css('display','block');
       }
       else {
         alert("Please remove the transcription text first, if the document has nothing to transcribe");
@@ -430,9 +175,7 @@ function installEventListeners() {
       jQuery('#transcription-language-selector select').removeAttr("disabled");
       jQuery('#transcription-language-selector select').removeClass("disabled-dropdown");
       tct_viewer.initTinyWithConfig('#item-page-transcription-text');
-      jQuery('#transcription-update-button').removeClass('theme-color-background');
-      jQuery('#transcription-update-button').prop('disabled', true);
-      jQuery('#transcription-update-button .language-tooltip-text').css('display', 'block');
+      jQuery('#transcription-update-button').css('display','none');
     }
   })
 
@@ -467,27 +210,6 @@ function installEventListeners() {
 
 
   tct_viewer.initTinyWithConfig('#item-page-transcription-text');
-}
-
-
-function closeAllSelect(elmnt) {
-  /*a function that will close all select boxes in the document,
-  except the current select box:*/
-  var x, y, i, arrNo = [];
-  x = document.getElementsByClassName("language-item-select");
-  y = document.getElementsByClassName("language-select-selected");
-  for (i = 0; i < y.length; i++) {
-    if (elmnt == y[i]) {
-      arrNo.push(i)
-    } else {
-      y[i].classList.remove("select-arrow-active");
-    }
-  }
-  for (i = 0; i < x.length; i++) {
-      if (arrNo.indexOf(i)) {
-        x[i].classList.add("select-hide");
-      }
-  }
 }
 
 // Switches between different tabs within the item page image view
@@ -538,7 +260,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").addClass("panel-right")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery("#item-splitter").addClass("splitter-vertical")
-      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
+      jQuery("#item-data-section").draggable()
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -574,7 +296,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-data-section").addClass("panel-bottom")
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").addClass("splitter-horizontal")
-      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
+      jQuery("#item-data-section").draggable()
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -610,7 +332,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery( "#item-data-section" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
-      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
+      jQuery("#item-data-section").draggable()
       jQuery("#item-data-section").draggable('enable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('enable')
@@ -622,12 +344,6 @@ function switchItemView(event, viewName) {
     case 'closewindow':
       jQuery("#item-image-section").css("width", '100%')
       jQuery("#item-image-section").css("height", '100%')
-      jQuery("#item-data-section").css("width", '')
-      jQuery("#item-data-section").css("height", '')
-      jQuery("#item-data-section").css("left", '')
-      jQuery("#item-data-section").css("bottom", '')
-      jQuery("#item-data-section").css("top", '')
-      jQuery("#item-data-section").css("right", '')
       jQuery("#item-image-section").addClass("image-popout")
       jQuery("#item-data-section").addClass("data-closed")
       jQuery("#image-view-container").removeClass("panel-container-horizontal")
@@ -640,7 +356,7 @@ function switchItemView(event, viewName) {
       jQuery("#item-splitter").removeClass("splitter-vertical")
       jQuery("#item-splitter").removeClass("splitter-horizontal")
       jQuery( "#item-data-section" ).resizable({ handles: "n, e, s, w, se, ne, sw, nw" })
-      jQuery("#item-data-section").draggable({ handle: "#item-data-header" })
+      jQuery("#item-data-section").draggable()
       jQuery("#item-data-section").draggable('disable')
       jQuery( "#item-data-section" ).resizable()
       jQuery( "#item-data-section" ).resizable('disable')
@@ -747,8 +463,6 @@ function switchItemPageView() {
     jQuery('#description-language-selector select').val(descriptionLanguage);
 
   } else {
-    var descriptionText = jQuery('#item-page-description-text').val();
-    var descriptionLanguage = jQuery('#description-language-selector select').val();
     //switch to full view
     jQuery('.site-footer').css('display', 'block')
     jQuery('#full-view-container').css('display', 'block')
@@ -794,12 +508,8 @@ function switchItemPageView() {
       inline: true
     });
     */
-    
-    jQuery('#item-page-description-text').val(descriptionText);
-    jQuery('#description-language-selector select').val(descriptionLanguage);
   }
   installEventListeners();
-  jQuery('.item-page-slider').slick('refresh')
 }
 
 // Updates specified data over the API
@@ -859,7 +569,6 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
     },
     // Check success and create confirmation message
     function(response) {
-      /*
       if (oldDescription != null) {
         var amount = description.length - oldDescription.length;
       }
@@ -871,8 +580,7 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
       }
       else { 
         amount = 10;
-      }*/
-      amount = 1;
+      }
 
       scoreData = {
                     ItemId: itemId,
@@ -902,7 +610,6 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
 
 // Updates the item description
 function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
-
   jQuery('#item-transcription-spinner-container').css('display', 'block')
 
   // Get languages
@@ -963,10 +670,10 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
       function(response) {
         var amount = newTranscriptionLength - currentTranscription.length
         if (amount > 0) {
-          amount = amount;
+          amount = amount + 10;
         }
         else { 
-          amount = 0;
+          amount = 10;
         }
   
         scoreData = {
@@ -992,13 +699,29 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
           if (transcriptionCompletion == "Not Started") {
             changeStatus(itemId, "Not Started", "Edit", "TranscriptionStatusId", 2, editStatusColor, statusCount)
           }
-          jQuery('#transcription-update-button').removeClass('theme-color-background');
-          jQuery('#transcription-update-button').prop('disabled', true);
+          jQuery('#transcription-update-button').css('display', 'none')
         }
         jQuery('#item-transcription-spinner-container').css('display', 'none')
       });
     });
   
+  /*
+  for (var i = 0; i < transcriptionLanguages.length; i++) {
+    // Prepare data and send API request
+    data = {
+      ItemId: itemId,
+      LanguageId: transcriptionLanguages[i]
+    }
+    var dataString= JSON.stringify(data);
+    jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+    'type': 'POST',
+    'url': home_url + '/tp-api/transcriptionLanguages',
+    'data': data
+    },
+    // Check success and create confirmation message
+    function(response) {
+    });
+  }*/
 }
 
 // Adds an Item Property
@@ -1017,8 +740,8 @@ function addItemProperty(itemId, userId, e) {
         'url': home_url + '/tp-api/itemProperties',
         'data': data
     },
+    // Check success and create confirmation message
     function(response) {
-      /*
       scoreData = {
                     ItemId: itemId,
                     UserId: userId,
@@ -1033,7 +756,6 @@ function addItemProperty(itemId, userId, e) {
       // Check success and create confirmation message
       function(response) {
       })
-    */
     });
   }
   else {
@@ -1176,7 +898,6 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
   }
   else {
     updateDataProperty("items", itemId , fieldName, value);
-    jQuery('.status-dropdown-content').removeClass('show')
   }
 }
 
@@ -1187,14 +908,10 @@ function removeTranscriptionLanguage(languageId, e) {
   var transcriptionText = jQuery('#item-page-transcription-text').text();  
   var languages = jQuery('#transcription-selected-languages ul').children().length;   
   if(transcriptionText.length != 0 && languages > 0) {
-    jQuery('#transcription-update-button').addClass('theme-color-background');
-    jQuery('#transcription-update-button').prop('disabled', false);
-    jQuery('#transcription-update-button .language-tooltip-text').css('display', 'none');
+    jQuery('#transcription-update-button').css('display','block');
   }
   else {
-    jQuery('#transcription-update-button').removeClass('theme-color-background');
-    jQuery('#transcription-update-button').prop('disabled', true);
-    jQuery('#transcription-update-button .language-tooltip-text').css('display', 'block');
+    jQuery('#transcription-update-button').css('display','none');
   }   
   if(transcriptionText.length == 0 && languages == 0) {
     jQuery('#no-text-selector').css('display','block');
@@ -1214,12 +931,6 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
   }
   if (isNaN(latitude) || isNaN(longitude)) {
     jQuery('#location-input-section .location-input-coordinates-container span').css('display', 'block');
-    jQuery('#item-location-spinner-container').css('display', 'none')
-    return 0;
-  }
-
-  if (jQuery('#location-input-section .location-input-name-container input').val() == "") {
-    jQuery('#location-input-section .location-input-name-container span').css('display', 'block');
     jQuery('#item-location-spinner-container').css('display', 'none')
     return 0;
   }
@@ -1280,10 +991,6 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
 }
 
 function saveItemDate(itemId, userId, editStatusColor, statusCount) {
-  if (jQuery('#transcribeLock').length) {
-    lockWarning();
-    return 0;
-  }
   jQuery('#item-date-spinner-container').css('display', 'block')
   // Prepare data and send API request
   data = {
@@ -1291,30 +998,10 @@ function saveItemDate(itemId, userId, editStatusColor, statusCount) {
   startDate = jQuery('#startdateentry').val().split('/');
   if (!isNaN(startDate[2]) && !isNaN(startDate[1]) && !isNaN(startDate[0])) {
     data['DateStart'] = startDate[2] + "-" + startDate[1] + "-" + startDate[0];
-    console.log(data['DateStart']);
   }
-  else if (startDate.length == 1 && startDate[0].length <= 4 && !isNaN(startDate[0])) {
-    data['DateStart'] = startDate[0] + "-01-01";
-    jQuery('#startdateentry').val("01/01/" + startDate[0])
-  }
-  else {
-    jQuery('#item-date-spinner-container').css('display', 'none')
-    alert("Please enter a valid date or year");
-    return 0
-  }
-
   endDate = jQuery('#enddateentry').val().split('/');
   if (!isNaN(endDate[2]) && !isNaN(endDate[1]) && !isNaN(endDate[0])) {
     data['DateEnd'] = endDate[2] + "-" + endDate[1] + "-" + endDate[0];
-  }
-  else if (endDate.length == 1 && endDate[0].length <=4 && !isNaN(endDate[0])) {
-    data['DateEnd'] = endDate[0] + "-01-01";
-    jQuery('#startdateentry').val("01/01/" + endDate[0])
-  }
-  else {
-    jQuery('#item-date-spinner-container').css('display', 'none')
-    alert("Please enter a valid date or year");
-    return 0
   }
   
   var dataString= JSON.stringify(data);
@@ -1494,7 +1181,7 @@ function saveKeyword(itemId, userId, editStatusColor, statusCount) {
         // Check success and create confirmation message
         function(response) {
         })
-        
+
         loadKeywordData(itemId, userId);
         if (taggingCompletion == "Not Started") {
           changeStatus(itemId, "Not Started", "Edit", "TaggingStatusId", 2, editStatusColor, statusCount)
@@ -1606,7 +1293,7 @@ function loadPlaceData(itemId, userId) {
                             '<div id="location-data-edit-' + content[i]['PlaceId'] + '" class="location-data-edit-container">' + 
                                 '<div class="location-input-section-top">' +
                                     '<div class="location-input-name-container location-input-container">' +
-                                        '<label>Location Name:</label><br/>' +
+                                        '<label>Location name:</label><br/>' +
                                         '<input type="text" value="' + content[i]['Name'] + '" name="" placeholder="">' +
                                     '</div>' +
                                     '<div class="location-input-coordinates-container location-input-container">' +
@@ -1619,19 +1306,11 @@ function loadPlaceData(itemId, userId) {
                                 '</div>' +
                 
                                 '<div class="location-input-description-container location-input-container">' +
-                                    '<label>Description:<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this location, e.g. the building name, or its significance to the item"></i></label><br/>' +
+                                    '<label>Description (enter here):</label><br/>' +
                                     '<textarea rows= "2" style="resize:none;" class="gsearch-form" type="text" id="ldsc" placeholder="" name="">' + comment + '</textarea>' +
                                 '</div>' +
-
-                                '<div id="location-input-geonames-search-container" class="location-input-container location-search-container">' +
-                                  '<label>WikiData:</label><br/>' +
-                                  '<input type="text" id="lgns" placeholder="" name="">' +
-                                     '<a id="geonames-search-button" href="">' +
-                                        '<i class="far fa-search"></i>' +
-                                     '</a>' +
-                                '</div>' +
                 
-                                "<div class='form-buttons-right'>" +
+                                "<div>" +
                                     "<button onClick='editItemLocation(" + content[i]['PlaceId'] + ", " + itemId + ", " + userId + ")' " +
                                                 "class='item-page-save-button edit-data-save-right theme-color-background'>" +
                                         "SAVE" +
@@ -1644,7 +1323,6 @@ function loadPlaceData(itemId, userId) {
                                     '<div id="item-location-' + content[i]['PlaceId'] +'-spinner-container" class="spinner-container spinner-container-right">' +
                                         '<div class="spinner"></div>' +
                                     "</div>" +
-                                    "<div style='clear:both;'></div>" +
                                 "</div>" +
                                 "<div style='clear:both;'></div>" +
                                "</div>" +
@@ -1716,24 +1394,22 @@ function loadPersonData(itemId, userId) {
             var description = "";
         } 
         
-        var personHeadline = '<span class="item-name-header">' +
-         firstName + ' ' + lastName + ' ' +
-        '</span>';
+        var personHeadline = firstName + ', ' + lastName + ' ';
         if (birthDate != "") {
           if (deathDate != "") {
-            personHeadline += '<span class="item-name-header">(' + birthDate + ' - ' + deathDate + ')</span>';
+            personHeadline += '(' + birthDate + ' - ' + deathDate + ')';
           }
           else {
-            personHeadline += '<span class="item-name-header">(Birth: ' + birthDate + ')</span>';
+            personHeadline += '(Birth: ' + birthDate + ')';
           }
         }
         else {
           if (deathDate != "") {
-            personHeadline += '<span class="item-name-header">(Death: ' + deathDate + ')</span>';
+            personHeadline += '(Death: ' + deathDate + ')';
           }
           else {
             if (description != "") {
-              personHeadline += "<span class='person-dots'>(" + description + ")</span>";
+              personHeadline += "(" + description + ")";
             }
           }
         }
@@ -1743,38 +1419,35 @@ function loadPersonData(itemId, userId) {
             '<h6 class="person-data-ouput-headline">' +
               personHeadline +
             '</h6>' +
-            '<span class="person-dots" style="width=10px; white-space: nowrap; text-overflow:ellipsis;"></span>' +
+            '<span class="person-dots" style="display: none">. . .)</span>' +
             '<i class="fas fa-angle-down" style= "float:right;"></i>' +
             '<div style="clear:both;"></div>' +
-          '</div>' + 
+          '</div>' +
           '<div id="person-data-output-' + content[i]['PersonId'] + '" class="collapse">' +
             '<div id="person-data-output-display-' + content[i]['PersonId'] + '" class="person-data-output-content">' +
-              '<div>' +
-                  '<div class="person-data-output-birthDeath">' +
-                      '<span>' +
-                          'Birth Location: ' +
-                          birthPlace +
-                      '</span>' +
-                        '</br>' +
-                      '<span>' +
-                          'Death Location: ' +
-                          deathPlace +
-                      '</span>' +
-                  '</div>' +
-                  '<div class="person-data-output-birthDeath">' +
-                      '<span>' +
-                          'Birth Date: ' +
-                          birthDate +
-                      '</span>' +
-                      '</br>' +
-                      '<span>' +
-                          'Death Date: ' +
-                          deathDate +
-                      '</span>' +
+              '<div class="person-data-output-birthDeath">' +
+                  '<span>' +
+                      'Birth Location: ' +
+                      birthPlace +
+                  '</span>' +
+                    '</br>' +
+                  '<span>' +
+                      'Death Location: ' +
+                      deathPlace +
+                  '</span>' +
+              '</div>' +
+              '<div class="person-data-output-birthDeath">' +
+                  '<span>' +
+                      'Birth Date: ' +
+                      birthDate +
+                  '</span>' +
+                  '</br>' +
+                  '<span>' +
+                      'Death Date: ' +
+                      deathDate +
+                  '</span>' +
 
-                      '</br>' +
-                  '</div>' +
-                  '<div style="clear:both;"></div>' +
+                  '</br>' +
               '</div>' +
               '<div class="person-data-output-button">'+
                       '<span>'+
@@ -1792,14 +1465,14 @@ function loadPersonData(itemId, userId) {
             '<div class="person-data-edit-container person-item-data-container" id="person-data-edit-' + content[i]['PersonId'] + '">' +
               '<div class="person-input-names-container">';
                 if (firstName != "") {
-                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-firstName-edit"  placeholder="First Name" class="person-input-field" value="' + firstName + '" style="outline:none;">'
+                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-firstName-edit" class="person-input-field" value="' + firstName + '" style="outline:none;">'
                 }
                 else {
                   personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-firstName-edit" class="person-input-field" placeholder="First Name" style="outline:none;">'
                 }
                 
                 if (lastName != "") {
-                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-lastName-edit" class="person-input-field" placeholder="Last Name" value="' + lastName + '" style="outline:none;">'
+                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-lastName-edit" class="person-input-field" value="' + lastName + '" style="outline:none;">'
                 }
                 else {
                   personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-lastName-edit" class="person-input-field" placeholder="Last Name" style="outline:none;">'
@@ -1809,14 +1482,14 @@ function loadPersonData(itemId, userId) {
               
               '<div class="person-location-birth-inputs">';
                 if (birthPlace != "") {
-                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthPlace-edit" class="person-input-field" value="' + birthPlace + '" placeholder="Birth Location" style="outline:none;">'
+                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthPlace-edit" class="person-input-field" value="' + birthPlace + '" style="outline:none;">'
                 }
                 else {
                   personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthPlace-edit" class="person-input-field" placeholder="Birth Location" style="outline:none;">'
                 }
                 
                 if (birthDate != "") {
-                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthDate-edit" class="person-input-field datepicker-input-field" value="' + birthDate + '" placeholder="Birth: dd/mm/yyyy" style="outline:none;">'
+                  personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthDate-edit" class="person-input-field datepicker-input-field" value="' + birthDate + '" style="outline:none;">'
                 }
                 else {
                   personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-birthDate-edit" class="person-input-field datepicker-input-field" placeholder="Birth: dd/mm/yyyy" style="outline:none;">'
@@ -1826,14 +1499,14 @@ function loadPersonData(itemId, userId) {
                 
                 '<div class="person-location-death-inputs">';
                   if (deathPlace != "") {
-                    personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathPlace-edit" class="person-input-field" value="' + deathPlace + '" placeholder="Death Location" style="outline:none;">'
+                    personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathPlace-edit" class="person-input-field" value="' + deathPlace + '" style="outline:none;">'
                   }
                   else {
                     personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathPlace-edit" class="person-input-field" placeholder="Death Location" style="outline:none;">'
                   }
                   
                   if (deathDate != "") {
-                    personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathDate-edit" class="person-input-field datepicker-input-field" value="' + deathDate + '" placeholder="Death: dd/mm/yyyy" style="outline:none;">'
+                    personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathDate-edit" class="person-input-field datepicker-input-field" value="' + deathDate + '" style="outline:none;">'
                   }
                   else {
                     personHtml += '<input type="text" id="person-' + content[i]['PersonId'] + '-deathDate-edit" class="person-input-field datepicker-input-field" placeholder="Death: dd/mm/yyyy" style="outline:none;">'
@@ -1842,31 +1515,33 @@ function loadPersonData(itemId, userId) {
                   '</div>' + 
 
                   '<div class="person-description-input">' +
-                      '<label>Description:</label><br/>' +
+                      '<label>Additional description:</label><br/>' +
                       '<input type="text" id="person-' + content[i]['PersonId'] + '-description-edit" class="person-input-field" value="' + description + '">' +
-                      '<i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Add more information to this person, e.g. their profession, or their significance to the item"></i>' +
                   '</div>' +
-                  '<div class="form-buttons-right">' +
-                      "<button class='edit-data-save-right theme-color-background'" +
-                                  "onClick='editPerson(" + content[i]['PersonId'] + ", " + itemId + ", " + userId + ")'>" +
-                          "SAVE" +
-                      "</button>" +
-                      
-                      "<button id='save-personinfo-button' class='theme-color-background edit-data-cancel-right' onClick='openPersonEdit(" + content[i]['PersonId'] + ")'>" +
-                          "CANCEL" +
-                      "</button>" +
-      
-                      '<div id="item-person-' + content[i]['PersonId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
-                          '<div class="spinner"></div>' +
-                      "</div>" +
-                      '<div style="clear:both;"></div>' +           
-                  '</div>' +
+  
+                  "<button class='edit-data-save-right theme-color-background'" +
+                              "onClick='editPerson(" + content[i]['PersonId'] + ", " + itemId + ", " + userId + ")'>" +
+                      "SAVE" +
+                  "</button>" +
+                  
+                  "<button id='save-personinfo-button' class='theme-color-background person-edit-data-cancel-right' onClick='openPersonEdit(" + content[i]['PersonId'] + ")'>" +
+                      "CANCEL" +
+                  "</button>" +
+  
+                  '<div id="item-person-' + content[i]['PersonId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
+                      '<div class="spinner"></div>' +
+                  "</div>" +
                   '<div style="clear:both;"></div>' +           
                 '</div>' +
               '</div>' +
             '</li>'
         jQuery('#item-person-list ul').append(personHtml)
       }   
+      jQuery('.person-data-ouput-headline').each(function() {
+        if (jQuery(this).prop('scrollHeight') > jQuery(this).prop('clientHeight')) {
+          jQuery(this).siblings('span').css('display', '-webkit-inline-box');
+        }
+      })  
     }
   });
 }
@@ -1887,8 +1562,8 @@ function loadKeywordData(itemId, userId) {
           jQuery('#item-keyword-list ul').append( 
             '<li id="add-item-keyword" class="theme-color-background">' +
               content[0]['Properties'][i]['PropertyValue'] +
-                '<i class="delete-item-datas far fa-times"' +
-                    'onClick="deleteItemData(\'properties\', ' + content[0]['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'keyword\', ' + userId + ')"></i>' +
+                '<i class="delete-item-datas far fa-times-circle"' +
+                    'onClick="deleteItemData(\'properties\', ' + content[0]['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'keyword\', ' + userID + ')"></i>' +
             '</li>'
           )
         }
@@ -1953,21 +1628,20 @@ function loadLinkData(itemId, userId) {
                         '<textarea rows= "3" type="text" placeholder="" name="">' + description + '</textarea>' +
                       '</div>' +
 
-                      '<div class="form-buttons-right">' +
-                          "<button type='submit' class='theme-color-background' id='link-save-button'" +
-                                "onClick='editLink(" + content[0]['Properties'][i]['PropertyId'] + ", " + itemId + ", " + userId + ")'>" +
-                            "SAVE" +
-                          "</button>" +
+                      
+                      "<button type='submit' class='theme-color-background' id='link-save-button'" +
+                            "onClick='editLink(" + content[0]['Properties'][i]['PropertyId'] + ", " + itemId + ", " + userId + ")'>" +
+                        "SAVE" +
+                      "</button>" +
 
-                          "<button class='theme-color-background edit-data-cancel-right' onClick='openLinksourceEdit(" + content[0]['Properties'][i]['PropertyId'] + ")'>" +
-                            "CANCEL" +
-                          "</button>" +
+                      "<button class='theme-color-background edit-data-cancel-right' onClick='openLinksourceEdit(" + content[0]['Properties'][i]['PropertyId'] + ")'>" +
+                        "CANCEL" +
+                      "</button>" +
 
-                          '<div id="item-link-' + content[0]['Properties'][i]['PropertyId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
-                          '<div class="spinner"></div>' +
-                          "</div>" +
-                          '<div style="clear:both;"></div>' +
-                      '</div>' +
+                      '<div id="item-link-' + content[0]['Properties'][i]['PropertyId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
+                      '<div class="spinner"></div>' +
+                      "</div>" +
+
                       '<div style="clear:both;"></div>' +
                   '</div>' +
               '</div>' +
@@ -2053,12 +1727,6 @@ function getMoreTopsPage(myid,limit,kind,cp,subject,showshortnames){
 }
 
 function openLocationEdit(placeId) {
-  if (jQuery('#transcribeLock').length) {
-    event.preventDefault();
-    lockWarning();
-    return 0;
-  }
-
   if (jQuery('#location-data-edit-' + placeId).css('display') == 'none') {
     jQuery('#location-data-edit-' + placeId).css('display', 'block');
     jQuery('#location-data-output-display-' + placeId).css('display', 'none');
@@ -2070,11 +1738,6 @@ function openLocationEdit(placeId) {
 }
 
 function openPersonEdit(personId) {
-  if (jQuery('#transcribeLock').length) {
-    event.preventDefault();
-    lockWarning();
-    return 0;
-  }
   if (jQuery('#person-data-edit-' + personId).css('display') == 'none') {
     jQuery('#person-data-edit-' + personId).css('display', 'block');
     jQuery('#person-data-output-display-' + personId).css('display', 'none');
@@ -2086,11 +1749,6 @@ function openPersonEdit(personId) {
 }
 
 function openLinksourceEdit(propertyId) {
-  if (jQuery('#transcribeLock').length) {
-    event.preventDefault();
-    lockWarning();
-    return 0;
-  }
   if (jQuery('#link-data-edit-' + propertyId).css('display') == 'none') {
     jQuery('#link-data-edit-' + propertyId).css('display', 'block');
     jQuery('#link-data-output-display-' + propertyId).css('display', 'none');
@@ -2222,382 +1880,8 @@ function editLink(linkId, itemId, userId) {
     function(response) {
 
       loadLinkData(itemId, userId);
-      openLinksourceEdit(linkId);
+      openLinkEdit(linkId);
       jQuery('#item-link-' + linkId + '-spinner-container').css('display', 'none')
     });
   }
-}
-
-function generateTeamCode() {
-  var result           = '';
-  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for ( var i = 0; i < 10; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
-function editTeam(teamId) {
-  jQuery('#team-' + teamId + '-spinner-container').css('display', 'block')
-  name = jQuery('#admin-team-' + teamId + '-name').val();
-  shortName = jQuery('#admin-team-' + teamId + '-shortName').val();
-  description = jQuery('#admin-team-' + teamId + '-description').val();
-  code = jQuery('#admin-team-' + teamId + '-code').val();
-
-  // Prepare data and send API request
-  data = {
-    Name: name,
-    ShortName: shortName,
-    Description: description,
-    Code: code
-  }
-  var dataString= JSON.stringify(data);
-  
-  jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
-      'type': 'POST',
-      'url': home_url + '/tp-api/teams/' + teamId,
-      'data': data
-  },
-  // Check success and create confirmation message
-  function(response) {
-    console.log(response);
-    jQuery('#team-' + teamId + '-spinner-container').css('display', 'none')
-  });
-}
-
-
-
-function exitTm(pID,cuID,tID,txt){
-	"use strict";
-	if(confirm(txt)){
-		jQuery('div#ismember_list').html("<p class=\"smallloading\"></p>");
-		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'pls-ex-it-tm','pid':pID,'cuid':cuID,'tid':tID}, function(res) {	
-			if(res.status === "ok"){
-				if(res.success !== "yes"){
-					alert("Sorry, this did not work. Please try again\n\n");
-				}
-				jQuery('div#ismember_list').html(res.content);
-				if(res.refresh_caps !== 'no'){
-					jQuery('div#isparticipant_list').html(res.refresh_caps);
-				}
-				jQuery('div#openteams_list').html(res.openteams);
-			}else{
-				alert("Sorry, an error occured. Please try again\n\n");	
-			}
-		});
-	}
-}
-function getTeamTabContent(pID,cuID){
-	"use strict";
-	jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'init-teamtab','pid':pID,'cuid':cuID}, function(res) {
-		if(res.status === "ok"){
-			jQuery('div#ismember_list').html(res.teamlist);
-			jQuery('div#isparticipant_list').html(res.campaignlist);
-			jQuery('div#openteams_list').html(res.openteams);
-		}else{
-			alert("Sorry, an error occured. Please try again\n\n"+JSON.stringify(res));	
-		}
-  });
-}
-function chkTmCd(pID,cuID){
-	"use strict";
-	var cd = jQuery("input#tct-mem-code").val();
-	jQuery('form#tct-tmcd-frm').html("<p class=\"smallloading\"></p>");
-	jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'chk-tm-cd','pid':pID,'cuid':cuID,'tidc':cd}, function(res) {	
-		if(res.status === "ok"){
-			if(res.success !== "yes"){
-				alert("Sorry, this did not work. Please try again\n\n");
-			}
-			jQuery('form#tct-tmcd-frm').html(res.content);
-			jQuery('form#tct-tmcd-frm div.message').delay( 3000 ).slideUp( 400 );
-			if(res.refresh !== 'no'){
-				jQuery('div#ismember_list').html(res.refresh);
-			}
-			if(res.refresh_caps !== 'no'){
-				jQuery('div#isparticipant_list').html(res.refresh_caps);
-			}
-		}else{
-			alert("Sorry, an error occured.\n\n");	
-		}
-	});
-}
-function openTmCreator(pid,cuid,obj){
-	"use strict";
-	if(pid !== cuid){
-		alert("ups, something went wrong.\nIt appears as if you are not working\nin your own profile...");
-	}else{
-		if(!jQuery('form#tct-crtrtm-frm').is(':visible')){
-			jQuery('input#qcmpgncd').val('');
-			jQuery('input#qtmnm').val('');
-			jQuery('textarea#qtsdes').val('');
-			jQuery('input#qtmcd').val('');
-			jQuery('form#tct-crtrtm-frm').slideDown(function(){
-				obj.text(obj.attr('data-rel-close'));
-			});
-		}else{
-			jQuery('form#tct-crtrtm-frm').slideUp(function(){
-				obj.text(obj.attr('data-rel-open'));
-			});
-		}	
-	}
-}
-function checkCode(fid,txt){
-	"use strict";
-	if(jQuery('input#'+fid).val().split(' ').join('').length >7){
-		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'check-code','cd':jQuery('input#'+fid).val()}, function(res) {	
-			if(res.allgood === "no"){
-				alert(res.message);
-				jQuery('input#'+fid).focus();
-			}
-		});
-	}else if(jQuery('input#'+fid).val().split(' ').join('').length >0){
-		alert(txt);
-	}
-}
-function tct_generateCode(fid){
-	"use strict";
-	jQuery('a#'+fid+'-but').fadeTo(1,0,function(){
-		jQuery('p#'+fid+'-waiter').css({'position':'absolute','margin-top':'-10px','margin-left':'15px','display':'block'});
-		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'get-code'}, function(res) {	
-			jQuery('input#'+fid).val(res.content);
-			jQuery('a#'+fid+'-but').fadeTo(1,1);
-			jQuery('p#'+fid+'-waiter').hide();
-
-		});
-	});	
-	jQuery('input#'+fid).keyup(function(e){
-    if(e.keyCode == 46 || e.keyCode == 8) {
-        jQuery('input#'+fid).val('');
-    }
-});
-}
-function joinTeam(pid,cuid,tid){
-	"use strict";
-	jQuery('div#openteams_list').html("<p class=\"smallloading\"></p>");
-	jQuery('div#ismember_list').html("<p class=\"smallloading\"></p>");
-	jQuery.post("/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'join-team','pid':pid,'cuid':cuid,'tid':tid}, function(res) {	
-		if(res.status === "ok"){
-			jQuery('div#openteams_messageholder').hide();
-			jQuery('div#openteams_messageholder').html(res.message);
-			jQuery('div#openteams_messageholder').show().delay( 3000 ).slideUp( 400,function(){jQuery('div#openteams_messageholder').html('');});
-			jQuery('div#ismember_list').html(res.teamlist);
-			jQuery('div#openteams_list').html(res.openteams);
-		}else{
-			alert('sorry, an error occured. Please reload page.');
-		}
-	});
-	
-}
-
-function svTeam(pid,cuid){
-	"use strict";
-	var tmp = jQuery('a#svTmBut').text();
-	var sollich = 0;
-	var errs=0;
-	var errtxt = "";
-	if(jQuery('input#qtmnm').val().split(' ').join('') === ""){
-		errs++;
-		errtxt += "- "+jQuery('input#qtmnm').attr('data-rel-missing');
-	}
-	if(jQuery('input#qtmshnm').val().split(' ').join('') === ""){
-		errs++;
-		errtxt += "- "+jQuery('input#qtmshnm').attr('data-rel-missing');
-	}
-	if(errs > 0){
-		alert(errtxt);
-		jQuery('p#svtm-waiter').replaceWith("<a class=\"tct-vio-but\" id=\"svTmBut\" onclick=\"svTeam('"+pid+"','"+cuid+"'); return false;\">"+tmp+"</a>");
-		sollich = 0;
-	}else{
-		jQuery('a#svTmBut').replaceWith("<p id=\"svtm-waiter\" class=\"smallloading\"></p>");
-		if(jQuery('input#qcmpgncd').val().split(' ').join('') !== ""){
-      /*
-			jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'check-tmcpgn-cd','cd':jQuery('input#qcmpgncd').val(),'pid':pid}, function(res) {	
-				if(res.allright === "ok"){*/
-					
-					var transport = {};
-					transport.q = 'crt-nw-tm';
-					transport.qttl = jQuery('input#qtmnm').val();
-					transport.qtshtl = jQuery('input#qtmshnm').val();
-					transport.pid = pid;
-					transport.cuid = cuid;
-					transport.tcd = jQuery('input#qtmcd').val();
-					transport.ccd = jQuery('input#qcmpgncd').val();
-					transport.tdes = jQuery('textarea#qtsdes').val();
-					jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",transport, function(res) {	
-						if(res.status === "ok"){
-							jQuery('div#team-creation-feedback').hide();
-							jQuery('div#team-creation-feedback').html(res.message);
-							jQuery('div#team-creation-feedback').show().delay( 3000 ).slideUp( 400,function(){jQuery('div#team-creation-feedback').html('');});
-							
-							if(res.success > 0){
-								//reset team-creator-form
-								jQuery('p#svtm-waiter').replaceWith("<a class=\"tct-vio-but\" id=\"svTmBut\" onclick=\"svTeam('"+pid+"','"+cuid+"'); return false;\">"+tmp+"</a>");
-								jQuery('input#qcmpgncd').val('');
-								jQuery('input#qtmnm').val('');
-								jQuery('input#qtmcd').val('');
-								jQuery('textarea#qtsdes').val('');
-								jQuery('form#tct-crtrtm-frm').slideUp(function(){
-									jQuery('a#open-tm-crt-but').text(jQuery('a#open-tm-crt-but').attr('data-rel-open'));
-								});
-								if(res.teamlist !== 'no'){
-									jQuery('div#ismember_list').html(res.teamlist);
-								}
-								if(res.campaignlist !== 'no'){
-									jQuery('div#isparticipant_list').html(res.campaignlist);
-								}
-							}
-						}else{
-							alert('Sorry, an error occured');
-						}
-						jQuery('input#'+fid).val(res.content);
-						jQuery('a#'+fid+'-but').fadeTo(1,1);
-						jQuery('p#'+fid+'-waiter').hide();
-
-					});
-					
-          
-        /*
-				}else{
-					alert(res.message);
-					jQuery('p#svtm-waiter').replaceWith("<a class=\"tct-vio-but\" id=\"svTmBut\" onclick=\"svTeam('"+pid+"','"+cuid+"'); return false;\">"+tmp+"</a>");
-					sollich = 0;
-				}
-      });
-      */
-		}else{
-			sollich = 1;
-		}
-	}
-	if(sollich>0){
-		transport = {};
-		transport.q = 'crt-nw-tm';
-		transport.qttl = jQuery('input#qtmnm').val();
-		transport.qtshtl = jQuery('input#qtmshnm').val();
-		transport.pid = pid;
-		transport.cuid = cuid;
-		transport.tcd = jQuery('input#qtmcd').val();
-		transport.ccd = jQuery('input#qcmpgncd').val();
-		transport.tdes = jQuery('textarea#qtsdes').val();
-		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",transport, function(res) {	
-			if(res.status === "ok"){
-				jQuery('div#team-creation-feedback').hide();
-				jQuery('div#team-creation-feedback').html(res.message);
-				jQuery('div#team-creation-feedback').show().delay( 3000 ).slideUp( 400,function(){jQuery('div#team-creation-feedback').html('');});
-				if(res.success > 0){
-					//reset team-creator-form
-					jQuery('p#svtm-waiter').replaceWith("<a class=\"tct-vio-but\" id=\"svTmBut\" onclick=\"svTeam('"+pid+"','"+cuid+"'); return false;\">"+tmp+"</a>");
-					jQuery('input#qcmpgncd').val('');
-					jQuery('input#qtmnm').val('');
-					jQuery('textarea#qtsdes').val('');
-					jQuery('form#tct-crtrtm-frm').slideUp(function(){
-						jQuery('a#open-tm-crt-but').text(jQuery('a#open-tm-crt-but').attr('data-rel-open'));
-					});
-					if(res.teamlist !== 'no'){
-						jQuery('div#ismember_list').html(res.teamlist);
-					}
-					if(res.campaignlist !== 'no'){
-						jQuery('div#isparticipant_list').html(res.campaignlist);
-					}
-				}
-			}else{
-				alert('Sorry, an error occured');
-			}
-			jQuery('a#'+fid+'-but').fadeTo(1,1);
-			jQuery('p#'+fid+'-waiter').hide();
-
-		});
-	}
-}
-
-function removeTm(pid,cuid,tid){
-	"use strict";
-	if(confirm(jQuery('a#teamsdeleter').attr('data-rel-realy'))){
-		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'rem-tmfg','pid':pid,'cuid':cuid,'tid':tid}, function(res) {	
-			if(res.status === "ok"){
-				if(res.message !== "no"){
-					alert(res.message);
-				}else{
-					if(res.teamlist !== 'no'){
-						jQuery('div#ismember_list').html(res.teamlist);
-					}
-					if(res.campaignlist !== 'no'){
-						jQuery('div#isparticipant_list').html(res.campaignlist);
-					}
-					disablePopup();
-				}
-			}else{
-				alert('Sorry, an error occured');
-			}
-		});
-	}
-}
-// When the user scrolls down 60px from the top of the document, resize the navbar's padding 
-//and the logo's font size
-
-window.onscroll = function() {scrollFunction()};
-                    
-function scrollFunction() {
-  if (document.body.scrollTop > 60 || document.documentElement.scrollTop > 60) {
-      document.getElementById("_transcribathon_partnerlogo").style.height = "56px";
-      document.getElementById("_transcribathon_partnerlogo").style.width = "56px";
-      document.getElementById("_transcribathon_partnerlogo").style.marginLeft = "33px";
-  } else {
-      document.getElementById("_transcribathon_partnerlogo").style.height = "120px";
-      document.getElementById("_transcribathon_partnerlogo").style.width = "120px"; 
-      document.getElementById("_transcribathon_partnerlogo").style.marginLeft = "0px";                   
-      }
-}
-
-
-function chkTeamname(nmfldid){
-	"use strict";
-	jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'chk-teamname','title':nmfldid.val(),'myself':'new'}, function(res) {	
-		if(res.status === "ok"){
-			if(res.usable != "ok"){
-				alert(res.message);	
-				nmfldid.val('').focus();
-			}else{
-				// do nothing - title is unique
-			}
-		}else{
-			alert('Sorry, an error occured');
-		}
-	});
-}
-
-function checkAbbr(nmfldid){
-	"use strict";
-	jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'chk-teamshortname','title':nmfldid.val(),'myself':'new'}, function(res) {	
-		if(res.status === "ok"){
-			if(res.usable != "ok"){
-				alert(res.message);	
-				nmfldid.val('').focus();
-			}else{
-				// do nothing - title is unique
-			}
-		}else{
-			alert('Sorry, an error occured');
-		}
-	});
-}
-
-function checkExAbbr(fid,txt,tid){
-	"use strict";
-	jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_profiletabs/scripts/team-script.php",{'q':'chk-teamshortname','title':jQuery('#'+fid).val(),'myself':tid}, function(res) {	
-		if(res.status === "ok"){
-			if(res.usable != "ok"){
-				alert(res.message);	
-				jQuery('#'+fid).val('');
-			}else{
-				// do nothing - title is unique
-			}
-		}else{
-			alert('Sorry, an error occured');
-		}
-	});
-}
-
-function lockWarning() {
-  jQuery('#locked-warning-container').css('display', 'block');
 }

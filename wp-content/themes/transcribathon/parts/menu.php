@@ -27,11 +27,11 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
         // Allways home of transcribathon
 		$theme_sets = get_theme_mods();
 		
-		echo "<a href=\"".network_home_url()."\" class=\"_transcribathon_logo\"></a>";
+		echo "<a href=\"http://fresenia.man.poznan.pl/\" class=\"_transcribathon_logo\"></a>";
         if(!is_home()){
-            echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
+            echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
         }else{
-            echo "<span class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
+            echo "<span class=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
 		}
 		
     
@@ -41,12 +41,7 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 			echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
 				$i=1;
 				foreach($sites as $s){
-					if (get_blog_details($s->blog_id)->blogname == "Europeana 1914-1918") {
-						echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a target=\"_blank\" href=\"https://transcribathon.com\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
-					}
-					else {
-						echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a href=\"https://".$s->domain.$s->path."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
-					}
+					echo "<li id=\"projects-".$i."\" class=\"menu-item menu-item-type-post_type menu-item-object-page projects-".$i." top_nav_point-".$s->blog_id."\"><a href=\"https://".$s->domain.$s->path."\">".get_blog_details($s->blog_id)->blogname."</a></li>\n";
 					$i++;
 				}
 			echo "</ul>\n";
@@ -67,14 +62,10 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 				echo "<a href=\"".network_home_url()."/register/ \">Register</a>";
 			echo "</li>\n";
 			echo "<li id=\"login\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
-				echo "<a href=\"".network_home_url()."/log-in/ \">Login</a>";
+				echo "<a href=\"".network_home_url()."/login/ \">Login</a>";
 			echo "</li>\n";
 		}
-
 	echo "</ul>\n";
-	echo '<div id="help-tutorial"><a class="tutorial-model" title="Help Tutorial"><i class="fal fa-question-circle"></i></a></div>';
-
-	//echo do_shortcode( '[contact-form-7 id="91" title="quote"]' );
      ?>
     </div>
 

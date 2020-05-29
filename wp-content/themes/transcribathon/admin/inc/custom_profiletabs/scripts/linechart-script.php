@@ -18,6 +18,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 				}
 			}
 
+
 			if(!isset($_POST['kind']) || trim($_POST['kind']) == ""){
 				$c_kind = 'days';
 				$c_min = date('Y-m').'-01';
@@ -167,7 +168,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			
 		
 			
-			$content .= "<div id='".$theme_sets['vantage_general_link_color']."' class=\"tct_linechart_area\" style=\"min-height:".$charouterheight."px;\">\n";
+			$content .= "<div class=\"tct_linechart_area\" style=\"min-height:".$charouterheight."px;\">\n";
 				$content .= "<div class=\"tct_linechart_holder\">\n";
 				
 				
