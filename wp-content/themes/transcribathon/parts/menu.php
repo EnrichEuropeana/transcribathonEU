@@ -20,22 +20,24 @@ if ( siteorigin_setting( 'navigation_mobile_navigation' ) ) {
 }
 $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 ?>
-
 <nav role="navigation" class="<?php echo implode( ' ', $nav_classes) ?>">
     <div class="_transcribathon_mainnav">
     <?php 
         // Allways home of transcribathon
 		$theme_sets = get_theme_mods();
 		
-		echo "<a href=\"http://fresenia.man.poznan.pl/\" class=\"_transcribathon_logo\"></a>";
-        if(!is_home()){
-            echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
-        }else{
-            echo "<span class=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
+		echo "<a href=\"".network_home_url()."\" class=\"_transcribathon_logo\"></a>";
+		if(!is_main_site()) {
+			if(!is_home()){
+				echo "<a href=\"".get_home_url()."\" class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\" >"; vantage_display_logo(); echo "</a>";
+			}else{
+				echo "<span class=\"_transcribathon_partnerlogo\" id=\"_transcribathon_partnerlogo\">"; vantage_display_logo(); echo "</span>";
+			}
 		}
 		
     
 	echo "\n<ul id=\"_transcribathon_topmenu\" class=\"menu\">\n";
+		echo "<li><a href=\"".network_home_url()."/contact/\" class=\"contact-area\">Contact Us</a></li>";
 		echo "<li id=\"projects\" class=\"menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children projects\">Projects\n";
 			$sites = get_sites(array('site__not_in'=>array('1'),'deleted'=>0));
 			echo "<ul class=\"sub-menu\" style=\"display: none; opacity: 0;\">\n";
@@ -61,11 +63,67 @@ $logo_in_menu = siteorigin_setting( 'layout_masthead' ) == 'logo-in-menu';
 			echo "<li id=\"register\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
 				echo "<a href=\"".network_home_url()."/register/ \">Register</a>";
 			echo "</li>\n";
-			echo "<li id=\"login\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
-				echo "<a href=\"".network_home_url()."/login/ \">Login</a>";
+			echo "<li id=\"default-lock-login\" class=\"menu-item menu-item-type-post_type menu-item-object-page\">\n";
+				echo "<a id=\"login\" href=\"#\">Login</a>";
 			echo "</li>\n";
 		}
+
+		
+	// Login modal
+	echo '<div id="default-login-container">';
+		echo '<div id="default-login-popup">';
+			echo '<div class="default-login-popup-header theme-color-background">';
+				echo '<span class="item-login-close">&times;</span>';
+			echo '</div>';
+			echo '<div class="default-login-popup-body">';
+				$login_post = get_posts( array(
+					'name'    => 'default-login',
+					'post_type'    => 'um_form',
+				));
+				echo do_shortcode('[ultimatemember form_id="'.$login_post[0]->ID.'"]');
+			echo '</div>';
+			echo '<div class="default-login-popup-footer theme-color-background">';
+			echo '</div>';
+		echo '</div>';
+	echo '</div>';
+		
 	echo "</ul>\n";
+	echo '<div id="help-tutorials" class="help-tutorials">';
+	echo '<a href="#" class="tutorial-model" title="Tutorial"><i class="fal fa-question-circle"></i></a>';
+	echo '</div>';
+
+	echo "<script> 
+ 	jQuery('#default-lock-login').click(function() {
+	  jQuery('#default-login-container').css('display', 'block');
+	})
+  
+ 	jQuery('.item-login-close').click(function() {
+	  jQuery('#default-login-container').css('display', 'none');
+	})
+	jQuery ( document ).ready(function() {
+							// When the user clicks the button, open the modal 
+							jQuery('#help-tutorials').click(function() {
+							jQuery('#tutorial-popup-window-container').css('display', 'block');
+							jQuery('#tutorial-menu-slider-area').slick('refresh');
+							
+							})
+							
+							// When the user clicks on <span> (x), close the modal
+							jQuery('.tutorial-window-close').click(function() {
+							jQuery('#tutorial-popup-window-container').css('display', 'none');
+							})		
+							
+							jQuery('#tutorial-popup-window-container').mousedown(function(event){
+								if (event.target.id == 'tutorial-popup-window-container') {
+									jQuery('#tutorial-popup-window-container').css('display', 'none')
+								}
+							})			
+						});
+						
+	 </script>"; 
+
+
+// Help tab 
      ?>
     </div>
 

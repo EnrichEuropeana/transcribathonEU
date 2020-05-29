@@ -143,6 +143,7 @@ function _TCT_campaigns_admin_page( $atts ) {
                           data['End'] = endDate[2] + '-' + endDate[1] + '-' + endDate[0];
                           data['End'] += ' '  + jQuery('#admin-campaign-' + campaignId + '-endTime').val();
                         }
+                        data['DatasetId'] = jQuery('#admin-campaign-' + campaignId + '-dataset').val();
                         data['Public'] = 0;
                         if (jQuery('#admin-campaign-' + campaignId + '-public').prop('checked')) {
                             data['Public'] = 1
@@ -154,6 +155,20 @@ function _TCT_campaigns_admin_page( $atts ) {
                             'type': 'POST',
                             'url': '".home_url()."/tp-api/campaigns/' + campaignId,
                             'data': data
+                        },
+                        // Check success and create confirmation message
+                        function(response) {
+                            console.log(response);
+                            jQuery('#campaign-' + campaignId + '-spinner-container').css('display', 'none')
+                        });
+                    }
+                    
+                    function removeCampaign(campaignId) {     
+                        jQuery('#campaign-' + campaignId + '-spinner-container').css('display', 'block');
+                                           
+                        jQuery.post('".home_url( null, 'https' )."/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+                            'type': 'DELETE',
+                            'url': '".home_url()."/tp-api/campaigns/' + campaignId
                         },
                         // Check success and create confirmation message
                         function(response) {
@@ -177,6 +192,9 @@ function _TCT_campaigns_admin_page( $atts ) {
                         if (!isNaN(endDate[2]) && !isNaN(endDate[1]) && !isNaN(endDate[0])) {
                           data['End'] = endDate[2] + '-' + endDate[1] + '-' + endDate[0];
                           data['End'] += ' '  + jQuery('#admin-campaign-endTime').val();
+                        }
+                        if (jQuery('#admin-campaign-dataset').val() != null && jQuery('#admin-campaign-dataset').val() != 'null') {
+                            data['DatasetId'] = jQuery('#admin-campaign-dataset').val();
                         }
                         data['Public'] = 0;
                         if (jQuery('#admin-campaign-public').prop('checked')) {
@@ -224,6 +242,26 @@ function _TCT_campaigns_admin_page( $atts ) {
                         });
                     }
                     
+                    function changeDataset(campaignId) {
+                        // Prepare data and send API request
+                        data = {
+                        }
+                        jQuery('#campaign-' + campaignId + '-spinner-container').css('display', 'block');
+                        data['DatasetId'] = jQuery('#admin-campaign-' + campaignId + '-dataset').val();
+                        var dataString= JSON.stringify(data);
+                        
+                        jQuery.post('".home_url( null, 'https' )."/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
+                            'type': 'POST',
+                            'url': '".home_url()."/tp-api/campaigns/' + campaignId,
+                            'data': data
+                        },
+                        // Check success and create confirmation message
+                        function(response) {
+                            console.log(response);
+                            jQuery('#campaign-' + campaignId + '-spinner-container').css('display', 'none');
+                        });
+                    }
+                    
                     ";
     $content .= "</script>";
 
@@ -243,10 +281,34 @@ function _TCT_campaigns_admin_page( $atts ) {
             $content .= "<input id='admin-campaign-startTime' style='width: 200px; margin-left: 20px;' placeholder='Start time: hh/mm/ss'>";
         $content .= "</p>";
         $content .= "<p>";
-            $content .= "<h6>Start: </h6>";
+            $content .= "<h6>End: </h6>";
             $content .= "<input id='admin-campaign-endDate' class='datepicker-input-field' style='width: 150px;'>";
             $content .= "<input id='admin-campaign-endTime' style='width: 200px; margin-left: 20px;' placeholder='End time: hh/mm/ss'>";
         $content .= "</p>";
+
+        $content .= "<h6>Dataset: </h6>";
+        $content .= "<select id='admin-campaign-dataset'>";
+            $requestData = array(
+                'key' => 'testKey'
+            );
+            $url = home_url()."/tp-api/datasets";
+            $requestType = "GET";
+        
+            include dirname(__FILE__) . '/../custom_scripts/send_api_request.php';
+        
+            $datasets = json_decode($result, true);
+
+            $content .= '<option selected value=null>';
+                $content .= "No dataset";
+            $content .= '</option>';
+            foreach ($datasets as $dataset) {
+                $content .= '<option value="'.$dataset['DatasetId'].'">';
+                    $content .= $dataset['Name'];
+                $content .= '</option>';
+            }
+        $content .= "</select>";
+
+        $content .= "</br>";
 
         $content .= "<span>Public: </span><input type='checkbox' id='admin-campaign-public'>";
         $content .= "</br>";
@@ -308,10 +370,48 @@ function _TCT_campaigns_admin_page( $atts ) {
                             $content .= "<input id='admin-campaign-".$campaign['CampaignId']."-startTime' style='width: 150px; margin-left: 20px;' value='".$timeStart."'>";
                         $content .= "</p>";
                         $content .= "<p>";
-                            $content .= "<h6>Start: </h6>";
+                            $content .= "<h6>End: </h6>";
                             $content .= "<input id='admin-campaign-".$campaign['CampaignId']."-endDate' class='datepicker-input-field' style='width: 150px;' value='".$dateEnd."'>";
                             $content .= "<input id='admin-campaign-".$campaign['CampaignId']."-endTime' style='width: 150px; margin-left: 20px;' value='".$timeEnd."'>";
                         $content .= "</p>";
+
+                        $content .= "<h6>Dataset: </h6>";
+                        $content .= "<select id='admin-campaign-".$campaign['CampaignId']."-dataset'>";
+                            $requestData = array(
+                                'key' => 'testKey'
+                            );
+                            $url = home_url()."/tp-api/datasets";
+                            $requestType = "GET";
+                        
+                            include dirname(__FILE__) . '/../custom_scripts/send_api_request.php';
+                        
+                            $datasets = json_decode($result, true);
+                
+                            if ($campaign['DatasetName'] == null) {
+                                $content .= '<option selected value=null>';
+                                    $content .= "No dataset";
+                                $content .= '</option>';
+                            }
+                            else {
+                                $content .= '<option value=null>';
+                                    $content .= "No dataset";
+                                $content .= '</option>';
+                            }
+                            foreach ($datasets as $dataset) {
+                                if ($campaign['DatasetName'] == $dataset['Name']) {
+                                    $content .= '<option selected value="'.$dataset['DatasetId'].'">';
+                                        $content .= $dataset['Name'];
+                                    $content .= '</option>';
+                                }
+                                else {
+                                    $content .= '<option value="'.$dataset['DatasetId'].'">';
+                                        $content .= $dataset['Name'];
+                                    $content .= '</option>';
+                                }
+                            }
+                        $content .= "</select>";
+
+                        $content .= "</br>";
 
                         $checked = "";
                         if ($campaign['Public'] == 1) {
@@ -324,6 +424,10 @@ function _TCT_campaigns_admin_page( $atts ) {
                         $content .= "<button onClick='editCampaign(".$campaign['CampaignId'].")' style='float: left; margin-top: 10px;'>";
                             $content .= "SAVE";
                         $content .= "</button>";
+                        $content .= "<button onClick='removeCampaign(".$campaign['CampaignId'].")' style='float: right; margin-top: 10px;'>";
+                            $content .= "REMOVE";
+                        $content .= "</button>";
+
                         $content .= '<div id="campaign-'.$campaign['CampaignId'].'-spinner-container" class="spinner-container spinner-container-left">';
                             $content .= '<div class="spinnerAdmin"></div>';
                         $content .= "</div>";

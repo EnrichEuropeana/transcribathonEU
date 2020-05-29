@@ -1,0 +1,19 @@
+.so-widget-sow-layout-slider-default-dacc581d96e2 .sow-slider-base ul.sow-slider-images .sow-slider-image-wrapper {
+  padding: 50px 50px 50px 50px;
+  max-width: 1280px;
+  
+}
+@media (max-width: 780px) {
+  .so-widget-sow-layout-slider-default-dacc581d96e2 .sow-slider-base ul.sow-slider-images .sow-slider-image-wrapper {
+    height: auto;
+  }
+}
+.so-widget-sow-layout-slider-default-dacc581d96e2 .sow-slider-base .sow-slider-pagination li a {
+  background: #b5b5b5;
+}
+.so-widget-sow-layout-slider-default-dacc581d96e2 .sow-slider-base .sow-slide-nav {
+  font-size: 20px;
+}
+.so-widget-sow-layout-slider-default-dacc581d96e2 .sow-slider-base .sow-slide-nav a {
+  color: #b5b5b5;
+}

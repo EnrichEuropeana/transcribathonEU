@@ -17,12 +17,12 @@ class MetaYouTubeSlide extends MetaSlide {
 
         if (is_admin()) {
             add_filter('media_upload_tabs', array($this, 'custom_media_upload_tab_name'), 999, 1);
-            add_action("metaslider_save_{$this->identifier}_slide", array($this, 'save_slide'), 5, 3);
             add_action("media_upload_{$this->identifier}", array($this, 'get_iframe'));
             add_action("wp_ajax_create_{$this->identifier}_slide", array($this, 'ajax_create_slide'));
             add_action('metaslider_register_admin_styles', array($this, 'register_admin_styles'), 10, 1);
         }
-
+		
+		add_action("metaslider_save_{$this->identifier}_slide", array($this, 'save_slide'), 5, 3);
 		add_filter("metaslider_get_{$this->identifier}_slide", array($this, 'get_slide'), 10, 2);
     }
 
@@ -189,7 +189,7 @@ class MetaYouTubeSlide extends MetaSlide {
         $row .= "        </div>";
         $row .= "    </td>";
         $row .= "    <td class='col-2'>";
-        $row .= "       <div class='metaslider-ui-inner'>";
+        $row .= "       <div class='metaslider-ui-inner flex flex-col h-full'>";
 
         if ( method_exists( $this, 'get_admin_slide_tabs_html' ) ) {
             $row .= $this->get_admin_slide_tabs_html();
@@ -221,7 +221,7 @@ class MetaYouTubeSlide extends MetaSlide {
 		$lazy_load = !isset($this->slide_settings['lazyLoad']) || $this->slide_settings['lazyLoad'] == 'on' ? 'checked=checked' : '';
 		$video_url = get_post_meta($slide_id, 'ml-slider_youtube_url', true);
 
-        $general_tab = "<input style='padding:7px 10px;max-width:500px' class='ms-super-wide' name='attachment[{$slide_id}][youtube_url]' value='{$video_url}'>";
+        $general_tab = "<input style='padding:7px 10px;max-width:500px' data-lpignore='true' class='ms-super-wide' name='attachment[{$slide_id}][youtube_url]' value='{$video_url}'>";
         $general_tab .= "<ul class='ms-split-li'>
 							<li><label><input type='checkbox' name='attachment[{$slide_id}][settings][showRelated]' {$show_related_checked}/><span>" . __('Show related videos (disabling this may instead show only recommend videos from the channel, <a href="https://developers.google.com/youtube/player_parameters#playsinline" target="_blank">see here</a>)', 'ml-slider-pro') ."</span></label></li>
 							<li><label><input type='checkbox' name='attachment[{$slide_id}][settings][mute]' {$mute_checked}/><span>" . __('Mute video on start (enabling this may help with auto play, <a href="https://developers.google.com/web/updates/2017/09/autoplay-policy-changes" target="_blank">see here</a>)', 'ml-slider-pro') ."</span></label></li>
@@ -423,7 +423,8 @@ class MetaYouTubeSlide extends MetaSlide {
      * @return string
      */		
 	public function youtube_title($video_id) {
-		$json = file_get_contents('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json');
+		$context = apply_filters('metaslider_youtube_title_extra_context', null);
+		$json = file_get_contents('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' . $video_id . '&format=json', false, $context);
 		$details = json_decode($json, true);
 		return $details['title'];
 	}
@@ -456,6 +457,7 @@ class MetaYouTubeSlide extends MetaSlide {
 		$options['after'] = isset($options['after']) ? $options['after'] : array();
 		$options['after'] = array_merge($options['after'], array(
 			"$('#metaslider_{$slider_id} .rslides1_on .youtube').each(function(index) {
+				if ($(this).data('lazyLoad') && $(this).data('autoPlay')) $(this).trigger('click');
 				$(this).data('mute') && $(this).tubeplayer('mute');
 				$(this).data('autoPlay') && $(this).tubeplayer('play');
 			});")
@@ -526,8 +528,10 @@ class MetaYouTubeSlide extends MetaSlide {
 					var player = $(this).tubeplayer({{$this->get_tubeplayer_params()}
 						onPlayerLoaded: function() {
 							$(this).data('mute') && $(this).tubeplayer('mute');
-							$(this).data('autoPlay') && $(this).tubeplayer('play');
-							$(this).data('lazyLoad') && $(this).tubeplayer('play');
+							if ($(this).parents('.flex-active-slide').length) {
+								$(this).data('autoPlay') && $(this).tubeplayer('play');
+								$(this).data('lazyLoad') && $(this).tubeplayer('play');
+							}
 							$(this).addClass('video-loaded');
 						},
 						onPlayerPlaying: function(id) {
@@ -571,8 +575,10 @@ class MetaYouTubeSlide extends MetaSlide {
 				$(this).tubeplayer({{$this->get_tubeplayer_params()}
 					onPlayerLoaded: function() {
 						$(this).data('mute') && $(this).tubeplayer('mute');
-						$(this).data('autoPlay') && $(this).tubeplayer('play');
-						$(this).data('lazyLoad') && $(this).tubeplayer('play');
+						if ($(this).parents('.rslides1_on').length) {
+							$(this).data('autoPlay') && $(this).tubeplayer('play');
+							$(this).data('lazyLoad') && $(this).tubeplayer('play');
+						}
 						$(this).addClass('video-loaded');
 					},
 					onPlayerPlaying: function(id) {
@@ -583,6 +589,7 @@ class MetaYouTubeSlide extends MetaSlide {
 			if (youtube.data('lazyLoad')) {
 				autoplay && youtube.trigger('click');
 			}
+			/* Either lazyload is on, in which we do nothing, or trigger an event to load the video iframe */
 			youtube.data('lazyLoad') || youtube.trigger('metaslider/load-youtube-video');
         });";
 
@@ -599,14 +606,16 @@ class MetaYouTubeSlide extends MetaSlide {
         $params = "";
 
         $tubeplayer_params = array(
-            'width' => $this->settings['width'],
+			'host' => "'https://www.youtube-nocookie.com'",
+			'width' => $this->settings['width'],
             'height' => $this->settings['height'],
             'preferredQuality' => "'hd720'",
             'initialVideo' => "youtube.data('id')",
             'controls' => "youtube.data('showControls')",
 			'showRelated' => "youtube.data('showRelated')",
             'theme' => "youtube.data('theme')",
-			'color' => "youtube.data('color')"
+			'color' => "youtube.data('color')",
+			'protocol' => is_ssl() ? "'https'" : "'http'"
         );
 
         $tubeplayer_params = apply_filters('metaslider_tubeplayer_params', $tubeplayer_params, $this->slider->ID, $this->slide->ID);
@@ -667,8 +676,8 @@ class MetaYouTubeSlide extends MetaSlide {
 	protected function save($fields) {
 
 		// Save the url in case it was updated
-        if (isset($fields['vimeo_url']) && !empty($fields['vimeo_url'])) {
-            update_post_meta($this->slide->ID, 'ml-slider_vimeo_url', $fields['vimeo_url']);
+        if (isset($fields['youtube_url']) && !empty($fields['youtube_url'])) {
+            update_post_meta($this->slide->ID, 'ml-slider_youtube_url', $fields['youtube_url']);
         }
 
         // Update the order
@@ -677,7 +686,7 @@ class MetaYouTubeSlide extends MetaSlide {
 			'menu_order' => $fields['menu_order']
 		));
 
-		foreach (array('showControls', 'showRelated', 'showInfo', 'mute') as $setting) {
+		foreach (array('lazyLoad', 'showControls', 'showRelated', 'showInfo', 'mute') as $setting) {
 			if (!isset($fields['settings'][$setting])) {
 				$fields['settings'][$setting] = 'off';
 			}

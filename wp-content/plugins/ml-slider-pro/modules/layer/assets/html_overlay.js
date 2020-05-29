@@ -38,7 +38,12 @@ wp.media.view.Toolbar.Custom = wp.media.view.Toolbar.extend({
         var selection = this.controller.state().get('selection');
 
         selection.map(function (attachment) {
-            attachment = attachment.toJSON();
+			attachment = attachment.toJSON();
+			var APP = window.parent.metaslider.app.MetaSlider;
+			// APP comes from the free version which holds some generic translations
+			APP && APP.notifyInfo('metaslider/creating-slides', APP.sprintf(
+				APP.__('Preparing %s slide...', 'ml-slider'),
+			'1'), true);
 
             var data = {
                 action: 'create_html_overlay_slide',
@@ -48,6 +53,8 @@ wp.media.view.Toolbar.Custom = wp.media.view.Toolbar.extend({
 
             jQuery.post(ajaxurl, data, function(response) {
 				window.parent.jQuery(".metaslider table#metaslider-slides-list").append(response);
+				var APP = window.parent.metaslider.app.MetaSlider;
+				APP && APP.notifySuccess('metaslider/slides-created', null, true);
                 window.parent.jQuery(".media-modal-close").click();
             });
         });

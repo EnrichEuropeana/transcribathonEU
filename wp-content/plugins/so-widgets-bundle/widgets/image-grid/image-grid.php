@@ -20,7 +20,7 @@ class SiteOrigin_Widgets_ImageGrid_Widget extends SiteOrigin_Widget {
 			'sow-image-grid',
 			__('SiteOrigin Image Grid', 'so-widgets-bundle'),
 			array(
-				'description' => __('Display a grid of images.', 'so-widgets-bundle'),
+				'description' => __('Display a grid of images. Also useful for displaying client logos.', 'so-widgets-bundle'),
 			),
 			array(),
 			false,
@@ -95,12 +95,12 @@ class SiteOrigin_Widgets_ImageGrid_Widget extends SiteOrigin_Widget {
 
 					'max_height' => array(
 						'label' => __( 'Maximum image height', 'so-widgets-bundle' ),
-						'type' => 'measurement',
+						'type' => 'number',
 					),
 
 					'max_width' => array(
 						'label' => __( 'Maximum image width', 'so-widgets-bundle' ),
-						'type' => 'measurement',
+						'type' => 'number',
 					),
 
 					'spacing' => array(
@@ -130,13 +130,16 @@ class SiteOrigin_Widgets_ImageGrid_Widget extends SiteOrigin_Widget {
 			}
 			$image['link_attributes'] = $link_atts;
 
+			$title = $this->get_image_title($image);
+
 			if ( empty( $image['image'] ) && ! empty( $image['image_fallback'] ) ) {
 				$alt = ! empty ( $image['alt'] ) ? $image['alt'] .'"' : '';
-				$image['image_html'] = '<img src="'. esc_url( $image['image_fallback'] ) .'" alt="'. esc_attr( $alt ) .'" title="'. esc_attr( $image['title'] ) .'">';
+				$image['image_html'] = '<img src="'. esc_url( $image['image_fallback'] ) .'" alt="'. esc_attr( $alt ) .'" title="'. esc_attr( $title ) .'" class="sow-image-grid-image_html">';
 			} else {
 				$image['image_html'] = wp_get_attachment_image( $image['image'], $instance['display']['attachment_size'], false, array(
-					'title' => $image['title'],
+					'title' => $title,
 					'alt'   => $image['alt'],
+					'class' => 'sow-image-grid-image_html',
 				) );
 			}
 		}
@@ -147,18 +150,41 @@ class SiteOrigin_Widgets_ImageGrid_Widget extends SiteOrigin_Widget {
 			'max_width' => $instance['display']['max_width'],
 		);
 	}
+
+	/**
+	 * Try to figure out an image's title for display.
+	 *
+	 * @param $image
+	 *
+	 * @return string The title of the image.
+	 */
+	private function get_image_title($image) {
+		if ( ! empty( $image['title'] ) ) {
+			$title = $image['title'];
+		} else {
+			// We do not want to use the default image titles as they're based on the file name without the extension
+			$file_name = pathinfo( get_post_meta( $image['image'], '_wp_attached_file', true ), PATHINFO_FILENAME );
+			$title = get_the_title( $image['image'] );
+			if ( $title == $file_name ) {
+				$title = '';
+			}
+		}
+
+		return $title;
+	}
 	
 	function modify_instance( $instance ) {
-		// Account for number to measurement form field type changes
 		if ( ! empty( $instance['display'] ) ) {
-			if ( is_numeric( $instance['display']['max_height'] ) ) {
-				$instance['display']['max_height'] = $instance['display']['max_height'] .'px';
+			// Revert changes to `max_width` and `max_height` back to `number` fields.
+			if ( ! empty( $instance['display']['max_height'] ) ) {
+				$instance['display']['max_height'] = intval( $instance['display']['max_height'] );
 			}
-			
-			if ( is_numeric( $instance['display']['max_width'] ) ) {
-				$instance['display']['max_width'] = $instance['display']['max_width'] .'px';
+
+			if ( ! empty( $instance['display']['max_width'] ) ) {
+				$instance['display']['max_width'] = intval( $instance['display']['max_width'] );
 			}
-	
+
+			// Input for `spacing` changed from `number` to `measurement` field.
 			if ( is_numeric( $instance['display']['spacing'] ) ) {
 				$instance['display']['spacing'] = $instance['display']['spacing'] .'px';
 			}

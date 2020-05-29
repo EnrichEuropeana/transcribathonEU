@@ -1,9 +1,15 @@
 <?php
+// include required files
+include($_SERVER["DOCUMENT_ROOT"].'/wp-load.php');
 global $wpdb;
 $myid = uniqid(rand()).date('YmdHis');
 $base = 0;
 
-if(isset($instance['tct-progress-line-chart-headline']) && trim($instance['tct-progress-line-chart-headline']) != ""){ echo "<h3>".str_replace("\n","<br />",$instance['tct-progress-line-chart-headline'])."</h3>\n"; }
+
+if (isset($instance['tct-progress-line-chart-headline']) && trim($instance['tct-progress-line-chart-headline']) != "") { 
+  echo "<h3>".str_replace("\n","<br />",$instance['tct-progress-line-chart-headline'])."</h3>\n"; 
+}
+
  //if(isset($instance['tct-progress-line-chart-figure']) && trim($instance['tct-progress-line-chart-figure']) != ""){ echo "<div class='ct-chart ct-golden-section' id='chart1'>".str_replace("\n","<br />",$instance['tct-progress-line-chart-figure'])."</div>\n"; }
  if( ! empty( $instance['image'] ) ) {
   //$size = empty( $instance['image_size'] ) ? 'full' : $instance['image_size']; // Account for no image size selection
@@ -20,47 +26,73 @@ if(isset($instance['tct-progress-line-chart-headline']) && trim($instance['tct-p
   
  // $content .= '<canvas id="myChart" width="400" height="400"></canvas>';
 
+ $url = home_url()."/tp-api/progress/".strtolower(str_replace(" ", "", $instance['tct-progress-line-chart-headline']));
+ $requestType = "GET";
+
+ // Execude request
+ include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+
+ // Display data
+ $progressData = json_decode($result, true);
+
+ $dates = array();
+ $amounts = array();
+ $amount = 0;
+
+ foreach($progressData as $data) {
+  $amount += $data['Amount'];
+  array_push($dates, $data['Year']."/".$data['Month']);
+  array_push($amounts, $amount);
+ }
   
  
- $content .= '<canvas id="myChart'.str_replace(" ", $instance['tct-progress-line-chart-headline']).'"  width="400" height="400" display="inline"></canvas>';
+  
+ $chartId = str_replace(" ", "", $instance['tct-progress-line-chart-headline']);
+ $content .= '<canvas id="lineChart'.$chartId.'"  width="800" height="400" display="inline"></canvas>';
 
   $content .= '</div>';
 
   $content .= "<script>
-  
-              var ctx = document.getElementById('myChart');
-              var myChart = new Chart(ctx, {
+              var dates = [];
+              var amounts = [];
+              var amount = 0;";
+              
+              foreach($progressData as $data) {
+                $content .= "amount += ".$data['Amount'].";";
+                $content .= "dates.push(\"".$data['Year']." / ".$data['Month']."\");";
+                $content .= "amounts.push(amount);";
+              }
+                
+  $content .= "var ctx = document.getElementById('lineChart".$chartId."');
+              var lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    datasets: [{
-                        data: [20, 50, 100, 75, 25, 0],
-                        label: 'Left dataset',
-            
-                        // This binds the dataset to the left y axis
-                        yAxisID: 'left-y-axis'
-                    }, {
-                        data: [0.1, 0.5, 1.0, 2.0, 1.5, 0],
-                        label: 'Right dataset',
-            
-                        // This binds the dataset to the right y axis
-                        yAxisID: 'right-y-axis'
-                    }],
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            id: 'left-y-axis',
-                            type: 'linear',
-                            position: 'left'
-                        }, {
-                            id: 'right-y-axis',
-                            type: 'linear',
-                            position: 'right'
-                        }]
+                  labels: dates,
+                  datasets: [{
+                      label: '',
+                      lineTension: 0,
+                      borderColor: 'rgba(9, 97, 129, 1)',
+                      data: amounts,
+                      backgroundColor: 'rgba(9, 97, 129, 0.4)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                legend: {
+                    onClick: (e) => e.stopPropagation(),
+                    labels: {
+                      boxWidth: '0px'
                     }
-                }
-            });
+                },
+                  scales: {
+                      yAxes: [{
+                          ticks: {
+                              beginAtZero: true
+                          }
+                      }]
+                  }
+              }
+          });
               </script>";
 /*$content .= "<style>
   line.ct-point {

@@ -20,20 +20,22 @@ class MetaSliderPro_Schedule_Slides{
 	 */
 	public function load_scripts() {
 		wp_enqueue_script('ms-moment-js', plugins_url('assets/moment/min/moment.min.js' , __FILE__), array(), METASLIDERPRO_VERSION);
-		wp_add_inline_script('ms-moment-js', sprintf("window.jQuery(function($) {
-			$('.scheduling-area span.tipsy-tooltip-top').each(function(time) {
-				var _this = $(this)
-				var interval = 0
-				window.moment && setInterval(function() {
-					interval += 1000 
-					_this.prop('title', _this.data('now-text') + '<br>' + window.moment(_this.data('time')).add(interval, 'ms').format('YYYY-MM-DD [%s] HH:mm:ss'))
-				}, 1000);
-				if (!window.moment) {
-					_this.remove()
-				}
+		wp_add_inline_script('ms-moment-js', sprintf('window.jQuery(function($) {
+			window.metaslider.app.EventManager.$on(["metaslider/app-loaded", "metaslider/slides-created"], function(e) {
+				$(".ms-time-helper").each(function(time) {
+					var _this = $(this)
+					var interval = 0
+					window.moment && setInterval(function() {
+						interval += 1000 
+						_this.prop("title", _this.data("now-text") + "<br>" + window.moment(_this.data("time")).add(interval, "ms").format("YYYY-MM-DD [%s] HH:mm:ss"))
+					}, 1000);
+					if (!window.moment) {
+						_this.remove()
+					}
+				})
 			})
 		})
-		", _x('at', 'As in "Your slide will display Tuesday at 5pm"', 'ml-slider-pro')));
+		', _x('at', 'As in "Your slide will display Tuesday at 5pm"', 'ml-slider-pro')));
 	}
 
 	/**
@@ -111,14 +113,17 @@ class MetaSliderPro_Schedule_Slides{
 		}
 
 		// If no slides were determined to hide, return the original query
-		// I couldn't reproduce this bug, but it seems setting post__not_in as an
-		// empty array will cause issue sometimes. See the related bug for post__in
-		// https://core.trac.wordpress.org/ticket/28099
 		if (empty($slides_to_hide)) return $slides_query;
 		
 		// Return a new wp_query with just the slides needed
 		$args = $slides_query->query_vars;
 		$args['post__not_in'] = $slides_to_hide;
+
+		// WP will set defaults using fill_query_vars() and when duplicating 
+		// a query will then cause issues. For example, the default ['s' => ''] will
+		// set is_search() to true as they just use isset() to test it. 
+		$args = array_filter($args, array($this, 'remove_empty_vars'));
+
 		return new WP_Query($args);
 	}
 
@@ -144,19 +149,46 @@ class MetaSliderPro_Schedule_Slides{
 
 		$now = current_time("timestamp");
 
-		// Check if it's available today. 0 = Sunday, etc ('w' gets a 1-6 representation of the day)
-		$visible_days = get_post_meta($slide_id, '_meta_slider_slide_scheduled_days', true);
-		if (!is_array($visible_days) || !in_array(date('w', $now), $visible_days)) return array();
-
 		// If it's scheduled, determine if it's in or out of bounds
 		$time_start = get_post_meta($slide_id, '_meta_slider_slide_scheduled_start', true);
 		$time_end = get_post_meta($slide_id, '_meta_slider_slide_scheduled_end', true);
 		
 		if ($time_start && $time_end) {
-			return ((strtotime($time_start) < $now) && ($now < strtotime($time_end))) ? $html : array();
+
+			// If we are not inside the schedule, hide the slide
+			if ((strtotime($time_start) <= $now) && ($now <= strtotime($time_end))) {
+				// We are inside the schedule. do nothing
+			} else {
+				return array();
+			}
 		}
 
-		// If the times aren't set then just show the slide.
+		// Check if it's available today. 0 = Sunday, etc ('w' gets a 1-6 representation of the day)
+		$visible_days = get_post_meta($slide_id, '_meta_slider_slide_scheduled_days', true);
+		if (!is_array($visible_days) || !in_array(date('w', $now), $visible_days)) return array();
+
+		// If this is checked (or not set), there is no time constraint
+		$all_day = get_post_meta($slide_id, '_meta_slider_slide_all_day', true);
+		if (!$all_day || filter_var($all_day, FILTER_VALIDATE_BOOLEAN)) return $html;
+		
+		$constraint_time_show = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_show', true);
+		$constraint_time_start = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_start', true);
+		$constraint_time_end = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_end', true);
+
+		// If "show" is checked, we should be within the two times, inclusive"
+		if (filter_var($constraint_time_show, FILTER_VALIDATE_BOOLEAN)) {
+			
+			// If we are inside the two times
+			if ((strtotime($constraint_time_start, $now) <= $now) && (strtotime($constraint_time_end, $now) >= $now)) return $html;
+			
+			// Outside the two times
+			return array();
+		} else {
+			
+			// Show is false, which means hide the slide if within the two times
+			if ((strtotime($constraint_time_start, $now) <= $now) && (strtotime($constraint_time_end, $now) >= $now)) return array();
+		}
+
 		return $html;
 	}
 
@@ -196,6 +228,11 @@ class MetaSliderPro_Schedule_Slides{
 		$schedule_end = get_post_meta($post->ID, '_meta_slider_slide_scheduled_end', true);
 		$days_scheduled = get_post_meta($post->ID, '_meta_slider_slide_scheduled_days', true);
 
+		$all_day = get_post_meta($post->ID, '_meta_slider_slide_all_day', true);
+		$constraint_time_show = get_post_meta($post->ID, '_meta_slider_slide_constraint_time_show', true);
+		$constraint_time_start = get_post_meta($post->ID, '_meta_slider_slide_constraint_time_start', true);
+		$constraint_time_end = get_post_meta($post->ID, '_meta_slider_slide_constraint_time_end', true);
+
 		$path = trailingslashit(plugin_dir_path(__FILE__)) . 'tabs/';
 		include $path . 'schedule-tab.php';
 	}
@@ -214,6 +251,12 @@ class MetaSliderPro_Schedule_Slides{
 		$hide_slide = get_post_meta($slide_id, '_meta_slider_slide_is_hidden', true);
 		$days_scheduled = get_post_meta($slide_id, '_meta_slider_slide_scheduled_days', true);
 
+		$all_day = get_post_meta($slide_id, '_meta_slider_slide_all_day', true);
+		$constraint_time_show = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_show', true);
+		$constraint_time_start = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_start', true);
+		$constraint_time_end = get_post_meta($slide_id, '_meta_slider_slide_constraint_time_end', true);
+
+
 		update_post_meta($slide_id, '_meta_slider_slide_is_hidden', isset($fields['hide_slide']) ? 'yes' : 'no', $hide_slide);
 		update_post_meta($slide_id, '_meta_slider_slide_is_scheduled', isset($fields['schedule']) ? 'yes' : 'no', $is_scheduled);
 
@@ -222,11 +265,19 @@ class MetaSliderPro_Schedule_Slides{
 			$end_date = $fields['to']['date'] . ' ' . $fields['to']['hh'] . ':' . $fields['to']['mn'] . ':' . $fields['to']['ss'];
 			update_post_meta($slide_id, '_meta_slider_slide_scheduled_start', sanitize_text_field($start_date), $schedule_start);
 			update_post_meta($slide_id, '_meta_slider_slide_scheduled_end', sanitize_text_field($end_date), $schedule_end);
-		}
-		if (isset($fields['days'])) {
-			update_post_meta($slide_id, '_meta_slider_slide_scheduled_days', array_keys($fields['days']), $days_scheduled);
-		}
 
+			if (isset($fields['days'])) {
+				update_post_meta($slide_id, '_meta_slider_slide_scheduled_days', array_keys($fields['days']), $days_scheduled);
+			}
+
+			update_post_meta($slide_id, '_meta_slider_slide_all_day', isset($fields['all_day']) ? 'yes' : 'no', $all_day);
+			update_post_meta($slide_id, '_meta_slider_slide_constraint_time_show', isset($fields['show_during_constraint']) ? 'yes' : 'no', $constraint_time_show);
+
+			$constraint_start_time_incoming = $fields['constraint_from']['hh'] . ':'. $fields['constraint_from']['mn'] . ':00';
+			$constraint_end_time_incoming = $fields['constraint_to']['hh'] . ':' . $fields['constraint_to']['mn'] . ':00';
+			update_post_meta($slide_id, '_meta_slider_slide_constraint_time_start', sanitize_text_field($constraint_start_time_incoming), $constraint_time_start);
+			update_post_meta($slide_id, '_meta_slider_slide_constraint_time_end', sanitize_text_field($constraint_end_time_incoming), $constraint_time_end);
+		}
 	}
 
 	/**
@@ -245,6 +296,24 @@ class MetaSliderPro_Schedule_Slides{
 		<svg class="feather feather-eye-off" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-reactid="496"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
 	</button>
 	<?php 
+	}
+
+	/**
+	 * Used to filter out empty strings/arrays with array_filter()
+	 *
+	 * @param  mixed $item The item being tested
+	 * @return bool - Will return whether empty on arrays/strings
+	 */
+	protected function remove_empty_vars($item) {
+
+		// If it's an array and not empty, keep it (return true)
+		if (is_array($item)) return !empty($item);
+
+		// If it's a string and not '', keep it (return true)
+		if (is_string($item)) return ('' !== trim($item));
+
+		// Not likely to get this far but just in case, keep everything else
+		return true;
 	}
 
 	/**

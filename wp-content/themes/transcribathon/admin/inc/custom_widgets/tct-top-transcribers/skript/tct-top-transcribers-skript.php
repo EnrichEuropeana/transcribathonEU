@@ -29,7 +29,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 
 
 		if($kind === "campaign"){
-			
+			/*
 			if($subject === "teams"){  // team
 				$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.teamid) AS total FROM ".$wpdb->prefix."campaign_transcriptionprogress prg JOIN ".$wpdb->prefix."teams t ON t.team_id=prg.teamid WHERE prg.campaignid='".$cp."'",ARRAY_A );
 				if((int)$alltops[0]['total'] <= $base){
@@ -139,9 +139,11 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 				//$query = "SELECT prg.userid,prg.campaignid,SUM(prg.amount)AS useramnt,usr.display_name,(SELECT(SUM(mm.miles_account)+SUM(mm.miles_chars)+SUM(mm.miles_review)+SUM(mm.miles_complete)+SUM(mm.miles_sharing)+SUM(mm.miles_message))  FROM ".$wpdb->prefix."user_miles mm WHERE mm.userid=prg.userid) AS umiles, (SELECT SUM(ttl.amount) FROM ".$wpdb->prefix."user_transcriptionprogress ttl WHERE ttl.userid=prg.userid) AS totalchars FROM ".$wpdb->prefix."campaign_transcriptionprogress prg LEFT JOIN CSMcH_users usr ON usr.ID=prg.userid WHERE prg.campaignid='".$cp."' GROUP BY prg.userid ORDER BY SUM(prg.amount) DESC LIMIT ".$base.",".$limit;
 				$topusrs = $wpdb->get_results($query,ARRAY_A);
 			}
+			*/
 		}else{
 			
 			if($subject === "teams"){  // team
+				/*
 				$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.teamid) AS total FROM ".$wpdb->prefix."team_transcriptionprogress prg JOIN ".$wpdb->prefix."teams t ON t.team_id=prg.teamid",ARRAY_A );
 				if((int)$alltops[0]['total'] <= $base){
 					$base = (floor(((int)$alltops[0]['total']-1) / $limit)) * $limit;
@@ -157,32 +159,30 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 					ORDER BY relamount DESC 
 					LIMIT ".$base.",".$limit;
 				$topusrs = $wpdb->get_results($query,ARRAY_A);
+				*/
 			}else{ // Invdl
-				$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT prg.userid) AS total FROM ".$wpdb->prefix."user_transcriptionprogress prg JOIN ".$wpdb->prefix."users usr ON usr.ID=prg.userid ",ARRAY_A );
-				if((int)$alltops[0]['total'] <= $base){
-					$base = (floor(((int)$alltops[0]['total']-1) / $limit)) * $limit;
+				// Set request parameters for image data
+				$url = home_url()."/tp-api/rankings/userCount";
+				$requestType = "GET";
+
+				// Execude http request
+				include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+
+				// Save image data
+				$alltops = json_decode($result, true);
+
+				if((int)$alltops <= $base){
+					$base = (floor(((int)$alltops-1) / $limit)) * $limit;
 				}
-				$query = "SELECT prg.userid,
-						(
-						SELECT GROUP_CONCAT(tShort) AS shortname 
-						FROM ".$wpdb->prefix."teams t 
-						JOIN ".$wpdb->prefix."user_teams ut 
-						ON t.team_id = ut.team_id WHERE ut.user_id = prg.userid
-						) AS teams,SUM(prg.amount)AS useramnt,
-						usr.display_name,
-						(
-						SELECT(SUM(mm.miles_account)+SUM(mm.miles_chars)+SUM(mm.miles_review)+SUM(mm.miles_complete)+SUM(mm.miles_sharing)+SUM(mm.miles_message)+SUM(miles_locations)+SUM(miles_enrichements))  
-						FROM ".$wpdb->prefix."user_miles mm 
-						WHERE mm.userid=prg.userid
-						) AS umiles 
-						FROM ".$wpdb->prefix."user_transcriptionprogress prg 
-						JOIN ".$wpdb->prefix."users usr 
-						ON usr.ID=prg.userid 
-						GROUP BY prg.userid 
-						ORDER BY umiles
-						DESC
-						LIMIT ".$base.",".$limit;
-				$topusrs = $wpdb->get_results($query,ARRAY_A);
+				// Set request parameters for image data
+				$url = home_url()."/tp-api/rankings?offset=".$base."&limit=".$limit;
+				$requestType = "GET";
+	
+				// Execude http request
+				include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+	
+				// Save image data
+				$topusrs = json_decode($result, true);
 			}
 
 			
@@ -192,6 +192,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 			$content .= "<ul class=\"topusers\">\n";
 			
 			if($subject === "teams"){
+				/*
 				$i=((int)$base+1);	
 				foreach($topusrs as $team){
 					$content .= "<li class=\"p".$i."\">";
@@ -204,35 +205,43 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$team['teamamnt'], 'transcribathon'  ) ), number_format_i18n((int)$team['teamamnt']))."</span>\n";
 						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$team['locations'], 'transcribathon'  ) ), number_format_i18n((int)$team['locations']))."</span>\n";
 						$enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$team['enrichements'], 'transcribathon'  ) ), number_format_i18n((int)$team['enrichements']))."</span>\n";
-						$content .=  "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/".$team['post_type']."/".$team['post_name']."\">".$team['post_title']."</a></h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
+						$content .=  "<span class=\"rang\">".$i."</span><h2><a href=\"/".$team['post_type']."/".$team['post_name']."\">".$team['post_title']."</a></h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
 						
 						
 					}else{
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Character per member', '%s Characters per member', (float)$team['relamount'], 'transcribathon'  ) ), number_format_i18n((float)$team['relamount']))."</span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character in total', '%s Characters in total', (int)$team['teamamnt'], 'transcribathon'  ) ), number_format_i18n((int)$team['teamamnt']))."</span>\n";
-						$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/".$team['post_type']."/".$team['post_name']."\">".$team['post_title']."</a></h2><p>".$miles." | ".$chars."</p></li>\n";
+						$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/".$team['post_type']."/".$team['post_name']."\">".$team['post_title']."</a></h2><p>".$miles." | ".$chars."</p></li>\n";
 					}
 					$i++;
 				}
+				*/
 			}else{
 				$i=((int)$base+1);	
 				foreach($topusrs as $usr){
-					$aut = get_user_by('ID',$usr['userid']);
-					um_fetch_user( $usr['userid']);
-					$content .= "<li class=\"p".((int)$base+(int)$i)."\">";
+					$aut = get_user_by('ID',$usr['UserId']);
+					um_fetch_user( $usr['UserId']);
+					$content .= "<li class=\"p".(int)$i."\">";
 					$content .= "<div class=\"tct-user-banner ".um_user('role')."\">".ucfirst(um_user('role'))."</div>\n"; 
 
 					if($kind === "campaign"){
+						/*
 						if($showshortnames > 0 && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
-						$charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</strong></span>\n";
+						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+						$charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</strong></span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['totalchars'], 'transcribathon'  ) ), number_format_i18n((int)$usr['totalchars']))."</span>\n";
-						$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$charsc."</p><p><p>".$miles." | ".$chars."</p></p></li>\n";
+						$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$charsc."</p><p><p>".$miles." | ".$chars."</p></p></li>\n";
+						*/
 					}else{
 						if($showshortnames > 0 && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</span>\n";
-						$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
+						if ($aut != null) {
+							$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						}
+						else {
+							$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						}
 					}
 					$i++;
 				}
@@ -248,7 +257,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 		$menu .= "<li class=\"ttprev\"><a href=\"\" onclick=\"getMoreTops('".$myid."','".$newb."','".$limit."','".$kind."','".$cp."','".$subject."','".$showshortnames."'); return false;\">"._x('Previous', 'Tutorial-Slider-Widget (frontentd)','transcribathon')."</a></li>\n";
 		$showttmenu++;
 	}
-	if((int)$alltops[0]['total'] > ($base+$limit)){
+	if((int)$alltops > ($base+$limit)){
 		$menu .= "<li class=\"ttnext\"><a href=\"\" onclick=\"getMoreTops('".$myid."','".((int)$base+(int)$limit)."','".$limit."','".$kind."','".$cp."','".$subject."','".$showshortnames."'); return false;\">"._x('Next', 'Top-Transcribers-Slider-Widget (frontentd)','transcribathon')."</a></li>\n";
 		$showttmenu++;
 	}
@@ -258,7 +267,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 					</br><p style='color:red; display:none;' id='pageWarning_".$subject."'>Please enter a number</p></div>";
 	
 	if($showttmenu > 0){
-		$nav .= $menu."</ul>\n".'<div id="loadingGif_'.$subject.'" style="display:none; float:right; height:50px; width:50px"><img src="/wp-content/themes/transcribathon/images/spinner.gif"></div>';
+		$nav .= $menu."</ul>\n".'<div id="top-transcribers-spinner" class="spinner" style="float:right; display:none;"></div>';
 	}
 
 	//Rueckgabe 
@@ -279,15 +288,25 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttmtrs"):
 	if(!isset($_POST['limit']) || trim($_POST['limit']) == ""){$limit=0;}else{$limit = (int)$_POST['limit'];}
 	$myid = $_POST['myid'];
 
-	$alltops = $wpdb->get_results("SELECT COUNT(DISTINCT user_id) AS total FROM ".$wpdb->prefix."user_teams WHERE team_id='".$_POST['tid']."'",ARRAY_A);
+	
+	// Set request parameters for image data
+	$url = home_url()."/tp-api/rankings/userCount";
+	$requestType = "GET";
+
+	// Execude http request
+	include TCT_THEME_DIR_PATH."admin/inc/custom_scripts/send_api_request.php";
+
+	// Save image data
+	$alltops = json_decode($result, true);
+
 	$query = "SELECT usr.display_name,ut.*,(SELECT SUM(tp.amount) FROM ".$wpdb->prefix."user_transcriptionprogress tp WHERE tp.userid=ut.user_id) AS useramnt,(SELECT(SUM(mm.miles_account)+SUM(mm.miles_chars)+SUM(mm.miles_review)+SUM(mm.miles_complete)+SUM(mm.miles_sharing)+SUM(mm.miles_message))  FROM ".$wpdb->prefix."user_miles mm WHERE mm.userid=usr.ID) AS umiles FROM ".$wpdb->prefix."user_teams ut LEFT JOIN ".$wpdb->prefix."users usr on usr.ID=ut.user_id WHERE ut.team_id='".$_POST['tid']."' ORDER BY useramnt DESC LIMIT ".$base.",".$limit;
 	$topusrs = $wpdb->get_results($query,ARRAY_A);
 		if(sizeof($topusrs)>0){
 			$content .= "<ul class=\"topusers\">\n";
 			$i=((int)$base+1);	
 			foreach($topusrs as $usr){
-				$aut = get_user_by('ID',$usr['user_id']);
-				um_fetch_user( $usr['user_id']);
+				$aut = get_user_by('ID',$usr['UserId']);
+				um_fetch_user( $usr['UserId']);
 				$content .= "<li class=\"p".$i."\">";
 				$content .= "<div class=\"tct-user-banner ".um_user('role')."\">".ucfirst(um_user('role'))."</div>\n"; 
 				$acs = $wpdb->get_results("SELECT ac.*,uc.campaign_title,CASE ac.placing WHEN '1' then uc.campaign_badge_1 WHEN '2' then uc.campaign_badge_2 WHEN '3' then uc.campaign_badge_3 END AS badge FROM ".$wpdb->prefix."user_achievments ac LEFT JOIN ".$wpdb->prefix."user_campaigns uc ON uc.id=ac.campaign WHERE ac.userid='".$usr['userid']."'",ARRAY_A);
@@ -298,9 +317,14 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttmtrs"):
 					}
 					$content .= "</div>\n";
 				}
-				$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
-				$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</span>\n";
-				$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a></h2><p>".$miles." | ".$chars."</p></li>\n";
+				$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+				$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
+				if ($aut != null) {
+					$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+				}
+				else {
+					$content .= "<span class=\"rang\">".$i."</span><h2><a href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+				}
 				$i++;
 			}
 		$content .= "</ul>\n";
@@ -315,7 +339,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttmtrs"):
 		$menu .= "<li class=\"ttprev\" style='float:left'><a href=\"\" onclick=\"getMoreTeamTops('".$myid."','".$newb."','".$limit."','".$_POST['tid']."'); return false;\">"._x('Previous', 'Tutorial-Slider-Widget (frontentd)','transcribathon')."</a></li>\n";
 		$showttmenu++;
 	}
-	if((int)$alltops[0]['total'] > ($base+$limit)){
+	if((int)$alltops > ($base+$limit)){
 		$menu .= "<li class=\"ttnext\" style='float:right'><a href=\"\" onclick=\"getMoreTeamTops('".$myid."','".((int)$base+(int)$limit)."','".$limit."','".$_POST['tid']."'); return false;\">"._x('Next', 'Top-Transcribers-Slider-Widget (frontentd)','transcribathon')."</a></li>\n";
 		$showttmenu++;
 	}
@@ -325,7 +349,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttmtrs"):
 					</br><p style='color:red; display:none;' id='pageWarning_".$subject."'>Please enter a number</p></div>";
 	
 	if($showttmenu > 0){
-		$nav .= $menu."</ul>\n".'<div id="loadingGif_'.$subject.'" style="display:none; float:right; height:50px; width:50px"><img src="/wp-content/themes/transcribathon/images/spinner.gif"></div>';
+		$nav .= $menu."</ul>\n".'<div id="top-transcribers-spinner" class="spinner" style="float:right; display:none;"></div>';
 	}
 
 	//Rueckgabe 

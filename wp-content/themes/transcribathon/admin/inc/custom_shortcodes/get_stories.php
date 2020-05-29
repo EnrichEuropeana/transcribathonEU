@@ -6,7 +6,7 @@ Description: Gets stories from the API and displays them
 function _TCT_get_stories( $atts ) {  
 
     /* Domain name of the Solr server */
-    define('SOLR_SERVER_HOSTNAME', network_home_url());
+    define('SOLR_SERVER_HOSTNAME', home_url());
 
     /* Whether or not to run in secure mode */
     define('SOLR_SECURE', true);
@@ -29,7 +29,7 @@ function _TCT_get_stories( $atts ) {
     $requestData = array(
         'key' => 'testKey'
     );
-    $url = network_home_url()."tp-api/storiesMinimal";
+    $url = home_url()."tp-api/storiesMinimal";
     $requestType = "GET";
 
     include dirname(__FILE__) . '/../custom_scripts/send_api_request.php';

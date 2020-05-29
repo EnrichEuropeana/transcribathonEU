@@ -1,10 +1,14 @@
+var home_url = WP_URLs.home_url;
+
 var tct_viewer = (function($, document, window) {
+	
 	var osdViewer,
 			osdViewerFS,
 			imageData,
 			imageLink,
 			imageHeight,
 			imageWidth,
+			selection,
 			sliderHtml = '<div class="sliderContainer" id="filterContainer"> ' +
 										'  <div id="closeFilterContainer"><i class="fas fa-times"></i></div>' +
 								    '  <div class="slidecontainer">' +
@@ -47,7 +51,10 @@ var tct_viewer = (function($, document, window) {
 
 		jQuery('#closeFilterContainer').click(function() {
 			jQuery('#filterContainer').hide();
-		})
+		});
+		jQuery('#openseadragonFS #closeFilterContainer').click(function() {
+			jQuery('#openseadragonFS #filterContainer').hide();
+		});
 
 		jQuery('#full-pageFS').click(function() {
 			toggleFS();
@@ -81,10 +88,25 @@ var tct_viewer = (function($, document, window) {
 		});
 
 		jQuery('#transcribe').click(function() {
-			if(!this[0].hasClass('locked')) {
-				toggleFS();
+			if(!jQuery(this).children('i').hasClass('locked')) {
+				toggleFS(); 
+				if (jQuery('#transcription-section').width() >= 495) {
+				  jQuery('#mytoolbar-transcription').css('height', '39px');
+				}
+				else {
+				  jQuery('#mytoolbar-transcription').css('height', '78px');
+				}
+				tinymce.EditorManager.get('item-page-transcription-text').focus();
+				jQuery('.tox-tinymce').css('width', jQuery('#mytoolbar-transcription').css('width'))
 				//TODO maximize
 			}
+		})
+
+		jQuery('#transcribeLockFS').click(function() {
+			lockWarning()
+		})
+		jQuery('#transcribeLock').click(function() {
+			lockWarning()
 		})
 
 		jQuery('#transcribeFS').click(function() {
@@ -98,19 +120,38 @@ var tct_viewer = (function($, document, window) {
 	getManifestUrl = function() {
 		jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
 		    'type': 'GET',
-		    'url': 'http://fresenia.man.poznan.pl/tp-api/items/' + getUrlParameter('item')
+		    'url': home_url + '/tp-api/items/' + getUrlParameter('item')
 			}, function(response) {
 			var response = JSON.parse(response);
 			if (response.code == "200") {
-	      imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
-	      imageLink = imageData['service']['@id'];
-	      imageHeight = imageData['height'];
-	      imageWidth = imageData['width'];
+				imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
+				imageLink = imageData['service']['@id'];
+                if (imageData['service']['@id'].substr(0, 4) == "http") {
+                    imageLink = imageData['service']['@id'];
+                }
+                else {
+                    imageLink = "http://" + imageData['service']['@id'];
+                }
+				imageHeight = imageData['height'];
+				imageWidth = imageData['width'];
 				initViewers();
 			}
 		});
 	},
+	getImageLink = function() {
+		return imageLink;
+	},
 	initViewers = function() {
+		console.log({
+				"@context": "http://iiif.io/api/image/2/context.json",
+				"@id": imageLink,
+				"height": imageHeight,
+				"width": imageWidth,
+				"profile": [
+					"http://iiif.io/api/image/2/level2.json"
+				],
+				"protocol": "http://iiif.io/api/image"
+			});
 		osdViewer = OpenSeadragon({
 			id: "openseadragon",
 			sequenceMode: false,
@@ -124,15 +165,15 @@ var tct_viewer = (function($, document, window) {
 			rotateRightButton: "rotate-right",
 			prefixUrl: "/wp-content/themes/transcribathon/images/osdImages/",
 			tileSources: {
-			"@context": "http://iiif.io/api/image/2/context.json",
-			"@id": imageLink,
-			"height": imageHeight,
-			"width": imageWidth,
-			"profile": [
-				"http://iiif.io/api/image/2/level2.json"
-			],
-			"protocol": "http://iiif.io/api/image"
-		},
+				"@context": "http://iiif.io/api/image/2/context.json",
+				"@id": imageLink,
+				"height": imageHeight,
+				"width": imageWidth,
+				"profile": [
+					"http://iiif.io/api/image/2/level2.json"
+				],
+				"protocol": "http://iiif.io/api/image"
+			},
 			maxZoomLevel: 8,
 			minZoomLevel: 0.3,
 			autoHideControls: false
@@ -151,20 +192,21 @@ var tct_viewer = (function($, document, window) {
 			rotateRightButton: "rotate-rightFS",
 			prefixUrl: "/wp-content/themes/transcribathon/images/osdImages/",
 			tileSources: {
-			"@context": "http://iiif.io/api/image/2/context.json",
-			"@id": imageLink,
-			"height": imageHeight,
-			"width": imageWidth,
-			"profile": [
-				"http://iiif.io/api/image/2/level2.json"
-			],
-			"protocol": "http://iiif.io/api/image"
-		},
+				"@context": "http://iiif.io/api/image/2/context.json",
+				"@id": imageLink,
+				"height": imageHeight,
+				"width": imageWidth,
+				"profile": [
+					"http://iiif.io/api/image/2/level2.json"
+				],
+				"protocol": "http://iiif.io/api/image"
+			},
 			maxZoomLevel: 8,
 			minZoomLevel: 0.3,
 			autoHideControls: false,
 			preserveImageSizeOnResize: true
 		});
+		selectionInit();
 		sliderInit();
 		osdViewerFS.addOnceHandler('resize', function() {
 		window.setTimeout(function() {
@@ -353,6 +395,59 @@ var tct_viewer = (function($, document, window) {
 			saturation = 100;
 		});
 	},
+	selectionInit = function() {
+		selection = osdViewerFS.selection({
+			element:                 null, // html element to use for overlay
+			showSelectionControl:    false, // show button to toggle selection mode
+			toggleButton:            null, // dom element to use as toggle button
+			showConfirmDenyButtons:  true,
+			styleConfirmDenyButtons: true,
+			returnPixelCoordinates:  true,
+			keyboardShortcut:        'c', // key to toggle selection mode
+			rect:                    null, // initial selection as an OpenSeadragon.SelectionRect object
+			allowRotation:           true, // turn selection rotation on or off as needed
+			startRotated:            false, // alternative method for drawing the selection; useful for rotated crops
+			startRotatedHeight:      0.1, // only used if startRotated=true; value is relative to image height
+			restrictToImage:         false, // true = do not allow any part of the selection to be outside the image
+			onSelection:             function(rect) {
+				var imgSize = osdViewerFS.viewport.imageToViewportRectangle(rect);
+				var osdDiv = document.getElementById('openseadragon1');
+				var rectnew = document.createElement('div');
+				rectnew.classList.add('rect');
+				console.log(osdViewerFS.viewport.imageToViewportRectangle(rect));
+				osdViewerFS.addOverlay({
+				  element: rectnew,
+				  location: new OpenSeadragon.Rect(imgSize.x, imgSize.y, imgSize.width, imgSize.height)
+				});
+				// add selected image to the form
+				var img = document.createElement('img');
+				img.src = imageLink + '/' + rect.x + ',' + rect.y + ',' + rect.width + ',' + rect.height + '/250,/0/default.jpg';
+				document.getElementById('selection-tab').appendChild(img);
+				console.log(rect);
+				selection.disable();
+			}, // callback
+			prefixUrl:               null, // overwrites OpenSeadragon's option
+			borderStyle: { // overwriteable style defaults
+			  width:      '1px',
+			  color:      '#fff'
+			},
+			handleStyle: {
+			  top:        '50%',
+			  left:       '50%',
+			  width:      '6px',
+			  height:     '6px',
+			  margin:     '-4px 0 0 -4px',
+			  background: '#000',
+			  border:     '1px solid #ccc'
+			},
+			cornersStyle: {
+			  width:      '6px',
+			  height:     '6px',
+			  background: '#000',
+			  border:     '1px solid #ccc'
+			}
+		});
+	},
 	fullscreenEdit = function() {
 	  console.log('show fullscreen Editor');
 	  toggleFSEditor('fs_editor_toggle');
@@ -374,44 +469,67 @@ var tct_viewer = (function($, document, window) {
 			}
 		}
 	},
+	getSelection = function() {
+		return selection;
+	},
+	getOsdViewer = function() {
+		return osdViewer;
+	},
+	getOsdViewerFS = function() {
+		return osdViewerFS;
+	},
+	makeImageSelection = function() {
+		console.log('making image selection');
+		selection.enable();
+	},
 	initTinyWithConfig = function(selector) {
 	  tinymce.init({
 	    selector: selector,
 	    inline: true,
-			fixed_toolbar_container: selector + '#tcttoolbar',
+		fixed_toolbar_container: selector + '#tcttoolbar',
 	    height:120,
 	    plugins: ['charmap','paste', 'autoresize', 'table'],
 	    toolbar: 'bold italic underline strikethrough removeformat | alignleft aligncenter alignright | missbut unsure side-info | charmap | table',
 			resize: true,
 	    menubar: false,
-	    browser_spellcheck: true,
-	    paste_auto_cleanup_on_paste : true,
+		browser_spellcheck: true,
+		object_resizing : false,
+		paste_auto_cleanup_on_paste : true,
+		forced_root_block : false,
 	    body_id: 'htranscriptor',
 			init_instance_callback: function (editor) {
-        /*
+        
 				editor.on('focus', function (e) {
-					jQuery('#mytoolbar-transcription').height('30px');
+					//jQuery('#mytoolbar-transcription').height('30px');
+					console.log('focusing');
 				});
-				editor.on('blur', function (e) {
+		 		editor.on('blur', function (e) {
 					jQuery('#mytoolbar-transcription').height('0px');
 				});
-        */
+         
 			},
 			setup: function (editor) {
-				console.log('in setup');
+				
+				editor.on('keydown',function(evt){
+					if (evt.keyCode==9) {
+						editor.execCommand('mceInsertContent', false, '&emsp;&emsp;'); // inserts tab
+						evt.preventDefault();
+						return false;
+					}
+				});
 				editor.ui.registry.addIcon('missing', '<i class="mce-ico mce-i-missing"></i>');
-    		editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
+    			editor.ui.registry.addIcon('unsure', '<i class="mce-ico mce-i-unsure"></i>');
 				editor.ui.registry.addIcon('info', '<i class="mce-ico mce-i-pos-in-text"></i>');
 
 				editor.ui.registry.addButton('missbut', {
-					title: 'Insert an indicator for missing text',
+					tooltip: 'Insert an indicator for missing text',
 					icon: 'missing',
 					onAction: function () {
 						editor.insertContent('<img src="/wp-content/themes/transcribathon/images/tinyMCEImages/missing.gif" style=\"display:inline;\" class=\"tct_missing\" alt=\"missing\" />');
 						}
 				});
 				editor.ui.registry.addButton('unsure', {
-					title: 'Mark selected as unclear',
+					tooltip: 'Mark selected as unclear',
 					icon: 'unsure',
 					onAction: function () {
 						if(editor.selection.getContent({format : 'text'}).split(' ').join('').length < 1){
@@ -432,7 +550,7 @@ var tct_viewer = (function($, document, window) {
 					}
 				});
         editor.ui.registry.addButton('side-info', {
-          title: 'Mark selected as side information',
+          tooltip: 'Add a comment',
           text: '',
           icon: 'info',
           onAction: function () {
@@ -478,6 +596,11 @@ var tct_viewer = (function($, document, window) {
 		init();
 	});
 	return {
-		initTinyWithConfig: initTinyWithConfig
+		initTinyWithConfig: initTinyWithConfig,
+		makeImageSelection: makeImageSelection ,
+		getSelection: getSelection,
+		getImageLink: getImageLink,
+		getOsdViewer: getOsdViewer,
+		getOsdViewerFS: getOsdViewerFS
 	}
 })(jQuery, document, window);

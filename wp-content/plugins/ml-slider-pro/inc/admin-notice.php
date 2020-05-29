@@ -36,6 +36,6 @@ class Metaslider_Admin_Notice {
      * Public method to be called by WP
      */
     public function display() {
-        printf('<div class="metaslider-admin-notice %s notice"><p>%s</p></div>', $this->type, $this->message);
+        printf('<div style="padding-top:1rem;padding-bottom:1rem" class="metaslider-admin-notice %s notice">%s</div>', $this->type, $this->message);
     }
 }

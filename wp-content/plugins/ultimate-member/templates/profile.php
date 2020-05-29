@@ -1,7 +1,9 @@
-<div class="um <?php echo $this->get_class( $mode ); ?> um-<?php echo esc_attr( $form_id ); ?> um-role-<?php echo um_user( 'role' ); ?> ">
+<?php if ( ! defined( 'ABSPATH' ) ) exit; ?>
 
-	<div class="um-form">
-	
+<div class="um <?php echo esc_attr( $this->get_class( $mode ) ); ?> um-<?php echo esc_attr( $form_id ); ?> um-role-<?php echo esc_attr( um_user( 'role' ) ); ?> ">
+
+	<div class="um-form" data-mode="<?php echo esc_attr( $mode ) ?>">
+
 		<?php
 		/**
 		 * UM hook
@@ -93,7 +95,7 @@
 		 */
 		$classes = apply_filters( 'um_profile_navbar_classes', '' ); ?>
 
-		<div class="um-profile-navbar <?php echo $classes ?>">
+		<div class="um-profile-navbar <?php echo esc_attr( $classes ); ?>">
 			<?php
 			/**
 			 * UM hook
@@ -140,60 +142,126 @@
 		 */
 		do_action( 'um_profile_menu', $args );
 
-		$nav = UM()->profile()->active_tab;
-		$subnav = ( get_query_var('subnav') ) ? get_query_var('subnav') : 'default';
+		if ( um_is_on_edit_profile() || UM()->user()->preview ) {
 
-		print "<div class='um-profile-body $nav $nav-$subnav'>";
+			$nav = 'main';
+			$subnav = UM()->profile()->active_subnav();
+			$subnav = ! empty( $subnav ) ? $subnav : 'default'; ?>
 
-			// Custom hook to display tabbed content
-		/**
-		 * UM hook
-		 *
-		 * @type action
-		 * @title um_profile_content_{$nav}
-		 * @description Custom hook to display tabbed content
-		 * @input_vars
-		 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
-		 * @change_log
-		 * ["Since: 2.0"]
-		 * @usage add_action( 'um_profile_content_{$nav}', 'function_name', 10, 1 );
-		 * @example
-		 * <?php
-		 * add_action( 'um_profile_content_{$nav}', 'my_profile_content', 10, 1 );
-		 * function my_profile_content( $args ) {
-		 *     // your code here
-		 * }
-		 * ?>
-		 */
-		do_action("um_profile_content_{$nav}", $args);
+			<div class="um-profile-body <?php echo esc_attr( $nav . ' ' . $nav . '-' . $subnav ); ?>">
 
-		/**
-		 * UM hook
-		 *
-		 * @type action
-		 * @title um_profile_content_{$nav}_{$subnav}
-		 * @description Custom hook to display tabbed content
-		 * @input_vars
-		 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
-		 * @change_log
-		 * ["Since: 2.0"]
-		 * @usage add_action( 'um_profile_content_{$nav}_{$subnav}', 'function_name', 10, 1 );
-		 * @example
-		 * <?php
-		 * add_action( 'um_profile_content_{$nav}_{$subnav}', 'my_profile_content', 10, 1 );
-		 * function my_profile_content( $args ) {
-		 *     // your code here
-		 * }
-		 * ?>
-		 */
-		do_action( "um_profile_content_{$nav}_{$subnav}", $args );
+				<?php
+				/**
+				 * UM hook
+				 *
+				 * @type action
+				 * @title um_profile_content_{$nav}
+				 * @description Custom hook to display tabbed content
+				 * @input_vars
+				 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage add_action( 'um_profile_content_{$nav}', 'function_name', 10, 1 );
+				 * @example
+				 * <?php
+				 * add_action( 'um_profile_content_{$nav}', 'my_profile_content', 10, 1 );
+				 * function my_profile_content( $args ) {
+				 *     // your code here
+				 * }
+				 * ?>
+				 */
+				do_action("um_profile_content_{$nav}", $args);
 
-		print "<div class=\"clear\"></div></div>";
+				/**
+				 * UM hook
+				 *
+				 * @type action
+				 * @title um_profile_content_{$nav}_{$subnav}
+				 * @description Custom hook to display tabbed content
+				 * @input_vars
+				 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
+				 * @change_log
+				 * ["Since: 2.0"]
+				 * @usage add_action( 'um_profile_content_{$nav}_{$subnav}', 'function_name', 10, 1 );
+				 * @example
+				 * <?php
+				 * add_action( 'um_profile_content_{$nav}_{$subnav}', 'my_profile_content', 10, 1 );
+				 * function my_profile_content( $args ) {
+				 *     // your code here
+				 * }
+				 * ?>
+				 */
+				do_action( "um_profile_content_{$nav}_{$subnav}", $args ); ?>
 
-		if ( um_is_on_edit_profile() ) { ?>
+				<div class="clear"></div>
+			</div>
+
+			<?php if ( ! UM()->user()->preview ) { ?>
+
 			</form>
-		<?php }
 
+			<?php }
+		} else {
+			$menu_enabled = UM()->options()->get( 'profile_menu' );
+			$tabs = UM()->profile()->tabs_active();
+
+			$nav = UM()->profile()->active_tab();
+			$subnav = UM()->profile()->active_subnav();
+			$subnav = ! empty( $subnav ) ? $subnav : 'default';
+
+			if ( $menu_enabled || ! empty( $tabs[ $nav ]['hidden'] ) ) { ?>
+
+				<div class="um-profile-body <?php echo esc_attr( $nav . ' ' . $nav . '-' . $subnav ); ?>">
+
+					<?php
+					// Custom hook to display tabbed content
+					/**
+					 * UM hook
+					 *
+					 * @type action
+					 * @title um_profile_content_{$nav}
+					 * @description Custom hook to display tabbed content
+					 * @input_vars
+					 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
+					 * @change_log
+					 * ["Since: 2.0"]
+					 * @usage add_action( 'um_profile_content_{$nav}', 'function_name', 10, 1 );
+					 * @example
+					 * <?php
+					 * add_action( 'um_profile_content_{$nav}', 'my_profile_content', 10, 1 );
+					 * function my_profile_content( $args ) {
+					 *     // your code here
+					 * }
+					 * ?>
+					 */
+					do_action("um_profile_content_{$nav}", $args);
+
+					/**
+					 * UM hook
+					 *
+					 * @type action
+					 * @title um_profile_content_{$nav}_{$subnav}
+					 * @description Custom hook to display tabbed content
+					 * @input_vars
+					 * [{"var":"$args","type":"array","desc":"Profile form shortcode arguments"}]
+					 * @change_log
+					 * ["Since: 2.0"]
+					 * @usage add_action( 'um_profile_content_{$nav}_{$subnav}', 'function_name', 10, 1 );
+					 * @example
+					 * <?php
+					 * add_action( 'um_profile_content_{$nav}_{$subnav}', 'my_profile_content', 10, 1 );
+					 * function my_profile_content( $args ) {
+					 *     // your code here
+					 * }
+					 * ?>
+					 */
+					do_action( "um_profile_content_{$nav}_{$subnav}", $args ); ?>
+
+					<div class="clear"></div>
+				</div>
+
+			<?php }
+		}
 
 		do_action( 'um_profile_footer', $args ); ?>
 	</div>

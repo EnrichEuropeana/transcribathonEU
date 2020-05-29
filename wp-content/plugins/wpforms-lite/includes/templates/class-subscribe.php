@@ -3,11 +3,7 @@
 /**
  * Scribe to Email list form template.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Template_Subscribe extends WPForms_Template {
 
@@ -65,7 +61,7 @@ class WPForms_Template_Subscribe extends WPForms_Template {
 	 *
 	 * @param array $form_data Form data and settings.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function template_modal_conditional( $form_data ) {
 

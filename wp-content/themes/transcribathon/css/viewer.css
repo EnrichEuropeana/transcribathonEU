@@ -85,10 +85,9 @@
 }
 
 #openseadragonFS {
-	height: 900px;
+	height: 100%;
 	position: relative;
 }
-
 
 #filterContainer {
 	position: absolute;
@@ -114,7 +113,7 @@
 }
 
 #invertRange {
-  vertical-align: middle;
+  vertical-align: text-bottom;
   margin-left: -2px;
 }
 
@@ -194,7 +193,13 @@
 .tabFilterValue {
 	float: right;
 }
-
+#buttons.new-grid-button{
+	display: grid;
+	position: absolute !important;
+	z-index: 9;
+  margin-left: 31px;
+  margin-top: 5px;
+}
 #buttons {
 	display: grid;
 	position: absolute !important;
@@ -216,8 +221,6 @@
 }
 
 #buttons > div:hover {
-	background-color: #0e4c63;
-	color: #fff;
 	cursor: pointer;
 }
 
@@ -225,8 +228,15 @@
 	display: grid;
 	position: absolute !important;
 	z-index: 9;
-	color: #0e4c63;
   margin-left: 5px;
+  margin-top: 5px;
+}
+
+#buttonsFS.new-grid-button {
+  display: grid;
+  position: absolute !important;
+  z-index: 9;
+  margin-left: 31px;
   margin-top: 5px;
 }
 
@@ -242,14 +252,12 @@
 }
 
 #buttonsFS > div:hover {
-	background-color: #0e4c63;
-	color: #fff;
 	cursor: pointer;
 }
 
 /* fix for fullscreen inline editor */
 body > div.tox.tox-tinymce.tox-tinymce-inline.tox-toolbar-dock-transition.tox-toolbar-dock-fadein {
-  z-index: 999999;
+  z-index: 999;
 }
 
 body > div.tox.tox-silver-sink.tox-tinymce-aux {
@@ -292,9 +300,9 @@ i.mce-i-missing {
 
 i.mce-i-unsure:before {
   content: "\f128";
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Pro";
   font-style: normal;
-  font-weight: normal;
+  font-weight: bold;
   color: #444;
   font-size: 1.2em;
   position: relative;
@@ -307,9 +315,9 @@ i.mce-i-unsure {
 
 i.mce-i-pos-in-text:before {
   content: '\f129';
-  font-family: FontAwesome;
+  font-family: "Font Awesome 5 Pro";
   font-style: normal;
-  font-weight: normal;
+  font-weight: bold;
   color: #444;
   font-size: 1.2em;
   position: relative;
@@ -320,7 +328,6 @@ i.mce-i-pos-in-text {
 }
 
 #mytoolbar-transcription {
-  height: 30px;
 }
 
 /* TODO wrong place, helper for mapbox map */
@@ -328,17 +335,159 @@ i.mce-i-pos-in-text {
 	height: 400px;
 }
 .mapboxgl-marker {
-	background-color: #ffdb00;
-	width: 30px;
-	height: 30px;
-	border-radius: 30px;
+	font-size: 40px;
 }
 
 .mapboxgl-marker.savedMarker {
-	background-color: #31768a;
+}
+
+.mapboxgl-popup-close-button {
+	padding: 2px;
+	width: 22px;
+	height: 22px;
+	background: none;
+	font-size: 18px;
+}
+
+.mapboxgl-popup .popupWrapper .title {
+	margin-right: 18px;
+	font-weight: 500;
+}
+
+.mapboxgl-popup .popupWrapper .title a {
+	color: #0C7DA7;
+}
+
+.mapboxgl-popup .popupWrapper .name {
+	margin-right: 18px;
+	font-weight: 500;
+	font-size: 14px;
+	color: #474747;
+}
+
+.mapboxgl-popup .popupWrapper .comment {
+	font-style: italic;
+	font-size: 14px;
+	color: #474747;
 }
 
 #all-places-map {
 	width: 100%;
 	height: 900px;
 }
+
+svg.mapboxgl-ctrl-geocoder--icon-search {
+  left: 90%;
+  top: 3px;
+}
+
+#storyMap {
+	width: 100%;
+	height: 500px;
+}
+
+#documentsMap {
+	width: 100%;
+	height: 750px;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+	height: 27px !important;
+}
+
+.mapboxgl-ctrl-geocoder.mapboxgl-ctrl {
+	width: 100%;
+  box-shadow: none;
+  max-width: 100%;
+}
+
+span.tct-uncertain::after {
+
+    content: '';
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 9px;
+    height: 20px;
+
+}
+
+span.tct-uncertain::before {
+
+    content: '';
+    background: transparent url(/wp-content/themes/transcribathon/images/tinyMCEImages/uncertain.png) bottom left no-repeat;
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 23px;
+    height: 20px;
+
+}
+
+span.tct-uncertain {
+    color: #444;
+    background: #ffeea2;
+}
+
+span.pos-in-text {
+    color: #fff;
+    background: #999;
+    font-weight: 400;
+}
+
+span.pos-in-text::before {
+    content: '';
+    background: transparent url(/wp-content/themes/transcribathon/images/tinyMCEImages/info.png) bottom left no-repeat;
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 23px;
+    height: 20px;
+}
+
+span.pos-in-text::after {
+    content: '';
+    display: inline-block;
+    margin-bottom: -3px;
+    width: 9px;
+    height: 20px;
+}
+
+/* image selection */
+#selection-tab {
+	display: block;
+	position: absolute;
+	top: 75px;
+}
+
+.rect {
+	border: 6px solid black;
+}
+
+.mapboxgl-marker.savedMarker {
+	background: url(../images/map/location%20icon.svg);
+	background-size: contain;
+	height: 40px;
+	width: 40px;
+}
+
+.mapboxgl-marker.savedMarker.storyMarker {
+	background: url(../images/map/selected%20location%20icon.svg);
+}
+
+.marker.newMarker {
+	background: url(../images/map/selected%20location%20icon.svg);
+	background-size: contain;
+	height: 40px;
+	width: 40px;
+}
+
+body .mapboxgl-popup-content {
+	border-radius: 10px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.popupWrapper .border:last-child {
+	display: none;
+}
+
+
+

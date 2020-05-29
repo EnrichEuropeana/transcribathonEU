@@ -51,6 +51,11 @@ add_action('um_post_registration_pending_hook', 'um_post_registration_pending_ho
  * @param $args
  */
 function um_after_insert_user( $user_id, $args ) {
+
+	if ( empty( $user_id ) || ( is_object( $user_id ) && is_a( $user_id, 'WP_Error' ) ) ) {
+		return;
+	}
+
 	//clear Users cached queue
 	UM()->user()->remove_cached_queue();
 
@@ -263,8 +268,9 @@ add_action( 'um_registration_complete', 'um_check_user_status', 100, 2 );
  * @return bool|int|WP_Error
  */
 function um_submit_form_register( $args ) {
-	if ( isset( UM()->form()->errors ) )
+	if ( isset( UM()->form()->errors ) ) {
 		return false;
+	}
 
 	/**
 	 * UM hook
@@ -291,11 +297,11 @@ function um_submit_form_register( $args ) {
 
 	extract( $args );
 
-	if ( isset( $username ) && ! isset( $user_login ) ) {
+	if ( ! empty( $username ) && empty( $user_login ) ) {
 		$user_login = $username;
 	}
 
-	if ( ! empty( $first_name ) && ! empty( $last_name ) && ! isset( $user_login ) ) {
+	if ( ! empty( $first_name ) && ! empty( $last_name ) && empty( $user_login ) ) {
 
 		if ( UM()->options()->get( 'permalink_base' ) == 'name' ) {
 			$user_login = rawurlencode( strtolower( str_replace( " ", ".", $first_name . " " . $last_name ) ) );
@@ -319,13 +325,13 @@ function um_submit_form_register( $args ) {
 		}
 	}
 
-	if ( ! isset( $user_login ) && isset( $user_email ) && $user_email ) {
+	if ( empty( $user_login ) && ! empty( $user_email ) ) {
 		$user_login = $user_email;
 	}
 
 	$unique_userID = UM()->query()->count_users() + 1;
 
-	if ( ! isset( $user_login ) ||  strlen( $user_login ) > 30 && ! is_email( $user_login ) ) {
+	if ( empty( $user_login ) || strlen( $user_login ) > 30 && ! is_email( $user_login ) ) {
 		$user_login = 'user' . $unique_userID;
 	}
 
@@ -337,7 +343,7 @@ function um_submit_form_register( $args ) {
 		$user_password = UM()->validation()->generate( 8 );
 	}
 
-	if ( ! isset( $user_email ) ) {
+	if ( empty( $user_email ) ) {
 		$site_url = @$_SERVER['SERVER_NAME'];
 		$user_email = 'nobody' . $unique_userID . '@' . $site_url;
 		/**
@@ -365,9 +371,9 @@ function um_submit_form_register( $args ) {
 	}
 
 	$credentials = array(
-		'user_login'	=> $user_login,
-		'user_password'	=> $user_password,
-		'user_email'	=> trim( $user_email ),
+		'user_login'    => $user_login,
+		'user_password' => $user_password,
+		'user_email'    => trim( $user_email ),
 	);
 
 	$args['submitted'] = array_merge( $args['submitted'], $credentials );
@@ -422,11 +428,12 @@ function um_submit_form_register( $args ) {
 	$user_role = apply_filters( 'um_registration_user_role', $user_role, $args );
 
 	$userdata = array(
-		'user_login'	=> $user_login,
-		'user_pass'		=> $user_password,
-		'user_email'	=> $user_email,
-		'role'			=> $user_role,
+		'user_login'    => $user_login,
+		'user_pass'     => $user_password,
+		'user_email'    => $user_email,
+		'role'          => $user_role,
 	);
+
 	$user_id = wp_insert_user( $userdata );
 
 	/**
@@ -462,9 +469,6 @@ add_action( 'um_submit_form_register', 'um_submit_form_register', 10 );
  * @param $args
  */
 function um_add_submit_button_to_register( $args ) {
-	// DO NOT add when reviewing user's details
-	if ( isset( UM()->user()->preview ) && UM()->user()->preview == true && is_admin() ) return;
-
 	$primary_btn_word = $args['primary_btn_word'];
 	/**
 	 * UM hook
@@ -490,6 +494,10 @@ function um_add_submit_button_to_register( $args ) {
 	 */
 	$primary_btn_word = apply_filters('um_register_form_button_one', $primary_btn_word, $args );
 
+	if ( ! isset( $primary_btn_word ) || $primary_btn_word == '' ){
+		$primary_btn_word = UM()->options()->get( 'register_primary_btn_word' );
+	}
+
 	$secondary_btn_word = $args['secondary_btn_word'];
 	/**
 	 * UM hook
@@ -514,6 +522,10 @@ function um_add_submit_button_to_register( $args ) {
 	 * ?>
 	 */
 	$secondary_btn_word = apply_filters( 'um_register_form_button_two', $secondary_btn_word, $args );
+
+	if ( ! isset( $secondary_btn_word ) || $secondary_btn_word == '' ){
+		$secondary_btn_word = UM()->options()->get( 'register_secondary_btn_word' );
+	}
 
 	$secondary_btn_url = ( isset( $args['secondary_btn_url'] ) && $args['secondary_btn_url'] ) ? $args['secondary_btn_url'] : um_get_core_page('login');
 	/**
@@ -548,7 +560,7 @@ function um_add_submit_button_to_register( $args ) {
 				<input type="submit" value="<?php esc_attr_e( wp_unslash( $primary_btn_word ), 'ultimate-member' ) ?>" class="um-button" id="um-submit-btn" />
 			</div>
 			<div class="um-right um-half">
-				<a href="<?php echo esc_attr( $secondary_btn_url ); ?>" class="um-button um-alt">
+				<a href="<?php echo esc_url( $secondary_btn_url ); ?>" class="um-button um-alt">
 					<?php _e( wp_unslash( $secondary_btn_word ),'ultimate-member' ); ?>
 				</a>
 			</div>
@@ -602,7 +614,7 @@ function um_registration_save_files( $user_id, $args ) {
 
 		foreach ( $fields as $key => $array ) {
 
-			if ( isset( $args['submitted'][$key] ) ) {
+			if ( isset( $args['submitted'][ $key ] ) ) {
 
 				if ( isset( $fields[ $key ]['type'] ) && in_array( $fields[ $key ]['type'], array( 'image', 'file' ) ) &&
 				     ( um_is_temp_file( $args['submitted'][ $key ] ) || $args['submitted'][ $key ] == 'empty_file' )

@@ -1,13 +1,4 @@
 <?php
-/**
- * Contains various WPForms integrations.
- *
- * @package    WPForms
- * @author     WPForms
- * @since      1.3.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
- */
 
 /**
  * Register and setup WPForms as a Visual Composer element.

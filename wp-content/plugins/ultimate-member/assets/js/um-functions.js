@@ -16,50 +16,55 @@ function UM_check_password_matched() {
 }
 
 function UM_hide_menus() {
-
-		menu = jQuery('.um-dropdown');
-		menu.parents('div').find('a').removeClass('active');
-		menu.hide();
-
+	var menu = jQuery( '.um-dropdown' );
+	menu.parents('div' ).find('a').removeClass( 'active' );
+	menu.hide();
 }
 
-function UM_domenus(){
+function UM_domenus() {
 
-	jQuery('.um-dropdown').each(function(){
+	jQuery('.um-dropdown').each( function() {
 
 		var menu = jQuery(this);
 		var element = jQuery(this).attr('data-element');
 		var position = jQuery(this).attr('data-position');
 
-		jQuery(element).addClass('um-trigger-menu-on-'+menu.attr('data-trigger'));
+		jQuery( element ).addClass('um-trigger-menu-on-' + menu.attr( 'data-trigger' ) );
 
-		if ( jQuery(window).width() <= 1200 && element == 'div.um-profile-edit' ) {
-			position = 'lc';
+		if ( position === 'lc' && jQuery('html').attr('dir') === 'rtl' ){
+			position = 'rc';
 		}
 
-		if ( position == 'lc' ){
-
-			if ( 200 > jQuery(element).find('img').width() ) {
-				left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 ) + ( ( jQuery(element).find('img').width() - 200 ) / 2 );
+		if ( jQuery(window).width() <= 1200 && element === 'div.um-profile-edit' ) {
+			if ( jQuery('html').attr('dir') === 'rtl' ){
+				position = 'rc';
 			} else {
-				left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 );
+				position = 'lc';
 			}
 
-			top_ = parseInt( jQuery(element).find('a').css('top') );
+		}
 
-			if ( top_ ) {
-				top_p = jQuery(element).find('img').height() + 4 + top_;
-				left_gap = 4;
-			} else {
-				top_p = jQuery(element).find('img').height() + 4;
-				left_gap = 0;
-			}
+		if ( 200 > jQuery(element).find('img').width() ) {
+			left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 ) + ( ( jQuery(element).find('img').width() - 200 ) / 2 );
+		} else {
+			left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 );
+		}
 
-			if ( top_p == 4 && element == 'div.um-cover' ) {
-				top_p = jQuery(element).height() / 2 + ( menu.height() / 2 );
-			} else if ( top_p == 4 ) {
-				top_p = jQuery(element).height() + 20;
-			}
+		top_ = parseInt( jQuery(element).find('a').css('top') );
+
+		if ( top_ ) {
+			top_p = jQuery(element).find('img').height() + 4 + top_;
+		} else {
+			top_p = jQuery(element).find('img').height() + 4;
+		}
+
+		if ( top_p == 4 && element === 'div.um-cover' ) {
+			top_p = jQuery(element).height() / 2 + ( menu.height() / 2 );
+		} else if ( top_p == 4 ) {
+			top_p = jQuery(element).height() + 20;
+		}
+
+		if ( position === 'lc' ) {
 
 			gap_right = jQuery(element).width() + 17;
 			menu.css({
@@ -78,36 +83,37 @@ function UM_domenus(){
 				'right' : '-17px'
 			});
 
-		}
+		} else if ( position === 'rc' ) {
 
-		if ( position == 'bc' ){
+			gap_right = jQuery(element).width() + 25;
+			menu.css({
+				'top' : 0,
+				'width': 200,
+				'left': gap_right + 'px',
+				'right' : 'auto',
+				'text-align' : 'center'
+			});
 
-			if ( 200 > jQuery(element).find('img').width() ) {
-				left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 ) + ( ( jQuery(element).find('img').width() - 200 ) / 2 );
-			} else {
-				left_p = ( ( jQuery(element).width() - jQuery(element).find('img').width() ) / 2 );
-			}
+			menu.find('.um-dropdown-arr').find('i').removeClass().addClass('um-icon-arrow-left-b');
 
-			top_ = parseInt( jQuery(element).find('a').css('top') );
+			menu.find('.um-dropdown-arr').css({
+				'top' : '4px',
+				'left' : '-17px',
+				'right' : 'auto'
+			});
 
-			if ( top_ ) {
-				top_p = jQuery(element).find('img').height() + 4 + top_;
-				left_gap = 4;
-			} else {
-				top_p = jQuery(element).find('img').height() + 4;
-				left_gap = 0;
-			}
+		} else if ( position === 'bc' ) {
 
-			if ( top_p == 4 && element == 'div.um-cover' ) {
-				top_p = jQuery(element).height() / 2 + ( menu.height() / 2 );
-			} else if ( top_p == 4 ) {
-				top_p = jQuery(element).height() + 20;
+			var top_o = 0;
+			var top_offset = menu.data('top-offset');
+			if ( typeof top_offset !== 'undefined' ) {
+				top_o = top_offset*1;
 			}
 
 			menu.css({
-				'top' : top_p,
+				'top' : top_p + top_o,
 				'width': 200,
-				'left': left_p + left_gap,
+				'left': left_p,
 				'right' : 'auto',
 				'text-align' : 'center'
 			});
@@ -197,22 +203,9 @@ function um_responsive(){
 
 	});
 
-	jQuery('.um-members').each(function(){
-		UM_Member_Grid( jQuery(this) );
-	});
-
 	UM_domenus();
-
 }
 
-function UM_Member_Grid( container ) {
-	container.masonry({
-		itemSelector: '.um-member',
-		columnWidth: '.um-member',
-		gutter: '.um-gutter-sizer'
-	});
-
-}
 
 function initImageUpload_UM( trigger ) {
 
@@ -406,7 +399,7 @@ function initFileUpload_UM( trigger ) {
 						}else if( key == 'original_name' ){
 
 							trigger.parents('.um-modal-body').find('.um-single-fileinfo a').attr('data-orignal-name', value );
-							trigger.parents('.um-modal-body').find('.um-single-fileinfo span.filename').html( value );						
+							trigger.parents('.um-modal-body').find('.um-single-fileinfo span.filename').html( value );
 							
 						} else if ( key == 'url' ) {
 							
@@ -670,7 +663,7 @@ function um_modal_responsive() {
 
 }
 
-function um_remove_modal(){
+function um_remove_modal() {
 	jQuery('img.cropper-hidden').cropper('destroy');
 
 	jQuery('body,html,textarea').css("overflow", "auto");

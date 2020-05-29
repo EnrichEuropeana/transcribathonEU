@@ -15,8 +15,9 @@
 
 get_header(); ?>
 
-<div id="primary" class="content-area">
+<div id="primary" class="content-area logo-status">
 	<div id="content" class="site-content" role="main">
+    
 
 		<?php while ( have_posts() ) : the_post(); ?>
 
@@ -31,4 +32,16 @@ get_header(); ?>
 	</div><!-- #content .site-content -->
 </div><!-- #primary .content-area -->
 
+        <script>
+            // When the user scrolls down 60px from the top of the document, resize the navbar's padding 
+            //and the logo's font size
+
+            window.onscroll = function() {scrollFunction()};
+                                
+            function scrollFunction() {
+                document.getElementById("_transcribathon_partnerlogo").style.height = "120px";
+                document.getElementById("_transcribathon_partnerlogo").style.width = "120px";
+                document.getElementById("_transcribathon_partnerlogo").style.marginLeft = "0px";
+            }
+        </script>
 <?php get_footer(); ?>

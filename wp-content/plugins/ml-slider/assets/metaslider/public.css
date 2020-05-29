@@ -214,10 +214,12 @@ body .metaslider .flexslider .flex-direction-nav li {
     /* Fix for single character text */
     text-indent: 9999px;
 }
+.metaslider .flexslider:focus-within .flex-next,
 .metaslider .flexslider:hover .flex-next {
     opacity: 0.8;
     right: 5px;
 }
+.metaslider .flexslider:focus-within .flex-prev,
 .metaslider .flexslider:hover .flex-prev {
     opacity: 0.8;
     left: 5px;
@@ -225,16 +227,25 @@ body .metaslider .flexslider .flex-direction-nav li {
     /* Fix for single character text */
     text-indent: -9999px;
 }
+.metaslider .flexslider:focus-within .flex-next:focus,
+.metaslider .flexslider:focus-within .flex-prev:focus,
 .metaslider .flexslider:hover .flex-next:hover,
 .metaslider .flexslider:hover .flex-prev:hover {
     opacity: 1;
+}
+.metaslider .flexslider .flex-next:focus,
+.metaslider .flexslider .flex-prev:focus {
+	    outline: -webkit-focus-ring-color auto 5px;
 }
 .metaslider .flexslider .flex-direction-nav .flex-disabled {
     cursor: default;
     pointer-events: none;
 }
 .metaslider .flexslider .flex-control-nav a {
-    box-shadow: none !important;
+	box-shadow: none !important;
+}
+.metaslider .flexslider .flex-control-nav a:focus {
+	outline: -webkit-focus-ring-color auto 5px;
 }
 .metaslider .flexslider .slides > li {
     position: relative;

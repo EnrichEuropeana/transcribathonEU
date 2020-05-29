@@ -101,7 +101,6 @@ class MetaSliderThemeEditor {
      * Admin styles
      */
     public function register_theme_editor_styles() {
-        wp_enqueue_style( 'metaslider-admin-styles', METASLIDER_ADMIN_URL . 'assets/css/admin.css', false, METASLIDER_VERSION );
         wp_enqueue_style( 'metasliderpro-theme-editor-styles', plugins_url( 'assets/style.css' , __FILE__ ), false, METASLIDERPRO_VERSION );
         wp_enqueue_style( 'metasliderpro-spectrum-style', plugins_url( 'assets/spectrum/spectrum.css' , __FILE__ ), false, METASLIDERPRO_VERSION );
     }

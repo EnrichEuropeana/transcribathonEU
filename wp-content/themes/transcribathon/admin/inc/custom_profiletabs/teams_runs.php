@@ -7,8 +7,8 @@ Description: Creates the 'Teams & runs' tab of profile tab
 function _TCT_teamsandruns_tab( $atts ) {  
 echo  "<style type='text/css'>
 
-.tct_hd h1{text-transform:none; line-height:1.2; font-weight:500; letter-spacing:0.2; font-size:2.3rem !important; margin-bottom:0px !important; padding-bottom:0px !important;}
-.tct_hd h3{text-transform:none; line-height:1.2; font-weight:300; letter-spacing:0.3; color:#333; font-size:2rem !important; margin-top:0px !important; padding-top:0px !important; margin-bottom:0px !important;}
+.tct_hd h1{text-transform:none; line-height:1.2; font-weight:500; letter-spacing:0.2; font-size:1.8rem !important; margin-bottom:0px !important; padding-bottom:0px !important;}
+.tct_hd h3{text-transform:none; line-height:1.2; font-weight:300; letter-spacing:0.3; color:#333; font-size:1.5rem !important; margin-top:0px !important; padding-top:0px !important; margin-bottom:0px !important;}
 .tct_hd h1+h3{margin-top:0px !important; padding-top:5px !important;}
 .tct_hd{padding-bottom:20px !important;}
 
@@ -25,13 +25,21 @@ button.tct-vio-but[type=button],input.tct-vio-but[type=button],a.tct-vio-but{min
 // build 'Teams & runs' tab of Profile page
 
 
+$url = home_url()."/tp-api/teams?WP_UserId=".get_current_user_id();
+$requestType = "GET";
+
+// Execude http request
+include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+
+// Save image data
+$myteams = json_decode($result, true);
+
 if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 		// Only User
 		
-		
 	echo "<div class=\"section group maingroup\">\n";
 		echo "<div class=\"column span_1_of_3\">\n";	
-				//if(sizeof($myteams)>0){	
+				if(sizeof($myteams)>0){	
 					echo "<div class=\"tct_hd\">\n";
 					echo "<h1>"._x('Teams', 'Team-Tab on Profile', 'transcribathon'  )."</h1><h3>"._x('Your teams','Team-Tab on Profile','transcribathon')."</h3>\n";
 					echo "</div>\n";
@@ -39,14 +47,14 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 					echo "<div id=\"ismember_list\" >\n";
 						echo "<p class=\"smallloading\"></p>\n";
 					echo "</div>\n";
-				//}else{
-                    /*
+				}else{
 					echo "<div class=\"tct_hd\">\n";
-					echo "<h1>"._x('Teams', 'Team-Tab on Profile', 'transcribathon'  )."</h1><h3>"._x('Your teams','Team-Tab on Profile','transcribathon')."</h3>\n";
+						echo "<h1>"._x('Teams', 'Team-Tab on Profile', 'transcribathon'  )."</h1><h3>"._x('Your teams','Team-Tab on Profile','transcribathon')."</h3>\n";
 					echo "</div>\n";
-					echo "<div id=\"ismember_list\" ><p>"._x('You are not yet a member of any team', 'Team-Tab on Profile', 'transcribathon'  )."</p></div>\n";
-                */
-                    //}	
+					echo "<div id=\"ismember_list\" >";
+						echo "<p>"._x('You are not yet a member of any team', 'Team-Tab on Profile', 'transcribathon'  )."</p>";
+					echo "</div>\n";
+                }	
 		echo "</div>\n";
 			echo "<div class=\"column span_1_of_3 alg_l\">\n";		
 				echo "<div class=\"tct_hd\">\n";
@@ -59,7 +67,7 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 				echo "</form>\n";
 		
 				echo "<p>&nbsp;</p>\n";
-		
+		/*
 				// Code-Anmeldung
 				echo "<div class=\"tct_hd\">\n";
 				echo "<h1>"._x('Open teams', 'Team-Tab on Profile', 'transcribathon'  )."</h1><h3>"._x('Join an open team','Team-Tab on Profile','transcribathon')."</h3>\n";
@@ -68,9 +76,9 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 				echo "<div id=\"openteams_messageholder\" ></div>\n";
 				echo "<div id=\"openteams_list\" >\n";
 					echo "<p class=\"smallloading\"></p>\n";
-				echo "</div>\n";
+				echo "</div>\n";*/
 		
-		
+				
 				// TO COME
 				
 			echo "</div>\n";
@@ -105,7 +113,7 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 		
 		
 				echo "<p>&nbsp;</p>\n";
-		
+		/*
 				// Runs
 				echo "<div class=\"tct_hd\">\n";
 				echo "<h1>"._x('Runs', 'Team-Tab on Profile', 'transcribathon'  )."</h1><h3>"._x('Your runs','Team-Tab on Profile','transcribathon')."</h3>\n";
@@ -115,6 +123,7 @@ if(is_user_logged_in() &&  get_current_user_id() === um_profile_id()){
 				echo "<div id=\"isparticipant_list\" >\n";
 					echo "<p class=\"smallloading\"></p>\n";
 				echo "</div>\n";
+				*/
 				echo "<script type=\"text/javascript\">getTeamTabContent('".um_profile_id()."','".get_current_user_id()."');</script>\n";
 			echo "</div>\n";
 		echo "</div>\n";

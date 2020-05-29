@@ -14,7 +14,7 @@ class SiteOrigin_Widget_Simple_Masonry_Widget extends SiteOrigin_Widget {
 			'sow-simple-masonry',
 			__('SiteOrigin Simple Masonry', 'so-widgets-bundle'),
 			array(
-				'description' => __('A simple masonry layout widget.', 'so-widgets-bundle'),
+				'description' => __('A masonry layout for images. Images can link to your posts.', 'so-widgets-bundle'),
 //				'help' => 'https://siteorigin.com/widgets-bundle/simple-masonry-widget-documentation/'
 			),
 			array(),
@@ -47,7 +47,16 @@ class SiteOrigin_Widget_Simple_Masonry_Widget extends SiteOrigin_Widget {
 				'type' => 'repeater',
 				'label' => __( 'Images', 'so-widgets-bundle' ),
 				'item_label' => array(
-					'selector'     => "[id*='title']"
+					'selectorArray' => array(
+						array(
+							'selector' => "[id*='title']",
+							'valueMethod' => 'val',
+						),
+						array(
+							'selector' => '.media-field-wrapper .current .title',
+							'valueMethod' => 'html'
+						),
+					),
 				),
 				'fields' => array(
 					'image' => array(
@@ -118,6 +127,7 @@ class SiteOrigin_Widget_Simple_Masonry_Widget extends SiteOrigin_Widget {
 					'break_point' => array(
 						'type' => 'number',
 						'lanel' => __( 'Break point', 'so-widgets-bundle' ),
+						'description' => __( 'Device width, in pixels, at which to collapse into a tablet view.', 'so-widgets-bundle' ),
 						'default' => 768
 					),
 					'columns' => array(
@@ -149,6 +159,7 @@ class SiteOrigin_Widget_Simple_Masonry_Widget extends SiteOrigin_Widget {
 					'break_point' => array(
 						'type' => 'number',
 						'lanel' => __( 'Break point', 'so-widgets-bundle' ),
+						'description' => __( 'Device width, in pixels, at which to collapse into a mobile view.', 'so-widgets-bundle' ),
 						'default' => 480
 					),
 					'columns' => array(

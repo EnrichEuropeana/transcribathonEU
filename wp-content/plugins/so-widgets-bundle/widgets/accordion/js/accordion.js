@@ -12,7 +12,7 @@ jQuery( function ( $ ) {
 			}
 
 			var $accordionPanels = $( element ).find( '> .sow-accordion-panel' );
-			$accordionPanels.not( '.sow-accordion-panel-open' ).find( '.sow-accordion-panel-content' ).hide();
+			$accordionPanels.not( '.sow-accordion-panel-open' ).children( '.sow-accordion-panel-content' ).hide();
 			var openPanels = $accordionPanels.filter( '.sow-accordion-panel-open' ).toArray();
 
 			var updateHash = function () {
@@ -140,9 +140,12 @@ jQuery( function ( $ ) {
 					var panels = $accordionPanels.toArray();
 					for ( var i = 0; i < panels.length; i++ ) {
 						var panel = panels[ i ];
-						var anchor = $( panel ).data( 'anchor' );
-						var anchors = window.location.hash.substring(1).split( ',' ); 
-						if ( anchor && $.inArray( anchor.toString(), anchors ) > -1 ) {
+						var panelAnchor = $( panel ).data( 'anchor' );
+						var anchors = window.location.hash.substring(1).split( ',' );
+						var panelOpen = anchors.some(function (anchor) {
+							return decodeURI( panelAnchor ) === decodeURI( anchor );
+						});
+						if ( panelOpen ) {
 							openPanel( panel, true );
 						} else {
 							closePanel( panel, true );
@@ -156,7 +159,11 @@ jQuery( function ( $ ) {
 					updateHash();
 				}
 				var initialScrollPanel = $widget.data( 'initialScrollPanel' );
-				if ( initialScrollPanel > 0 ) {
+				if ( window.location.hash && openPanels.length ) {
+					setTimeout( function() {
+						scrollToPanel( $( openPanels[0] ) );
+					}, 500 );
+				} else if ( initialScrollPanel > 0 ) {
 					var $initialScrollPanel = initialScrollPanel > $accordionPanels.length ?
 						$accordionPanels.last() :
 						$accordionPanels.eq( initialScrollPanel - 1 );
