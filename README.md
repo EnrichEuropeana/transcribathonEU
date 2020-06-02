@@ -3,6 +3,6 @@ The frontend application of the [Transcribathon Platform](https://europeana.tran
 
 ## License
 
-Licensed under the EUPL V.1.2
+Licensed under the GPL V.2 license
 
 For full details, see [license.txt](license.txt)
