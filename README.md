@@ -5,4 +5,4 @@ The frontend application of the [Transcribathon Platform](https://europeana.tran
 
 Licensed under the EUPL V.1.2
 
-For full details, see [LICENSE.md](LICENSE.md)
+For full details, see [license.txt](license.txt)
