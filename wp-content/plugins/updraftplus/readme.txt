@@ -2,8 +2,8 @@
 Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, aporter, snightingale, bcrodua
 Tags: backup, restore, database backup, wordpress backup, cloud backup, s3, dropbox, google drive, onedrive, ftp, backups
 Requires at least: 3.2
-Tested up to: 5.4
-Stable tag: 1.16.23
+Tested up to: 5.5
+Stable tag: 1.16.26
 Author URI: https://updraftplus.com
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -36,7 +36,7 @@ You could always create your own manual backups- but using backup plugin is infi
 
 = How UpdraftPlus compares with other backup plugins: =
 
-UpdraftPlus is the most highly-rated and popular plugin out there - and for good reason. Not only is it comprehensive in terms of its features, but it's aso easy and intuitive to use. And because it has such a vast user base, it's tried and tested in a whole range of different situations and scenarios.
+UpdraftPlus is the most highly-rated and popular plugin out there - and for good reason. Not only is it comprehensive in terms of its features, but it's also easy and intuitive to use. And because it has such a vast user base, it's tried and tested in a whole range of different situations and scenarios.
 
 Unlike many other plugins, UpdraftPlus:
 
@@ -166,7 +166,52 @@ Unfortunately not; since this is free software, there’s no warranty and no gua
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.16.23.x of the free version correspond to changes made in 2.16.23.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.16.26.x of the free version correspond to changes made in 2.16.26.x of the paid version.
+
+= 1.16.26 - 23/Jun/2020 =
+
+* FIX: In the free version configured remote storage locations were not selected by default in the backup now modal
+* FIX: On newer versions of Curl uploads to Dropbox can fail with a bad request, we now retry with a better request
+* FEATURE: Improve support for enormous tables when outputing via PHP via batching of the dump
+* TWEAK: Add site_url to load_plugins and load_themes requests
+* TWEAK: Catch PHP fatal errors when executing UpdraftCentral commands
+* TWEAK: Tweak the version that gets added to CSS and JS filenames to work with addons
+* TWEAK: Prevent an internal UpdraftVault message displaying in the UI when Vault is not in use
+* TWEAK: Stop displaying the 'licence expires soon' warning if an active subscription is detected on the account
+* TWEAK: Catch Google_IO_Exception during upload to Google Cloud to prevent further unwanted errors
+* TWEAK: Date/time indicator in the UI now gets updated via the WP heartbeat API
+* TWEAK: On large databases the database file scan can time-out; an option has been added to allow the restore operation to include tables that are missing from the list
+* TWEAK: Use the administration email address (if possible) as the email sender address when sending a backup report email
+* TWEAK: Catch new OneDrive access token has expired message during a backup
+* TWEAK: Cleanup failed OneDrive uploads to prevent repeated failures that will never succeed
+* TWEAK: Add a warning alert when the remote scan button is pressed to explain this feature to prevent support requests
+* TWEAK: On large databases the amount of database tables can exceed the php_max_input_vars value; an option has been added to allow the restore operation to include tables that are missing from the list
+
+= 1.16.25 - 23/May/2020 =
+
+* FIX: Dropbox since 1.16.24 was only deleting one backup files archive out of the set. i.e. Excess archives remained on Dropbox. These have to be deleted manually.
+* TWEAK: Add version to CSS and JS within filenames to prevent old versions being served after update on sites which have customisations to remove the query string
+* FEATURE: Added the ability to create UpdraftCentral keys from WP-CLI
+
+= 1.16.24 - 15/May/2020 =
+
+* FEATURE: Support migration between different "generate columns" syntaxes of MySQL and MariaDB
+* FEATURE: Added the ability to choose the remote storage locations you want to send your backup to in the "Backup Now" modal
+* FIX: If non-WordPress tables are selected in the advanced 'Backup Now' options, then back them up (even if the saved setting to back them up is off). i.e. "Backup Now" over-ride options should have been taking priority.
+* FIX: Failure to restore database 'view' in some rare circumstances due to the nonexistent DEFINER account and lack of privileges
+* TWEAK: Handle binary data during backup
+* TWEAK: Add strack_st to the lists of large logging tables and tables not requiring search/replace
+* TWEAK: Make search and replace case insensitive when operating on URLs
+* TWEAK: The incremental backup notice logic
+* TWEAK: Update bundled updater class (YahnisElsts/plugin-update-checker) (paid versions) to version 4.9
+* TWEAK: Add another tweak to paid versions' update checking time algorithm
+* TWEAK: Add the options_exist() method to backup modules that did not have it
+* TWEAK: During manual backup uploads, check if the last 4 bytes are string "null" (caused by an error in uploading to Dropbox) and if so remove them. Prevents an unnecessary message about unexpected data.
+* TWEAK: Show the backup label (if specified) in the UI backup progress indicator
+* TWEAK: Added the facility to clear the list of existing migration sites
+* TWEAK: Create default instance labels
+* TWEAK: Bring list of debugging plugins up to date
+* TWEAK: Add support for the AWS Milan and Cape Town endpoints (and correct a couple of existing endpoints that had wrong references)
 
 = 1.16.23 - 01/Apr/2020 =
 
@@ -1018,4 +1063,4 @@ Furthermore, reliance upon any non-English translation is at your own risk. Updr
 We recognise and thank the following for code and/or libraries used and/or modified under the terms of their open source licences; see: https://updraftplus.com/acknowledgements/
 
 == Upgrade Notice ==
-* 1.16.23: Added the ability to select which database tables you want to restore. Various other small tweaks and improvements. A recommended update for all.
+* 1.16.26: Fix a problem with Dropbox on new versions of Curl. Improve support for enormous tables when outputing via PHP via batching of the dump. In the free version configured remote storage locations were not selected by default in the backup now modal. A recommended update for all.

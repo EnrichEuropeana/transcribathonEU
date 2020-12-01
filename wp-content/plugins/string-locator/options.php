@@ -17,17 +17,36 @@ if ( isset( $_POST['string-locator-search'] ) ) {
 }
 
 if ( isset( $_GET['restore'] ) ) {
-	$restore = unserialize( get_option( 'string-locator-search-overview' ) );
+	$restore = get_transient( 'string-locator-search-overview' );
 
-	$search_string   = $restore->search;
-	$search_location = $restore->directory;
-	$search_regex    = String_Locator::absbool( $restore->regex );
+	if ( false !== $restore ) {
+		$search_string   = $restore->search;
+		$search_location = $restore->directory;
+		$search_regex    = String_Locator::absbool( $restore->regex );
+	} else {
+		?>
+	<div class="notice notice-large notice-warning">No previous searches could be restored.</div>
+		<?php
+	}
 }
 ?>
 <div class="wrap">
-	<h2>
+	<h1>
 		<?php esc_html_e( 'String Locator', 'string-locator' ); ?>
-	</h2>
+	</h1>
+
+	<?php if ( ! current_user_can( 'edit_themes' ) ) : ?>
+		<div class="notice notice-warning inline">
+			<p>
+				<strong>
+					<?php esc_html_e( 'String Locator is limited to search mode only.', 'string-locator' ); ?>
+				</strong>
+			</p>
+			<p>
+				<?php esc_html_e( 'Because this site is configured to not allow direct file editing, the String Locator plugin has limited functionality and will only allow you to search for files with your string in them.', 'string-locator' ); ?>
+			</p>
+		</div>
+	<?php endif; ?>
 
 	<form action="<?php echo esc_url( $this_url ); ?>" method="post" id="string-locator-search-form">
 		<label for="string-locator-search"><?php esc_html_e( 'Search through', 'string-locator' ); ?></label>
@@ -52,7 +71,7 @@ if ( isset( $_GET['restore'] ) ) {
 		<label for="string-locator-string"><?php esc_html_e( 'Search string', 'string-locator' ); ?></label>
 		<input type="text" name="string-locator-string" id="string-locator-string" value="<?php echo esc_attr( $search_string ); ?>" />
 
-		<label><input type="checkbox" name="string-locator-regex" id="string-locator-regex"<?php echo ( $search_regex ? ' checked="checked"' : '' ); ?>'> <?php esc_html_e( 'RegEx search', 'string-locator' ); ?></label>
+		<label><input type="checkbox" name="string-locator-regex" id="string-locator-regex"<?php echo ( $search_regex ? ' checked="checked"' : '' ); ?>> <?php esc_html_e( 'RegEx search', 'string-locator' ); ?></label>
 
 		<p>
 			<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Search', 'string-locator' ); ?>">
@@ -70,13 +89,50 @@ if ( isset( $_GET['restore'] ) ) {
 	<div class="table-wrapper">
 		<?php
 		if ( isset( $_GET['restore'] ) ) {
-			$items = maybe_unserialize( get_option( 'string-locator-search-history', array() ) );
+			$items = get_transient( 'string-locator-search-history' );
+			if ( false === $items ) {
+				$items = array();
+			}
+			$items = maybe_unserialize( $items );
 
 			echo String_Locator::prepare_full_table( $items, array( 'restore' ) );
-		}
-		else {
+		} else {
 			echo String_Locator::prepare_full_table( array() );
 		}
 		?>
 	</div>
 </div>
+
+<script id="tmpl-string-locator-search-result" type="text/template">
+	<tr>
+		<td>
+			{{{ data.stringresult }}}
+
+			<div class="row-actions">
+				<# if ( data.editurl ) { #>
+					<span class="edit">
+						<a href="{{ data.editurl }}" aria-label="Edit">
+							Edit
+						</a>
+					</span>
+				<# } #>
+			</div>
+		</td>
+		<td>
+			<# if ( data.editurl ) { #>
+				<a href="{{ data.editurl }}">
+					{{ data.filename_raw }}
+				</a>
+			<# } #>
+			<# if ( ! data.editurl ) { #>
+				{{ data.filename_raw }}
+			<# } #>
+		</td>
+		<td>
+			{{ data.linenum }}
+		</td>
+		<td>
+			{{ data.linepos }}
+		</td>
+	</tr>
+</script>

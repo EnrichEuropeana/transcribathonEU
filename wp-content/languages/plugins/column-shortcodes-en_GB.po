@@ -2,14 +2,74 @@
 # This file is distributed under the same license as the Plugins - Column Shortcodes - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-12-20 03:52:05+0000\n"
+"PO-Revision-Date: 2020-06-18 13:12:25+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/2.4.0-alpha\n"
+"X-Generator: GlotPress/3.0.0-alpha\n"
 "Language: en_GB\n"
 "Project-Id-Version: Plugins - Column Shortcodes - Stable (latest release)\n"
+
+#. Author URI of the plugin
+msgid "https://www.admincolumns.com/"
+msgstr "https://www.admincolumns.com/"
+
+#. Plugin URI of the plugin
+msgid "https://wordpress.org/plugins/column-shortcodes"
+msgstr "https://en-gb.wordpress.org/plugins/column-shortcodes"
+
+#: column-shortcodes.php:444
+msgid "%s Active Installs"
+msgstr "%s Active Installs"
+
+#: column-shortcodes.php:435
+msgid "Download for Free"
+msgstr "Download for Free"
+
+#: column-shortcodes.php:431
+msgid "Be sure to check out other plugins by Codepress, such as %s. It adds custom columns to your posts, users, comments and media overview in your admin. Get more insight in your content now!"
+msgstr "Be sure to check out other plugins by Codepress, such as %s. It adds custom columns to your posts, users, comments and media overview in your admin. Get more insight into your content now!"
+
+#: column-shortcodes.php:417
+msgid "Tweet"
+msgstr "Tweet"
+
+#: column-shortcodes.php:416
+msgid "I'm using Column Shortcodes for WordPress!"
+msgstr "I'm using Column Shortcodes for WordPress!"
+
+#: column-shortcodes.php:411
+msgid "Rate"
+msgstr "Rate"
+
+#: column-shortcodes.php:406
+msgid "We would really love it if you could show your appreciation by giving us a rating on WordPress.org or tweet about Column Shortcodes!"
+msgstr "We would really love it if you could show your appreciation by giving us a rating on WordPress.org or tweet about Column Shortcodes!"
+
+#: column-shortcodes.php:403
+msgid "Woohoo! We're glad to hear that!"
+msgstr "Woohoo! We're glad to hear that!"
+
+#: column-shortcodes.php:393
+msgid "Support Forums"
+msgstr "Support Forums"
+
+#: column-shortcodes.php:388
+msgid "What's wrong? Need help? Let us know: please open a support topic on WordPress.org!"
+msgstr "What's wrong? Need help? Let us know: please open a support topic on WordPress.org!"
+
+#: column-shortcodes.php:382
+msgid "No"
+msgstr "No"
+
+#: column-shortcodes.php:381
+msgid "Yes"
+msgstr "Yes"
+
+#: column-shortcodes.php:378
+msgid "Are you happy with Columns Shortcodes?"
+msgstr "Are you happy with Column Shortcodes?"
 
 #. Author of the plugin
 msgid "Codepress"

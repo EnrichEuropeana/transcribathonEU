@@ -133,10 +133,13 @@ namespace WPDataProjects\List_Table {
 			$this->mode     = $this->project->get_mode();
 			$this->setname  = null===$this->project->get_setname() ? 'default' : $this->project->get_setname();
 
-			if ( 'view' === $this->mode ) {
-				global $wpda_project_mode;
-				$wpda_project_mode = 'view';
-			}
+			global $wpda_project_mode;
+			$wpda_project_mode = [
+				'project_id' => $this->project_id,
+				'page_id'    => $this->page_id,
+				'setname'    => $this->setname,
+				'mode'       => $this->mode,
+			];
 
 			$args['title']    = ( null === $this->title || '' === $this->title ) ? null : $this->title;
 			$args['subtitle'] = $this->subtitle;
@@ -199,11 +202,14 @@ namespace WPDataProjects\List_Table {
 			if (
 				'view' === $this->mode &&
 				(
-					'new' === $this->action ||
-					'edit' === $this->action
+					'new' === $this->action || 'edit' === $this->action
 				)
 			) {
-				wp_die( __( 'ERROR: Action not allowed', 'wp-data-access' ) );
+				if ( ( 'only' === $this->allow_insert || null === $this->allow_insert ) && 'new' === $this->action ) {
+					// Allow these actions (exceptions)
+				} else {
+					wp_die( __( 'ERROR: Action not allowed', 'wp-data-access' ) );
+				}
 			}
 
 			switch ( $this->action ) {
@@ -233,6 +239,7 @@ namespace WPDataProjects\List_Table {
 			$args = [
 				'title'               => $this->title,
 				'add_action_to_title' => 'FALSE',
+				'hide_add_new'        => 'off' === $this->allow_insert || 'only' === $this->allow_insert,
 			];
 
 			if ( 'only' === $this->allow_insert ) {

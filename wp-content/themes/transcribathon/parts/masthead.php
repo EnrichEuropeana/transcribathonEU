@@ -12,7 +12,7 @@
    <div class=" ">
 
 		 <!-- Modal content -->
-	   <span id="MyPopupp" class="closerr">OK</span>
+	   <span id="MyPopupp" class="cookie-confrm">OK</span>
      <P>This website uses cookies to ensure you get the best experience on our website. By clicking or navigating the site, you agree to allow our collection of information through cookies. <a href='https://transcribathon.eu/terms-of-use/' target="_blank">More info</a>
      </p>
    </div>
@@ -76,7 +76,9 @@ function showPopup() {
 #MyPopup p {
   color: #ffffff;
   font-size: 19px;
-  line-height: 25px;
+  line-height: 44px;
+  /* padding: 0; */
+  margin: 0;
 }
 
 #MyPopup a {
@@ -96,21 +98,22 @@ function showPopup() {
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-/* The Closerr Button */
-.closerr {
+/* The cookie-confrm Button */
+.cookie-confrm {
   color: #fff;
   float: right;
-  font-size: 2em;
-  border: 1px solid #ffffff;
+  font-size: 1.4em;
+  font-weight: bold;
+  border: 2px solid #ffffff;
   padding: 8px 8px;
   border-radius: 8px;
   margin-left: 20px;
   margin-right: 32px;
 }
 
-.closerr:hover,
-.closerr:focus {
-  color: black;
+.cookie-confrm:hover,
+.cookie-confrm:focus {
+  color: white;
   text-decoration: none;
   cursor: pointer;
 }

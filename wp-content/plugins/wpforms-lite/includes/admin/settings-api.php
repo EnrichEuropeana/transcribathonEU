@@ -35,8 +35,11 @@ function wpforms_settings_output_field( $args ) {
 	// Custom row classes.
 	$class = ! empty( $args['class'] ) ? wpforms_sanitize_classes( (array) $args['class'], true ) : '';
 
+	// Allow hiding blocks on page load (useful for JS toggles).
+	$display_none = ! empty( $args['is_hidden'] ) ? 'style="display:none;"' : '';
+
 	// Build standard field markup and return.
-	$output = '<div class="wpforms-setting-row wpforms-setting-row-' . sanitize_html_class( $args['type'] ) . ' wpforms-clear ' . $class . '" id="wpforms-setting-row-' . wpforms_sanitize_key( $args['id'] ) . '">';
+	$output = '<div class="wpforms-setting-row wpforms-setting-row-' . sanitize_html_class( $args['type'] ) . ' wpforms-clear ' . $class . '" id="wpforms-setting-row-' . wpforms_sanitize_key( $args['id'] ) . '" ' . $display_none . '>';
 
 	if ( ! empty( $args['name'] ) && empty( $args['no_label'] ) ) {
 		$output .= '<span class="wpforms-setting-label">';
@@ -158,21 +161,17 @@ function wpforms_settings_license_callback( $args ) {
 	$output .= '<p class="type ' . $class . '">' .
 				sprintf(
 					/* translators: $s - license type. */
-					esc_html__( 'Your license key type is %s.', 'wpforms-lite' ),
-					'<strong>' . esc_html( $type ) . '</strong>'
+					esc_html__( 'Your license key level is %s.', 'wpforms-lite' ),
+					'<strong>' . esc_html( ucwords( $type ) ) . '</strong>'
 				) .
 				'</p>';
 	$output .= '<p class="desc ' . $class . '">' .
-				wp_kses(
-					__( 'If your license has been upgraded or is incorrect, <a href="#" id="wpforms-setting-license-key-refresh">click here to force a refresh</a>.', 'wpforms-lite' ),
-					array(
-						'a' => array(
-							'href' => array(),
-							'id'   => array(),
-						),
-					)
-				) .
-				'</p>';
+				sprintf( /* translators: %s - Refresh link. */
+					esc_html__( 'If your license has been upgraded or is incorrect, then please %1$sforce a refresh%2$s.', 'wpforms-lite' ),
+					'<a href="#" id="wpforms-setting-license-key-refresh">',
+					'</a>'
+				)
+				. '</p>';
 
 	return $output;
 }

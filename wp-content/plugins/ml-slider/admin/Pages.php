@@ -176,6 +176,14 @@ Class MetaSlider_Admin_Pages extends MetaSliderPlugin {
         parent::render_admin_page(); 
     }
 
+	/**
+     * Sets up any logic needed for the main page
+     * TODO continue refactoring from here
+     */
+    public function render_metaslider_settings_page() {
+        include METASLIDER_PATH."admin/views/pages/settings.php";
+    }
+
     /**
      * Sets up any logic needed for the upgrade page
      */

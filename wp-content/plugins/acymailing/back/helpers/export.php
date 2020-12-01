@@ -207,7 +207,7 @@ class acymexportHelper extends acymObject
     {
         $final = implode($this->eol, $csvLines);
 
-        @ob_clean();
+        @ob_get_clean();
         $filename = 'export_stats_'.$type.'_'.date('Y-m-d');
         $this->setDownloadHeaders($filename);
         echo $final;
@@ -228,7 +228,7 @@ class acymexportHelper extends acymObject
         $firstLine = $this->before.implode($separator, array_merge($fieldsToExport, $customFieldsToExport)).$this->after.$this->eol;
 
         if (empty($exportFile)) {
-            @ob_clean();
+            @ob_get_clean();
             $filename = 'export_'.date('Y-m-d');
             $this->setDownloadHeaders($filename);
             echo $firstLine;

@@ -292,7 +292,26 @@ namespace WPDataAccess\Simple_Form {
 		 */
 		protected $back_to_list_text = '';
 
+		/**
+		 * Table settings (taken from plugin table settings table)
+		 *
+		 * @var mixed|null
+		 */
 		protected $wpda_table_settings = null;
+
+		/**
+		 * Show help icon if hrlp url is available
+		 *
+		 * @var null|string
+		 */
+		protected $help_url = null;
+
+		/**
+		 * Hide Add New button
+		 *
+		 * @var null|string
+		 */
+		protected $hide_add_new = false;
 
 		/**
 		 * WPDA_Simple_Form constructor
@@ -452,11 +471,19 @@ namespace WPDataAccess\Simple_Form {
 				$this->page_number_item .= "<input type='hidden' name='" . $this->page_number_item_name . "' value='$requested_page_number'/>";
 			}
 
+			// Add search arguments to link to return to same page
+			foreach ( $_REQUEST as $key => $value) {
+				if ( substr( $key, 0, 19) === 'wpda_search_column_' ) {
+					$this->page_number_link .= "&{$key}={$value}";
+					$this->page_number_item .= "<input type='hidden' name='{$key}' value='{$value}' />";
+				}
+			}
+
 			// Check if button text "back to list" should be changed
 			if ( isset( $args['back_to_list_text'] ) && '' !== $args['back_to_list_text'] ) {
 				$this->back_to_list_text = $args['back_to_list_text'];
 			} else {
-				$this->back_to_list_text = __( 'Back To List', 'wp-data-access' );
+				$this->back_to_list_text = __( 'List', 'wp-data-access' );
 			}
 
 			// Get table settings
@@ -465,6 +492,13 @@ namespace WPDataAccess\Simple_Form {
 				$this->wpda_table_settings = json_decode( $wpda_table_settings[0]['wpda_table_settings'] );
 			}
 
+			if ( isset( $args['help_url'] ) ) {
+				$this->help_url = $args['help_url'];
+			}
+
+			if ( isset( $args['hide_add_new'] ) ) {
+				$this->hide_add_new = $args['hide_add_new'];
+			}
 		}
 
 		/**
@@ -610,6 +644,9 @@ namespace WPDataAccess\Simple_Form {
 			) {
 				$this->fieldset_title = $this->title;
 				$this->title          = __( 'Data Explorer', 'wp-data-access' );
+				if ( wpda_fremius()->is_premium() ) {
+					$this->title = __( 'Premium', 'wp-data-access' ) . ' ' . $this->title;
+				}
 			}
 
 		}
@@ -631,6 +668,22 @@ namespace WPDataAccess\Simple_Form {
 		 */
 		public function show( $allow_save = true, $add_param = '' ) {
 			$this->prepare_form( $allow_save );
+
+			// Prepare url
+			if ( is_admin() ) {
+				$url = "?page={$this->page}";
+			} else {
+				$url = '';
+			}
+			if ( '' !== $this->schema_name ) {
+				$url .= $url === '' ? '?' : '&';
+				$url .= "schema_name={$this->schema_name}";
+			}
+			$url .= $url === '' ? '?' : '&';
+			$url .= "table_name={$this->table_name}";
+
+			$url_back = $url;
+			$url     .= $add_param;
 			?>
 			<div class="wrap">
 				<?php if ( $this->show_title ) { ?>
@@ -638,39 +691,42 @@ namespace WPDataAccess\Simple_Form {
 						<?php if ( is_admin() && $this->show_back_icon ) { ?>
 						<a
 								href="javascript:void(0)"
-								onclick="javascript:location.href='?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $add_param ); ?><?php echo $this->page_number_link; ?>'"
+								onclick="jQuery('#<?php echo esc_attr( $this->current_form_id ); ?>_backbutton').submit()"
 								style="display: inline-block; vertical-align: unset;"
-								class="dashicons dashicons-arrow-left-alt"
+								class="dashicons dashicons-arrow-left-alt wpda_tooltip"
 								title="<?php echo $this->back_to_list_text; ?>"
 						></a>
 						<?php } ?>
 						<span style="vertical-align:top;"><?php echo esc_attr( $this->title ); ?></span>
 						<?php
-						if ( 'wpda_publisher' === $this->page ) {
-							// I can't believe I'm doing this... Shame on me!!! "Bud" it works...
+						if ( null !== $this->help_url ) {
 							?>
-							<a href="https://wpdataaccess.com/docs/documentation/data-publisher/" target="_blank" title="Plugin Help - open a new tab or window">
+							<a href="<?php echo $this->help_url; ?>" target="_blank" class="wpda_tooltip" title="Plugin Help - open a new tab or window">
 								<span class="dashicons dashicons-editor-help"
 									  style="text-decoration:none;vertical-align:top;font-size:30px;">
 								</span></a>
 							<?php
 						} else {
-							if ( 'view' !== $this->action ) {
+							if ( 'view' !== $this->action && ! $this->hide_add_new ) {
 								if ( WPDA::is_wpda_table( $this->table_name ) ||
 								     ( 'on' === WPDA::get_option( WPDA::OPTION_BE_ALLOW_INSERT ) &&
 								       count( $this->wpda_list_columns->get_table_primary_key() ) ) > 0
 								) {
+									$title = __( 'Add new row to table', 'wp-data-access' );
 									?>
 									<form
 											method="post"
-											action="?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $add_param ); ?>"
+											action="<?php echo esc_attr( $url ); ?>"
 											style="display: inline-block; vertical-align: bottom;"
 									>
 										<div>
 											<input type="hidden" name="action" value="new">
-											<input type="submit"
-												   value="<?php echo __( 'Add New', 'wp-data-access' ); ?>"
-												   class="page-title-action">
+											<button type="submit" class="page-title-action wpda_tooltip"
+													title="<?php echo $title; ?>"
+											>
+												<span class="material-icons wpda_icon_on_button">add_circle</span>
+												<?php echo __( 'Add New', 'wp-data-access' ); ?>
+											</button>
 										</div>
 									</form>
 									<?php
@@ -689,7 +745,7 @@ namespace WPDataAccess\Simple_Form {
 				<?php } ?>
 				<form id="<?php echo esc_attr( $this->current_form_id ); ?>"
 					  method="post" enctype="multipart/form-data"
-					  action="?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $add_param ); ?>">
+					  action="<?php echo esc_attr( $url ); ?>">
 					<div>
 						<fieldset class="wpda_fieldset">
 							<?php if ( '' !== $this->fieldset_title ) { ?>
@@ -699,7 +755,7 @@ namespace WPDataAccess\Simple_Form {
 								</span>
 								</legend>
 							<?php } ?>
-							<table class="wpda_simple_table" cellspacing="0" cellpadding="0"">
+							<table class="wpda_simple_table <?php echo esc_attr( $this->table_name ); ?>" cellspacing="0" cellpadding="0">
 								<?php
 								$js_code = ''; // All column JS code will be stored here and added to the end of the form.
 								foreach ( $this->form_items as $item ) {
@@ -722,26 +778,40 @@ namespace WPDataAccess\Simple_Form {
 					<?php $this->add_parent_args(); ?>
 					<?php wp_nonce_field( $this->get_nonce_action( false ), '_wpnonce', false ); ?>
 					<?php if ( 'view' !== $this->action ) { ?>
-						<input type="submit"
-							   value="<?php echo __( 'Save Changes To Database', 'wp-data-access' ); ?>"
-							   class="button button-primary"
-							   name="submit_button"
-							   onclick="return submit_form();"
-						/>
+						<button type="submit"
+							   	class="button button-primary"
+							   	name="submit_button"
+							   	onclick="return submit_form();">
+							<span class="material-icons wpda_icon_on_button">check</span>
+							<?php echo __( 'Submit', 'wp-data-access' ); ?>
+						</button>
 						<?php if ( $this->show_back_button ) { ?>
-							<input type="button"
-								   onclick="javascript:location.href='?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $this->add_parent_args_to_back_button() ); ?><?php echo esc_attr( $add_param ); ?><?php echo $this->page_number_link; ?>'"
-								   class="button button-secondary"
-								   value="<?php echo $this->back_to_list_text; ?>">
+							<button type="button"
+								    onclick="jQuery('#<?php echo esc_attr( $this->current_form_id ); ?>_backbutton').submit();"
+								    class="button button-secondary">
+								<span class="material-icons wpda_icon_on_button">arrow_back</span>
+								<?php echo $this->back_to_list_text; ?>
+							</button>
 						<?php } ?>
 						<span style="float:right;"><?php $this->add_buttons(); ?></span>
 					<?php } ?>
 					<?php if ( 'view' === $this->action ) { ?>
-						<input type="button"
-							   onclick="javascript:location.href='?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $this->add_parent_args_to_back_button() ); ?><?php echo esc_attr( $add_param ); ?><?php echo $this->page_number_link; ?>'"
-							   class="button button-secondary"
-							   value="<?php echo $this->back_to_list_text; ?>">
+						<button type="button"
+							   	onclick="jQuery('#<?php echo esc_attr( $this->current_form_id ); ?>_backbutton').submit()"
+							   	class="button button-secondary">
+							<span class="material-icons wpda_icon_on_button">arrow_back</span>
+							<?php echo $this->back_to_list_text; ?>
+						</button>
 					<?php } ?>
+				</form>
+				<form id="<?php echo esc_attr( $this->current_form_id ); ?>_backbutton"
+					  method="post" style="display:none"
+					  action="<?php echo esc_attr( $url_back ); ?>">
+					<?php
+					echo $this->add_parent_args();
+					echo $this->page_number_item;
+					?>
+					<input type="hidden" name="action" value="list">
 				</form>
 			</div>
 
@@ -795,6 +865,7 @@ namespace WPDataAccess\Simple_Form {
 							jQuery(this).removeClass('wpda_input_error');
 						}
 					});
+					jQuery( '.wpda_tooltip' ).tooltip();
 				});
 				<?php echo $js_code; ?>
 			</script>

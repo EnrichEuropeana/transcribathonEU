@@ -1,10 +1,10 @@
 # WP Data Access
 
-* Contributors: [PeterSchulzNL](https://www.linkedin.com/in/peterschulznl/)
+* Contributors: [PeterSchulzNL](https://wpdataaccess.com/)
 * Donate link: https://www.paypal.me/kpsch
 * Requires at least: WordPress 4.8.3
 * Tested up to: WordPress 5.4
-* Stable tag: 3.1.1
+* Stable tag: 3.5.0
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,15 +22,13 @@ For advanced users, the plugin support more complex features like remote databas
 
 [» Download plugin](https://wordpress.org/plugins/wp-data-access/) 
 
-[» Download Source Code](https://bitbucket.org/wpdataaccess/wp-data-access/src)
+[» What's New](https://wpdataaccess.com/docs/documentation/getting-started/whats-new/)
 
-[» Changelog](https://bitbucket.org/wpdataaccess/wp-data-access/src/master/CHANGES.md)
-
-[» Actual TODO List](https://bitbucket.org/wpdataaccess/wp-data-access/src/master/todo.txt)
+[» Known Limitations](https://wpdataaccess.com/docs/documentation/getting-started/known-limitations/)
 
 ## License
 
-WP Data Access is licensed under the [GPL v2](https://bitbucket.org/wpdataaccess/wp-data-access/src/master/LICENSE.txt) or later.
+WP Data Access is licensed under the [GPL v2](http://www.gnu.org/licenses/gpl-2.0.html) or later.
 
 > This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as

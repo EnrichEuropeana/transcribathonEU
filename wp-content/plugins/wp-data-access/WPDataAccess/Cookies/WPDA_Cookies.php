@@ -59,7 +59,7 @@ namespace WPDataAccess\Cookies {
 				$cookie_name = \WP_Data_Access_Admin::PAGE_MAIN . '_schema_name';
 				if ( isset( $_REQUEST['wpda_main_db_schema'] ) && '' !== $_REQUEST['wpda_main_db_schema'] ) {
 					$requested_db_schema = sanitize_text_field( wp_unslash( $_REQUEST['wpda_main_db_schema'] ) ); // input var okay.
-					setcookie( $cookie_name, $requested_db_schema, time() + 3600 );
+					$this->set_cookie( $cookie_name, $requested_db_schema, time() + 3600 );
 				} else {
 					if ( 'clear' === $panel_cookies ) {
 						// Check referer: clear cookie on new page request.
@@ -70,8 +70,7 @@ namespace WPDataAccess\Cookies {
 								$page = $path['page'];
 								if ( $this->page !== $page ) {
 									// New page request: reset cookie.
-									setcookie( $cookie_name, '', time() - 3600 );
-									unset( $_COOKIE[ $cookie_name ] );
+									$this->set_cookie( $cookie_name, '', time() - 3600 );
 								}
 							}
 						}
@@ -82,7 +81,7 @@ namespace WPDataAccess\Cookies {
 				$cookie_name = $this->page . '_favourites';
 				if ( isset( $_REQUEST['wpda_main_favourites'] ) ) {
 					$favourites = sanitize_text_field( wp_unslash( $_REQUEST['wpda_main_favourites'] ) ); // input var okay.
-					setcookie( $cookie_name, $favourites, time() + 3600 );
+					$this->set_cookie( $cookie_name, $favourites, time() + 3600 );
 				} else {
 					if ( 'clear' === $panel_cookies ) {
 						// Check referer: clear cookie on new page request.
@@ -93,8 +92,7 @@ namespace WPDataAccess\Cookies {
 								$page = $path['page'];
 								if ( $this->page !== $page ) {
 									// New page request: reset cookie.
-									setcookie( $cookie_name, '', time() - 3600 );
-									unset( $_COOKIE[ $cookie_name ] );
+									$this->set_cookie( $cookie_name, '', time() - 3600 );
 								}
 							}
 						}
@@ -111,12 +109,7 @@ namespace WPDataAccess\Cookies {
 			$search_item_name = WPDA_List_Table::SEARCH_ITEM_NAME_DEFAULT;
 			if ( isset( $_REQUEST[ $search_item_name ] ) ) { // input var okay.
 				$search_argument = sanitize_text_field( wp_unslash( $_REQUEST[ $search_item_name ] ) ); // input var okay.
-				if ( '' !== $search_argument ) {
-					setcookie( $cookie_name, $search_argument, time() + 3600 );
-				} else {
-					setcookie( $cookie_name, '', time() - 3600 );
-					unset( $_COOKIE[ $cookie_name ] );
-				}
+				$this->set_cookie( $cookie_name, $search_argument, time() + 3600 );
 			} else {
 				if ( 'clear' === $panel_cookies ) {
 					// Check referer: clear cookie on new page request.
@@ -129,14 +122,29 @@ namespace WPDataAccess\Cookies {
 								// New page request: reset cookie and all cookies for subpages.
 								foreach ( $_COOKIE as $key => $value ) {
 									if ( $this->page . '_search_' === substr( $key, 0, strlen( $this->page . '_search_' ) ) ) {
-										setcookie( $key, '', time() - 3600 );
-										unset( $_COOKIE[ $key ] );
+										$this->set_cookie( $key, '', time() - 3600 );
 									}
 								}
 							}
 						}
 					}
 				}
+			}
+		}
+
+		protected function set_cookie( $cookie_name, $cookie_value, $cookie_expires ) {
+			if (PHP_VERSION_ID < 70300) {
+				setcookie( $cookie_name, $cookie_value, $cookie_expires, '/; samesite=strict' );
+			} else {
+				setcookie($cookie_name, $cookie_value, [
+					'expires'  => $cookie_expires,
+					'path'     => '/',
+					'samesite' => 'strict',
+				]);
+			}
+
+			if ( '' === $cookie_value ) {
+				unset( $_COOKIE[ $cookie_name ] );
 			}
 		}
 

@@ -10,7 +10,7 @@ foreach ($our_plugins as $plugin) {
 // If they have any plugins missing, make room for ads
 $width = (in_array(false, $installed_plugins, true)) ? 'metaslider_half_width' : ''
 ?>
-<div class="flex p-6 mb-16">
+<div id="metaslider-ui" class="flex p-6 mb-16">
     <div class="metaslider_col <?php echo $width; ?>">
         <h2 class="font-light text-xl mb-2">MetaSlider <?php _e("Comparison Chart", 'ml-slider');?></h2>
         <table class="metaslider_feat_table shadow">

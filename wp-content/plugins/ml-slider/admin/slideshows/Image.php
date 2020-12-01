@@ -288,4 +288,35 @@ class MetaSlider_Image {
 		return $attach_id;
 	}
 
+	/**
+     * Method to get image id from the filename
+     *
+     * @param array $filenames - It should be the the post_name
+	 * @return array
+     */
+	public static function get_image_ids_from_file_name($filenames) {
+		$images = array();
+		foreach ($filenames as $filename) {
+			$image = get_posts(array(
+				'post_type' => 'attachment',
+				'name' => $filename,
+				'posts_per_page' => 1,
+				'post_status' => 'inherit',
+			));
+			$image = $image ? array_pop($image) : null;
+
+			if (is_null($image)) {
+				$images[$filename] = null;
+				continue;
+			}
+
+			$images[$filename] = array(
+				'url' => wp_get_attachment_url($image->ID),
+				'thumbnail' => wp_get_attachment_thumb_url($image->ID),
+				'id' => $image->ID
+			);
+		}
+		return $images;
+	}
+
 }

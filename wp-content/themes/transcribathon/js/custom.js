@@ -4,7 +4,36 @@ var map, marker;
 
 
 
-jQuery ( document ).ready(function() {
+jQuery(window).load(function() {
+  initializeMap();
+});
+
+jQuery(document).ready(function() {
+  jQuery('#default-lock-login').click(function() {
+    jQuery('#default-login-container').css('display', 'block');
+  })
+
+  jQuery('.item-login-close').click(function() {
+    jQuery('#default-login-container').css('display', 'none');
+  })
+
+  // When the user clicks the button, open the modal 
+  jQuery('#help-tutorials.panel-widget-style').click(function() {
+    jQuery('#tutorial-popup-window-container').css('display', 'block');
+    jQuery('#tutorial-menu-slider-area').slick('refresh');
+  })
+    
+  // When the user clicks on <span> (x), close the modal
+  jQuery('.tutorial-window-close').click(function() {
+  jQuery('#tutorial-popup-window-container').css('display', 'none');
+  })		
+  
+  jQuery('#tutorial-popup-window-container').mousedown(function(event){
+    if (event.target.id == 'tutorial-popup-window-container') {
+      jQuery('#tutorial-popup-window-container').css('display', 'none')
+    }
+  })		
+
   if (jQuery('.sow-contact-form-success').length) {
     jQuery('.contact-question').html("");
   }
@@ -53,7 +82,6 @@ jQuery ( document ).ready(function() {
     jQuery('#tutorial-menu-slider-area').slick('slickGoTo', slideno - 1);
   });
   jQuery("#tutorial-menu-slider-area").on("afterChange", function (){
-    console.log(jQuery('.slick-active').index());
     jQuery('a[data-slide]').removeClass('theme-color');
     jQuery('#tutorial-nav').children().eq(jQuery('.slick-active').index()).children('a').addClass("theme-color");
   })
@@ -63,7 +91,6 @@ jQuery ( document ).ready(function() {
     jQuery(this).css('display', 'none')
   })
   jQuery('.show-less').click(function(){
-    console.log(jQuery(this).parent().html());
     jQuery(this).parent().siblings('.show-more').css('display', 'block')
   })
 
@@ -137,142 +164,8 @@ function uninstallEventListeners() {
 }
 
 function installEventListeners() {
-   //reinitialising map
-    var url_string = window.location.href;
-    var url = new URL(url_string);
-    var itemId = url.searchParams.get('item');
-    var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
-
-    mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
-
-    jQuery('#addMapMarker').click(function() {
-	
-	 var el = document.createElement('div');
-        el.className = 'marker';
-
-        var icon = document.createElement('i');
-        icon .className = 'fas fa-map-marker-plus';
-        if(typeof marker !== 'undefined') {
-          marker.remove();
-        }
-        marker = new mapboxgl.Marker({element: el, draggable: true})
-          .setLngLat(map.getCenter())
-          .addTo(map);
-
-          var lngLat = marker.getLngLat();
-        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
-	marker.on('dragend', onDragEnd);
-    });
-
-    if (jQuery('#full-view-map').length) {
-        map = new mapboxgl.Map({
-          container: 'full-view-map',
-          style: 'mapbox://styles/fandf/ck4birror0dyh1dlmd25uhp6y',
-          center: [16, 49],
-          zoom: 2.25
-        });
-        map.addControl(new mapboxgl.NavigationControl());
-        
-	      var bounds = new mapboxgl.LngLatBounds();
-
-        fetch(home_url + '/tp-api/places/story/' + itemId)
-          .then(function(response) {
-            return response.json();
-          })
-          .then(function(places) {
-            places.filter(place => place.Latitude != 0 || place.Longitude != 0).forEach(function(marker) {
-              var el = document.createElement('div');
-              el.className = 'marker savedMarker ' + (marker.ItemId == 0 ? "storyMarker" : "");
-              var popup = new mapboxgl.Popup({offset: 35, closeButton: false})
-              .setHTML('<div class=\"popupWrapper\">' + (marker.ItemId == 0 ? '<div class=\"story-location-header\">Story Location</div>' : '') + '<div class=\"name\">' + (marker.Name || marker.ItemTitle || "") + '</div><div class=\"comment\">' + (marker.Comment || "") + '</div></div>');
-	          	bounds.extend([marker.Longitude, marker.Latitude]);
-              new mapboxgl.Marker({element: el, anchor: 'bottom'})
-                .setLngLat([marker.Longitude, marker.Latitude])
-              .setPopup(popup)
-                .addTo(map);
-            });
-		if(places[0].Places && places[0].Places.length === 1) {
-		  map.flyTo({
-			center: [
-			bounds._ne.lng,
-			bounds._ne.lat
-			],
-			zoom: 9,
-			essential: true
-		  });
-		} else {
-			map.fitBounds(bounds, {padding: {top: 100, bottom:100, left: 100, right: 100}});
-		}
-        });
-
-      var geocoder = new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl,
-              marker: false,
-	      language: 'en-EN'
-      });
-      
-      geocoder.on('result', function(res) {
-        jQuery('#location-input-section').addClass('show');
-        jQuery('#location-input-geonames-search-container > input').val(res.result['text_en-EN'] + '; ' + res.result.properties.wikidata);
-        var el = document.createElement('div');
-        el.className = 'marker';
-
-        var icon = document.createElement('div');
-        icon .className = 'marker newMarker';
-        if(typeof marker !== 'undefined') {
-          marker.remove();
-        }
-        marker = new mapboxgl.Marker({element: el, draggable: true, element: icon})
-          .setLngLat(res.result.geometry.coordinates)
-          .addTo(map);
-          var lngLat = marker.getLngLat();
-        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
-        marker.on('dragend', onDragEnd);
-      })
-      
-        //map.addControl(geocoder, 'bottom-left');
-
-      jQuery('#location-input-section .location-input-name-container input').remove()
-      jQuery('#location-input-section .location-input-name-container.location-input-container')[0].appendChild(geocoder.onAdd(map));   
-      
-
-      var marker;
-      jQuery('#addMarker').click(function() {
-        var el = document.createElement('div');
-        el.className = 'marker';
-      
-        // make a marker for each feature and add to the map
-        marker = new mapboxgl.Marker({element: el, draggable: true})
-          .setLngLat(map.getCenter())
-          .addTo(map);
-
-        marker.on('dragend', onDragEnd);
-      });
-
-      function onDragEnd() {
-        var lngLat = marker.getLngLat();
-        coordinates.value = lngLat.lat + ', ' + lngLat.lng;
-      }  
-    }
-    
-  jQuery('#location-input-section > div:nth-child(4) > button:nth-child(1)').click(function() {
-    marker.setDraggable(false);
-    marker.getElement().classList.remove('fa-map-marker-plus');
-    //marker.getElement().classList.add('fa-map-marker-alt');
-    marker.getElement().classList.add('savedMarker');
-    // set the popup
-    var name = jQuery('#location-input-section > div:nth-child(1) > div:nth-child(1) > input:nth-child(3)').val();
-    var desc = jQuery('#location-input-section > div:nth-child(2) > textarea:nth-child(3)').val();
-    var popup = new mapboxgl.Popup({offset: 25, closeButton: false})
-            .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + name + '</div><div class=\"comment\">' + desc + '</div></div>');
-    marker.setPopup(popup);
-    console.log(marker._lngLat);
-    // allow multiple markers to be added
-    marker = undefined;
-  });
-
-
+  initializeMap();
+  
   // When the user clicks the button, open the modal 
   jQuery('#lock-login').click(function() {
     jQuery('#item-page-login-container').css('display', 'block');
@@ -730,7 +623,6 @@ function switchItemView(event, viewName) {
       jQuery( "#item-data-section" ).resizable({
          handles: "n, e, s, w, se, ne, sw, nw" , 
          resize: function(event, ui) {
-          console.log("test");
             jQuery('#tutorial-help-item-page').slick('refresh')
         }
       })
@@ -979,8 +871,8 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
 	function(response) {
 		// Check success and create confirmation message
 		var response = JSON.parse(response);
-    var descriptionCompletion = JSON.parse(response.content)[0]["DescriptionStatusName"];
-    var oldDescription = JSON.parse(response.content)[0]["Description"];
+    var descriptionCompletion = JSON.parse(response.content)["DescriptionStatusName"];
+    var oldDescription = JSON.parse(response.content)["Description"];
     
     jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
       'type': 'POST',
@@ -1032,7 +924,8 @@ function updateItemDescription(itemId, userId, editStatusColor, statusCount) {
 
 // Updates the item description
 function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
-
+  jQuery('#transcription-update-button').removeClass('theme-color-background');
+  jQuery('#transcription-update-button').prop('disabled', true);
   jQuery('#item-transcription-spinner-container').css('display', 'block')
 
   // Get languages
@@ -1055,23 +948,17 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
   },
     function(response) {
       var response = JSON.parse(response);
-      var itemCompletion = JSON.parse(response.content)[0]["CompletionStatusName"];
-      var transcriptionCompletion = JSON.parse(response.content)[0]["TranscriptionStatusName"];
+      var itemCompletion = JSON.parse(response.content)["CompletionStatusName"];
+      var transcriptionCompletion = JSON.parse(response.content)["TranscriptionStatusName"];
       var currentTranscription = "";
-      for (var i = 0; i < JSON.parse(response.content)[0]["Transcriptions"].length; i++) {
-        if (JSON.parse(response.content)[0]["Transcriptions"][i]["CurrentVersion"] == 1) {
-          currentTranscription = JSON.parse(response.content)[0]["Transcriptions"][i]["TextNoTags"];
+      console.log(JSON.parse(response.content)["Transcriptions"]);
+      for (var i = 0; i < JSON.parse(response.content)["Transcriptions"].length; i++) {
+        if (JSON.parse(response.content)["Transcriptions"][i]["CurrentVersion"] == 1) {
+          currentTranscription = JSON.parse(response.content)["Transcriptions"][i]["TextNoTags"];
         }
       }
       
-      var newTranscriptionLength = 0
-      jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/strip_tags.php', {
-        'text': jQuery('#item-page-transcription-text').html().replace("&nbsp;", " ")
-      },
-      function(response) {
-        newTranscriptionLength = response.length;
-      })
-
+      var newTranscriptionLength = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'}).length
 
       // Prepare data and send API request
       data = {
@@ -1083,8 +970,8 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
           }
       
       if (jQuery('#item-page-transcription-text').html()) {
-        data['Text'] = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'html'});
-        data['TextNoTags'] = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'});
+        data['Text'] = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'html'}).replace(/'/g, "\\'");
+        data['TextNoTags'] = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'}).replace(/'/g, "\\'");
       }
       else {
         data['Text'] = "";
@@ -1130,8 +1017,6 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
           if (transcriptionCompletion == "Not Started") {
             changeStatus(itemId, "Not Started", "Edit", "TranscriptionStatusId", 2, editStatusColor, statusCount)
           }
-          jQuery('#transcription-update-button').removeClass('theme-color-background');
-          jQuery('#transcription-update-button').prop('disabled', true);
         }
         jQuery('#item-transcription-spinner-container').css('display', 'none')
       });
@@ -1140,7 +1025,13 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
 }
 
 // Adds an Item Property
-function addItemProperty(itemId, userId, type, editStatusColor, statusCount, e) {
+function addItemProperty(itemId, userId, type, editStatusColor, statusCount, propertyValue, e) {
+  if (jQuery('#type-' + propertyValue + '-checkbox').is(':checked')) {
+    jQuery('#type-' + propertyValue + '-checkbox').attr("checked", true);
+  }
+  else {
+    jQuery('#type-' + propertyValue + '-checkbox').attr("checked", false);
+  }
   // Prepare data and send API request
   propertyId = e.value;
   data = {
@@ -1189,7 +1080,7 @@ function addItemProperty(itemId, userId, type, editStatusColor, statusCount, e) 
     function(response) {
       // Check success and create confirmation message
       var response = JSON.parse(response);
-      var descriptionCompletion = JSON.parse(response.content)[0]["DescriptionStatusName"];
+      var descriptionCompletion = JSON.parse(response.content)["DescriptionStatusName"];
       if (descriptionCompletion == "Not Started") {
         changeStatus(itemId, "Not Started", "Edit", "DescriptionStatusId", 2, editStatusColor, statusCount)
       }
@@ -1214,7 +1105,7 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
         if (response.code == "200") {
           var content = JSON.parse(response.content);
 
-          oldStatus = content[0][fieldName.replace("Id", "Name")];
+          oldStatus = content[fieldName.replace("Id", "Name")];
 
           // Add "-"" to "Not Started"
           var oldProgress = 'progress-bar-' + oldStatus.replace(" ", "-") + '-section';
@@ -1314,6 +1205,7 @@ function changeStatus (itemId, oldStatus, newStatus, fieldName, value, color, st
     updateDataProperty("items", itemId , fieldName, value);
     jQuery('.status-dropdown-content').removeClass('show')
   }
+  updateSolr();
 }
 
 function removeTranscriptionLanguage(languageId, e) {
@@ -1338,7 +1230,6 @@ function removeTranscriptionLanguage(languageId, e) {
 }
 
 function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
-	console.log("test");
   jQuery('#item-location-spinner-container').css('display', 'block')
   // Prepare data and send API request
   locationName = jQuery('#location-name-display input').val();
@@ -1375,7 +1266,7 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
   },
     function(response) {
       var response = JSON.parse(response);
-      var locationCompletion = JSON.parse(response.content)[0]["LocationStatusName"];
+      var locationCompletion = JSON.parse(response.content)["LocationStatusName"];
       var data = {
                 Name: locationName,
                 Latitude: latitude,
@@ -1396,7 +1287,6 @@ function saveItemLocation(itemId, userId, editStatusColor, statusCount) {
       },
       // Check success and create confirmation message
       function(response) {
-	console.log(data);
         scoreData = {
                       ItemId: itemId,
                       UserId: userId,
@@ -1472,10 +1362,9 @@ function saveItemDate(itemId, userId, editStatusColor, statusCount) {
   },
     function(response) {
       var response = JSON.parse(response);
-      var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
-      var oldStartDate = JSON.parse(response.content)[0]["DateStart"];
-      var oldEndDate = JSON.parse(response.content)[0]["DateEnd"];
-      console.log(data)
+      var taggingCompletion = JSON.parse(response.content)["TaggingStatusName"];
+      var oldStartDate = JSON.parse(response.content)["DateStart"];
+      var oldEndDate = JSON.parse(response.content)["DateEnd"];
       jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
           'url': home_url + '/tp-api/items/' + itemId,
@@ -1569,7 +1458,7 @@ function savePerson(itemId, userId, editStatusColor, statusCount) {
   },
   function(response) {
     var response = JSON.parse(response);
-    var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
+    var taggingCompletion = JSON.parse(response.content)["TaggingStatusName"];
     jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'POST',
         'url': home_url + '/tp-api/persons',
@@ -1621,7 +1510,7 @@ function saveKeyword(itemId, userId, editStatusColor, statusCount) {
     },
     function(response) {
       var response = JSON.parse(response);
-      var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
+      var taggingCompletion = JSON.parse(response.content)["TaggingStatusName"];
       jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
           'url': home_url + '/tp-api/properties?ItemId=' + itemId,
@@ -1675,7 +1564,7 @@ function saveLink(itemId, userId, editStatusColor, statusCount, e) {
     },
     function(response) {
       var response = JSON.parse(response);
-      var taggingCompletion = JSON.parse(response.content)[0]["TaggingStatusName"];
+      var taggingCompletion = JSON.parse(response.content)["TaggingStatusName"];
       jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
           'type': 'POST',
           'url': home_url + '/tp-api/properties?ItemId=' + itemId,
@@ -1748,8 +1637,8 @@ function loadPlaceData(itemId, userId) {
                                 '</span></br>' +
                                 '<span>' +
                                     'Wikidata: ' +
-                                    '<a href="' + 'http://wikidata.org/wiki/' + $place['WikiDataId'] +'" style="text-decoration: none;" target="_blank">' + 
-                                    $place['WikidataName'] + ', ' + $place['WikidataId'] + 
+                                    '<a href="' + 'http://wikidata.org/wiki/' + content[i]['WikiDataId'] +'" style="text-decoration: none;" target="_blank">' + 
+                                    content[i]['WikidataName'] + ', ' + content[i]['WikidataId'] + 
                                     '</a>' +
                                 '</span>' +
                                '<div style="display:flex;"><span style="width:86%;"></span>' + '<span style="width:14%;">' +
@@ -2074,13 +1963,13 @@ function loadKeywordData(itemId, userId) {
     if (response.code == "200") {
       var content = JSON.parse(response.content);
       jQuery('#item-keyword-list ul').html('')
-      for (var i = 0; i < content[0]['Properties'].length; i++) {  
-        if (content[0]['Properties'][i]['PropertyType'] == "Keyword") { 
+      for (var i = 0; i < content['Properties'].length; i++) {  
+        if (content['Properties'][i]['PropertyType'] == "Keyword") { 
           jQuery('#item-keyword-list ul').append( 
             '<li id="add-item-keyword" class="theme-color-background">' +
-                escapeHtml(content[0]['Properties'][i]['PropertyValue']) +
+                escapeHtml(content['Properties'][i]['PropertyValue']) +
                 '<i class="login-required delete-item-datas far fa-times"' +
-                    'onClick="deleteItemData(\'properties\', ' + content[0]['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'keyword\', ' + userId + ')"></i>' +
+                    'onClick="deleteItemData(\'properties\', ' + content['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'keyword\', ' + userId + ')"></i>' +
             '</li>'
           )
         }
@@ -2100,27 +1989,27 @@ function loadLinkData(itemId, userId) {
     if (response.code == "200") {
       var content = JSON.parse(response.content);
       jQuery('#item-link-list ul').html('')
-      for (var i = 0; i < content[0]['Properties'].length; i++) {  
-        if (content[0]['Properties'][i]['PropertyType'] == "Link") { 
-          if (content[0]['Properties'][i]['PropertyDescription'] != "NULL" && content[0]['Properties'][i]['PropertyDescription'] != null) {
-            var description = escapeHtml(content[0]['Properties'][i]['PropertyDescription']);
+      for (var i = 0; i < content['Properties'].length; i++) {  
+        if (content['Properties'][i]['PropertyType'] == "Link") { 
+          if (content['Properties'][i]['PropertyDescription'] != "NULL" && content['Properties'][i]['PropertyDescription'] != null) {
+            var description = escapeHtml(content['Properties'][i]['PropertyDescription']);
           }
           else {
             var description = "";
           } 
           jQuery('#item-link-list ul').append( 
-            '<li id="link-' + content[0]['Properties'][i]['PropertyId'] + '">' +
-              '<div id="link-data-output-' + content[0]['Properties'][i]['PropertyId'] + '" class="">' +
-                '<div id="link-data-output-display-' + content[0]['Properties'][i]['PropertyId'] + '" class="link-data-output-content">' +
+            '<li id="link-' + content['Properties'][i]['PropertyId'] + '">' +
+              '<div id="link-data-output-' + content['Properties'][i]['PropertyId'] + '" class="">' +
+                '<div id="link-data-output-display-' + content['Properties'][i]['PropertyId'] + '" class="link-data-output-content">' +
                     '<div class="item-data-output-element-header">' +
-                        '<a href="' + content[0]['Properties'][i]['PropertyValue'] + '" target="_blank" class="link-data-ouput-headline">' +
-                        escapeHtml(content[0]['Properties'][i]['PropertyValue']) +
+                        '<a href="' + content['Properties'][i]['PropertyValue'] + '" target="_blank" class="link-data-ouput-headline">' +
+                        escapeHtml(content['Properties'][i]['PropertyValue']) +
                         '</a>' +
                       
                         '<i class="edit-item-data-icon fas fa-pencil theme-color-hover"' +
-                        'onClick="openLinksourceEdit(' + content[0]['Properties'][i]['PropertyId'] + ')"></i>' +
+                        'onClick="openLinksourceEdit(' + content['Properties'][i]['PropertyId'] + ')"></i>' +
                         '<i class="edit-item-data-icon delete-item-data fas fa-trash-alt theme-color-hover"' +
-                                      'onClick="deleteItemData(\'properties\', ' + content[0]['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'link\', ' + userId + ')"></i>' +
+                                      'onClick="deleteItemData(\'properties\', ' + content['Properties'][i]['PropertyId'] + ', ' + itemId + ', \'link\', ' + userId + ')"></i>' +
                         '<div style="clear:both;"></div>' +
                     '</div>' +
                     '<div>' +
@@ -2131,31 +2020,31 @@ function loadLinkData(itemId, userId) {
                     '</div>' +
                   '</div>' +
 
-                  '<div class="link-data-edit-container" id="link-data-edit-' + content[0]['Properties'][i]['PropertyId'] +'">' +
+                  '<div class="link-data-edit-container" id="link-data-edit-' + content['Properties'][i]['PropertyId'] +'">' +
                       '<div>' +
                         "<span>Link:</span><br/>" +
                       '</div>' +
 
-                      '<div id="link-' + content[0]['Properties'][i]['PropertyId'] +'-url-input" class="link-url-input">' +
-                        '<input type="url" value="' + escapeHtml(content[0]['Properties'][i]['PropertyValue']) + '">' +
+                      '<div id="link-' + content['Properties'][i]['PropertyId'] +'-url-input" class="link-url-input">' +
+                        '<input type="url" value="' + escapeHtml(content['Properties'][i]['PropertyValue']) + '">' +
                       '</div>' +
 
-                      '<div id="link-' + content[0]['Properties'][i]['PropertyId'] +'-description-input" class="link-description-input" >' +
+                      '<div id="link-' + content['Properties'][i]['PropertyId'] +'-description-input" class="link-description-input" >' +
                         '<label>Additional description:</label><br/>' +
                         '<textarea rows= "3" type="text" placeholder="" name="">' + escapeHtml(description) + '</textarea>' +
                       '</div>' +
 
                       '<div class="form-buttons-right">' +
                           "<button type='submit' class='theme-color-background' id='link-save-button'" +
-                                "onClick='editLink(" + content[0]['Properties'][i]['PropertyId'] + ", " + itemId + ", " + userId + ")'>" +
+                                "onClick='editLink(" + content['Properties'][i]['PropertyId'] + ", " + itemId + ", " + userId + ")'>" +
                             "SAVE" +
                           "</button>" +
 
-                          "<button class='theme-color-background edit-data-cancel-right' onClick='openLinksourceEdit(" + content[0]['Properties'][i]['PropertyId'] + ")'>" +
+                          "<button class='theme-color-background edit-data-cancel-right' onClick='openLinksourceEdit(" + content['Properties'][i]['PropertyId'] + ")'>" +
                             "CANCEL" +
                           "</button>" +
 
-                          '<div id="item-link-' + content[0]['Properties'][i]['PropertyId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
+                          '<div id="item-link-' + content['Properties'][i]['PropertyId'] + '-spinner-container" class="spinner-container spinner-container-left">' +
                           '<div class="spinner"></div>' +
                           "</div>" +
                           '<div style="clear:both;"></div>' +
@@ -2208,13 +2097,11 @@ function getMoreTops(myid,base,limit,kind,cp,subject,showshortnames){
 	document.getElementById("top-transcribers-spinner").style.display = "block";
 	
 	jQuery.post("/wp-content/themes/transcribathon/admin/inc/custom_widgets/tct-top-transcribers/skript/tct-top-transcribers-skript.php",{'q':'gtttrs','myid':myid,'base':base,'limit':limit,'kind':kind,'cp':cp,'subject':subject,'shortnames':showshortnames}, function(res) {	
-    
-    console.log("test");
+
     if(res.stat === "ok"){
 			jQuery('#tu_list_'+myid).html(res.content);
 			jQuery('#ttnav_'+myid).html(res.ttnav);
 		}else{
-      console.log(jQuery('#tu_list_'+myid).html());
 			alert(res.content);	
 		}
 	});
@@ -2243,7 +2130,19 @@ function getMoreTopsPage(myid,limit,kind,cp,subject,showshortnames){
 		}
 	});
 }
-
+/* Surf Members in teams */
+function getMoreTeamTops(myid,base,limit,tid){
+	"use strict";
+	document.getElementById("loadingGif_" + subject).style.display = "block";
+	jQuery.post("/wp-content/themes/transcribathon/admin/inc/custom_widgets/tct-top-transcribers/skript/tct-top-transcribers-skript.php",{'q':'gtttmtrs','myid':myid,'base':base,'limit':limit,'tid':tid}, function(res) {	
+		if(res.stat === "ok"){
+			jQuery('#tu_list_'+myid).html(res.content);
+			jQuery('#ttnav_'+myid).html(res.ttnav);
+		}else{
+			alert(res.content);	
+		}
+	});
+}
 function openLocationEdit(placeId) {
   if (jQuery('#transcribeLock').length) {
     event.preventDefault();
@@ -2453,7 +2352,6 @@ function editTeam(teamId) {
   },
   // Check success and create confirmation message
   function(response) {
-    console.log(response);
     jQuery('#team-' + teamId + '-spinner-container').css('display', 'none')
   });
 }
@@ -2819,14 +2717,37 @@ function tct_storybox_getNextTwelve(modID,stand,cols){
 		//alert("'q':'gmbxs','ids':"+ids+",'cols':"+cols);
 		jQuery('#tct_storyboxmore_'+modID).removeClass('smallloading').addClass('smallloading');
 		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_widgets/tct-storyboxes/skript/loadboxes.php",{'q':'gmbxs','ids':ids,'cols':cols}, function(res) {	
-			//alert(JSON.stringify(res));
+			// alert(JSON.stringify(res));
 			if(res.status === "ok"){
-        console.log(res);
 				jQuery('#doc-results_'+modID+' div.tableholder div.tablegrid').append(res.boxes);
 				if(jQuery('#tct_storyboxidholder_'+modID+' div.tct_sry_'+(parseInt(stand)+1)).text() != ""){
 					jQuery('#tct_storyboxmore_'+modID).attr('onclick',"tct_storybox_getNextTwelve('"+modID+"','"+(parseInt(stand)+1)+"','"+cols+"'); return false;").removeClass('smallloading');
 				}else{
 				   	jQuery('#tct_storyboxmore_'+modID).removeClass('smallloading').remove();	
+				}
+			}else{
+				alert('Sorry, an error occured');
+			}
+		});
+	}
+}
+
+// Itemboxes
+function tct_itembox_getNextTwelve(modID,stand,cols){
+	"use strict";
+	var ids = jQuery('#tct_itemboxidholder_'+modID+' div.tct_sry_'+stand).text().split(',').join('|');
+	// alert(jQuery('#tct_itemboxidholder_'+modID+' div.tct_sry_'+stand).text());
+	if(jQuery('#tct_itemboxidholder_'+modID+' div.tct_sry_'+stand).text() != ""){
+    // alert("'q':'gmbxs','ids':"+ids+",'cols':"+cols);
+		jQuery('#tct_itemboxmore_'+modID).removeClass('smallloading').addClass('smallloading');
+		jQuery.post(home_url + "/wp-content/themes/transcribathon/admin/inc/custom_widgets/tct-itemboxes/skript/loadboxes.php",{'q':'gmbxs','ids':ids,'cols':cols}, function(res) {	
+			// alert(JSON.stringify(res));
+			if(res.status === "ok"){
+				jQuery('#doc-results_'+modID+' div.tableholder div.tablegrid').append(res.boxes);
+				if(jQuery('#tct_itemboxidholder_'+modID+' div.tct_sry_'+(parseInt(stand)+1)).text() != ""){
+					jQuery('#tct_itemboxmore_'+modID).attr('onclick',"tct_itembox_getNextTwelve('"+modID+"','"+(parseInt(stand)+1)+"','"+cols+"'); return false;").removeClass('smallloading');
+				}else{
+				   	jQuery('#tct_itemboxmore_'+modID).removeClass('smallloading').remove();	
 				}
 			}else{
 				alert('Sorry, an error occured');
@@ -2856,11 +2777,11 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
     function(response) {
       var response = JSON.parse(response);
       var content = JSON.parse(response.content);
-      var transcriptions = content[0]['Transcriptions'];
+      var transcriptions = content['Transcriptions'];
 
       
       // swap the image in the iiif viewer
-      imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
+      imageData = JSON.parse(JSON.parse(response.content)['ImageLink']);
       imageLink = imageData['service']['@id'];
       if (imageData['service']['@id'].substr(0, 4) == "http") {
         imageLink = imageData['service']['@id'];
@@ -2888,7 +2809,7 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
       jQuery('.marker').remove();
       var bounds = new mapboxgl.LngLatBounds(); 
   
-      content[0]['Places'].forEach(function(marker) {
+      content['Places'].forEach(function(marker) {
         var el = document.createElement('div');
         el.className = 'marker savedMarker fas fa-map-marker-alt';
         var popup = new mapboxgl.Popup({offset: 0, closeButton: false})
@@ -2981,7 +2902,7 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
         }
       }
 
-      var properties = content[0]['Properties'];
+      var properties = content['Properties'];
       jQuery('.category-checkbox').each(function() {
         jQuery(this).prop('checked', false);
       })
@@ -2991,10 +2912,10 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
         }
       }
       jQuery('#item-page-description-text').val("");
-      jQuery('#item-page-description-text').val(content[0]['Description']);
-      if (content[0]['DescriptionLanguage'] != "0") {
-        jQuery('#description-language-selector select').val('\"' + content[0]['DescriptionLanguage'] + '\"');
-        jQuery('#description-language-custom-selector').html(jQuery('#description-language-selector select option[value="' + content[0]['DescriptionLanguage'] + '"').text());
+      jQuery('#item-page-description-text').val(content['Description']);
+      if (content['DescriptionLanguage'] != "0") {
+        jQuery('#description-language-selector select').val('\"' + content['DescriptionLanguage'] + '\"');
+        jQuery('#description-language-custom-selector').html(jQuery('#description-language-selector select option[value="' + content['DescriptionLanguage'] + '"').text());
       }
       else {
         jQuery('#description-language-selector select').val(null);
@@ -3044,14 +2965,14 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
       jQuery('[data-slick-index=' + (itemOrder - 1) + ']').append("<div class='slider-current-item-pointer'></div>");
 
 
-      jQuery('#transcription-status-indicator').css('color', content[0]['TranscriptionStatusColorCode']);
-      jQuery('#transcription-status-indicator').css('background-color', content[0]['TranscriptionStatusColorCode']);
-      jQuery('#description-status-indicator').css('color', content[0]['DescriptionStatusColorCode']);
-      jQuery('#description-status-indicator').css('background-color', content[0]['DescriptionStatusColorCode']);
-      jQuery('#location-status-indicator').css('color', content[0]['LocationStatusColorCode']);
-      jQuery('#location-status-indicator').css('background-color', content[0]['LocationStatusColorCode']);
-      jQuery('#tagging-status-indicator').css('color', content[0]['TaggingStatusColorCode']);
-      jQuery('#tagging-status-indicator').css('background-color', content[0]['TaggingStatusColorCode']);
+      jQuery('#transcription-status-indicator').css('color', content['TranscriptionStatusColorCode']);
+      jQuery('#transcription-status-indicator').css('background-color', content['TranscriptionStatusColorCode']);
+      jQuery('#description-status-indicator').css('color', content['DescriptionStatusColorCode']);
+      jQuery('#description-status-indicator').css('background-color', content['DescriptionStatusColorCode']);
+      jQuery('#location-status-indicator').css('color', content['LocationStatusColorCode']);
+      jQuery('#location-status-indicator').css('background-color', content['LocationStatusColorCode']);
+      jQuery('#tagging-status-indicator').css('color', content['TaggingStatusColorCode']);
+      jQuery('#tagging-status-indicator').css('background-color', content['TaggingStatusColorCode']);
 
       jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
         'type': 'GET',
@@ -3062,10 +2983,10 @@ function switchItem(itemId, userId, statusColor, progressSize, itemOrder, itemAm
           var statusContent = JSON.parse(statusResponse.content);
 
           var progressData = [
-            content[0]['TranscriptionStatusName'],
-            content[0]['DescriptionStatusName'],
-            content[0]['LocationStatusName'],
-            content[0]['TaggingStatusName'],
+            content['TranscriptionStatusName'],
+            content['DescriptionStatusName'],
+            content['LocationStatusName'],
+            content['TaggingStatusName'],
           ];
           var progressCount = [];
           progressCount['Not Started'] = 0;
@@ -3127,51 +3048,6 @@ jQuery(document).delegate('#item-page-description-text', 'keydown', function(e) 
   }
 });
 
-/*jQuery(document).delegate('.mce-content-body.mce-edit-focus', 'keydown', function(e) {
-  var keyCode = e.keyCode || e.which;
-
-  if (keyCode == 9) {
-    e.preventDefault();
-    var start = this.selectionStart;
-    var end = this.selectionEnd;
-
-    // set textarea value to: text before caret + tab + text after caret
-    jQuery(this).val(jQuery(this).val().substring(0, start)
-                + "\t"
-                + jQuery(this).val().substring(end));
-
-    // put caret at right position again
-    this.selectionStart =
-    this.selectionEnd = start + 1;
-  }
-});*/
-
-jQuery('#default-lock-login').click(function() {
-  jQuery('#default-login-container').css('display', 'block');
-})
-
- jQuery('.item-login-close').click(function() {
-  jQuery('#default-login-container').css('display', 'none');
-})
-jQuery ( document ).ready(function() {
-            // When the user clicks the button, open the modal 
-            jQuery('#help-tutorials.panel-widget-style').click(function() {
-            jQuery('#tutorial-popup-window-container').css('display', 'block');
-            jQuery('#tutorial-menu-slider-area').slick('refresh');
-            
-            })
-            
-            // When the user clicks on <span> (x), close the modal
-            jQuery('.tutorial-window-close').click(function() {
-            jQuery('#tutorial-popup-window-container').css('display', 'none');
-            })		
-            
-            jQuery('#tutorial-popup-window-container').mousedown(function(event){
-              if (event.target.id == 'tutorial-popup-window-container') {
-                jQuery('#tutorial-popup-window-container').css('display', 'none')
-              }
-            })			
-          });
           
 function updateSolr() {
   jQuery.post(home_url + '/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
@@ -3191,7 +3067,6 @@ function getEnrichments(storyId, itemId, savedEnrichmentIds) {
     var response = JSON.parse(response);
     var content = JSON.parse(response.content);
     savedEnrichmentIds = savedEnrichmentIds.split(",");
-    console.log(savedEnrichmentIds);
 
     content.items.forEach((item, i) => {
       var name = item.body.prefLabel.en;
@@ -3217,7 +3092,6 @@ function getEnrichments(storyId, itemId, savedEnrichmentIds) {
 }
 
 function saveEnrichment(name, type, wikiData, itemId, id, index) {
-  console.log(index);
   if (jQuery('#received-enrichment-' + index + ' input').attr('checked') == "checked") {
     data = {
       Name: name,
@@ -3256,4 +3130,140 @@ function saveEnrichment(name, type, wikiData, itemId, id, index) {
     function(response) {
     });
   }
+}
+
+function initializeMap() {
+  //reinitialising map
+  var url_string = window.location.href;
+  var url = new URL(url_string);
+  var itemId = url.searchParams.get('item');
+  var coordinates = jQuery('.location-input-coordinates-container.location-input-container > input ')[0];
+
+  mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZGYiLCJhIjoiY2pucHoybmF6MG5uMDN4cGY5dnk4aW80NSJ9.U8roKG6-JV49VZw5ji6YiQ';
+
+  jQuery('#addMapMarker').click(function() {
+    var el = document.createElement('div');
+    el.className = 'marker';
+
+    var icon = document.createElement('i');
+    icon .className = 'fas fa-map-marker-plus';
+    if(typeof marker !== 'undefined') {
+      marker.remove();
+    }
+    marker = new mapboxgl.Marker({element: el, draggable: true})
+      .setLngLat(map.getCenter())
+      .addTo(map);
+
+    var lngLat = marker.getLngLat();
+    coordinates.value = lngLat.lat + ', ' + lngLat.lng;
+    marker.on('dragend', onDragEnd);
+  });
+
+  if (jQuery('#full-view-map').length) {
+      jQuery('.map-placeholder').css('display', 'none');
+      map = new mapboxgl.Map({
+        container: 'full-view-map',
+        style: 'mapbox://styles/fandf/ck4birror0dyh1dlmd25uhp6y',
+        center: [16, 49],
+        zoom: 2.25
+      });
+      map.addControl(new mapboxgl.NavigationControl());
+      
+      var bounds = new mapboxgl.LngLatBounds();
+
+      fetch(home_url + '/tp-api/places/story/' + itemId)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(places) {
+          places.filter(place => place.Latitude != 0 || place.Longitude != 0).forEach(function(marker) {
+            var el = document.createElement('div');
+            el.className = 'marker savedMarker ' + (marker.ItemId == 0 ? "storyMarker" : "");
+            var popup = new mapboxgl.Popup({offset: 35, closeButton: false})
+            .setHTML('<div class=\"popupWrapper\">' + (marker.ItemId == 0 ? '<div class=\"story-location-header\">Story Location</div>' : '') + '<div class=\"name\">' + (marker.Name || marker.ItemTitle || "") + '</div><div class=\"comment\">' + (marker.Comment || "") + '</div></div>');
+            bounds.extend([marker.Longitude, marker.Latitude]);
+            new mapboxgl.Marker({element: el, anchor: 'bottom'})
+              .setLngLat([marker.Longitude, marker.Latitude])
+            .setPopup(popup)
+              .addTo(map);
+          });
+        if(places && places.length === 1) {
+          map.flyTo({
+            center: [
+            bounds._ne.lng,
+            bounds._ne.lat
+            ],
+            zoom: 5, 
+            essential: true
+          });
+        } else {
+          map.fitBounds(bounds, {padding: {top: 100, bottom:100, left: 100, right: 100}});
+        }
+      });
+
+    var geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+            marker: false,
+      language: 'en-EN'
+    });
+    
+    geocoder.on('result', function(res) {
+      jQuery('#location-input-section').addClass('show');
+      jQuery('#location-input-geonames-search-container > input').val(res.result['text_en-EN'] + '; ' + res.result.properties.wikidata);
+      var el = document.createElement('div');
+      el.className = 'marker';
+
+      var icon = document.createElement('div');
+      icon .className = 'marker newMarker';
+      if(typeof marker !== 'undefined') {
+        marker.remove();
+      }
+      marker = new mapboxgl.Marker({element: el, draggable: true, element: icon})
+        .setLngLat(res.result.geometry.coordinates)
+        .addTo(map);
+        var lngLat = marker.getLngLat();
+      coordinates.value = lngLat.lat + ', ' + lngLat.lng;
+      marker.on('dragend', onDragEnd);
+    })
+    
+      //map.addControl(geocoder, 'bottom-left');
+
+    jQuery('#location-input-section .location-input-name-container input').remove()
+    jQuery('#location-input-section .location-input-name-container.location-input-container')[0].appendChild(geocoder.onAdd(map));   
+    
+
+    var marker;
+    jQuery('#addMarker').click(function() {
+      var el = document.createElement('div');
+      el.className = 'marker';
+    
+      // make a marker for each feature and add to the map
+      marker = new mapboxgl.Marker({element: el, draggable: true})
+        .setLngLat(map.getCenter())
+        .addTo(map);
+
+      marker.on('dragend', onDragEnd);
+    });
+
+    function onDragEnd() {
+      var lngLat = marker.getLngLat();
+      coordinates.value = lngLat.lat + ', ' + lngLat.lng;
+    }  
+  }
+  
+  jQuery('#location-input-section > div:nth-child(4) > button:nth-child(1)').click(function() {
+  marker.setDraggable(false);
+  marker.getElement().classList.remove('fa-map-marker-plus');
+  //marker.getElement().classList.add('fa-map-marker-alt');
+  marker.getElement().classList.add('savedMarker');
+  // set the popup
+  var name = jQuery('#location-input-section > div:nth-child(1) > div:nth-child(1) > input:nth-child(3)').val();
+  var desc = jQuery('#location-input-section > div:nth-child(2) > textarea:nth-child(3)').val();
+  var popup = new mapboxgl.Popup({offset: 25, closeButton: false})
+          .setHTML('<div class=\"popupWrapper\"><div class=\"name\">' + name + '</div><div class=\"comment\">' + desc + '</div></div>');
+  marker.setPopup(popup);
+  // allow multiple markers to be added
+  marker = undefined;
+  });
 }

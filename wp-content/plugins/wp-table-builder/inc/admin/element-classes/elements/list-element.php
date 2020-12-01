@@ -1,7 +1,7 @@
 <?php
 namespace WP_Table_Builder\Inc\Admin\Element_Classes\Elements;
 
-use WP_Table_Builder\Inc\Admin\Element_Classes\Base\Element_Base_Object as Element_Base_Object;
+use WP_Table_Builder\Inc\Admin\Element_Classes\Base\Element_Base as Element_Base;
 use WP_Table_Builder\Inc\Admin\Managers\Controls_Manager as Controls_Manager;
 use WP_Table_Builder as NS;
 
@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-class List_Element extends Element_Base_Object {
+class List_Element extends Element_Base {
     
     /**
 	 * Get element name.
@@ -51,7 +51,7 @@ class List_Element extends Element_Base_Object {
 	 * @return string Directory Element icon.
 	 */
 	public function get_directory_icon() {
-		return NS\WP_TABLE_BUILDER_DIR . 'inc/admin/views/builder/icons/list.svg'; ;
+		return NS\WP_TABLE_BUILDER_DIR . 'inc/admin/views/builder/icons/list.svg';
 	}
     
     /**
@@ -173,6 +173,36 @@ class List_Element extends Element_Base_Object {
                 'selectors' => [
                     '{{{data.container}}} ul li p' => 'color',
                 ]
+			]
+		);
+
+		$this->add_control(
+			'size',
+			[
+				'label' => __( 'Font Size', 'wp_table_builder' ),
+				'type' => Controls_Manager::SIZE,
+                'selectors' => [
+                    '{{{data.container}}} ul li p' => 'fontSize',
+                ],
+                'min' => 10, 
+                'max' => 50,
+                'defaultValue' => 15,
+                'dimension' => 'px'
+			]
+		);
+
+		$this->add_control(
+			'spacing',
+			[
+				'label' => __( 'Item Spacing', 'wp_table_builder' ),
+				'type' => Controls_Manager::SIZE,
+                'selectors' => [
+                    '{{{data.container}}} ul li' => 'marginBottom',
+                ],
+                'min' => 0, 
+                'max' => 30,
+                'defaultValue' => 0,
+                'dimension' => 'px'
 			]
 		);
         

@@ -2,37 +2,35 @@
 	die; } // Cannot access directly.
 
 //
-// Set a unique slug-like ID
+// Set a unique slug-like ID.
 //
 $prefix = 'sp_eap_settings';
 
 //
-// Create options
+// Create options.
 //
 SP_EAP::createOptions(
 	$prefix,
 	array(
-		'menu_title'         => __( 'Settings', 'easy-accordion-free' ),
-		'menu_slug'          => 'eap_settings',
-		'menu_parent'        => 'edit.php?post_type=sp_easy_accordion',
-		'menu_type'          => 'submenu',
-		'ajax_save'          => true,
-		'save_defaults'      => true,
-		'show_reset_all'     => true,
-		'show_all_options'   => false,
-		'show_reset_section' => true,
-		'show_search'        => false,
-		'show_bar_menu'      => false,
-		'show_footer'        => false,
-		'framework_title'    => __( 'Easy Accordion', 'easy-accordion-free' ),
-		'framework_class'    => 'sp-eap-options',
-		'theme'              => 'light',
-		// 'async_webfont'   => true,
+		'menu_title'       => __( 'Settings', 'easy-accordion-free' ),
+		'menu_slug'        => 'eap_settings',
+		'menu_parent'      => 'edit.php?post_type=sp_easy_accordion',
+		'menu_type'        => 'submenu',
+		'ajax_save'        => true,
+		'show_bar_menu'    => false,
+		'save_defaults'    => true,
+		'show_reset_all'   => true,
+		'show_all_options' => false,
+		'show_search'      => false,
+		'show_footer'      => false,
+		'framework_title'  => __( 'Easy Accordion', 'easy-accordion-free' ),
+		'framework_class'  => 'sp-eap-options',
+		'theme'            => 'light',
 	)
 );
 
 //
-// Create a section
+// Create a section.
 //
 SP_EAP::createSection(
 	$prefix,
@@ -66,7 +64,7 @@ SP_EAP::createSection(
 );
 
 //
-// Custom CSS Fields
+// Custom CSS Fields.
 //
 SP_EAP::createSection(
 	$prefix,

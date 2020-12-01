@@ -458,7 +458,7 @@ namespace WPDataAccess\Utilities {
 									' ' .
 									__( 'ACTION', 'wp-data-access' ) .
 									': ' .
-									'<a href="?page=wpda_settings&tab=repository">' . __( 'Recreate repository', 'wp-data-access' ) . '</a>' .
+									'<a href="?page=wpdataaccess&tab=repository">' . __( 'Recreate repository', 'wp-data-access' ) . '</a>' .
 									' ' .
 									__( 'to to solve this problem.', 'wp-data-access' ) .
 									' [' .
@@ -471,29 +471,28 @@ namespace WPDataAccess\Utilities {
 					}
 				}
 			}
+		}
 
-			if ( isset( $_REQUEST['whats_new'] ) && 'off' === $_REQUEST['whats_new'] ) {
-				// Turn off what's new message.
-				WPDA::set_option( WPDA::OPTION_WPDA_SHOW_WHATS_NEW, 'off' );
+		public static function whats_new() {
+			if ( ! is_admin() ) {
+				return;
 			}
+
+			$url = admin_url() . 'admin.php?action=wpda_show_whats_new';
+
 			if ( 'off' !== WPDA::get_option( WPDA::OPTION_WPDA_SHOW_WHATS_NEW ) ) {
-				$msg = new WPDA_Message_Box(
-					[
-						'message_text' =>
-							__( 'See the', 'wp-data-access' ) .
-							' ' .
-							'<span class="dashicons dashicons-external"></span>' .
-							'<a href="https://wpdataaccess.com/docs/documentation/getting-started/whats-new/" target="_blank">' . __( 'what\'s new', 'wp-data-access' ) . '</a>' .
-							' ' .
-							__( 'page for new features added to WP Data Access.', 'wp-data-access' ) .
-							' [' .
-							'<a href="?' . $_SERVER['QUERY_STRING'] . '&whats_new=off">' . __( 'do not show this message again', 'wp-data-access' ) . '</a>' .
-							']',
-					]
-				);
-
-				$msg->box();
+				$color = 'color: #a00;';
+				$url  .= '&whats_new=off';
+			} else {
+				$color = '';
 			}
+
+			?>
+			<a href="<?php echo $url; ?>" class="wpda_tooltip"
+			   target="_blank" title="What's New? - opens in a new tab or window">
+				<span class="material-icons"
+					  style="font-size: 26px;vertical-align: sub;<?php echo $color; ?>">update</span></a>
+			<?php
 		}
 
 	}

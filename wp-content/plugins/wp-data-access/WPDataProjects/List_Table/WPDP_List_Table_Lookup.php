@@ -146,8 +146,9 @@ namespace WPDataProjects\List_Table {
 											$target_schema_name
 										);
 										if ( null !== $lookup_value ) {
-											$item[ $column_name ] = $lookup_value; // Change item value, set to lookup value
-											// return sprintf( '%1$s', $this->render_column_content( $lookup_value, $column_name ) );
+											$item[ "lookup_id_$column_name" ]     = $item[ $column_name ];
+											$item[ "lookup_column_$column_name" ] = $column_option->lookup;
+											$item[ "lookup_value_$column_name" ]  = $lookup_value;
 										}
 									}
 								}

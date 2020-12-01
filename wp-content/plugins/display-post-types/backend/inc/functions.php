@@ -14,17 +14,17 @@
 function dpt_get_post_types() {
 
 	// Default Post and Pages post types.
-	$default = [
+	$default = array(
 		'post' => esc_html__( 'Posts', 'display-post-types' ),
 		'page' => esc_html__( 'Pages', 'display-post-types' ),
-	];
+	);
 
 	// Get the registered post types.
 	$post_types = get_post_types(
-		[
+		array(
 			'public'   => true,
 			'_builtin' => false,
-		],
+		),
 		'objects'
 	);
 	$post_types = wp_list_pluck( $post_types, 'label', 'name' );
@@ -41,18 +41,18 @@ function dpt_get_post_types() {
 function dpt_get_taxonomies() {
 
 	// Default taxonomies.
-	$default = [
+	$default = array(
 		''         => esc_html__( 'Ignore Taxonomy', 'display-post-types' ),
 		'category' => esc_html__( 'Categories', 'display-post-types' ),
 		'post_tag' => esc_html__( 'Tags', 'display-post-types' ),
-	];
+	);
 
 	// Get list of all registered taxonomies.
 	$taxonomies = get_taxonomies(
-		[
+		array(
 			'public'   => true,
 			'_builtin' => false,
-		],
+		),
 		'objects'
 	);
 
@@ -72,7 +72,7 @@ function dpt_get_taxonomies() {
  */
 function dpt_get_object_taxonomies( $request ) {
 
-	$taxs = [];
+	$taxs = array();
 	if ( isset( $request['post_type'] ) ) {
 		// Get list of all registered taxonomies.
 		$taxs = get_object_taxonomies( sanitize_text_field( $request['post_type'] ), 'objects' );
@@ -102,7 +102,7 @@ function dpt_get_object_taxonomies( $request ) {
 function dpt_get_pagelist() {
 
 	// Get list of all pages.
-	$pages = get_pages( [ 'exclude' => get_option( 'page_for_posts' ) ] );
+	$pages = get_pages( array( 'exclude' => get_option( 'page_for_posts' ) ) );
 	$pages = wp_list_pluck( $pages, 'post_title', 'ID' );
 
 	return $pages;
@@ -117,16 +117,16 @@ function dpt_get_pagelist() {
  */
 function dpt_get_terms( $request ) {
 
-	$terms = [];
+	$terms = array();
 	if ( isset( $request['taxonomy'] ) ) {
 		$terms = get_terms(
-			[
+			array(
 				'taxonomy'   => sanitize_text_field( $request['taxonomy'] ),
 				'hide_empty' => true,
-			]
+			)
 		);
 		if ( is_wp_error( $terms ) ) {
-			$terms = [];
+			$terms = array();
 		}
 	}
 
@@ -146,17 +146,18 @@ function dpt_get_terms( $request ) {
  */
 function dpt_get_defaults() {
 
-	return [
+	return array(
 		'post_type'  => '',
 		'taxonomy'   => '',
-		'terms'      => [],
+		'terms'      => array(),
+		'relation'   => 'IN',
 		'post_ids'   => '',
-		'pages'      => [],
+		'pages'      => array(),
 		'number'     => 5,
 		'orderby'    => 'date',
 		'order'      => 'DESC',
 		'styles'     => 'dpt-grid1',
-		'style_sup'  => [ 'thumbnail', 'title' ],
+		'style_sup'  => array( 'thumbnail', 'title' ),
 		'image_crop' => 'centercrop',
 		'img_aspect' => '',
 		'img_align'  => '',
@@ -170,5 +171,6 @@ function dpt_get_defaults() {
 		'e_teaser'   => '',
 		'classes'    => '',
 		'offset'     => 0,
-	];
+		'autotime'   => 0,
+	);
 }

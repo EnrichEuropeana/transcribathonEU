@@ -174,7 +174,7 @@ class Meow_Gallery_Custom_Links_Admin extends MeowApps_Admin { // extends MeowAp
 
 	function admin_parsing_engine_callback( $args ) {
 		$layouts = array(
-			//'None' => array( 'name' => __( 'None', 'gallery-custom-links' ), 'desc' => "" ),
+			'None' => array( 'name' => __( 'None (Not Supported Yet)', 'gallery-custom-links' ), 'desc' => "" ),
 			'HtmlDomParser' => array( 'name' => __( 'HtmlDomParser', 'gallery-custom-links' ), 'desc' => "" ),
 			'DiDom' => array( 'name' => __( 'DiDom', 'gallery-custom-links' ), 'desc' => "" )
 		);

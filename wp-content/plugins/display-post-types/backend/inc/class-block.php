@@ -37,9 +37,10 @@ class Block {
 	 * @since 1.0.0
 	 */
 	public static function init() {
-		add_action( 'init', [ self::get_instance(), 'register_block' ] );
-		add_action( 'rest_api_init', [ self::get_instance(), 'register_routes' ] );
-		add_action( 'enqueue_block_editor_assets', [ self::get_instance(), 'block_assets' ] );
+		$inst = self::get_instance();
+		add_action( 'init', array( $inst, 'register_block' ) );
+		add_action( 'rest_api_init', array( $inst, 'register_routes' ) );
+		add_action( 'enqueue_block_editor_assets', array( $inst, 'block_assets' ) );
 	}
 
 	/**
@@ -71,7 +72,11 @@ class Block {
 						'items'   => array(
 							'type' => 'string',
 						),
-						'default' => [],
+						'default' => array(),
+					),
+					'relation'  => array(
+						'type'    => 'string',
+						'default' => 'IN',
 					),
 					'postIds'   => array(
 						'type'    => 'string',
@@ -82,7 +87,7 @@ class Block {
 						'items'   => array(
 							'type' => 'string',
 						),
-						'default' => [],
+						'default' => array(),
 					),
 					'number'    => array(
 						'type'    => 'number',
@@ -105,7 +110,7 @@ class Block {
 						'items'   => array(
 							'type' => 'string',
 						),
-						'default' => [ 'thumbnail', 'title' ],
+						'default' => array( 'thumbnail', 'title' ),
 					),
 					'imageCrop' => array(
 						'type'    => 'string',
@@ -126,6 +131,10 @@ class Block {
 					'colNarr'   => array(
 						'type'    => 'number',
 						'default' => 3,
+					),
+					'autoTime'  => array(
+						'type'    => 'number',
+						'default' => 0,
 					),
 					'plHolder'  => array(
 						'type'    => 'bool',
@@ -174,10 +183,11 @@ class Block {
 		$classes = isset( $atts['className'] ) ? $atts['className'] : '';
 		ob_start();
 		dpt_display_posts(
-			[
+			array(
 				'post_type'  => $atts['postType'],
 				'taxonomy'   => $atts['taxonomy'],
 				'terms'      => $atts['terms'],
+				'relation'   => $atts['relation'],
 				'post_ids'   => $atts['postIds'],
 				'pages'      => $atts['pages'],
 				'number'     => $atts['number'],
@@ -190,6 +200,7 @@ class Block {
 				'img_align'  => $atts['imgAlign'],
 				'br_radius'  => $atts['brRadius'],
 				'col_narr'   => $atts['colNarr'],
+				'autotime'   => $atts['autoTime'],
 				'text_align' => $atts['textAlign'],
 				'v_gutter'   => $atts['vGutter'],
 				'h_gutter'   => $atts['hGutter'],
@@ -198,7 +209,7 @@ class Block {
 				'classes'    => $classes,
 				'offset'     => $atts['offset'],
 				'pl_holder'  => ( 'false' === $atts['plHolder'] || ! $atts['plHolder'] ) ? '' : 'yes',
-			]
+			)
 		);
 		$content = ob_get_clean();
 		return $content;
@@ -241,7 +252,7 @@ class Block {
 			array(
 				'methods'             => 'GET',
 				'callback'            => function () {
-					return apply_filters( 'dpt_styles', [] );
+					return apply_filters( 'dpt_styles', array() );
 				},
 				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
@@ -295,7 +306,7 @@ class Block {
 		wp_enqueue_script(
 			'dpt-flickity',
 			plugins_url( '/frontend/js/flickity.pkgd.min.js', dirname( dirname( __FILE__ ) ) ),
-			[],
+			array(),
 			DISPLAY_POST_TYPES_VERSION,
 			true
 		);
@@ -303,7 +314,7 @@ class Block {
 		wp_enqueue_script(
 			'dpt-bricklayer',
 			plugins_url( '/frontend/js/bricklayer.build.js', dirname( dirname( __FILE__ ) ) ),
-			[],
+			array(),
 			DISPLAY_POST_TYPES_VERSION,
 			true
 		);

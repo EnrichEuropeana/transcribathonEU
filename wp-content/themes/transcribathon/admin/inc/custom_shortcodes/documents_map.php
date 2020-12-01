@@ -21,7 +21,7 @@ function _TCT_documents_map( $atts ) {
 							      container: 'documentsMap',
 							      style: 'mapbox://styles/fandf/ck4birror0dyh1dlmd25uhp6y',
 							      center: [13, 46],
-							      zoom: 2.8
+							      zoom: 2.25
 							    });
 							map.addControl(
 								new MapboxGeocoder({
@@ -40,7 +40,6 @@ function _TCT_documents_map( $atts ) {
 							                          return response.json();
 							                        })
 							                        .then(function(places) {
-							                          console.log(places);
 										    var geojson = {type: 'FeatureCollection', features: [] }
 											var t0 = performance.now();
 										    for(var i = 0; i < places.length; i++) {

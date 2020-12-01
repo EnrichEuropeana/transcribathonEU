@@ -2,7 +2,7 @@
 /*
 Plugin Name: Responsive Lightbox & Gallery
 Description: Responsive Lightbox & Gallery allows users to create galleries and view larger versions of images, galleries and videos in a lightbox (overlay) effect optimized for mobile devices.
-Version: 2.2.2
+Version: 2.2.3.1
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/responsive-lightbox/
@@ -12,7 +12,7 @@ Text Domain: responsive-lightbox
 Domain Path: /languages
 
 Responsive Lightbox & Gallery
-Copyright (C) 2013-2018, Digital Factory - info@digitalfactory.pl
+Copyright (C) 2013-2020, Digital Factory - info@digitalfactory.pl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -43,7 +43,7 @@ include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes' . DIRECTORY_SEPARATOR . 'fun
  * Responsive Lightbox class.
  *
  * @class Responsive_Lightbox
- * @version	2.2.2
+ * @version	2.2.3
  */
 class Responsive_Lightbox {
 
@@ -199,7 +199,7 @@ class Responsive_Lightbox {
 		'folders' => array(
 			'active'			=> true,
 			'media_taxonomy'	=> 'rl_media_folder',
-			'media_tags'		=> 'rl_media_tag',
+			'media_tags'		=> false,
 			// 'jstree_style'		=> 'default',
 			'jstree_wholerow'	=> true,
 			'show_in_menu'		=> false,
@@ -264,7 +264,7 @@ class Responsive_Lightbox {
 			'origin_left'		=> true,
 			'origin_top'		=> true
 		),
-		'version' => '2.2.2',
+		'version' => '2.2.3',
 		'activation_date' => ''
 	);
 	public $options = array();
@@ -334,7 +334,7 @@ class Responsive_Lightbox {
 		$this->options['basicmasonry_gallery'] = array_merge( $this->defaults['basicmasonry_gallery'], ( ( $array = get_option( 'responsive_lightbox_basicmasonry_gallery', $this->defaults['basicmasonry_gallery'] ) ) == false ? array() : $array ) );
 
 		// actions
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+		add_action( 'plugins_loaded', array( $this, 'plugins_loaded_init' ) );
 		add_action( 'after_setup_theme', array( $this, 'init_remote_libraries' ), 11 );
 		add_action( 'init', array( $this, 'init_galleries' ) );
 		add_action( 'init', array( $this, 'init_folders' ) );
@@ -461,20 +461,23 @@ class Responsive_Lightbox {
 	}
 
 	/**
-	 * Load textdomain
+	 * Early initialization.
 	 *
 	 * @return void
 	 */
-	public function load_textdomain() {
+	public function plugins_loaded_init() {
+		// load textdomain
 		load_plugin_textdomain( 'responsive-lightbox', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
-		// gallery types
+		// set gallery types
 		$this->gallery_types = array(
 			'default'		=> __( 'Default', 'responsive-lightbox' ),
 			'basicgrid'		=> __( 'Basic Grid', 'responsive-lightbox' ),
 			'basicslider'	=> __( 'Basic Slider', 'responsive-lightbox' ),
 			'basicmasonry'	=> __( 'Basic Masonry', 'responsive-lightbox' )
 		);
+
+		include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes' . DIRECTORY_SEPARATOR . 'class-multilang.php' );
 	}
 
 	/**
@@ -938,7 +941,7 @@ class Responsive_Lightbox {
 					'show_in_nav_menus'		=> false,
 					'show_in_quick_edit'	=> true,
 					'show_tagcloud'			=> false,
-					'show_admin_column'		=> true,
+					'show_admin_column'		=> $this->options['folders']['show_in_menu'],
 					'update_count_callback'	=> '_update_generic_term_count',
 					'query_var'				=> false,
 					'rewrite'				=> false
@@ -994,6 +997,8 @@ class Responsive_Lightbox {
 	 * @return void
 	 */
 	public function register_media_taxonomy( $taxonomy ) {
+		$show_in_menu = ( $this->options['folders']['show_in_menu'] && ( ( $taxonomy === 'rl_media_folder' && $this->options['folders']['media_taxonomy'] === 'rl_media_folder' ) || ( $taxonomy !== 'rl_media_folder' && $this->options['folders']['media_taxonomy'] !== 'rl_media_folder' ) ) );
+
 		register_taxonomy(
 			$taxonomy,
 			'attachment',
@@ -1015,11 +1020,11 @@ class Responsive_Lightbox {
 					'menu_name'			=> _x( 'Folders', 'taxonomy general name', 'responsive-lightbox' ),
 				),
 				'show_ui'				=> ! ( $taxonomy === 'rl_media_folder' && $this->options['folders']['media_taxonomy'] !== 'rl_media_folder' ),
-				'show_in_menu'			=> ( $this->options['folders']['show_in_menu'] && ( ( $taxonomy === 'rl_media_folder' && $this->options['folders']['media_taxonomy'] === 'rl_media_folder' ) || ( $taxonomy !== 'rl_media_folder' && $this->options['folders']['media_taxonomy'] !== 'rl_media_folder' ) ) ),
+				'show_in_menu'			=> $show_in_menu,
 				'show_in_nav_menus'		=> false,
 				'show_in_quick_edit'	=> true,
 				'show_tagcloud'			=> false,
-				'show_admin_column'		=> true,
+				'show_admin_column'		=> $show_in_menu,
 				'update_count_callback'	=> '_update_generic_term_count',
 				'query_var'				=> false,
 				'rewrite'				=> false
@@ -1088,8 +1093,10 @@ class Responsive_Lightbox {
 	 * @return void
 	 */
 	public function init_gutenberg() {
+		// actions
 		add_action( 'enqueue_block_editor_assets', array( $this, 'gutenberg_enqueue_scripts' ) );
 
+		// filters
 		add_filter( 'block_categories', array( $this, 'block_category' ) );
 	}
 
@@ -1117,6 +1124,9 @@ class Responsive_Lightbox {
 	 */
 	public function gutenberg_enqueue_scripts() {
 		$rl = Responsive_Lightbox();
+
+		// enqueue gallery
+		$rl->galleries->enqueue_gallery_scripts_styles();
 
 		// enqueue script
 		wp_enqueue_script( 'responsive-lightbox-block-editor-script', RESPONSIVE_LIGHTBOX_URL . '/js/gutenberg.min.js', array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor', 'wp-components' ), $rl->defaults['version'] );

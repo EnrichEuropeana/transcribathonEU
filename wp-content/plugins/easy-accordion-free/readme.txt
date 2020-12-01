@@ -3,7 +3,7 @@ Contributors: shapedplugin
 Donate link: http://shapedplugin.com/donate
 Tags: accordion, accordions, accordion faq, vertical accordion, faq, faqs, faq widget, accordion widget, accordion menu, wordpress faq plugin, easy accordion, premium accordion, bootstrap accordion, horizontal accordion, responsive accordion, accordion jquery, css3 accordion, accordion shortcode, collapsible content, toggle, toggle accordion, wordpress accordion plugin, wordpress accordion, bootstrap collapse, post accordion, post faq, custom post accordion, accordion grid, accordion bar, product faq, woocommerce product accordion, woocommerce accordion, wordpress post accordion, content hide, hidden content, expand content
 Requires at least: 4.3
-Tested up to: 5.4
+Tested up to: 5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -260,6 +260,22 @@ Thank you!
 
 
 == Changelog ==
+
+= 2.0.10 - Aug 15, 2020 =
+* Fix: WordPress 5.5 compatible issue.
+
+= 2.0.9 - Jul 27, 2020 =
+* Fix: Fusion builder modal conflict issue.
+
+= 2.0.8 - Jun 20, 2020 =
+* Fix: New version update failed issue.
+
+= 2.0.7 - Jun 18, 2020 =
+* New: Add Media button on accordion content field.
+* New: Shortcode support for accordion content field.
+* New: FAQ page schema option.
+* Fix: Google font loading issue.
+* Fix: Padding top issue for content.
 
 = 2.0.6 - Dec 04, 2019 =
 * Fix: HTTP and HTTPS mixed content issue.

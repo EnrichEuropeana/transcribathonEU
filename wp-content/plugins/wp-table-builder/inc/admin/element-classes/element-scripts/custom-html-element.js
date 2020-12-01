@@ -1,80 +1,105 @@
-let infArr = element.className.match( /wptb-element-((.+-)\d+)/i );
-let controlKey = 'textarea';
-let elementControlTargetUnicClass = 'wptb-el-' + infArr[1] + '-' + controlKey;
+const infArr = element.className.match(/wptb-element-((.+-)\d+)/i);
+const controlKey = 'textarea';
+const elementControlTargetUnicClass = `wptb-el-${infArr[1]}-${controlKey}`;
 
-let tinyMceInitStart = function() {
-    tinyMCE.init({
-        target: element.childNodes[0],
-        inline: true,
-        plugins: "code",
-        //dialog_type: "modal",
-        //theme: 'modern',
-        menubar: false,
-        force_br_newlines: false,
-        force_p_newlines: false,
-        forced_root_block: '',
-        paste_as_text: false,
-        toolbar: false,
-        extended_valid_elements: "svg[*],defs[*],pattern[*],desc[*],metadata[*],g[*],\n\
-                            mask[*],path[*],line[*],marker[*],rect[*],circle[*],\n\
-                            ellipse[*],polygon[*],polyline[*],linearGradient[*],\n\
-                            radialGradient[*],stop[*],image[*],view[*],text[*],\n\
-                            textPath[*],title[*],tspan[*],glyph[*],symbol[*],switch[*],use[*]",
-        setup: function (ed) {
+const allowedChildrenTags = [
+	'div',
+	'a',
+	'p',
+	'ul',
+	'li',
+	'ol',
+	'span',
+	'h1',
+	'h2',
+	'h3',
+	'h4',
+	'h5',
+	'center',
+	'iframe',
+];
 
-            ed.on('input', function (e) {
-                let elementControlTextarea = document.getElementsByClassName(elementControlTargetUnicClass);
-                if (elementControlTextarea.length > 0) {
-                    elementControlTextarea = elementControlTextarea[0];
-                    elementControlTextarea.value = ed.targetElm.textContent;
-                }
-            });
+const innerChildTextArray = Array.from(allowedChildrenTags);
+innerChildTextArray.push('#text');
+const innerChildText = innerChildTextArray.join('|');
 
-            ed.on('focus', function () {
-                ed.targetElm.innerText = ed.targetElm.innerHTML;
+const greatTextWallOfValidChildren = allowedChildrenTags.reduce((p, c) => {
+	const formedValidChildren = `${c}[${innerChildText}]`;
+	p.push(formedValidChildren);
+	return p;
+}, []);
 
-                WPTB_Helper.wptbDocumentEventGenerate('click', ed.targetElm);
-                WPTB_Helper.wptbDocumentEventGenerate('input', ed.targetElm);
-            });
+const tinyMceInitStart = function () {
+	tinyMCE.init({
+		target: element.childNodes[0],
+		inline: true,
+		plugins: 'code',
+		// dialog_type: "modal",
+		// theme: 'modern',
+		menubar: false,
+		force_br_newlines: false,
+		force_p_newlines: false,
+		forced_root_block: '',
+		paste_as_text: false,
+		toolbar: false,
+		valid_elements: '*[*]',
+		valid_children: greatTextWallOfValidChildren.join(','),
+		allow_script_urls: true,
+		verify_html: false,
+		setup(ed) {
+			ed.on('input', function (e) {
+				let elementControlTextarea = document.getElementsByClassName(elementControlTargetUnicClass);
+				if (elementControlTextarea.length > 0) {
+					elementControlTextarea = elementControlTextarea[0];
+					elementControlTextarea.value = ed.targetElm.textContent;
+				}
+			});
 
-            ed.on('blur', function () {
-                ed.targetElm.innerHTML = ed.targetElm.innerText;
-            });
+			ed.on('focus', function () {
+				ed.targetElm.innerText = ed.targetElm.innerHTML;
 
-            ed.on('click', function () {
-                WPTB_Helper.wptbDocumentEventGenerate('input', ed.targetElm);
-            });
+				WPTB_Helper.wptbDocumentEventGenerate('click', ed.targetElm);
+				WPTB_Helper.wptbDocumentEventGenerate('input', ed.targetElm);
+			});
 
-            ed.on('keydown', function (e) {
-                let div = e.target;
-                let divText = div.innerHTML.replace(/\s+/g, ' ').trim();
-                divText = divText.replace(/&nbsp;/g, '').trim();
+			ed.on('blur', function () {
+				ed.targetElm.innerHTML = ed.targetElm.innerText;
+			});
 
-                if (!window.htmlElemKeyDown) {
-                    window.htmlElemKeyDown = divText;
-                }
-            });
+			ed.on('click', function () {
+				WPTB_Helper.wptbDocumentEventGenerate('input', ed.targetElm);
+			});
 
-            ed.on('keyup', function (e) {
-                let div = e.target;
-                let divText = div.innerHTML.replace(/\s+/g, ' ').trim();
-                divText = divText.replace(/&nbsp;/g, '').trim();
-                if (divText !== window.htmlElemKeyDown) {
-                    e.target.onblur = function () {
-                        let wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-                        wptbTableStateSaveManager.tableStateSet();
+			ed.on('keydown', function (e) {
+				const div = e.target;
+				let divText = div.innerHTML.replace(/\s+/g, ' ').trim();
+				divText = divText.replace(/&nbsp;/g, '').trim();
 
-                        window.htmlElemKeyDown = '';
-                        e.target.onblur = '';
-                    }
-                } else {
-                    e.target.onblur = '';
-                }
-            });
-        }
-    });
+				if (!window.htmlElemKeyDown) {
+					window.htmlElemKeyDown = divText;
+				}
+			});
 
-    element.removeEventListener( 'mouseover', tinyMceInitStart, false );
-}
+			ed.on('keyup', function (e) {
+				const div = e.target;
+				let divText = div.innerHTML.replace(/\s+/g, ' ').trim();
+				divText = divText.replace(/&nbsp;/g, '').trim();
+				if (divText !== window.htmlElemKeyDown) {
+					e.target.onblur = function () {
+						const wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
+						wptbTableStateSaveManager.tableStateSet();
 
-element.addEventListener( 'mouseover', tinyMceInitStart, false );
+						window.htmlElemKeyDown = '';
+						e.target.onblur = '';
+					};
+				} else {
+					e.target.onblur = '';
+				}
+			});
+		},
+	});
+
+	element.removeEventListener('mouseover', tinyMceInitStart, false);
+};
+
+element.addEventListener('mouseover', tinyMceInitStart, false);

@@ -1,4 +1,4 @@
-﻿=== Ultimate Member - User Profile & Membership Plugin ===
+﻿=== Ultimate Member - User Profile, Registration & Membership Plugin ===
 Author URI: https://ultimatemember.com/
 Plugin URI: https://ultimatemember.com/
 Contributors: ultimatemember, champsupertramp, nsinelnikov
@@ -6,8 +6,8 @@ Donate link:
 Tags: community, member, membership, user-profile, user-registration
 Requires PHP: 5.6
 Requires at least: 5.0
-Tested up to: 5.4
-Stable tag: 2.1.5
+Tested up to: 5.5
+Stable tag: 2.1.7
 License: GNU Version 2 or Any Later Version
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -67,6 +67,7 @@ Ultimate Member has a range of extensions that allow you to extend the power of 
 
 = Free Extensions =
 
+* [JobsBoardWP](https://wordpress.org/plugins/um-jobboardwp) - This free extension integrates Ultimate Member with the job board plugin [JobBoardWP](https://wordpress.org/plugins/jobboardwp).
 * [ForumWP](https://ultimatemember.com/extensions/forumwp/) - This free extension integrates Ultimate Member with the forum plugin [ForumWP](https://forumwpplugin.com).
 * [Terms & Conditions](https://ultimatemember.com/extensions/terms-conditions/) - Add a terms and condition checkbox to your registration forms & require users to agree to your T&Cs before registering on your site.
 * [Google reCAPTCHA](https://ultimatemember.com/extensions/google-recaptcha/) - Stop bots on your registration & login forms with Google reCAPTCHA
@@ -76,9 +77,17 @@ Ultimate Member has a range of extensions that allow you to extend the power of 
 
 Our official [theme](https://ultimatemember.com/theme/) is purpose built for websites that have logged in and out users. The [theme](https://ultimatemember.com/theme/) has deep integration with Ultimate Member plugin and the extensions, different header designs for logged-in/out users and works alongside the Beaver Builder and Elementor page builders.
 
+= Our other plugins =
+
+In addition to Ultimate Member, we also have two other plugins: [ForumWP](https://forumwpplugin.com/) and [JobBoardWP](https://wordpress.org/plugins/jobboardwp).
+
 = ForumWP =
 
-In addition to Ultimate Member we also have another plugin called [ForumWP](https://forumwpplugin.com/). ForumWP is a forum plugin which adds an online forum to your website, allowing users to create topics and write replies. Forums are a great way to build and grow an online community.
+[ForumWP](https://forumwpplugin.com/) is a forum plugin which adds an online forum to your website, allowing users to create topics and write replies. Forums are a great way to build and grow an online community.
+
+= JobBoardWP =
+
+[JobBoardWP](https://wordpress.org/plugins/jobboardwp) is a job board plugin which adds a modern job board to your website. Display job listings and allow employers to submit and manage jobs all from the front-end.
 
 = Development * Translations =
 
@@ -142,8 +151,69 @@ The plugin works with popular caching plugins by automatically excluding Ultimat
 
 = Important: =
 
-* To learn more about version 2.1 please see this [topic](https://wordpress.org/support/topic/version-2-1-4/)
+* To learn more about version 2.1 please see this [docs](https://docs.ultimatemember.com/article/1512-upgrade-2-1-0)
 * UM2.1+ is a significant update to the Member Directories' code base from 2.0.x. Please make sure you take a full-site backup with restore point before updating the plugin
+
+= 2.1.7: August 12, 2020 =
+
+* Enhancements:
+
+  - Added dependency functions for plugins: [Ultimate Member - JobBoardWP integration](https://wordpress.org/plugins/um-jobboardwp) & [JobBoardWP](https://wordpress.org/plugins/jobboardwp)
+  - Added account privacy setting for the avoiding profile indexation
+  - Added setting "Change image orientation" based on image EXIF data
+  - Added setting "Account Deletion without password Custom Text"
+
+* Bugfixes:
+
+  - Fixed security lacks for 'redirect_to' attributes
+  - Fixed account submission when change a password
+  - Fixed updating UM roles metadata (WP capabilities section) when 3rd-party plugins update the caps for the UM roles
+  - Fixed member directory roles in query (the case when selected some roles, but current user can see another only)
+  - Fixed member directory sorting
+  - Fixed member directory list dropdown init after changing view type
+  - Fixed member directory admin filtering by the 'user_registered' field
+  - Fixed validation when using HTML in textarea
+  - Fixed cleaning user old uploads
+  - Fixed conditional logic for file/image-type fields
+  - Fixed "get_profile_photo_size" function (avoid PHP notice with array_combine)
+  - Fixed password reset/change form when other forms are initialized at the same page
+  - Fixed getting extension updates on multisites
+  - Fixed the 'wp_authenticate_user' filter's variables (changed username string to WP_User object)
+  - Fixed SEO link canonical for the profile page
+  - Fixed displaying error & notice when the text is empty
+
+* Deprecated:
+
+  - Deprecated JS event 'um_before_modal_removed', use wp.hooks action 'um_before_modal_removed' instead
+
+= 2.1.6: June 1, 2020 =
+
+* Enhancements:
+
+  - Added The profile page SEO meta tags for OG, Twitter and schema.org
+  - Added filter to the field's privacy option for the 3rd-party integrations 'um_field_privacy_options'
+  - Added layout changes to show email notification description in Settings > Email screen
+  - Added member directory option 'Exclude specific users'
+  - Added filter for the changing redirect after profile edited 'um_update_profile_redirect_after'
+  - Added JS filters for conditional logic
+  - Tweak: apply_shortcodes() function support
+  - Tweak: nav-menu custom fields using 'wp_nav_menu_item_custom_fields' hook
+
+* Bugfixes:
+
+  - Fixed custom meta table fields migration (create, edit, remove field actions)
+  - Fixed wp-login.php and UM login form validation/errors triggers when using email for login
+  - Fixed profile form duplicates, show only the first form shortcode on the page for the user with selected role
+  - Fixed creating user uploads directory on registration
+  - Fixed Role fields validation on registration
+  - Fixed Erase User Data field on the Account page
+  - Fixed profile privacy
+  - Fixed SkypeID field
+  - Fixed clickable links in the UM forms which are displayed in a modal window
+  - Fixed disabling select and textarea fields in inactive tabs on Account
+  - Fixed compatibility with jQuery 3.x and 'load' event
+  - Fixed some translations
+  - Small PHP notices fixes
 
 = 2.1.5: April 2, 2020 =
 

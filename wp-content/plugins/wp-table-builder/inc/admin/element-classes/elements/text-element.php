@@ -1,7 +1,7 @@
 <?php
 namespace WP_Table_Builder\Inc\Admin\Element_Classes\Elements;
 
-use WP_Table_Builder\Inc\Admin\Element_Classes\Base\Element_Base_Object as Element_Base_Object;
+use WP_Table_Builder\Inc\Admin\Element_Classes\Base\Element_Base as Element_Base;
 use WP_Table_Builder\Inc\Admin\Managers\Controls_Manager as Controls_Manager;
 use WP_Table_Builder as NS;
 
@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-class Text_Element extends Element_Base_Object {
+class Text_Element extends Element_Base {
     
     /**
 	 * Get element name.
@@ -104,6 +104,17 @@ class Text_Element extends Element_Base_Object {
 				'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{{data.container}}}' => 'color',
+                ]
+			]
+		);
+
+		$this->add_control(
+			'linkColor',
+			[
+				'label' => __( 'Link Font Color', 'wp_table_builder' ),
+				'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{{data.container}}} a' => 'color',
                 ]
 			]
 		);

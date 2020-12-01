@@ -552,7 +552,7 @@ window.jQuery(function($) {
 
 		// bind an event to the slides table to update the menu order of each slide
 		// TODO: Remove this soon
-        $(".metaslider table#metaslider-slides-list").live("resizeSlides", function(event) {
+        $(".metaslider").on('resizeSlides', 'table#metaslider-slides-list', function(event) {
             var slideshow_width = $("input.width").val();
             var slideshow_height = $("input.height").val();
     
@@ -595,10 +595,10 @@ window.jQuery(function($) {
         });
     
         // helptext tooltips
-        $('.tipsy-tooltip').tipsy({className: 'msTipsy', live: true, delayIn: 500, html: true, gravity: 'e'})
-		$('.tipsy-tooltip-top').tipsy({live: true, delayIn: 500, html: true, gravity: 's'})
-		$('.tipsy-tooltip-bottom').tipsy({ live: true, delayIn: 500, html: true, gravity: 'n' })
-		$('.tipsy-tooltip-bottom-toolbar').tipsy({ live: true, delayIn: 500, html: true, gravity: 'n', offset: 2 })
+        $('.tipsy-tooltip').tipsy({className: 'msTipsy', live: false, delayIn: 500, html: true, gravity: 'e'})
+		$('.tipsy-tooltip-top').tipsy({live: false, delayIn: 500, html: true, gravity: 's'})
+		$('.tipsy-tooltip-bottom').tipsy({ live: false, delayIn: 500, html: true, gravity: 'n' })
+		$('.tipsy-tooltip-bottom-toolbar').tipsy({ live: false, delayIn: 500, html: true, gravity: 'n', offset: 2 })
     
 
 });

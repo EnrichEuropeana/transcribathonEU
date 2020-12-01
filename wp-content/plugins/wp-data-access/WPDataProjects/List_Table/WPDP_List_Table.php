@@ -99,7 +99,7 @@ namespace WPDataProjects\List_Table {
 							}
 							$title       = get_the_title( esc_attr( $media_id ) );
 							$media_links .= '' !== $media_links ? '<br/>' : '';
-							$media_links .= sprintf( '<span class="dashicons dashicons-external"></span><a href="%s" title="%s" target="_blank">%s</a>', $url, $title, $mime_type );
+							$media_links .= sprintf( '<span class="dashicons dashicons-external"></span><a href="%s" title="%s" class="wpda_tooltip" target="_blank">%s</a>', $url, $title, $mime_type );
 						}
 					}
 				}

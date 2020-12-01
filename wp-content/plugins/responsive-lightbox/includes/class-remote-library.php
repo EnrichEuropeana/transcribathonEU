@@ -86,7 +86,7 @@ class Responsive_Lightbox_Remote_Library {
 			$attachment = wp_unslash( $_POST['attachment'] );
 
 			if ( isset( $attachment['remote_library_image'], $attachment['width'], $attachment['height'] ) ) {
-				$html = preg_replace( '/src=(\'|")(.*?)(\'|")/', 'src="' . $url . '"', $html );
+				$html = preg_replace( '/src=(\'|")(.*?)(\'|")/', 'src="' . ( ! empty( $attachment['rl_url'] ) ? $attachment['rl_url'] : $url ) . '"', $html );
 				$html = preg_replace( '/width=(\'|")(.*?)(\'|")/', 'width="' . ( (int) $attachment['width'] ) . '"', $html );
 				$html = preg_replace( '/height=(\'|")(.*?)(\'|")/', 'height="' . ( (int) $attachment['height'] ) . '"', $html );
 				$html = preg_replace( '/(\s)?id="attachment_' . $id . '"/', '', $html );

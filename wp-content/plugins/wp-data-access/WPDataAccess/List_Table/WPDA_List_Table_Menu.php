@@ -124,6 +124,9 @@ namespace WPDataAccess\List_Table {
 			$args['column_headers'] = self::column_headers_labels();
 
 			$args['title'] = __( 'Data Explorer', 'wp-data-access' );
+			if ( wpda_fremius()->is_premium() ) {
+				$args['title'] = __( 'Premium', 'wp-data-access' ) . ' ' . $args['title'];
+			}
 
 			$args['subtitle'] = ''; // Define an empty subtitle to prevent WPDA_List_Table from adding one.
 
@@ -284,7 +287,7 @@ namespace WPDataAccess\List_Table {
 					}
 				}
 				$favourites_menu =
-					"<a href=\"javascript:void( 0 )\" title=\"$favourite_title\" onclick=\"wpda_list_table_favourite( '{$this->schema_name}', '$table_name' )\">
+					"<a href=\"javascript:void( 0 )\" class=\"wpda_tooltip\" title=\"$favourite_title\" onclick=\"wpda_list_table_favourite( '{$this->schema_name}', '$table_name' )\">
 						<span id=\"span_favourites_$table_name\" class=\"dashicons $favourite_class\"></span>
 					</a>";
 
@@ -308,7 +311,7 @@ namespace WPDataAccess\List_Table {
 						}
 					} else {
 						$msg    = __( "This is an estimation!\nClick to read more...", 'wp-data-access' );
-						$approx = " <a href='https://wpdataaccess.com/home/hints/column-rows-for-innodb-tables-shows-an-estimation/' target='_blank' title='$msg' style'cursor:pointer;'><span style='font-size:15px;' class='dashicons dashicons-warning'></span></a>";
+						$approx = " <a href='https://wpdataaccess.com/home/hints/column-rows-for-innodb-tables-shows-an-estimation/' target='_blank' title='$msg' class='wpda_tooltip' style'cursor:pointer;'><span style='font-size:15px;' class='dashicons dashicons-warning'></span></a>";
 
 						return stripslashes( $item[ $column_name ] ) . $approx;
 					}
@@ -340,7 +343,7 @@ namespace WPDataAccess\List_Table {
 					} else {
 						if ( $item[ $column_name ] > 0 && $item['data_size'] > 0 && ( $item[ $column_name ] / $item['data_size'] > 0.2 ) ) {
 							$msg    = __( "Fragmentation for this table is high.\nConsider: Manage>Actions>Optimize", 'wp-data-access' );
-							$approx = " <span style='font-size:15px;' class='dashicons dashicons-warning' title='$msg' style'cursor:pointer;'></span>";
+							$approx = " <span style='font-size:15px;' class='dashicons dashicons-warning wpda_tooltip' title='$msg' style'cursor:pointer;'></span>";
 						} else {
 							$approx = '';
 						}
@@ -364,9 +367,10 @@ namespace WPDataAccess\List_Table {
 				// Add manage table/view line.
 				$wp_nonce_action_table_actions = "wpda-actions-$table_name";
 				$wp_nonce_table_actions        = wp_create_nonce( $wp_nonce_action_table_actions );
+				$table_actions_title           = sprintf( __( 'Table %s settings and administration panel', 'wp-data-access' ), $table_name );
 				$actions['manage']             =
-					"<a href=\"javascript:void( 0 )\" onclick=\"wpda_show_table_actions( '{$this->schema_name}', '$table_name', '" . self::$list_number++ . "', '$wp_nonce_table_actions', '{$item['table_type_db']}', '" . self::LOADING . "' ); this.blur();\">" .
-					__( 'Manage', 'wp-data-access' ) .
+					"<a href=\"javascript:void( 0 )\" class='wpda_tooltip' title='{$table_actions_title}' onclick=\"wpda_show_table_actions( '{$this->schema_name}', '$table_name', '" . self::$list_number++ . "', '$wp_nonce_table_actions', '{$item['table_type_db']}', '" . self::LOADING . "' ); this.blur();\">" .
+					'<span class="material-icons wpda_icon_on_button" style="width:20px">apps</span>' . __( 'Manage', 'wp-data-access' ) .
 					"</a>";
 
 				// Prepare type checking for editing.
@@ -398,14 +402,19 @@ namespace WPDataAccess\List_Table {
 				} else {
 					$schema_name = "&schema_name=$this->schema_name";
 				}
-				$action_view          = __( 'Explore', 'wp-data-access' );
+				$action_view          =
+					'<span class="material-icons wpda_icon_on_button" style="width:20px">view_list</span>' .
+					__( 'Explore', 'wp-data-access' );
+				$table_view_title     = sprintf( __( 'Explore, filter and maintain %s table data', 'wp-data-access' ), $table_name );
 				$actions['listtable'] =
 					sprintf(
 						'<a href="javascript:void(0)" 
-                               class="view"  
-                               onclick="if (%s) location.href=\'?page=%s%s&table_name=%s&action=listtable\'">
+						       title="%s"
+                               class="view wpda_tooltip"  
+                               onclick="if (%s) window.location.href=\'?page=%s%s&table_name=%s&action=listtable\'">
                                %s
                             </a>',
+						$table_view_title,
 						$check_view_access,
 						$this->page,
 						$schema_name,
@@ -532,19 +541,20 @@ namespace WPDataAccess\List_Table {
 		 *
 		 */
 		public function column_cb( $item ) {
-
 			if ( ! $this->bulk_actions_enabled ) {
 				// Bulk actions disabled.
 				return '';
 			}
 
 			if ( 'VIEW' === $item['table_type_db'] ) {
-				// Disabled checkbox for views (do not allow export).
-				return "<input type='checkbox' name='bulk-selected[]' disabled />";
+				$title = 'title="Performs only drop actions on views"';
+				$class = 'class="wpda_tooltip"';
 			} else {
-				return "<input type='checkbox' name='bulk-selected[]' value='{$item['table_name']}' />";
+				$title = '';
+				$class = '';
 			}
 
+			return "<input type='checkbox' name='bulk-selected[]' value='{$item['table_name']}' {$title} {$class} />";
 		}
 
 		/**
@@ -1543,21 +1553,26 @@ namespace WPDataAccess\List_Table {
 					}
 
 					if ( 0 < $cnt ) {
-						// Export tables.
-						?>
-						<script type='text/javascript'>
-							jQuery(document).ready(function () {
-								jQuery("#stealth_mode").attr("src", "<?php echo esc_sql( $querystring ); ?>");
-							});
-						</script>
-						<?php
-
+						// Provide a link to table export (export starts when clicked)
 						$msg = new WPDA_Message_Box(
 							[
-								'message_text' => sprintf( __( '%d tables exported', 'wp-data-access' ), $cnt ),
+								'message_text' =>
+									"<a id='wpda_export_link' target='_blank' href='$querystring'>" .
+									__( 'Click here to download your export file', 'wp-data-access' ) .
+									'</a>',
 							]
 						);
 						$msg->box();
+						?>
+						<script type="text/javascript">
+							jQuery(document).ready(function() {
+								jQuery('#wpda_export_link').on('mouseup', function() {
+									// Hide link after click to prevent large exports being started more than ones
+									jQuery('#wpda_export_link').parent().parent().hide();
+								});
+							});
+						</script>
+						<?php
 					}
 				}
 			}
@@ -2122,11 +2137,11 @@ namespace WPDataAccess\List_Table {
 				}
 
 				jQuery(document).ready(function () {
-					jQuery("#doaction").off();
+					//jQuery("#doaction").off();
 					jQuery("#doaction").bind("click", function (e) {
 						return wpda_check_bulk();
 					});
-					jQuery("#doaction2").off();
+					//jQuery("#doaction2").off();
 					jQuery("#doaction2").bind("click", function (e) {
 						return wpda_check_bulk();
 					});
@@ -2267,8 +2282,12 @@ namespace WPDataAccess\List_Table {
 				<div>
 					<input type="hidden" name="action" value="create_table">
 					<input type="hidden" name="caller" value="dataexplorer">
-					<input type="submit" value="<?php echo __( 'Design new table', 'wp-data-access' ); ?>"
-						   class="page-title-action">
+					<button type="submit"
+						   class="page-title-action wpda_tooltip"
+						   title="Create a new table design"
+					>
+						<span class="material-icons wpda_icon_on_button">add_circle</span><?php echo __( 'Design new table', 'wp-data-access' ); ?>
+					</button>
 				</div>
 			</form>
 			<div style="text-align: right;">
@@ -2276,9 +2295,13 @@ namespace WPDataAccess\List_Table {
 				$this->wpda_import->add_button();
 				?>
 				<a href="?page=wpda&page_action=wpda_import_csv&schema_name=<?php echo esc_attr( $this->schema_name ); ?>"
-				   class="page-title-action"><?php echo __( 'Import CSV' ); ?></a>
+				   class="page-title-action wpda_tooltip"
+				   title="Upload, map and import CSV files"
+				><span class="material-icons wpda_icon_on_button">cloud_upload</span> <?php echo __( 'Import CSV' ); ?></a>
 				<a href="?page=wpda&page_action=wpda_backup&schema_name=<?php echo esc_attr( $this->schema_name ); ?>"
-				   class="page-title-action"><?php echo __( 'Data Backup' ); ?></a>
+				   class="page-title-action wpda_tooltip"
+				   title="Create unattended export jobs"
+				><span class="material-icons wpda_icon_on_button">cloud_download</span> <?php echo __( 'Data Backup' ); ?></a>
 			</div>
 			<?php
 			$this->add_db_containers();
@@ -2393,7 +2416,7 @@ namespace WPDataAccess\List_Table {
 								<div style="height:10px;"></div>
 								<label for="remote_host" style="vertical-align:baseline;" class="database_item_label">MySQL
 									host:</label>
-								<input type="text" name="remote_host" id="remote_host" maxlength="64">
+								<input type="text" name="remote_host" id="remote_host">
 								<br/>
 								<label for="remote_user" style="vertical-align:baseline;" class="database_item_label">MySQL
 									username:</label>
@@ -2593,7 +2616,7 @@ namespace WPDataAccess\List_Table {
 					}
 					?>
 				</select>
-				<a class="dashicons dashicons-edit" href="javascript:void(0)"
+				<a class="dashicons dashicons-edit wpda_tooltip" href="javascript:void(0)"
 				   <?php
 				   if ( 'rdb:' === substr( $this->schema_name, 0, 4 ) ) {
 					   ?>
@@ -2603,11 +2626,11 @@ namespace WPDataAccess\List_Table {
 				   ?>
 				   style="<?php echo 'rdb:' === substr( $this->schema_name, 0, 4 ) ? '' : 'color:grey;cursor:default;'; ?>vertical-align:middle;"
 				   title="<?php echo 'rdb:' === substr( $this->schema_name, 0, 4 ) ? __( 'Edit remote database connection', 'wp-data-access' ) : __( 'Not available for local database', 'wp-data-access' ); ?>">&nbsp;</a>
-				<a class="dashicons dashicons-plus-alt" href="javascript:void(0)"
+				<a class="dashicons dashicons-plus-alt wpda_tooltip" href="javascript:void(0)"
 				   onclick="jQuery('#wpda_db_container').show(); jQuery('#local_database').focus();"
 				   style="vertical-align:middle;"
 				   title="<?php echo $this->user_create_db_hint; ?>">&nbsp;</a>
-				<a class="dashicons dashicons-dismiss" id="wpda_drop_database" href="javascript:void(0)"
+				<a class="dashicons dashicons-dismiss wpda_tooltip" id="wpda_drop_database" href="javascript:void(0)"
 					<?php
 					if ( $this->user_can_drop_db ) {
 						if ( 'rdb:' === substr( $this->schema_name, 0, 4 ) ) {

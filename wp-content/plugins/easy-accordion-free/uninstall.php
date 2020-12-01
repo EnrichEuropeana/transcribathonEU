@@ -5,7 +5,8 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 // Load LCP file.
 require_once 'plugin-main.php';
 
-if ( true == ( eap_get_option( 'eap_data_remove', false ) ) ) {
+$settings = get_option( 'sp_eap_settings' );
+if ( true == ( $settings['eap_data_remove'] ) ) {
 	// Delete Accordions and shortcodes.
 	global $wpdb;
 	$wpdb->query( "DELETE FROM wp_posts WHERE post_type = 'sp_easy_accordion'" );

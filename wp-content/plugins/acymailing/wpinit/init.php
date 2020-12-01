@@ -4,19 +4,8 @@ defined('ABSPATH') or die('Restricted access');
 
 abstract class acyHook
 {
-    public function loadAcyLibrary()
-    {
-        if (function_exists('acym_get')) return true;
-        $helperFile = rtrim(dirname(__DIR__), DS).DS.'back'.DS.'helpers'.DS.'helper.php';
-        if (!file_exists($helperFile) || !include_once $helperFile) return false;
-
-        return true;
-    }
-
     public function addRegistrationFields($externalPluginConfig = '')
     {
-        if (!$this->loadAcyLibrary()) return;
-
         $config = acym_config();
 
         $displayOnExternalPlugin = true;

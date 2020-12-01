@@ -74,6 +74,8 @@ var WPTB_ActionsField = function WPTB_ActionsField() {
 
                 var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
                 wptbTableStateSaveManager.tableStateSet();
+
+                WPTB_Helper.wptbDocumentEventGenerate('element:removed:dom', document, act);
             };
 
             btnCopy.onclick = function (event) {
@@ -177,7 +179,7 @@ var WPTB_ActionsField = function WPTB_ActionsField() {
                 };
             }
 
-            actions.style.display = 'block';
+            actions.style.display = 'flex';
 
             _this.wptbActions = actions;
         }
@@ -195,7 +197,7 @@ var WPTB_ActionsField = function WPTB_ActionsField() {
         }
 
         if (_this.wptbActions && _this.wptbActions.classList.contains('wptb-actions')) {
-            _this.wptbActions.style.display = 'block';
+            _this.wptbActions.style.display = 'flex';
         } else {
             return;
         }
@@ -212,7 +214,7 @@ var WPTB_ActionsField = function WPTB_ActionsField() {
         _this.wptbActions.style.top = parseFloat(coordinatesElement.top) - 15 + 'px';
         _this.wptbActions.style.left = parseFloat(coordinatesElement.right) - parseFloat(_this.wptbActions.clientWidth) + 1 + 'px';
 
-        _this.wptbActions.style.display = 'block';
+        _this.wptbActions.style.display = 'flex';
         thisNode.classList.add('wptb-directlyhovered');
 
         wptbContainer.addEventListener('scroll', correctTop, false);
@@ -339,8 +341,6 @@ var WPTB_ActionsField = function WPTB_ActionsField() {
 
                         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
                         wptbTableStateSaveManager.tableStateSet();
-
-                        WPTB_Helper.elementOptionsSet('table_setting', element);
                     } else {
                         document.getElementsByClassName('wptb-table-generator')[0].style.display = 'table';
                     }
@@ -446,6 +446,8 @@ var WPTB_Cell = function WPTB_Cell(callback, DOMElement) {
 
     WPTB_innerElementSet(DOMElement);
 
+    WPTB_Helper.elementStartScript(DOMElement, 'table_cell_setting');
+
     var wptbPhElement = DOMElement.getElementsByClassName('wptb-ph-element');
 
     if (wptbPhElement.length > 0) {
@@ -524,46 +526,52 @@ var WPTB_Cell = function WPTB_Cell(callback, DOMElement) {
         var tdBorderTopWidth = tdStyleObj.getPropertyValue('border-top-width');
         var tdBorderBottomWidth = tdStyleObj.getPropertyValue('border-bottom-width');
 
-        var width = parseInt(this.offsetWidth, 10) - parseInt(tdPaddingLeft, 10) - parseInt(tdPaddingRight, 10) - parseInt(tdBorderLeftWidth, 10) / 2 - parseInt(tdBorderRightWidth, 10) / 2;
+        var width = parseInt(this.offsetWidth, 10) - parseInt(tdPaddingLeft, 10) - parseInt(tdPaddingRight, 10);
 
-        var height = parseInt(this.offsetHeight, 10) - parseInt(tdPaddingTop, 10) - parseInt(tdPaddingBottom, 10) - parseInt(tdBorderTopWidth, 10) / 2 - parseInt(tdBorderBottomWidth, 10) / 2;
-
+        var height = parseInt(this.offsetHeight, 10) - parseInt(tdPaddingTop, 10) - parseInt(tdPaddingBottom, 10);
         var table = WPTB_Helper.findAncestor(this, 'wptb-preview-table');
         if (table) {
-            var tableFullStyleObj = window.getComputedStyle(table, null);
-            var tableBorderLeft = tableFullStyleObj.getPropertyValue('border-left-width');
-            var tableBorderRight = tableFullStyleObj.getPropertyValue('border-right-width');
-            var tableBorderTop = tableFullStyleObj.getPropertyValue('border-top-width');
-            var tableBorderBottom = tableFullStyleObj.getPropertyValue('border-bottom-width');
+            if (table.style.borderCollapse === 'collapse') {
+                width = width - parseInt(tdBorderLeftWidth, 10) / 2 - parseInt(tdBorderRightWidth, 10) / 2;
+                height = height - parseInt(tdBorderTopWidth, 10) / 2 - parseInt(tdBorderBottomWidth, 10) / 2;
+                var tableFullStyleObj = window.getComputedStyle(table, null);
+                var tableBorderLeft = tableFullStyleObj.getPropertyValue('border-left-width');
+                var tableBorderRight = tableFullStyleObj.getPropertyValue('border-right-width');
+                var tableBorderTop = tableFullStyleObj.getPropertyValue('border-top-width');
+                var tableBorderBottom = tableFullStyleObj.getPropertyValue('border-bottom-width');
 
-            var tr = this.parentNode;
-            if (tr && tr.nodeName.toLowerCase() === 'tr') {
-                if (tr.firstChild && tr.firstChild.dataset.xIndex === this.dataset.xIndex) {
-                    if (parseInt(tableBorderLeft, 10) > parseInt(tdBorderLeftWidth, 10)) {
-                        width += -(parseInt(tableBorderLeft, 10) - parseInt(tdBorderLeftWidth, 10)) / 2;
-                    }
-                }
-
-                if (tr.lastChild && tr.lastChild.dataset.xIndex === this.dataset.xIndex) {
-                    if (parseInt(tableBorderRight, 10) > parseInt(tdBorderRightWidth, 10)) {
-                        width += -(parseInt(tableBorderRight, 10) - parseInt(tdBorderRightWidth, 10)) / 2;
-                    }
-                }
-
-                var body = tr.parentNode;
-                if (body && body.nodeName.toLowerCase() === 'body') {
-                    if (body.firstChild && body.firstChild.firstChild.dataset.yIndex === this.dataset.yIndex) {
-                        if (parseInt(tableBorderTop, 10) > parseInt(tdBorderTopWidth, 10)) {
-                            height += (parseInt(tableBorderTop, 10) - parseInt(tdBorderTopWidth, 10)) / 2;
+                var tr = this.parentNode;
+                if (tr && tr.nodeName.toLowerCase() === 'tr') {
+                    if (tr.firstChild && tr.firstChild.dataset.xIndex === this.dataset.xIndex) {
+                        if (parseInt(tableBorderLeft, 10) > parseInt(tdBorderLeftWidth, 10)) {
+                            width += -(parseInt(tableBorderLeft, 10) - parseInt(tdBorderLeftWidth, 10)) / 2;
                         }
                     }
 
-                    if (body.lastChild && body.lastChild.firstChild.dataset.yIndex === this.dataset.yIndex) {
-                        if (parseInt(tableBorderBottom, 10) > parseInt(tdBorderBottomWidth, 10)) {
-                            height += (parseInt(tableBorderBottom, 10) - parseInt(tdBorderBottomWidth, 10)) / 2;
+                    if (tr.lastChild && tr.lastChild.dataset.xIndex === this.dataset.xIndex) {
+                        if (parseInt(tableBorderRight, 10) > parseInt(tdBorderRightWidth, 10)) {
+                            width += -(parseInt(tableBorderRight, 10) - parseInt(tdBorderRightWidth, 10)) / 2;
+                        }
+                    }
+
+                    var body = tr.parentNode;
+                    if (body && body.nodeName.toLowerCase() === 'body') {
+                        if (body.firstChild && body.firstChild.firstChild.dataset.yIndex === this.dataset.yIndex) {
+                            if (parseInt(tableBorderTop, 10) > parseInt(tdBorderTopWidth, 10)) {
+                                height += (parseInt(tableBorderTop, 10) - parseInt(tdBorderTopWidth, 10)) / 2;
+                            }
+                        }
+
+                        if (body.lastChild && body.lastChild.firstChild.dataset.yIndex === this.dataset.yIndex) {
+                            if (parseInt(tableBorderBottom, 10) > parseInt(tdBorderBottomWidth, 10)) {
+                                height += (parseInt(tableBorderBottom, 10) - parseInt(tdBorderBottomWidth, 10)) / 2;
+                            }
                         }
                     }
                 }
+            } else if (table.style.borderCollapse === 'separate') {
+                width = width - parseInt(tdBorderLeftWidth, 10) - parseInt(tdBorderRightWidth, 10);
+                height = height - parseInt(tdBorderTopWidth, 10) - parseInt(tdBorderBottomWidth, 10);
             }
         }
 
@@ -576,9 +584,63 @@ var WPTB_Cell = function WPTB_Cell(callback, DOMElement) {
     return this;
 };
 var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
+    var hide = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
 
     var wptbDropHandle = void 0,
-        wptbDropBorderMarker = void 0;
+        wptbDropBorderMarker = void 0,
+        wptbDropBorderMarkerTop = void 0,
+        wptbDropBorderMarkerRight = void 0,
+        wptbDropBorderMarkerBottom = void 0,
+        wptbDropBorderMarkerLeft = void 0;
+
+    /**
+     * Add px suffix to a value
+     *
+     * @param {any} val value
+     * @returns {string} string value suffixed with px
+     */
+    function toPx(val) {
+        return val + 'px';
+    }
+
+    if (WPTB_Helper.getDragRelativeType() === 'td_relative') {
+        var cellRelatedDropHandle = document.querySelector('.wptb-cell-related-drop-handle');
+        if (hide && cellRelatedDropHandle) {
+            cellRelatedDropHandle.style.display = 'none';
+            return;
+        }
+        if (cellRelatedDropHandle === null) {
+            var range = document.createRange();
+            range.setStart(document.body, 0);
+
+            var shadowRoot = range.createContextualFragment('<div class="wptb-cell-related-drop-handle">Add to cell</div>').children[0];
+
+            document.body.appendChild(shadowRoot);
+            cellRelatedDropHandle = shadowRoot.children[0];
+        }
+
+        var parentTd = WPTB_Helper.getParentOfType('td', thisElem);
+
+        var _parentTd$getBounding = parentTd.getBoundingClientRect(),
+            _top = _parentTd$getBounding.top,
+            _left = _parentTd$getBounding.left,
+            width = _parentTd$getBounding.width,
+            _height = _parentTd$getBounding.height;
+
+        if (!cellRelatedDropHandle) {
+            return;
+        }
+
+        cellRelatedDropHandle.style.display = 'flex';
+        cellRelatedDropHandle.style.top = toPx(_top);
+        cellRelatedDropHandle.style.width = toPx(width);
+        cellRelatedDropHandle.style.height = toPx(_height);
+        cellRelatedDropHandle.style.left = toPx(_left);
+
+        return;
+    }
+
     if (document.getElementsByClassName('wptb-drop-handle').length == 0) {
         wptbDropHandle = document.createElement('div');
         wptbDropHandle.classList.add('wptb-drop-handle');
@@ -586,20 +648,17 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
         wptbDropBorderMarker = document.createElement('div');
         wptbDropBorderMarker.classList.add('wptb-drop-border-marker');
 
-        var _wptbDropBorderMarkerTop = document.createElement('div'),
-            _wptbDropBorderMarkerRight = document.createElement('div'),
-            _wptbDropBorderMarkerBottom = document.createElement('div'),
-            _wptbDropBorderMarkerLeft = document.createElement('div');
+        wptbDropBorderMarkerTop = document.createElement('div'), wptbDropBorderMarkerRight = document.createElement('div'), wptbDropBorderMarkerBottom = document.createElement('div'), wptbDropBorderMarkerLeft = document.createElement('div');
 
-        _wptbDropBorderMarkerTop.classList.add('wptb-drop-border-marker-top');
-        _wptbDropBorderMarkerRight.classList.add('wptb-drop-border-marker-right');
-        _wptbDropBorderMarkerBottom.classList.add('wptb-drop-border-marker-bottom');
-        _wptbDropBorderMarkerLeft.classList.add('wptb-drop-border-marker-left');
+        wptbDropBorderMarkerTop.classList.add('wptb-drop-border-marker-top');
+        wptbDropBorderMarkerRight.classList.add('wptb-drop-border-marker-right');
+        wptbDropBorderMarkerBottom.classList.add('wptb-drop-border-marker-bottom');
+        wptbDropBorderMarkerLeft.classList.add('wptb-drop-border-marker-left');
 
-        wptbDropBorderMarker.appendChild(_wptbDropBorderMarkerTop);
-        wptbDropBorderMarker.appendChild(_wptbDropBorderMarkerRight);
-        wptbDropBorderMarker.appendChild(_wptbDropBorderMarkerBottom);
-        wptbDropBorderMarker.appendChild(_wptbDropBorderMarkerLeft);
+        wptbDropBorderMarker.appendChild(wptbDropBorderMarkerTop);
+        wptbDropBorderMarker.appendChild(wptbDropBorderMarkerRight);
+        wptbDropBorderMarker.appendChild(wptbDropBorderMarkerBottom);
+        wptbDropBorderMarker.appendChild(wptbDropBorderMarkerLeft);
 
         var body = document.getElementsByTagName('body');
         if (body.length > 0) {
@@ -607,7 +666,12 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
             body[0].appendChild(wptbDropBorderMarker);
         }
 
-        wptbDropHandle.ondragenter = function () {};
+        wptbDropHandle.ondragenter = function () {
+            if (e.target.classList.contains('wptb-empty')) {
+                e.preventDefault();
+                return false;
+            }
+        };
 
         wptbDropHandle.ondragover = function (e) {
             e.preventDefault();
@@ -634,6 +698,7 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
                 if (thisElem.nodeName.toLowerCase() == 'td') {
                     td = wptbDropHandle.getDOMParentElement();
                     td.appendChild(element);
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 }
             } else {
                 var innerElement = wptbDropHandle.getDOMParentElement();
@@ -641,9 +706,11 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
 
                 if (wptbDropHandle.dataset.text == 'Above Element') {
                     td.insertBefore(element, innerElement);
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 } else if (wptbDropHandle.dataset.text == 'Below Element') {
                     var innerElementNext = innerElement.nextSibling;
                     td.insertBefore(element, innerElementNext);
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 }
             }
 
@@ -654,13 +721,6 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
                 if (table.classList.contains('wptb-table-preview-head')) {
                     WPTB_Helper.dataTitleColumnSet(table);
                 }
-            }
-
-            // start item javascript if item is new
-            var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i);
-            var elemKind = infArr[1];
-            if (e.dataTransfer.getData('wptbElement') && (elemKind == 'text' || elemKind == 'button' || elemKind == 'image' || elemKind == 'star_rating' || elemKind == 'list')) {
-                //WPTB_Helper.elementStartScript( element );
             }
 
             wptbDropHandle.style.display = 'none';
@@ -683,6 +743,10 @@ var WPTB_DropHandle = function WPTB_DropHandle(thisElem, e) {
         wptbDropBorderMarker = document.getElementsByClassName('wptb-drop-border-marker')[0];
     }
     if (thisElem && thisElem.nodeName.toLowerCase() == 'td' && thisElem.getElementsByClassName('wptb-ph-element').length != 0) {
+        return;
+    }
+
+    if (thisElem && thisElem.nodeName.toLowerCase() == 'td' && thisElem.classList.contains('wptb-empty')) {
         return;
     }
 
@@ -916,67 +980,93 @@ var WPTB_Helper = {
         }
     },
     linkHttpCheckChange: function linkHttpCheckChange(link) {
+        var convertToAbs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
         if (link) {
-            if (link.indexOf('http://') == -1 && link.indexOf('https://') == -1) {
-                var linkArr = link.split('/'),
-                    linkClean = void 0;
-                if (Array.isArray(linkArr) && linkArr.length > 0) {
-                    linkClean = linkArr[linkArr.length - 1];
-                }
-                return document.location.protocol + '//' + linkClean;
-            } else {
+            // even though it is not a best practice and a huge security risk, sometimes our users use javascript tag at href attributes, this check will make sure those tags will not be modified and returned as they are
+            if (link.match(/^(javascript:)(.+)$/)) {
                 return link;
             }
+            // relative link checking
+            // if link starts with '/', assume it is a relative link to the origin of the current site
+            else if (link.match(/^\/([\S]+)$/)) {
+                    if (convertToAbs) {
+                        var currentLocation = document.location;
+                        var origin = currentLocation.origin;
+
+                        // strip out the '/' at the end of the origin name if there is any
+
+                        if (origin.match(/^(.+)\/$/)) {
+                            origin = origin.slice(-1);
+                        }
+
+                        return '' + origin + link;
+                    } else {
+                        return link;
+                    }
+                } else if (link.indexOf('http://') == -1 && link.indexOf('https://') == -1) {
+                    var linkArr = link.split('/'),
+                        linkClean = void 0;
+                    if (Array.isArray(linkArr) && linkArr.length > 0) {
+                        linkClean = linkArr[linkArr.length - 1];
+                    }
+                    return document.location.protocol + '//' + linkClean;
+                } else {
+                    return link;
+                }
         } else {
             return '';
         }
     },
     dataTitleColumnSet: function dataTitleColumnSet(table) {
-        var rows = table.rows,
-            rowHead = rows[0];
-        var computedStyleRowHead = getComputedStyle(rowHead);
-
-        var rowHeadChildren = rowHead.children;
-        var contentsForHeader = {};
-        for (var i = 0; i < rowHeadChildren.length; i++) {
-            var tdElements = rowHeadChildren[i].children;
-
-            for (var j = 0; j < tdElements.length; j++) {
-                var element = tdElements[j];
-                if (element.classList.contains('wptb-ph-element')) {
-                    var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i);
-                    if (infArr[1] == 'text') {
-                        var p = element.querySelector('p'),
-                            textContent = p.textContent,
-                            textAlign = p.style.textAlign;
-                        contentsForHeader[rowHeadChildren[i].dataset.xIndex] = [textContent, element.style.fontSize, element.style.color, computedStyleRowHead.backgroundColor, textAlign];
-                        break;
-                    }
-                }
-            }
-            if (!contentsForHeader[rowHeadChildren[i].dataset.xIndex]) {
-                contentsForHeader[rowHeadChildren[i].dataset.xIndex] = ['', '', '', computedStyleRowHead.backgroundColor, ''];
-            }
-        }
-        for (var _i3 = 1; _i3 < rows.length; _i3++) {
-            var thisRow = rows[_i3],
-                thisRowChildren = thisRow.children;
-            for (var _j = 0; _j < thisRowChildren.length; _j++) {
-                if (contentsForHeader[thisRowChildren[_j].dataset.xIndex]) {
-                    thisRowChildren[_j].dataset.wptbTitleColumn = contentsForHeader[thisRowChildren[_j].dataset.xIndex][0];
-                    thisRowChildren[_j].dataset.wptbTitleColumnFontSize = contentsForHeader[thisRowChildren[_j].dataset.xIndex][1];
-                    thisRowChildren[_j].dataset.wptbTitleColumnColor = contentsForHeader[thisRowChildren[_j].dataset.xIndex][2];
-                    thisRowChildren[_j].dataset.wptbTitleBackgroundColor = contentsForHeader[thisRowChildren[_j].dataset.xIndex][3];
-                    thisRowChildren[_j].dataset.wptbTitleAlign = contentsForHeader[thisRowChildren[_j].dataset.xIndex][4];
-                } else {
-                    thisRowChildren[_j].dataset.wptbTitleColumn = '';
-                    thisRowChildren[_j].dataset.wptbTitleColumnFontSize = '';
-                    thisRowChildren[_j].dataset.wptbTitleColumnColor = '';
-                    thisRowChildren[_j].dataset.wptbTitleBackgroundColor = '';
-                    thisRowChildren[_j].dataset.wptbTitleAlign = '';
-                }
-            }
-        }
+        // TODO dataTitleColumnSet
+        // let rows = table.rows,
+        //     rowHead = rows[0];
+        // let computedStyleRowHead = getComputedStyle( rowHead );
+        //
+        // let rowHeadChildren = rowHead.children;
+        // let contentsForHeader = {};
+        // for( let i = 0; i < rowHeadChildren.length; i++ ) {
+        //     let tdElements = rowHeadChildren[i].children;
+        //
+        //     for( let j = 0; j < tdElements.length; j++ ) {
+        //         let element = tdElements[j];
+        //         if( element.classList.contains( 'wptb-ph-element' ) ) {
+        //             let infArr = element.className.match( /wptb-element-(.+)-(\d+)/i );
+        //             if( infArr[1] == 'text' ) {
+        //                 let p = element.querySelector( 'p' ),
+        //                     textContent = p.textContent,
+        //                     textAlign = p.style.textAlign;
+        //                     contentsForHeader[rowHeadChildren[i].dataset.xIndex] = [textContent, element.style.fontSize,
+        //                         element.style.color, computedStyleRowHead.backgroundColor, textAlign];
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     if( ! contentsForHeader[rowHeadChildren[i].dataset.xIndex] ) {
+        //         contentsForHeader[rowHeadChildren[i].dataset.xIndex] = ['', '',
+        //                     '', computedStyleRowHead.backgroundColor, ''];
+        //     }
+        // }
+        // for ( let i = 1; i < rows.length; i++ ) {
+        //     let thisRow = rows[i],
+        //         thisRowChildren = thisRow.children;
+        //     for( let j = 0; j < thisRowChildren.length; j++ ) {
+        //         if ( contentsForHeader[thisRowChildren[j].dataset.xIndex] ) {
+        //             thisRowChildren[j].dataset.wptbTitleColumn = contentsForHeader[thisRowChildren[j].dataset.xIndex][0];
+        //             thisRowChildren[j].dataset.wptbTitleColumnFontSize = contentsForHeader[thisRowChildren[j].dataset.xIndex][1];
+        //             thisRowChildren[j].dataset.wptbTitleColumnColor = contentsForHeader[thisRowChildren[j].dataset.xIndex][2];
+        //             thisRowChildren[j].dataset.wptbTitleBackgroundColor = contentsForHeader[thisRowChildren[j].dataset.xIndex][3];
+        //             thisRowChildren[j].dataset.wptbTitleAlign = contentsForHeader[thisRowChildren[j].dataset.xIndex][4];
+        //         } else {
+        //             thisRowChildren[j].dataset.wptbTitleColumn = null;
+        //             thisRowChildren[j].dataset.wptbTitleColumnFontSize = null;
+        //             thisRowChildren[j].dataset.wptbTitleColumnColor = null;
+        //             thisRowChildren[j].dataset.wptbTitleBackgroundColor = null;
+        //             thisRowChildren[j].dataset.wptbTitleAlign = null;
+        //         }
+        //     }
+        // }
     },
     findAncestor: function findAncestor(el, cls) {
         while ((el = el.parentElement) && !el.classList.contains(cls)) {}
@@ -1120,8 +1210,8 @@ var WPTB_Helper = {
         } else if (type == 'star_rating') {
             if (parent.dataset.type == 'star-color') {
                 var ratingStar = affectedEl.querySelectorAll('li');
-                for (var _i4 = 0; _i4 < ratingStar.length; _i4++) {
-                    var span = ratingStar[_i4].getElementsByTagName('span');
+                for (var _i3 = 0; _i3 < ratingStar.length; _i3++) {
+                    var span = ratingStar[_i3].getElementsByTagName('span');
                     for (var j = 0; j < span.length; j++) {
                         span[j].style.fill = uiColor;
                     }
@@ -1168,27 +1258,30 @@ var WPTB_Helper = {
         }
     },
     // run script for the pointed element
-    elementStartScript: function elementStartScript(element) {
+    elementStartScript: function elementStartScript(element, kind) {
         //let script = element.getElementsByTagName( 'script' );
-        var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i);
-        if (infArr && Array.isArray(infArr)) {
-            var kind = infArr[1];
-            if (kind) {
-                //                let wpTemplateId = 'wptb-' + kind + '-script';
-                //                let template = wp.template( wpTemplateId );
-                //                let data  = {elemClass: infArr[0]};
-                //                let elementScriptText = template( data );
-                //                elementScriptText = elementScriptText.replace(/\r|\n|\t/g, '').trim();
-                //
-                //                let scriptNew = document.createElement( 'script' );
-                //                scriptNew.setAttribute( 'type', 'text/javascript' );
-                //                scriptNew.innerHTML = elementScriptText;
-                //                element.parentNode.appendChild( scriptNew );
+        if (!kind) {
+            var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i);
+            if (infArr && Array.isArray(infArr)) {
+                kind = infArr[1];
+            }
+        }
 
-                //                element.parentNode.removeChild( scriptNew );
-                if (kind in WPTB_ElementsScriptsLauncher) {
-                    WPTB_ElementsScriptsLauncher[kind](element);
-                }
+        if (kind) {
+            //                let wpTemplateId = 'wptb-' + kind + '-script';
+            //                let template = wp.template( wpTemplateId );
+            //                let data  = {elemClass: infArr[0]};
+            //                let elementScriptText = template( data );
+            //                elementScriptText = elementScriptText.replace(/\r|\n|\t/g, '').trim();
+            //
+            //                let scriptNew = document.createElement( 'script' );
+            //                scriptNew.setAttribute( 'type', 'text/javascript' );
+            //                scriptNew.innerHTML = elementScriptText;
+            //                element.parentNode.appendChild( scriptNew );
+
+            //                element.parentNode.removeChild( scriptNew );
+            if (kind in WPTB_ElementsScriptsLauncher) {
+                WPTB_ElementsScriptsLauncher[kind](element);
             }
         }
     },
@@ -1294,77 +1387,111 @@ var WPTB_Helper = {
     },
     // function which set handler for event of changes of control
     controlsInclude: function controlsInclude(element, functionHandler) {
+        var acceptEventValues = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
         if (element && (typeof element === 'undefined' ? 'undefined' : _typeof(element)) === 'object' && typeof functionHandler === 'function') {
             element.addEventListener('element:controls:active', function () {
-                if (!element.hasOwnProperty('сontrolsConnectIndic') || element.сontrolsConnectIndic !== true) {
-                    var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i),
-                        elementKind = void 0;
+                if (!element.hasOwnProperty('controlConnectFunctionsName') || !Array.isArray(element.controlConnectFunctionsName) || element.controlConnectFunctionsName.indexOf(functionHandler.name) == -1) {
+                    (function () {
+                        var infArr = element.className.match(/wptb-element-(.+)-(\d+)/i),
+                            elementKind = void 0;
 
-                    if (infArr && Array.isArray(infArr)) {
-                        elementKind = infArr[1];
-                    }
-
-                    //                if( ! element.hasOwnProperty( 'сontrolsConnectIndic' ) || element.сontrolsConnectIndic !== true && elementKind  ) {
-                    //                    let elementsSettingsTemplateJs = document.getElementsByClassName( 'wptb-element-datas' );
-                    //                    if( elementsSettingsTemplateJs.length > 0 ) {
-                    //                        elementsSettingsTemplateJs = elementsSettingsTemplateJs[0];
-                    //
-                    //                        let elementsSettings = elementsSettingsTemplateJs.innerHTML;
-                    //                        let controlClassesNames = [];
-                    //                        if( elementsSettings ) {
-                    //                            elementsSettings = elementsSettings.trim();
-                    //                            elementsSettings = JSON.parse( elementsSettings );
-                    //                            if( elementsSettings && typeof elementsSettings === 'object' ) {
-                    //                                if( 'tmpl-wptb-el-datas-' + infArr[1] + '-' + infArr[2] in elementsSettings ) {
-                    //                                    let elementSettings = elementsSettings['tmpl-wptb-el-datas-' + infArr[1] + '-' + infArr[2]];
-                    //                                    if( elementSettings && typeof elementSettings === 'object' ) {
-                    //                                        Object.keys( elementSettings ).forEach( function( key ) {
-                    //                                            let regularText = new RegExp( 'data-wptb-el-' + elementKind + '-(\\d+)-([a-zA-Z0-9_-]+)', "i" );
-                    //                                            let keyInfArr = key.match( regularText );
-                    //                                            if( keyInfArr && Array.isArray( keyInfArr ) ) {
-                    //                                                let controlClass = key.replace( 'data-', '' );
-                    //                                                controlClassesNames.push( [controlClass, keyInfArr[2]] );
-                    //                                            }
-                    //                                        });
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                }
-                    if (elementKind) {
-                        var elementOptionsContainer = document.querySelector('.wptb-element-options.wptb-options-' + infArr[1] + '-' + infArr[2]);
-
-                        var elementOptions = elementOptionsContainer.querySelectorAll('.wptb-element-option');
-
-                        for (var i = 0; i < elementOptions.length; i++) {
-                            var controlActiveElement = elementOptions[i].querySelector('.wptb-element-property');
-                            if (controlActiveElement) {
-                                (function () {
-                                    var regularText = new RegExp('wptb-el-' + elementKind + '-(\\d+)-([a-zA-Z0-9_-]+)', "i");
-                                    var controlInfArr = controlActiveElement.className.match(regularText);
-                                    if (controlInfArr && Array.isArray(controlInfArr)) {
-                                        var controlUnicClassName = controlInfArr[0];
-
-                                        element.addEventListener('wptb-control:' + controlUnicClassName, function () {
-                                            var controls = {};
-                                            var controlName = controlInfArr[2];
-                                            var control = document.getElementsByClassName(controlUnicClassName);
-                                            if (control.length > 0 && controlName) {
-                                                var targetControlValue = WPTB_Helper.targetControlValueGet(control);
-
-                                                controls[controlName] = targetControlValue;
-                                            }
-
-                                            functionHandler(controls, element);
-                                        }, false);
-                                    }
-
-                                    element.сontrolsConnectIndic = true;
-                                })();
-                            }
+                        if (infArr && Array.isArray(infArr)) {
+                            elementKind = infArr[1];
                         }
-                    }
+
+                        //                if( ! element.hasOwnProperty( 'сontrolsConnectIndic' ) || element.сontrolsConnectIndic !== true && elementKind  ) {
+                        //                    let elementsSettingsTemplateJs = document.getElementsByClassName( 'wptb-element-datas' );
+                        //                    if( elementsSettingsTemplateJs.length > 0 ) {
+                        //                        elementsSettingsTemplateJs = elementsSettingsTemplateJs[0];
+                        //
+                        //                        let elementsSettings = elementsSettingsTemplateJs.innerHTML;
+                        //                        let controlClassesNames = [];
+                        //                        if( elementsSettings ) {
+                        //                            elementsSettings = elementsSettings.trim();
+                        //                            elementsSettings = JSON.parse( elementsSettings );
+                        //                            if( elementsSettings && typeof elementsSettings === 'object' ) {
+                        //                                if( 'tmpl-wptb-el-datas-' + infArr[1] + '-' + infArr[2] in elementsSettings ) {
+                        //                                    let elementSettings = elementsSettings['tmpl-wptb-el-datas-' + infArr[1] + '-' + infArr[2]];
+                        //                                    if( elementSettings && typeof elementSettings === 'object' ) {
+                        //                                        Object.keys( elementSettings ).forEach( function( key ) {
+                        //                                            let regularText = new RegExp( 'data-wptb-el-' + elementKind + '-(\\d+)-([a-zA-Z0-9_-]+)', "i" );
+                        //                                            let keyInfArr = key.match( regularText );
+                        //                                            if( keyInfArr && Array.isArray( keyInfArr ) ) {
+                        //                                                let controlClass = key.replace( 'data-', '' );
+                        //                                                controlClassesNames.push( [controlClass, keyInfArr[2]] );
+                        //                                            }
+                        //                                        });
+                        //                                    }
+                        //                                }
+                        //                            }
+                        //                        }
+                        //                    }
+                        //                }
+                        if (elementKind) {
+                            var elementOptionsGroupIds = element.optionsGroupIds;
+                            if (elementOptionsGroupIds && Array.isArray(elementOptionsGroupIds)) {
+                                for (var i = 0; i < elementOptionsGroupIds.length; i++) {
+                                    var _elementOptionsGroupId = elementOptionsGroupIds[i];
+
+                                    var elementOptionsGroup = document.getElementById(_elementOptionsGroupId);
+
+                                    var controlActiveElements = elementOptionsGroup.querySelectorAll('.wptb-element-property');
+                                    controlActiveElements = [].concat(_toConsumableArray(controlActiveElements));
+
+                                    controlActiveElements.map(function (controlActiveElement) {
+                                        var regularText = new RegExp('wptb-el-' + elementKind + '-(\\d+)-([a-zA-Z0-9_-]+)', "i");
+                                        var controlInfArr = controlActiveElement.className.match(regularText);
+                                        if (controlInfArr && Array.isArray(controlInfArr)) {
+                                            var controlUnicClassName = controlInfArr[0];
+
+                                            element.addEventListener('wptb-control:' + controlUnicClassName, function (e) {
+                                                var controls = {};
+                                                var controlName = controlInfArr[2];
+                                                var control = document.getElementsByClassName(controlUnicClassName);
+                                                if (control.length > 0 && controlName) {
+                                                    var targetControlValue = WPTB_Helper.targetControlValueGet(control);
+
+                                                    if (acceptEventValues) {
+                                                        controls[controlName] = {
+                                                            targetValue: targetControlValue,
+                                                            eventValue: e.detail.value
+                                                        };
+                                                    } else {
+                                                        controls[controlName] = targetControlValue;
+                                                    }
+                                                }
+                                                functionHandler(controls, element);
+                                            }, false);
+                                        }
+                                    });
+                                }
+                            }
+                            //let elementOptionsContainer = document.querySelector( '.wptb-element-options.wptb-options-' + infArr[1] + '-' + infArr[2] );
+
+                            // from time to time depend on table cells hierarchy, cell td items may catch mouse clicks which are intended for elements. since the active section is not cell management, this will gives and unharmfull error of not found element, simple check for null equality will be sufficient for now.
+                            // if(!elementOptionsContainer){
+                            //     return;
+                            // }
+
+                            // let elementOptions = elementOptionsContainer.querySelectorAll( '.wptb-element-option' );
+                            // let controlActiveElements = elementOptions[i].querySelector( '.wptb-element-property' );
+                            //
+                            //
+                            // for( let i = 0; i < elementOptions.length; i++ ) {
+                            //     let controlActiveElement = elementOptions[i].querySelector( '.wptb-element-property' );
+                            //     if( controlActiveElement ) {
+                            //
+                            //     }
+                            // }
+
+                            if (!element.controlConnectFunctionsName && !Array.isArray(element.controlConnectFunctionsName)) {
+                                element.controlConnectFunctionsName = [];
+                            }
+
+                            element.controlConnectFunctionsName.push(functionHandler.name);
+                        }
+                    })();
                 }
             }, false);
         }
@@ -1414,78 +1541,149 @@ var WPTB_Helper = {
             }, false);
         }
     },
-    //
-    appearDependOnControl: function appearDependOnControl(dependOn, targetControlElementClass) {
-        if (Array.isArray(dependOn)) {
-            var dependOnControlName = dependOn[0];
+    /**
+     * Sets the control elements when changing which to will restart this control
+     * @param {array} dependOnControlName
+     * @param {string} targetControlElementClass
+     * @param {array} valueDependOnControlCorrect
+     * @param {string} kind
+     * @param {HTMLElement} element
+     */
+    valueDependOnControl: function valueDependOnControl(dependOnControlName, targetControlElementClass, valueDependOnControlCorrect, kind, element) {
+        function dependOnControlDataGet(dependOnControlName, targetControlElementClass, valueDependOnControlCorrect) {
+            if (typeof dependOnControlName === 'string') {
+                dependOnControlName = [dependOnControlName];
+            }
             var infArr = targetControlElementClass.match(/wptb-el-((.+-)\d+)-(.+)/i);
-
+            var valueDependOnControl = {};
+            var dependOnControlElementsArr = [];
             if (infArr && Array.isArray(infArr)) {
                 var controlName = infArr[3];
-
-                var dependOnControlElementClass = targetControlElementClass.replace(controlName, dependOnControlName);
-
-                var dependOnControlElement = document.getElementsByClassName(dependOnControlElementClass);
-
-                if (dependOnControlElement.length > 0) {
-                    dependOnControlElement = dependOnControlElement[0];
-                    var targetControlElement = document.getElementsByClassName(targetControlElementClass);
-                    if (targetControlElement.length > 0) {
-                        targetControlElement = targetControlElement[0];
-                        var controlContainerElem = WPTB_Helper.findAncestor(targetControlElement, 'wptb-element-option');
-
-                        if (controlContainerElem) {
-                            var showHideDependOnControlElement = function showHideDependOnControlElement(dependOnControlElementClass, dependOn) {
-
-                                //                                let elementsSettingsTemplateJs = document.getElementsByClassName( 'wptb-element-datas' );
-                                //                                if( elementsSettingsTemplateJs.length > 0 ) {
-                                //                                    elementsSettingsTemplateJs = elementsSettingsTemplateJs[0];
-                                //
-                                //                                    let elementsSettings = elementsSettingsTemplateJs.innerHTML;
-                                //                                    if( elementsSettings ) {
-                                //                                        elementsSettings = elementsSettings.trim();
-                                //                                        elementsSettings = JSON.parse( elementsSettings );
-                                //                                        if( elementsSettings && typeof elementsSettings === 'object' && 
-                                //                                            ( 'tmpl-wptb-el-datas-' + dependOnControlElementKind ) in elementsSettings ) {
-                                //                                            let elementSettings = elementsSettings['tmpl-wptb-el-datas-' + dependOnControlElementKind];
-                                //                                            if( elementSettings && typeof elementSettings === 'object' && 
-                                //                                                    ( 'data-wptb-el-' + dependOnControlElementKind + '-' + dependOnControlName ) in elementSettings ) {
-                                //                                                let elementSettingValue = elementSettings['data-wptb-el-' + dependOnControlElementKind + '-' + dependOnControlName];
-                                //                                                
-                                //                                                if( elementSettingValue ) {
-                                //                                                    if( dependOn[1] && Array.isArray( dependOn[1] ) && 
-                                //                                                        ( dependOn[1].indexOf( elementSettingValue ) !== -1 ) ) {
-                                //                                                        controlContainerElem.style.display = 'block';
-                                //                                                    } else if( dependOn[2] && Array.isArray( dependOn[2] ) && 
-                                //                                                        ( dependOn[2].indexOf( elementSettingValue ) !== -1 ) ) {
-                                //                                                        controlContainerElem.style.display = 'none';
-                                //                                                    }
-                                //                                                }
-                                //                                            }
-                                //                                        }
-                                //                                    }
-                                //                                }
-                                if (dependOnControlElementClass) {
-                                    var dependOnControlElements = document.getElementsByClassName(dependOnControlElementClass);
-                                    if (dependOnControlElements.length > 0) {
-                                        var targetControlValue = WPTB_Helper.targetControlValueGet(dependOnControlElements);
-
-                                        if (dependOn[1] && Array.isArray(dependOn[1]) && dependOn[1].indexOf(targetControlValue) !== -1) {
-                                            controlContainerElem.style.display = 'block';
-                                        } else if (dependOn[2] && Array.isArray(dependOn[2]) && dependOn[2].indexOf(targetControlValue) !== -1) {
-                                            controlContainerElem.style.display = 'none';
-                                        }
-                                    }
+                var dependOnControlElements = void 0;
+                var valueDependOnControlCorrectObj = {};
+                if (Array.isArray(valueDependOnControlCorrect)) {
+                    if (Array.isArray(valueDependOnControlCorrect[0])) {
+                        valueDependOnControlCorrect.map(function (s) {
+                            valueDependOnControlCorrectObj[s[0]] = [s[1], s[2]];
+                        });
+                    } else {
+                        valueDependOnControlCorrectObj[valueDependOnControlCorrect[0]] = [valueDependOnControlCorrect[1], valueDependOnControlCorrect[2]];
+                    }
+                }
+                dependOnControlName.map(function (s) {
+                    var dependOnControlElementClass = targetControlElementClass.replace(controlName, s);
+                    if (dependOnControlElementClass) {
+                        dependOnControlElements = document.getElementsByClassName(dependOnControlElementClass);
+                        if (dependOnControlElements.length > 0 && dependOnControlElements[0].type) {
+                            valueDependOnControl[s] = dependOnControlElements[0].value;
+                            if (s in valueDependOnControlCorrectObj) {
+                                if (valueDependOnControlCorrectObj[s][1] === 'integer') {
+                                    valueDependOnControl[s] = parseInt(valueDependOnControl[s]) + parseInt(valueDependOnControlCorrectObj[s][0]);
+                                } else if (valueDependOnControlCorrectObj[s][1] === 'string') {
+                                    valueDependOnControl[s] = valueDependOnControl[s] + valueDependOnControlCorrectObj[s][0];
                                 }
-                            };
-
-                            showHideDependOnControlElement(dependOnControlElementClass, dependOn);
-
-                            dependOnControlElement.addEventListener('change', function (event) {
-                                showHideDependOnControlElement(dependOnControlElementClass, dependOn);
-                            }, false);
+                            }
+                            dependOnControlElementsArr.push(dependOnControlElements[0]);
                         }
                     }
+                });
+            }
+
+            return [valueDependOnControl, dependOnControlElementsArr];
+        }
+
+        var dependOnControlData = dependOnControlDataGet(dependOnControlName, targetControlElementClass, valueDependOnControlCorrect);
+        WPTB_Helper.elementOptionsSet(kind, element, dependOnControlData[0], targetControlElementClass);
+
+        Object.keys(dependOnControlData[0]).forEach(function (key) {
+            var infArr = element.className.match(/wptb-element-((.+-)\d+)/i);
+            var unicClass = 'wptb-el-' + infArr[1] + '-' + [key];
+            element.addEventListener('wptb-control:' + unicClass, function (event) {
+                var dependOnControlData = dependOnControlDataGet(dependOnControlName, targetControlElementClass, valueDependOnControlCorrect);
+                WPTB_Helper.elementOptionsSet(kind, element, dependOnControlData[0], targetControlElementClass);
+            }, false);
+        });
+    },
+    /**
+     * Sets the visibility of one control to depend on the state of other controls
+     * @param dependOnMain
+     * @param targetControlElementClass
+     */
+    appearDependOnControl: function appearDependOnControl(dependOnMain, targetControlElementClass) {
+        if (Array.isArray(dependOnMain)) {
+            var dependOnControlElementChangeHandler = function dependOnControlElementChangeHandler(controlContainerElem, dependOnControlElementsValue, k) {
+                var dependOn = dependOnControlElementsValue[k][2];
+                var dependOnControlElements = dependOnControlElementsValue[k][1];
+                dependOnControlElementsValue[dependOn[0]] = [dependOnControlElementValue(dependOnControlElements, dependOn), dependOnControlElements, dependOn];
+                showHideTargetControlElement(controlContainerElem, dependOnControlElementsValue);
+            };
+
+            var showHideTargetControlElement = function showHideTargetControlElement(controlContainerElem, dependOnControlElementsValue) {
+                var display = 'block';
+                Object.keys(dependOnControlElementsValue).map(function (k) {
+                    if (Object.prototype.hasOwnProperty.call(dependOnControlElementsValue, k)) {
+                        if (dependOnControlElementsValue[k][0] === false) {
+                            display = 'none';
+                        }
+                    }
+                });
+
+                controlContainerElem.style.display = display;
+            };
+
+            var dependOnControlElementValue = function dependOnControlElementValue(dependOnControlElements, dependOn) {
+                var targetControlValue = WPTB_Helper.targetControlValueGet(dependOnControlElements);
+
+                if (dependOn[1] && Array.isArray(dependOn[1]) && dependOn[1].indexOf(targetControlValue) !== -1) {
+                    return true;
+                    // let childCheck = controlContainerElem.querySelector('input[type="checkbox"]')
+                    // if (childCheck) {
+                    //     childCheck.checked = true;
+                    // }
+                } else if (dependOn[2] && Array.isArray(dependOn[2]) && dependOn[2].indexOf(targetControlValue) !== -1) {
+                    return false;
+                }
+            };
+
+            if (typeof dependOnMain[0] === 'string') {
+                dependOnMain = [dependOnMain];
+            } else if (!Array.isArray(dependOnMain[0])) {
+                return;
+            }
+            var dependOnControlElementsValue = {};
+            for (var i = 0; i < dependOnMain.length; i++) {
+                var dependOn = dependOnMain[i];
+                var dependOnControlName = dependOn[0];
+                var infArr = targetControlElementClass.match(/wptb-el-((.+-)\d+)-(.+)/i);
+
+                if (infArr && Array.isArray(infArr)) {
+                    var controlName = infArr[3];
+
+                    var dependOnControlElementClass = targetControlElementClass.replace(controlName, dependOnControlName);
+                    if (dependOnControlElementClass) {
+                        var dependOnControlElements = document.getElementsByClassName(dependOnControlElementClass);
+                        if (dependOnControlElements.length > 0) {
+                            dependOnControlElementsValue[dependOn[0]] = [dependOnControlElementValue(dependOnControlElements, dependOn), dependOnControlElements, dependOn];
+                        }
+                    }
+                }
+            }
+
+            var targetControlElement = document.getElementsByClassName(targetControlElementClass);
+            if (targetControlElement.length > 0) {
+                targetControlElement = targetControlElement[0];
+                var controlContainerElem = WPTB_Helper.findAncestor(targetControlElement, 'wptb-element-option');
+
+                if (controlContainerElem) {
+                    showHideTargetControlElement(controlContainerElem, dependOnControlElementsValue);
+
+                    Object.keys(dependOnControlElementsValue).map(function (k) {
+                        if (Object.prototype.hasOwnProperty.call(dependOnControlElementsValue, k)) {
+                            var _dependOnControlElements = dependOnControlElementsValue[k][1];
+                            var dependOnControlElement = _dependOnControlElements[0];
+                            dependOnControlElement.addEventListener('change', dependOnControlElementChangeHandler.bind(null, controlContainerElem, dependOnControlElementsValue, k), false);
+                        }
+                    });
                 }
             }
         }
@@ -1673,8 +1871,8 @@ var WPTB_Helper = {
             }
         }
     },
-    // 
-    elementOptionsSet: function elementOptionsSet(kind, element) {
+    //
+    elementOptionsSet: function elementOptionsSet(kind, element, valueDependOnControl, targetControlElementClass) {
         // get controls config for this element
         var wptbContrlStacksConfigId = 'wptb-' + kind + '-control-stack';
         var tmplControlsConfig = wp.template(wptbContrlStacksConfigId);
@@ -1682,77 +1880,88 @@ var WPTB_Helper = {
         var elementContainerClass = void 0;
         var elementOptionClassIndic = void 0;
         var elementOptionsGroup = void 0;
-        var elementOptionsGroupId = void 0;
-        var wptbelementOptionClass = void 0;
 
-        // create containers for inserting controls of this item and their scripts
-        var wptbelementOptionsContainer = document.createElement('div');
-        var wptbelementOptionsScriptsContainer = document.createElement('div');
+        var controlElementParent = void 0;
+        var elementOptionsScriptsContainer = void 0;
 
         var infArr = element.className.match(/wptb-element-((.+-)\d+)/i);
-        if (!infArr && element.classList.contains('wptb-preview-table')) {
+        if (!infArr) {
             var table_id = WPTB_Helper.detectMode();
-            element.classList.add('wptb-element-main-table_setting-' + table_id);
+            if (!table_id) {
+                table_id = 'startedid-0';
+            }
+            if (element.classList.contains('wptb-preview-table')) {
+                element.classList.add('wptb-element-main-table_setting-' + table_id);
+            } else if (element.classList.contains('wptb-cell')) {
+                var cellEditActiveClass = document.querySelector('.wptb-element-table_cell_setting-' + element.dataset.xIndex + '-' + element.dataset.yIndex);
+                if (!cellEditActiveClass) element.classList.add('wptb-element-table_cell_setting-' + element.dataset.xIndex + '-' + element.dataset.yIndex);
+            } else if (element.classList.contains('wptb-responsive')) {
+                element.classList.add('wptb-element-table_responsive_setting-' + table_id);
+            }
+
             infArr = element.className.match(/wptb-element-((.+-)\d+)/i);
         }
+
         data = {
             container: '.' + infArr[0]
         };
+        var controlName = void 0;
+        data.valueDependOnControl = {};
+        if (valueDependOnControl) {
+            Object.keys(valueDependOnControl).forEach(function (key) {
+                data.valueDependOnControl[key] = valueDependOnControl[key];
+            });
+        }
+        if (targetControlElementClass) {
+            var _infArr = targetControlElementClass.match(/wptb-el-((.+-)\d+)-(.+)/i);
+
+            if (_infArr && Array.isArray(_infArr)) {
+                controlName = _infArr[3];
+            }
+        }
 
         elementContainerClass = infArr[0];
         elementOptionClassIndic = infArr[1];
 
-        if (!element.classList.contains('wptb-preview-table')) {
-            var children = document.getElementById('element-options-group').childNodes;
-            for (var _i5 = 0; _i5 < children.length; _i5++) {
-                if (children[_i5].style) children[_i5].style.display = 'none';
-            }
-
-            // hide wptb-elements-container and wptb-settings-section
-            document.getElementsByClassName('wptb-elements-container')[0].style.display = 'none';
-            document.getElementsByClassName('wptb-settings-section')[0].style.display = 'none';
-
-            // show element-options-group 
-            document.getElementById('element-options-group').style.display = 'block';
-
-            elementOptionsGroupId = 'element-options-group';
+        if (element.classList.contains('wptb-preview-table')) {} else if (element.classList.contains('wptb-cell')) {
+            this.activateSection('cell_settings');
+        } else if (element.classList.contains('wptb-responsive')) {
+            elementOptionsGroupId = 'table-responsive-group';
             wptbelementOptionClass = 'wptb-element-option';
         } else {
-            elementOptionsGroupId = 'table-settings-group';
-            wptbelementOptionClass = 'wptb-element-option';
+            var children = document.getElementById('element-options-group').childNodes;
+            for (var _i4 = 0; _i4 < children.length; _i4++) {
+                if (children[_i4].style) children[_i4].style.display = 'none';
+            }
+            this.activateSection('options_group');
         }
 
-        wptbelementOptionsContainer.classList.add('wptb-element-options', 'wptb-options-' + infArr[1]);
-        wptbelementOptionsScriptsContainer.classList.add('wptb-element-options-scripts', 'wptb-options-' + infArr[1]);
+        var controlsConfigJson = tmplControlsConfig(data);
+        var controlsConfig = JSON.parse(controlsConfigJson);
 
-        var jsonControlsConfigJson = tmplControlsConfig(data);
-        var jsonControlsConfig = JSON.parse(jsonControlsConfigJson);
+        var elementOptionsGroupIdsInvolved = [],
+            elementOptionsGroupInvolved = {},
+            elementOptionsContainerInvolved = {};
 
-        // clear elements from options group
-        //document.getElementById( 'element-options-group' ).innerHTML = '';
-        elementOptionsGroup = document.getElementById(elementOptionsGroupId);
-        var elementOptionsGroupChildren = [].concat(_toConsumableArray(elementOptionsGroup.children));
-        for (var _i6 = 0; _i6 < elementOptionsGroupChildren.length; _i6++) {
-            elementOptionsGroup.removeChild(elementOptionsGroupChildren[_i6]);
-        }
+        // object for save all scrips for each controls
+        var controlScriptsObj = {};
 
-        // insert created container into element-option-group tag
-        document.getElementById(elementOptionsGroupId).appendChild(wptbelementOptionsContainer);
-        document.getElementById(elementOptionsGroupId).appendChild(wptbelementOptionsScriptsContainer);
-
-        // show created container
-        wptbelementOptionsContainer.style.display = 'block';
-
-        // array for save all scrips for each controls
-        var controlScriptsArr = [];
-
-        // array for keep "appear depend on" parametrs
+        // array for keep "appear depend on" params
         var controlappearDependOnControl = [];
 
+        // array for keep "value depend on" params
+        var controlValueDependOnControl = [];
+
         // create controls
+        var elementOptionsScriptsContainerIndic = false;
+        if (controlName) {
+            var controlsConfigNew = {};
+            controlsConfigNew[controlName] = controlsConfig[controlName];
+            controlsConfig = controlsConfigNew;
+        }
         var i = 0;
-        Object.keys(jsonControlsConfig).forEach(function (key) {
-            var data = jsonControlsConfig[key];
+        Object.keys(controlsConfig).forEach(function (key) {
+            var data = controlsConfig[key];
             data.controlKey = key;
 
             // get necessary wp js template
@@ -1760,58 +1969,172 @@ var WPTB_Helper = {
 
             data.elemContainer = elementContainerClass;
             data.elementControlTargetUnicClass = 'wptb-el-' + elementOptionClassIndic + '-' + data.controlKey;
+            Object.keys(data).map(function (k) {
+                if (Object.prototype.hasOwnProperty.call(data, k) && data[k] === 'control_param_calculate_value') {
+                    data[k] = WPTB_Helper.controlParamCalculateValue(data.elementControlTargetUnicClass, k);
+                }
+            });
             var controlTemplate = tmplControlTemplate(data);
-
             if ('appearDependOnControl' in data) {
                 if (Array.isArray(data.appearDependOnControl)) {
                     controlappearDependOnControl.push([data.appearDependOnControl, data.elementControlTargetUnicClass]);
                 }
             }
 
-            var wptbElementOptionContainer = document.createElement('div');
-            wptbElementOptionContainer.classList.add(wptbelementOptionClass, 'wptb-settings-items');
-
-            if (data.customClassForContainer) {
-                wptbElementOptionContainer.classList.add(data.customClassForContainer);
+            if ('valueDependOnControl' in data && !valueDependOnControl && !targetControlElementClass) {
+                var valueDependOnControlCorrect = '';
+                if (data.valueDependOnControlCorrect) valueDependOnControlCorrect = data.valueDependOnControlCorrect;
+                controlValueDependOnControl.push([data.valueDependOnControl, data.elementControlTargetUnicClass, valueDependOnControlCorrect]);
             }
 
-            if (data.containerAdditionalStyles) {
-                wptbElementOptionContainer.setAttribute('style', data.containerAdditionalStyles);
+            function elementOptionsContainerInvolvedGet(elementOptionsGroupId, elementOptionsContainerInvolved) {
+                if (!elementOptionsContainerInvolved[elementOptionsGroupId]) {
+                    var elementOptionsContainer = document.createElement('div');
+                    elementOptionsContainer.classList.add('wptb-element-options', 'wptb-options-' + infArr[1]);
+                    document.getElementById(elementOptionsGroupId).appendChild(elementOptionsContainer);
+                    elementOptionsContainerInvolved[elementOptionsGroupId] = elementOptionsContainer;
+                }
+
+                return elementOptionsContainerInvolved[elementOptionsGroupId];
             }
 
-            wptbElementOptionContainer.innerHTML = controlTemplate;
+            if (elementOptionsGroupIdsInvolved.indexOf(data.elementOptionsGroupId) == -1 && !controlName) {
+                elementOptionsGroupIdsInvolved.push(data.elementOptionsGroupId);
+                // clear elements from options group
+                //document.getElementById( 'element-options-group' ).innerHTML = '';
+                elementOptionsGroup = document.getElementById(data.elementOptionsGroupId);
+                var elementOptionsGroupChildren = [].concat(_toConsumableArray(elementOptionsGroup.children));
+                for (var _i5 = 0; _i5 < elementOptionsGroupChildren.length; _i5++) {
+                    elementOptionsGroup.removeChild(elementOptionsGroupChildren[_i5]);
+                }
+                elementOptionsGroupInvolved[data.elementOptionsGroupId] = elementOptionsGroup;
+            }
 
-            wptbelementOptionsContainer.appendChild(wptbElementOptionContainer);
+            controlElementParent = elementOptionsGroupInvolved[data.elementOptionsGroupId];
 
-            var helperJavascriptElem = wptbElementOptionContainer.getElementsByTagName('wptb-template-script');
+            if (data.elementOptionsContainerOn === 'true' && !controlName) {
+                controlElementParent = elementOptionsContainerInvolvedGet(data.elementOptionsGroupId, elementOptionsContainerInvolved);
+            }
+
+            if (data.elementOptionContainerOn === 'true') {
+                var elementOptionContainer = document.createElement('div');
+                elementOptionContainer.classList.add(data.elementOptionClass, 'wptb-settings-items');
+
+                if (data.customClassForContainer) {
+                    elementOptionContainer.classList.add(data.customClassForContainer);
+                }
+
+                if (data.containerAdditionalStyles) {
+                    elementOptionContainer.setAttribute('style', data.containerAdditionalStyles);
+                }
+
+                if (targetControlElementClass) {
+                    var targetControlElement = document.getElementsByClassName(targetControlElementClass);
+                    if (targetControlElement.length > 0) {
+                        targetControlElement = targetControlElement[0];
+                        var controlContainerElem = WPTB_Helper.findAncestor(targetControlElement, 'wptb-element-option');
+
+                        if (controlContainerElem) {
+                            var controlContainerElemParent = controlContainerElem.parentNode;
+                            controlContainerElemParent.insertBefore(elementOptionContainer, controlContainerElem);
+                            controlContainerElemParent.removeChild(controlContainerElem);
+                        }
+                    }
+                } else {
+                    controlElementParent.appendChild(elementOptionContainer);
+                }
+                controlElementParent = elementOptionContainer;
+            }
+            controlElementParent.innerHTML = controlElementParent.innerHTML + controlTemplate;
+
+            var helperJavascriptElem = controlElementParent.getElementsByTagName('wptb-template-script');
             if (helperJavascriptElem.length > 0) {
                 helperJavascriptElem = helperJavascriptElem[0];
                 var helperJavascriptCode = helperJavascriptElem.innerText;
-                wptbElementOptionContainer.removeChild(helperJavascriptElem);
+                controlElementParent.removeChild(helperJavascriptElem);
                 var script = document.createElement('script');
                 script.setAttribute('type', 'text/javascript');
+                script.setAttribute('id', kind + '-' + data.controlKey);
                 script.innerHTML = helperJavascriptCode.replace(/\r|\n|\t/g, '').trim();
-                controlScriptsArr.push(script);
+                if (!controlScriptsObj[data.elementOptionsGroupId] || !Array.isArray(controlScriptsObj[data.elementOptionsGroupId])) {
+                    controlScriptsObj[data.elementOptionsGroupId] = [];
+                }
+                controlScriptsObj[data.elementOptionsGroupId].push(script);
             }
 
             i++;
         });
 
-        // run the scripts of controls
-        if (controlScriptsArr.length > 0) {
-            for (var _i7 = 0; _i7 < controlScriptsArr.length; _i7++) {
-                wptbelementOptionsScriptsContainer.appendChild(controlScriptsArr[_i7]);
+        element.optionsGroupIds = elementOptionsGroupIdsInvolved;
+
+        Object.keys(controlScriptsObj).forEach(function (elementOptionsGroupId) {
+            if (!targetControlElementClass) {
+                elementOptionsScriptsContainer = document.createElement('div');
+                elementOptionsScriptsContainer.classList.add('wptb-element-options-scripts', 'wptb-options-' + infArr[1]);
+                elementOptionsGroupInvolved[elementOptionsGroupId].appendChild(elementOptionsScriptsContainer);
             }
-        }
+
+            var controlScriptsArr = controlScriptsObj[elementOptionsGroupId];
+            if (controlScriptsArr.length > 0) {
+                for (var _i6 = 0; _i6 < controlScriptsArr.length; _i6++) {
+                    if (targetControlElementClass) {
+                        var id = kind + '-' + controlName;
+                        var script = document.getElementById(id);
+                        elementOptionsScriptsContainer = script.parentNode;
+                        elementOptionsScriptsContainer.insertBefore(controlScriptsArr[_i6], script);
+                        elementOptionsScriptsContainer.removeChild(script);
+                    } else {
+                        elementOptionsScriptsContainer.appendChild(controlScriptsArr[_i6]);
+                    }
+                }
+            }
+        });
+
+        // run the scripts of controls
 
         // run appearDependOnControl function
-        for (var _i8 = 0; _i8 < controlappearDependOnControl.length; _i8++) {
-            WPTB_Helper.appearDependOnControl(controlappearDependOnControl[_i8][0], controlappearDependOnControl[_i8][1]);
+        for (var _i7 = 0; _i7 < controlappearDependOnControl.length; _i7++) {
+            WPTB_Helper.appearDependOnControl(controlappearDependOnControl[_i7][0], controlappearDependOnControl[_i7][1]);
         }
 
         WPTB_Helper.wptbDocumentEventGenerate('element:controls:active', element);
+        // run valueDependOnControl function
+        for (var _i8 = 0; _i8 < controlValueDependOnControl.length; _i8++) {
+            WPTB_Helper.valueDependOnControl(controlValueDependOnControl[_i8][0], controlValueDependOnControl[_i8][1], controlValueDependOnControl[_i8][2], kind, element);
+        }
     },
-    // function for create, update css for element
+
+    /**
+     *
+     * @param unicClass
+     * @param controlKey
+     * @param key
+     * @returns {*}
+     */
+    controlParamCalculateValue: function controlParamCalculateValue(unicClass, key) {
+        var unicClassP = WPTB_Helper.replaceAll(unicClass, '-', '_');
+        if (window['paramCalculateValue_' + unicClassP + '_' + key] && typeof window['paramCalculateValue_' + unicClassP + '_' + key] === "function") {
+            return window['paramCalculateValue_' + unicClassP + '_' + key]();
+        }
+    },
+
+    controlParamCalculateValueCreateFunction: function controlParamCalculateValueCreateFunction(element, controlKey, key, handlerFunction) {
+        var infArr = element.className.match(/wptb-element-((.+-)\d+)/i);
+        var unicClass = 'wptb-el-' + infArr[1] + '-' + controlKey;
+        var unicClassP = WPTB_Helper.replaceAll(unicClass, '-', '_');
+        window['paramCalculateValue_' + unicClassP + '_' + key] = function () {
+            return handlerFunction(element);
+        };
+    },
+
+    /**
+     * function for create, update css for element
+     *
+     * @param elementContainer
+     * @param selector
+     * @param cssName
+     * @param cssValue
+     */
     managerExternalCssStyles: function managerExternalCssStyles(elementContainer, selector, cssName, cssValue) {
         var infArr = elementContainer.match(/wptb-element-main(.+)-(\d+)/i);
         if (!infArr || !Array.isArray(infArr)) {
@@ -1820,9 +2143,9 @@ var WPTB_Helper = {
             if (table.length > 0) {
                 table = table[0];
 
-                var _infArr = table.className.match(/wptb-element-main(.+)-(\d+)/i);
-                if (_infArr && Array.isArray(_infArr)) {
-                    selector = '.' + _infArr[0] + ' ' + selector;
+                var _infArr2 = table.className.match(/wptb-element-main(.+)-(\d+)/i);
+                if (_infArr2 && Array.isArray(_infArr2)) {
+                    selector = '.' + _infArr2[0] + ' ' + selector;
                 }
             }
         }
@@ -1902,6 +2225,137 @@ var WPTB_Helper = {
             }
         }
     },
+    /**
+     *
+     * Register section parts for sidebar
+     *
+     * @param {array} sections an array of section names
+     */
+    registerSections: function registerSections(sections) {
+        var _this = this;
+
+        this.sections = {};
+        this.currentSection = '';
+        if (!Array.isArray(sections)) {
+            sections = [sections];
+        }
+
+        sections.map(function (s) {
+            var sectionElement = document.querySelector('[data-wptb-section=' + s + ']');
+            if (sectionElement) {
+                _this.sections[s] = sectionElement;
+            }
+        });
+    },
+
+    /**
+     * Activate a registered section and deactivates others
+     *
+     * @param {string} sectionDataId section name to be activated
+     * @param {string} displayType display type override for section to be used in its display style property
+     */
+    activateSection: function activateSection(sectionDataId) {
+        var _this2 = this;
+
+        var displayType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'block';
+
+        this.currentSection = sectionDataId;
+        this.triggerSectionEvent(sectionDataId);
+        Object.keys(this.sections).map(function (k) {
+            if (Object.prototype.hasOwnProperty.call(_this2.sections, k)) {
+                var visibility = sectionDataId === k ? displayType : 'none';
+                _this2.sections[k].style = 'display: ' + visibility + ' !important';
+            }
+        });
+    },
+
+    /**
+     * Get id of current active section
+     *
+     * @returns {string} active section i
+     */
+    getCurrentSection: function getCurrentSection() {
+        return this.currentSection;
+    },
+
+    /**
+     * Get current section from search parameter 'wptb-builder-section' of window location
+     */
+    getSectionFromUrl: function getSectionFromUrl() {
+        var parsedUrl = new URL(window.location.href);
+        var urlSection = parsedUrl.searchParams.get('wptb-builder-section');
+        if (urlSection) {
+            if (Object.keys(this.sections).some(function (key) {
+                return key === urlSection;
+            })) {
+                this.activateSection(urlSection);
+            }
+        }
+    },
+
+    /**
+     * Set up related buttons and links to trigger certain elements
+     */
+    setupSectionButtons: function setupSectionButtons() {
+        var sectionButtons = Array.from(document.querySelectorAll('[data-wptb-section-button'));
+        var vm = this;
+
+        sectionButtons.map(function (s) {
+            var sectionName = s.dataset.wptbSectionButton;
+            s.addEventListener('click', function () {
+                var displayType = s.dataset.wptbSectionDisplayType;
+                vm.activateSection(sectionName, displayType);
+            });
+
+            document.addEventListener('wptbSectionChanged', function (e) {
+                if (e.detail === sectionName) {
+                    s.classList.remove('disabled');
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                    s.classList.add('disabled');
+                }
+            });
+        });
+    },
+    setupPanelToggleButtons: function setupPanelToggleButtons() {
+        var $ = jQuery;
+
+        $('.wptb-panel-toggle-group').each(function () {
+            var vm = $(this);
+            $(this).find('.toggle-icon').click(function () {
+                vm.find('.wptb-panel-toggle-target').slideToggle();
+                vm.toggleClass('wptb-panel-toggle-content');
+            });
+        });
+    },
+
+    /**
+     * Trigger a section change event
+     *
+     * @param {string} sectionName section name
+     */
+    triggerSectionEvent: function triggerSectionEvent(sectionName) {
+        var sectionEvent = new CustomEvent('wptbSectionChanged', { detail: sectionName });
+
+        document.dispatchEvent(sectionEvent);
+    },
+
+    /**
+     * Setup sidebar toggle element
+     *
+     * @param {string} toggleSelector query selector for drawer toggle element
+     */
+    setupSidebarToggle: function setupSidebarToggle(toggleSelector) {
+        var toggleButton = document.querySelector(toggleSelector);
+        if (toggleButton) {
+            toggleButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.body.classList.toggle('collapsed');
+            });
+        }
+    },
+
     // function for deleting all external CSS for the element
     externalCssStylesDelete: function externalCssStylesDelete(elementContainerClass) {
         var head = document.head;
@@ -2022,6 +2476,12 @@ var WPTB_Helper = {
                 if (codeClone.classList.contains('wptb-element-main-table_setting-startedid-0')) {
                     codeClone.classList.remove('wptb-element-main-table_setting-startedid-0');
                     codeClone.classList.add('wptb-element-main-table_setting-' + postId);
+                    var wptbTableSetup = document.querySelector('.wptb-table-setup');
+                    if (wptbTableSetup) {
+                        wptbTableSetup.innerHTML = '';
+                        wptbTableSetup.appendChild(codeClone);
+                        WPTB_Table();
+                    }
                     paramIdsNecessaryChange = true;
                 }
             }
@@ -2120,6 +2580,7 @@ var WPTB_Helper = {
                     if (wptbSaveBtn.length > 0) {
                         wptbSaveBtn = wptbSaveBtn[0];
                         wptbSaveBtn.classList.add('wptb-save-disabled');
+                        wptbSaveBtn.classList.remove('active');
                     }
                 } else if (data[0] == 'edited') {
                     messagingArea.innerHTML = '<div class="wptb-success wptb-message">Table "' + t + '" was successfully updated.</div>';
@@ -2129,6 +2590,7 @@ var WPTB_Helper = {
                     if (_wptbSaveBtn.length > 0) {
                         _wptbSaveBtn = _wptbSaveBtn[0];
                         _wptbSaveBtn.classList.add('wptb-save-disabled');
+                        _wptbSaveBtn.classList.remove('active');
                     }
                 } else if (data[0] == 'preview_edited') {
                     return;
@@ -2145,9 +2607,20 @@ var WPTB_Helper = {
     },
     //
     clickOnFreeSpace: function clickOnFreeSpace() {
-        document.getElementsByClassName('wptb-elements-container')[0].style.display = 'table';
-        document.getElementsByClassName('wptb-settings-section')[0].style.display = 'block';
-        document.getElementById('element-options-group').style.display = 'none';
+        // if current active section is responsive menu, ignore this functionality
+        if (this.getCurrentSection() === 'table_responsive_menu') {
+            return;
+        }
+
+        var cellModeBackground = document.querySelector('#wptb-cell_mode_background');
+        if (cellModeBackground && cellModeBackground.classList.contains('visible')) {
+            return;
+        }
+        // document.getElementsByClassName( 'wptb-elements-container' )[0].style.display = 'table';
+        // document.getElementsByClassName( 'wptb-settings-section' )[0].style.display = 'block';
+        // document.getElementById( 'element-options-group' ).style.display = 'none';
+        this.activateSection('elements');
+
         var wpcdFixedToolbar = document.getElementById('wpcd_fixed_toolbar');
         if (wpcdFixedToolbar.hasAttribute('data-toolbar-active-id')) {
             document.getElementById(wpcdFixedToolbar.getAttribute('data-toolbar-active-id')).classList.remove('toolbar-active');
@@ -2212,6 +2685,7 @@ var WPTB_Helper = {
         }
 
         if (bar.length > 0) {
+            var toggleEditMode = '';
             for (var i = 0; i < bar.length; i++) {
                 if (bar[i].classList.contains('visible')) {
                     document.select.deactivateMultipleSelectMode();
@@ -2226,14 +2700,19 @@ var WPTB_Helper = {
                             wptbPreviewTableTds[_i9].classList.remove('wptb-highlighted');
                         }
                     }
+                    toggleEditMode = 'closed';
                 } else if (!close) {
                     document.select.activateMultipleSelectMode();
                     bar[i].classList.add('visible');
                     cellModeBackground.classList.add('visible');
                     leftScrollPanelCurtain.classList.add('visible');
                     wptbPreviewTable.parentNode.classList.add('wptb-preview-table-manage-cells');
+
+                    toggleEditMode = 'opened';
                 }
             }
+
+            WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-edit-mode/' + toggleEditMode, wptbPreviewTable);
         }
     },
 
@@ -2358,11 +2837,16 @@ var WPTB_Helper = {
     getValueMaxCountSameElementsInArray: function getValueMaxCountSameElementsInArray(arr) {
         if (arr && Array.isArray(arr)) {
             var check = {};
+            var countEmpty = 0;
             for (var i = 0; i < arr.length; i++) {
-                if (check[arr[i]]) {
-                    check[arr[i]]++;
+                if (arr[i]) {
+                    if (check[arr[i]]) {
+                        check[arr[i]]++;
+                    } else {
+                        check[arr[i]] = 1;
+                    }
                 } else {
-                    check[arr[i]] = 1;
+                    countEmpty++;
                 }
             }
 
@@ -2378,7 +2862,7 @@ var WPTB_Helper = {
                 }
             }
 
-            return maxPropName;
+            return check[maxPropName] >= countEmpty ? maxPropName : '';
         }
     },
 
@@ -2436,10 +2920,10 @@ var WPTB_Helper = {
                     }
                 }
                 jMainIter++;
+            }
 
-                if (j > maxCols) {
-                    maxCols = j;
-                }
+            if (tds.length > maxCols) {
+                maxCols = tds.length;
             }
 
             if (i == 0) {
@@ -2481,6 +2965,64 @@ var WPTB_Helper = {
                 WPTB_Helper.wptbDocumentEventGenerate('controlColor:change', tableOddRowBackground, _details2);
             }
         }
+    },
+    /**
+     * Get parent html element of given type
+     *
+     * @param {string} parentType type of parent element
+     * @param {HTMLElement} el current element
+     * @returns {*} html element of type
+     */
+    getParentOfType: function getParentOfType(parentType, el) {
+        if (el.nodeName === parentType.toUpperCase()) {
+            return el;
+        }
+
+        return WPTB_Helper.getParentOfType(parentType, el.parentElement);
+    },
+    // current relative type of drag element
+    // this type is used on differentiating certain elements based on their positioning on table
+    dragRelativeType: '',
+    /**
+     *
+     * @param {string} val drag relative type
+     */
+    setDragRelativeType: function setDragRelativeType(val) {
+        this.dragRelativeType = val;
+    },
+    // get drag relative type
+    getDragRelativeType: function getDragRelativeType() {
+        return this.dragRelativeType;
+    },
+    /**
+     *
+     * @param {HTMLElement} element
+     * @param {string} styleName
+     */
+    getElementColorStylesHex: function getElementColorStylesHex(element, styleName) {
+        var color = element.style[styleName];
+        color = WPTB_Helper.rgbToHex(color);
+        if (!WPTB_Helper.isHex(color)) {
+            color = '';
+        }
+        return color;
+    },
+    /**
+     * Show element controls on adding them to table.
+     */
+    showControlsOnElementMount: function showControlsOnElementMount() {
+        document.addEventListener('element:mounted:dom', function (e) {
+            e.target.click();
+        });
+    },
+
+    /**
+     * Show elements list menu on left panel on removing element from table
+     */
+    showElementsListOnRemove: function showElementsListOnRemove() {
+        document.addEventListener('element:removed:dom', function () {
+            WPTB_Helper.activateSection('elements');
+        });
     }
 };
 var WPTB_Initializer = function WPTB_Initializer() {
@@ -2528,183 +3070,37 @@ var WPTB_Initializer = function WPTB_Initializer() {
                 var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
                 wptbTableStateSaveManager.tableStateSet();
         };
-};
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+        // register and setup section buttons
+        WPTB_Helper.registerSections(['elements', 'table_settings', 'cell_settings', 'options_group', 'table_responsive_menu']);
+        WPTB_Helper.setupSectionButtons();
+
+        // activate elements section for startup
+        WPTB_Helper.activateSection('elements');
+
+        // side bar toggle setup
+        // WPTB_Helper.setupSidebarToggle('.wptb-panel-drawer-toggle');
+        WPTB_Helper.setupSidebarToggle('.wptb-panel-toggle-section .wptb-panel-drawer-icon');
+
+        // setup panel sections that have the ability to be toggled on/off
+        WPTB_Helper.setupPanelToggleButtons();
+
+        // setup responsive menu both at left and builder panel
+        new WptbResponsive('table_responsive_menu', 'wptbResponsiveApp', '.wptb-builder-content');
+
+        // get builder section from url parameter for easy switch at page load
+        WPTB_Helper.getSectionFromUrl();
+
+        // automatically show element controls when dropped to table
+        WPTB_Helper.showControlsOnElementMount();
+
+        // show elements list menu on left panel on removing elements from table
+        WPTB_Helper.showElementsListOnRemove();
+};
 var WPTB_LeftPanel = function WPTB_LeftPanel() {
 
     var table = document.getElementsByClassName('wptb-preview-table')[0],
         wptbElementButtons = document.getElementsByClassName('wptb-element');
-
-    var wptbTableColumnWidthNumber = document.getElementById('wptb-table-column-width-number');
-    WPTB_Helper.numberImputSize(wptbTableColumnWidthNumber, 2, 500);
-
-    var wptbTableRowHeightNumber = document.getElementById('wptb-table-row-height-number');
-    WPTB_Helper.numberImputSize(wptbTableRowHeightNumber, 2, 200);
-
-    document.getElementById('wptb-table-column-width-slider').oninput = function () {
-        document.getElementById('wptb-table-column-width-number').value = this.value;
-        table.addColumnWidth(this.value);
-    };
-
-    document.getElementById('wptb-table-column-width-slider').onchange = function () {
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    document.getElementById('wptb-table-column-width-number').onchange = function () {
-        document.getElementById('wptb-table-column-width-slider').value = this.value;
-        table.addColumnWidth(this.value);
-
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    document.getElementById('wptb-table-column-width-auto-fixed').onchange = function () {
-        if (this.checked) {
-            var highlighted = table.querySelector('.wptb-highlighted');
-            var width = WPTB_Helper.getColumnWidth(table, highlighted);
-            table.addColumnWidth(width);
-        } else {
-            table.addColumnWidth(false, true);
-            var _highlighted = table.querySelector('.wptb-highlighted');
-            var _width = WPTB_Helper.getColumnWidth(table, _highlighted);
-            document.getElementById('wptb-table-column-width-number').value = _width;
-            document.getElementById('wptb-table-column-width-slider').value = _width;
-        }
-
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    document.getElementById('wptb-table-row-height-slider').oninput = function () {
-        document.getElementById('wptb-table-row-height-number').value = this.value;
-        table.addRowHeight(this.value);
-    };
-
-    document.getElementById('wptb-table-row-height-slider').onchange = function () {
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    document.getElementById('wptb-table-row-height-number').onchange = function () {
-        document.getElementById('wptb-table-row-height-slider').value = this.value;
-        table.addRowHeight(this.value);
-
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    document.getElementById('wptb-table-row-height-auto-fixed').onchange = function () {
-        if (this.checked) {
-            var highlighted = table.querySelector('.wptb-highlighted');
-            var height = WPTB_Helper.getRowHeight(table, highlighted);
-            table.addRowHeight(height);
-        } else {
-            table.addRowHeight(false, true);
-            var _highlighted2 = table.querySelector('.wptb-highlighted');
-            var _height = WPTB_Helper.getRowHeight(table, _highlighted2);
-            document.getElementById('wptb-table-row-height-number').value = _height;
-            document.getElementById('wptb-table-row-height-slider').value = _height;
-        }
-
-        var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-        wptbTableStateSaveManager.tableStateSet();
-    };
-
-    function controlsChange(inputs, table) {
-        if (inputs && (typeof inputs === 'undefined' ? 'undefined' : _typeof(inputs)) === 'object') {
-            if (inputs.hasOwnProperty('tableTopRowsAsHeader')) {
-                //                if( inputs.tableTopRowsAsHeader == 'checked' ) {
-                //                    let rows = table.rows;
-                //                    table.classList.add( 'wptb-table-preview-head' );
-                //                } else if( inputs.tableTopRowsAsHeader == 'unchecked' ) {
-                //                    let rows = table.rows;
-                //                    table.classList.remove( 'wptb-table-preview-head' );
-                //
-                //                    for ( let i = 1; i < rows.length; i++ ) {
-                //                        let thisRow = rows[i],
-                //                            thisRowChildren = thisRow.children;
-                //                        for( let j = 0; j < thisRowChildren.length; j++ ) {
-                //                            thisRowChildren[j].removeAttribute( 'data-wptb-title-column' );
-                //                            thisRowChildren[j].removeAttribute( 'data-wptb-title-column-font-size' );
-                //                            thisRowChildren[j].removeAttribute( 'data-wptb-title-column-color' );
-                //                            thisRowChildren[j].removeAttribute( 'data-wptb-title-background-color' );
-                //                            thisRowChildren[j].removeAttribute( 'data-wptb-title-align' );
-                //                        }
-                //                    }
-                //                }
-            } else if (inputs.hasOwnProperty('makeTableResponsive')) {
-                var infArr = table.className.match(/wptb-element-main(.+)-(\d+)/i);
-                if (infArr && Array.isArray(infArr) && typeof infArr[2] != 'undefined') {
-                    var inputSelector = void 0;
-                    if (infArr[2] == '0') {
-                        inputSelector = 'wptb-el-main-table_setting-startedid-0-tableTopRowsAsHeader';
-                    } else {
-                        inputSelector = 'wptb-el-main-table_setting-' + infArr[2] + '-tableTopRowsAsHeader';
-                    }
-
-                    var inputTopAsHeader = document.querySelector('.' + inputSelector);
-                    if (inputTopAsHeader) {
-                        if (inputs.makeTableResponsive == 'checked') {
-                            table.classList.add('wptb-table-preview-head');
-                            inputTopAsHeader.checked = true;
-                        } else if (inputs.makeTableResponsive == 'unchecked') {
-                            table.classList.remove('wptb-table-preview-head');
-                            inputTopAsHeader.checked = false;
-                        }
-                    }
-                }
-            } else if (inputs.hasOwnProperty('applyTableContainerMaxWidth')) {
-                var wptbTableSetup = document.querySelector('.wptb-table-setup');
-                if (inputs.applyTableContainerMaxWidth == 'checked') {
-                    var table_id = WPTB_Helper.detectMode();
-
-                    if (!table_id) {
-                        table_id = 'startedid-0';
-                    }
-
-                    var tableContainerMaxWidthInput = document.getElementsByClassName('wptb-el-main-table_setting-' + table_id + '-tableContainerMaxWidth');
-                    var tableContainerMaxWidthInputValue = 850;
-                    if (tableContainerMaxWidthInput.length > 0) {
-                        tableContainerMaxWidthInput = tableContainerMaxWidthInput[0];
-                        if (tableContainerMaxWidthInput.value) tableContainerMaxWidthInputValue = tableContainerMaxWidthInput.value;
-                    }
-
-                    table.dataset.wptbTableContainerMaxWidth = tableContainerMaxWidthInputValue;
-                    if (wptbTableSetup) wptbTableSetup.style.maxWidth = tableContainerMaxWidthInputValue + 'px';
-                } else if (inputs.applyTableContainerMaxWidth == 'unchecked') {
-                    table.removeAttribute('data-wptb-table-container-max-width');
-                    if (wptbTableSetup) wptbTableSetup.style.maxWidth = null;
-                }
-
-                table.tdDefaultWidth();
-            } else if (inputs.hasOwnProperty('tableContainerMaxWidth')) {
-                if (inputs.tableContainerMaxWidth) {
-                    table.dataset.wptbTableContainerMaxWidth = inputs.tableContainerMaxWidth;
-
-                    var _wptbTableSetup = document.querySelector('.wptb-table-setup');
-                    if (_wptbTableSetup) _wptbTableSetup.style.maxWidth = inputs.tableContainerMaxWidth + 'px';
-
-                    table.tdDefaultWidth();
-                }
-            } else if (inputs.hasOwnProperty('tableManageCells')) {
-                WPTB_Helper.toggleTableEditMode();
-            } else if (inputs.hasOwnProperty('tableAlignmentCheckbox')) {
-                table.tdDefaultWidth();
-            } else if (inputs.hasOwnProperty('tableCellMinAutoWidth')) {
-                table.tdDefaultWidth();
-            } else if (inputs.hasOwnProperty('tableBorder')) {
-                table.tdDefaultWidth();
-            } else if (inputs.hasOwnProperty('tableInnerBorderSize')) {
-                table.tdDefaultWidth();
-            } else if (inputs.hasOwnProperty('tableCellPadding')) {
-                table.tdDefaultWidth();
-            }
-        }
-    }
-
-    WPTB_Helper.controlsInclude(table, controlsChange);
 
     for (var i = 0; i < wptbElementButtons.length; i++) {
         wptbElementButtons[i].ondragstart = function (e) {
@@ -2718,32 +3114,9 @@ var WPTB_LeftPanel = function WPTB_LeftPanel() {
         for (var _i = 0; _i < wptbTablesEditModeCloseButton.length; _i++) {
             wptbTablesEditModeCloseButton[_i].onclick = WPTB_Helper.toggleTableEditMode;
         }
-        document.getElementById('wptb-add-end-row').onclick = table.addRowToTheEnd;
-        document.getElementById('wptb-add-start-row').onclick = table.addRowToTheStart;
-        document.getElementById('wptb-add-row-before').onclick = table.addRowBefore;
-        document.getElementById('wptb-add-row-after').onclick = table.addRowAfter;
-        document.getElementById('wptb-add-end-column').onclick = table.addColumnEnd;
-        document.getElementById('wptb-add-start-column').onclick = table.addColumnStart;
-        document.getElementById('wptb-add-column-before').onclick = table.addColumnBefore;
-        document.getElementById('wptb-add-column-after').onclick = table.addColumnAfter;
-        document.getElementById('wptb-delete-column').onclick = table.deleteColumn;
-        document.getElementById('wptb-delete-row').onclick = table.deleteRow;
-        document.getElementById('wptb-merge-cells').onclick = table.mergeCells;
-        document.getElementById('wptb-split-cell').onclick = table.splitCell;
     };
 
-    document.querySelector('.wptb-left-panel-extend').onclick = function () {
-        var wptbContainer = document.querySelector('.wptb-container');
-        if (wptbContainer) {
-            if (wptbContainer.classList.contains('collapsed')) {
-                wptbContainer.classList.remove('collapsed');
-            } else {
-                wptbContainer.classList.add('collapsed');
-            }
-        }
-    };
-
-    // this code hides the "element parameters" area 
+    // this code hides the "element parameters" area
     // when clicked outside this element and its "tinymce" toolbar 
     var wptbBuilderPanel = document.getElementsByClassName('wptb-builder-panel')[0];
     wptbBuilderPanel.onclick = function (e) {
@@ -2893,6 +3266,88 @@ if (!Object.keys) {
         };
     }();
 }
+/**
+ * Responsive menu and options class.
+ *
+ * This class will be called and instanced at table builder menu to add it the responsive menu and its controls.
+ *
+ * @param {string} sectionName section name
+ * @param {string} responsiveWrapperId id for mount point
+ * @param {string} mainContainerQuery query to find parent container for responsive menu
+ * @throws {Error} will throw an error if mainContainerQuery failed to find any element
+ * @constructor
+ */
+// eslint-disable-next-line no-unused-vars
+function WptbResponsive(sectionName, responsiveWrapperId, mainContainerQuery) {
+	var _this = this;
+
+	this.sectionName = sectionName;
+	this.responsiveWrapperId = responsiveWrapperId;
+	this.responsiveTable = null;
+	this.loaded = false;
+
+	/**
+  * Add responsive container to dom.
+  */
+	this.addContainerToDom = function () {
+		var responsiveContainer = document.querySelector('#' + _this.responsiveWrapperId);
+		if (!responsiveContainer) {
+			var mainContainer = document.querySelector(mainContainerQuery);
+
+			// parent container not found, throw error
+			if (!mainContainer) {
+				throw new Error('[WPTB_Responsive]: no parent container is found with the given query of [' + mainContainerQuery + ']');
+			}
+
+			var range = document.createRange();
+			range.setStart(mainContainer, 0);
+
+			var responsiveElement = range.createContextualFragment('<div class="wptb-responsive" id="' + _this.responsiveWrapperId + '">responsive element</div>');
+			mainContainer.appendChild(responsiveElement);
+			_this.loaded = true;
+		}
+
+		_this.responsiveTable = document.querySelector('#' + _this.responsiveWrapperId);
+	};
+
+	/**
+  * Load and make necessary mount preparations for component.
+  */
+	this.load = function () {
+		if (!_this.loaded) {
+			_this.addContainerToDom();
+
+			WPTB_Helper.elementStartScript(_this.responsiveTable, 'table_responsive_menu');
+			WPTB_Helper.elementOptionsSet('table_responsive_menu', _this.responsiveTable);
+			WPTB_ControlsManager.callControlScript('ResponsiveTable', _this.responsiveWrapperId);
+		}
+	};
+
+	/**
+  * Startup hook for the component.
+  */
+	this.startUp = function () {
+		// event listener for section change events
+		document.addEventListener('wptbSectionChanged', function (e) {
+			var tablePreview = document.querySelector('.wptb-preview-table');
+
+			// check if activated section is related to responsive and there is a main table already in the view
+			if (e.detail === _this.sectionName && tablePreview) {
+				_this.load();
+			}
+		});
+
+		// event listener for table ready signal
+		document.addEventListener('wptb:table:generated', function () {
+			// check current section to be sure that responsive menu is the active one before calling load related scripts
+			if (WPTB_Helper.getCurrentSection() === 'table_responsive_menu') {
+				_this.load();
+			}
+		});
+	};
+
+	this.startUp();
+}
 var WPTB_Settings = function WPTB_Settings() {
     var elems = document.getElementsByClassName('wptb-element');
 
@@ -2901,12 +3356,15 @@ var WPTB_Settings = function WPTB_Settings() {
             event.dataTransfer.effectAllowed = 'move';
             event.dataTransfer.setData('wptbElement', event.target.dataset.wptbElement);
             event.dataTransfer.setData('wptbElIndic-' + event.target.dataset.wptbElement, 'wptbElIndic-' + event.target.dataset.wptbElement);
+
+            // set drag relative helper field for future use
+            WPTB_Helper.setDragRelativeType(this.dataset.wptbRelativeElements || '');
         };
         elems[i].ondragend = function () {
             WPTB_Helper.elementDragEndClear();
         };
     };
-    var table = document.getElementsByClassName('wptb-preview-table');
+
     var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
     var wptbUndo = document.getElementsByClassName('wptb-undo');
     if (wptbUndo.length > 0) {
@@ -2916,10 +3374,11 @@ var WPTB_Settings = function WPTB_Settings() {
             if (!this.classList.contains('wptb-undoredo-disabled')) {
                 wptbTableStateSaveManager.tableStateGet(this.dataset.wptbUndoredo);
                 var wptbUndoRedoContainer = document.getElementsByClassName('wptb-undo-redo-container');
-                if (wptbUndoRedoContainer.length > 0 && table.length > 0) {
+                if (wptbUndoRedoContainer.length > 0) {
                     wptbUndoRedoContainer = wptbUndoRedoContainer[0];
                     wptbUndoRedoContainer.onmouseleave = function (event) {
                         event.target.onmouseleave = '';
+                        var table = document.querySelector('.wptb-preview-table');
                         WPTB_Table();
                     };
                 }
@@ -2935,10 +3394,11 @@ var WPTB_Settings = function WPTB_Settings() {
             if (!this.classList.contains('wptb-undoredo-disabled')) {
                 wptbTableStateSaveManager.tableStateGet(this.dataset.wptbUndoredo);
                 var wptbUndoRedoContainer = document.getElementsByClassName('wptb-undo-redo-container');
-                if (wptbUndoRedoContainer.length > 0 && table.length > 0) {
+                if (wptbUndoRedoContainer.length > 0) {
                     wptbUndoRedoContainer = wptbUndoRedoContainer[0];
                     wptbUndoRedoContainer.onmouseleave = function (event) {
                         event.target.onmouseleave = '';
+                        var table = document.querySelector('.wptb-preview-table');
                         WPTB_Table();
                     };
                 }
@@ -3011,12 +3471,12 @@ var WPTB_Stringifier = function WPTB_Stringifier(codeMain) {
         if (tds.length > 0) {
             for (var i = 0; i < tds.length; i++) {
 
-                if (codeMain.querySelector('wptb-table-preview-head')) {
-                    tds[i].removeAttribute('data-x-index');
-                }
+                tds[i].removeAttribute('data-x-index');
                 tds[i].removeAttribute('data-y-index');
                 tds[i].removeAttribute('draggable');
                 tds[i].classList.remove('wptb-droppable');
+                var infArr = tds[i].className.match(/wptb-element-((.+-)\d+)/i);
+                if (infArr) tds[i].classList.remove(infArr[0]);
                 var innerElements = tds[i].getElementsByClassName('wptb-ph-element');
 
                 if (innerElements.length > 0) {
@@ -3080,21 +3540,22 @@ var WPTB_Stringifier = function WPTB_Stringifier(codeMain) {
                     }
                 }
 
-                if (tds[i].hasAttribute('data-wptb-title-column')) {
-                    var columnNameDivContainer = document.createElement('div'),
-                        columnNameDiv = document.createElement('div');
-                    columnNameDivContainer.classList.add('wptb-column-title-mobile-container');
-                    columnNameDiv.classList.add('wptb-column-title-mobile');
-                    columnNameDiv.dataset.wptbTitleColumn = tds[i].dataset.wptbTitleColumn;
-                    columnNameDiv.setAttribute('style', 'font-size:' + tds[i].dataset.wptbTitleColumnFontSize + '; \n\
-                        color:' + tds[i].dataset.wptbTitleColumnColor + '; background-color:' + tds[i].dataset.wptbTitleBackgroundColor + '; text-align:' + tds[i].dataset.wptbTitleAlign + ';');
-                    columnNameDiv.style.padding = tds[i].style.padding;
-                    if (tds[i].children.length == 0) {
-                        tds[i].classList.add('wptb-column-title-mobile-not-elements');
-                    }
-                    columnNameDivContainer.appendChild(columnNameDiv);
-                    tds[i].insertBefore(columnNameDivContainer, tds[i].firstChild);
-                }
+                // TODO dataTitleColumnSet
+                // if( tds[i].hasAttribute( 'data-wptb-title-column' ) ) {
+                //     let columnNameDivContainer = document.createElement( 'div' ),
+                //         columnNameDiv = document.createElement( 'div' );
+                //     columnNameDivContainer.classList.add( 'wptb-column-title-mobile-container' );
+                //     columnNameDiv.classList.add( 'wptb-column-title-mobile' );
+                //     columnNameDiv.dataset.wptbTitleColumn = tds[i].dataset.wptbTitleColumn;
+                //     columnNameDiv.setAttribute( 'style', 'font-size:' + tds[i].dataset.wptbTitleColumnFontSize + '; \n\
+                //         color:' + tds[i].dataset.wptbTitleColumnColor + '; background-color:' + tds[i].dataset.wptbTitleBackgroundColor + '; text-align:' + tds[i].dataset.wptbTitleAlign + ';' );
+                //     columnNameDiv.style.padding = tds[i].style.padding;
+                //     if( tds[i].children.length == 0 ) {
+                //         tds[i].classList.add( 'wptb-column-title-mobile-not-elements' );
+                //     }
+                //     columnNameDivContainer.appendChild( columnNameDiv );
+                //     tds[i].insertBefore( columnNameDivContainer, tds[i].firstChild );
+                // }
             }
         }
 
@@ -3102,6 +3563,8 @@ var WPTB_Stringifier = function WPTB_Stringifier(codeMain) {
     }
 };
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var array = [],
     WPTB_Table = function WPTB_Table(columns, rows, wptb_preview_table) {
@@ -3125,28 +3588,28 @@ var array = [],
      * @param Event this is the event instance of the click performed over a cell.
      */
     var mark = function mark(event) {
-        var rs = this.rowSpan,
-            cs = this.colSpan,
-            markedCells,
+        var thisElem = event.currentTarget;
+        var rs = thisElem.rowSpan,
+            cs = thisElem.colSpan,
             noCells = document.getElementsByClassName('wptb-no-cell-action'),
             singleCells = document.getElementsByClassName('wptb-single-action'),
             multipleCells = document.getElementsByClassName('wptb-multiple-select-action'),
             cellSettings = document.getElementById('wptb-left-scroll-panel-cell-settings'),
-            position = getCoords(this),
+            position = getCoords(thisElem),
             row = position[0],
             column = position[1];
         if (!document.select.isActivated()) {
             return;
         }
-        if (this.className.match(/wptb-highlighted/)) {
-            this.classList.remove('wptb-highlighted');
+        if (thisElem.className.match(/wptb-highlighted/)) {
+            thisElem.classList.remove('wptb-highlighted');
             for (var i = 0; i < rs; i++) {
                 for (var j = 0; j < cs; j++) {
                     array[row + i][column + j] = 0;
                 }
             }
         } else {
-            this.classList.add('wptb-highlighted');
+            thisElem.classList.add('wptb-highlighted');
             for (var i = 0; i < rs; i++) {
                 for (var j = 0; j < cs; j++) {
                     array[row + i][column + j] = 1;
@@ -3154,7 +3617,8 @@ var array = [],
             }
         }
 
-        markedCells = document.getElementsByClassName('wptb-highlighted').length;
+        var cellHighlighted = document.getElementsByClassName('wptb-highlighted'),
+            markedCells = cellHighlighted.length;
         if (markedCells === 0) {
             for (var i = 0; i < multipleCells.length; i++) {
                 multipleCells[i].classList.remove('visible');
@@ -3182,46 +3646,53 @@ var array = [],
                 singleCells[i].classList.add('visible');
                 singleCells[i].removeAttribute('disabled');
             }
-            var cellHighlighted = document.querySelector('.wptb-highlighted');
-            if (cellHighlighted) {
-                var wptbTableColumnWidthSlider = document.getElementById('wptb-table-column-width-slider');
-                var wptbTableColumnWidthNumber = document.getElementById('wptb-table-column-width-number');
-                var tableColumnWidthAutoFixedCheckbox = document.getElementById('wptb-table-column-width-auto-fixed');
-                var width = cellHighlighted.style.width;
-                if (width) {
-                    wptbTableColumnWidthSlider.value = parseFloat(width, 10);
-                    wptbTableColumnWidthNumber.value = parseFloat(width, 10);
-                    tableColumnWidthAutoFixedCheckbox.checked = true;
-                } else if (cellHighlighted.dataset.wptbFixedWidth) {
-                    wptbTableColumnWidthSlider.value = cellHighlighted.dataset.wptbFixedWidth;
-                    wptbTableColumnWidthNumber.value = cellHighlighted.dataset.wptbFixedWidth;
-                    tableColumnWidthAutoFixedCheckbox.checked = true;
-                } else {
-                    var cellWidth = WPTB_Helper.getColumnWidth(table, cellHighlighted);
-                    wptbTableColumnWidthSlider.value = cellWidth;
-                    wptbTableColumnWidthNumber.value = cellWidth;
-                    tableColumnWidthAutoFixedCheckbox.checked = false;
-                }
 
-                var wptbTableRowHeightSlider = document.getElementById('wptb-table-row-height-slider');
-                var wptbTableRowHeightNumber = document.getElementById('wptb-table-row-height-number');
-                var tableRowHeightAutoFixedCheckbox = document.getElementById('wptb-table-row-height-auto-fixed');
-                var height = cellHighlighted.style.height;
-                if (height) {
-                    wptbTableRowHeightSlider.value = parseFloat(height, 10);
-                    wptbTableRowHeightNumber.value = parseFloat(height, 10);
-                    tableRowHeightAutoFixedCheckbox.checked = true;
-                } else if (cellHighlighted.dataset.wptbFixedHeight) {
-                    wptbTableRowHeightSlider.value = cellHighlighted.dataset.wptbFixedHeight;
-                    wptbTableRowHeightNumber.value = cellHighlighted.dataset.wptbFixedHeight;
-                    tableRowHeightAutoFixedCheckbox.checked = true;
-                } else {
-                    var cellHeight = WPTB_Helper.getRowHeight(table, cellHighlighted);
-                    wptbTableRowHeightSlider.value = cellHeight;
-                    wptbTableRowHeightNumber.value = cellHeight;
-                    tableRowHeightAutoFixedCheckbox.checked = false;
+            cellHighlighted = cellHighlighted[0];
+            WPTB_Helper.elementOptionsSet('table_cell_setting', cellHighlighted);
+
+            var _infArr = cellHighlighted.className.match(/wptb-element-((.+-)\d+)/i);
+
+            var controlElemIds = ['cellWidth', 'cellHeight'];
+
+            controlElemIds.map(function (s) {
+                var elementControlSizeUnicClass = 'wptb-el-' + _infArr[1] + '-' + s,
+                    elementControlSizeFixedUnicClass = 'wptb-el-' + _infArr[1] + '-' + s + 'Fixed';
+                if (s === 'cellWidth' || s === 'cellHeight') {
+                    var sizeName = '',
+                        getSizeFunctionName = '';
+                    if (s === 'cellWidth') {
+                        sizeName = 'width';
+                        getSizeFunctionName = 'getColumnWidth';
+                    } else if (s === 'cellHeight') {
+                        sizeName = 'height';
+                        getSizeFunctionName = 'getRowHeight';
+                    }
+                    var size = cellHighlighted.style[sizeName],
+                        cellSizeInputs = document.querySelectorAll('.' + elementControlSizeUnicClass),
+                        cellSizeFixedInput = document.querySelector('.' + elementControlSizeFixedUnicClass);
+                    cellSizeInputs = [].concat(_toConsumableArray(cellSizeInputs));
+
+                    if (!size && !cellHighlighted.dataset['wptbFixed' + sizeName.toUpperCase()]) {
+                        size = WPTB_Helper[getSizeFunctionName](table, cellHighlighted);
+                        cellSizeInputs.map(function (s) {
+                            s.value = size;
+                        });
+
+                        cellSizeFixedInput.checked = false;
+                    } else {
+                        cellSizeInputs.map(function (s) {
+                            if (size) {
+                                s.value = parseFloat(size, 10);
+                            } else if (cellHighlighted.dataset['wptbFixed' + sizeName.toUpperCase()]) {
+                                s.value = cellHighlighted.dataset['wptbFixed' + sizeName.toUpperCase()];
+                            }
+                        });
+
+                        cellSizeFixedInput.checked = true;
+                    }
                 }
-            }
+            });
+
             cellSettings.classList.add('visible');
         } else {
             for (var i = 0; i < multipleCells.length; i++) {
@@ -3243,6 +3714,23 @@ var array = [],
             }
             cellSettings.classList.remove('visible');
         }
+
+        /**
+         * empty cell setting
+         */
+        // let emptySetting = document.
+        var infArr = thisElem.className.match(/wptb-element-table_cell_setting-((.+-)\d+)/i);
+        if (infArr && infArr.length > 1) {
+            var controlKey = 'emptyCell';
+            var settingId = 'wptb-el-table_cell_setting-' + infArr[1] + '-' + controlKey;
+            var settingElem = document.getElementById(settingId);
+            if (settingElem) {
+                settingElem.querySelector('input[type="checkbox"]').checked = thisElem.classList.contains('wptb-empty');
+            }
+        }
+
+        var details = { countMarkedCells: markedCells };
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/cell/mark', thisElem, details);
     };
 
     /* 
@@ -3376,23 +3864,25 @@ var array = [],
             tds[0].classList.remove('wptb-highlighted');
         }
         cellSettings.classList.remove('visible');
-        for (var i = 0; i < array.length; i++) {
-            for (var j = 0; j < array[i].length; j++) {
-                array[i][j] = 0;
+        for (var _i = 0; _i < array.length; _i++) {
+            for (var _j = 0; _j < array[_i].length; _j++) {
+                array[_i][_j] = 0;
             }
         }
-        for (var i = 0; i < multipleCells.length; i++) {
-            multipleCells[i].classList.remove('visible');
-            multipleCells[i].setAttribute('disabled', 'disabled');
+        for (var _i2 = 0; _i2 < multipleCells.length; _i2++) {
+            multipleCells[_i2].classList.remove('visible');
+            multipleCells[_i2].setAttribute('disabled', 'disabled');
         }
-        for (var i = 0; i < noCells.length; i++) {
-            noCells[i].classList.add('visible');
-            noCells[i].removeAttribute('disabled');
+        for (var _i3 = 0; _i3 < noCells.length; _i3++) {
+            noCells[_i3].classList.add('visible');
+            noCells[_i3].removeAttribute('disabled');
         }
-        for (var i = 0; i < singleCells.length; i++) {
-            singleCells[i].classList.remove('visible');
-            singleCells[i].setAttribute('disabled', 'disabled');
+        for (var _i4 = 0; _i4 < singleCells.length; _i4++) {
+            singleCells[_i4].classList.remove('visible');
+            singleCells[_i4].setAttribute('disabled', 'disabled');
         }
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/undo-select/active', table);
     };
 
     /*
@@ -3522,8 +4012,8 @@ var array = [],
             var cells = table.getElementsByTagName('td');
 
             if (cells.length > 0) {
-                for (var _i = 0; _i < cells.length; _i++) {
-                    WPTB_Cell(mark, cells[_i]);
+                for (var _i5 = 0; _i5 < cells.length; _i5++) {
+                    WPTB_Cell(mark, cells[_i5]);
                 }
             }
         } else {
@@ -3531,6 +4021,45 @@ var array = [],
         }
     }
 
+    /**
+     * this method run "mark" method of WPTB_Table object
+     * @param event
+     */
+    table.mark = function (event) {
+        mark(event);
+    };
+
+    /**
+     * this method run "undoSelect" method of WPTB_Table object
+     * @param event
+     */
+    table.undoSelect = function () {
+        undoSelect();
+    };
+
+    /**
+     * method for set value for maxAmountOfCells
+     * @param value
+     */
+    table.setMaxAmountOfCells = function (value) {
+        maxAmountOfCells = value;
+    };
+
+    /**
+     * this method return maxAmountOfCells value
+     * @returns {*}
+     */
+    table.getMaxAmountOfCells = function () {
+        return maxAmountOfCells;
+    };
+
+    /**
+     * this method run "fillTableArray" method of WPTB_Table object
+     * @returns {[]}
+     */
+    table.fillTableArray = function () {
+        return fillTableArray();
+    };
     /*
      * For assigning to each cell xIndex and y Index attributes,
      * these are the column number and row number of cell in table. 
@@ -3551,25 +4080,21 @@ var array = [],
                             var tableRows = table.rows;
                             var widthIsSet = false;
                             var arrayTdsFromPreviousRow = [];
-                            for (var _i2 = 0; _i2 < tableRows.length; _i2++) {
-                                var _row = tableRows[_i2];
+                            for (var _i6 = 0; _i6 < tableRows.length; _i6++) {
+                                var _row = tableRows[_i6];
                                 var tds = _row.children;
-                                for (var _j = 0; _j < tds.length; _j++) {
-                                    var td = tds[_j];
+                                for (var _j2 = 0; _j2 < tds.length; _j2++) {
+                                    var td = tds[_j2];
                                     if (td.dataset.xIndex == dataXIndex) {
                                         if (value) {
                                             if (td.colSpan == colspan) {
                                                 td.style.width = value + 'px';
                                                 td.removeAttribute('data-wptb-fixed-width');
                                                 widthIsSet = true;
-                                                var tableColumnWidthAutoFixedCheckbox = document.getElementById('wptb-table-column-width-auto-fixed');
-                                                if (!tableColumnWidthAutoFixedCheckbox.checked) {
-                                                    tableColumnWidthAutoFixedCheckbox.checked = true;
-                                                }
                                             } else {
                                                 td.style.width = null;
                                                 td.dataset.wptbFixedWidth = value;
-                                                if (_i2 == tableRows.length - 1 && !widthIsSet) {
+                                                if (_i6 == tableRows.length - 1 && !widthIsSet) {
                                                     tableTdsFor(dataXIndex, colspan + 1);
                                                 }
                                             }
@@ -3603,6 +4128,8 @@ var array = [],
             }
 
             table.tdDefaultWidth();
+
+            WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
         }
     };
 
@@ -3627,10 +4154,10 @@ var array = [],
         var borderRightWidth = tableFullStyleObj.getPropertyValue('border-right-width');
         var tableBorderCommon = parseFloat(borderLeftWidth, 10) + parseFloat(borderRightWidth, 10);
 
-        for (var _i3 = 0; _i3 < rows.length; _i3++) {
-            var tds = rows[_i3].children;
-            for (var _j2 = 0; _j2 < tds.length; _j2++) {
-                var td = tds[_j2];
+        for (var _i7 = 0; _i7 < rows.length; _i7++) {
+            var tds = rows[_i7].children;
+            for (var _j3 = 0; _j3 < tds.length; _j3++) {
+                var td = tds[_j3];
 
                 if (!arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] && !arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)]) {
                     if (td.style.width) {
@@ -3658,30 +4185,30 @@ var array = [],
                             arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += tdPaddingCommon;
                             arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += tableTdBorderCommonWidth;
 
-                            if (_j2 == 0 && tableBorderCommon / 2 <= parseFloat(tableTdBorderLeftWidth, 10)) {
+                            if (_j3 == 0 && tableBorderCommon / 2 <= parseFloat(tableTdBorderLeftWidth, 10)) {
                                 arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += parseFloat(tableTdBorderLeftWidth, 10) / 2;
-                            } else if (_j2 == 0 && tableBorderCommon / 2 > parseFloat(tableTdBorderLeftWidth, 10)) {
+                            } else if (_j3 == 0 && tableBorderCommon / 2 > parseFloat(tableTdBorderLeftWidth, 10)) {
                                 arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += tableBorderCommon / 2 - parseFloat(tableTdBorderRightWidth, 10) / 2;
                             }
 
-                            if (_j2 == tds.length - 1 && tableBorderCommon / 2 <= parseFloat(tableTdBorderRightWidth, 10)) {
+                            if (_j3 == tds.length - 1 && tableBorderCommon / 2 <= parseFloat(tableTdBorderRightWidth, 10)) {
                                 arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += parseFloat(tableTdBorderRightWidth, 10) / 2;
-                            } else if (_j2 == tds.length - 1 && tableBorderCommon / 2 > parseFloat(tableTdBorderRightWidth, 10)) {
+                            } else if (_j3 == tds.length - 1 && tableBorderCommon / 2 > parseFloat(tableTdBorderRightWidth, 10)) {
                                 arrayCellsWidthFixedHelper[parseFloat(td.dataset.xIndex)] += tableBorderCommon / 2 - parseFloat(tableTdBorderRightWidth, 10) / 2;
                             }
                         } else if (arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)]) {
                             arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += tdPaddingCommon;
                             arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += tableTdBorderCommonWidth;
 
-                            if (_j2 == 0 && tableBorderCommon / 2 <= parseFloat(tableTdBorderLeftWidth, 10)) {
+                            if (_j3 == 0 && tableBorderCommon / 2 <= parseFloat(tableTdBorderLeftWidth, 10)) {
                                 arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += parseFloat(tableTdBorderLeftWidth, 10) / 2;
-                            } else if (_j2 == 0 && tableBorderCommon / 2 > parseFloat(tableTdBorderLeftWidth, 10)) {
+                            } else if (_j3 == 0 && tableBorderCommon / 2 > parseFloat(tableTdBorderLeftWidth, 10)) {
                                 arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += tableBorderCommon / 2 - parseFloat(tableTdBorderLeftWidth, 10) / 2;
                             }
 
-                            if (_j2 == tds.length - 1 && tableBorderCommon / 2 <= parseFloat(tableTdBorderRightWidth, 10)) {
+                            if (_j3 == tds.length - 1 && tableBorderCommon / 2 <= parseFloat(tableTdBorderRightWidth, 10)) {
                                 arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += parseFloat(tableTdBorderRightWidth, 10) / 2;
-                            } else if (_j2 == tds.length - 1 && tableBorderCommon / 2 > parseFloat(tableTdBorderRightWidth, 10)) {
+                            } else if (_j3 == tds.length - 1 && tableBorderCommon / 2 > parseFloat(tableTdBorderRightWidth, 10)) {
                                 arrayCellsWidthAutoHelper[parseFloat(td.dataset.xIndex)] += tableBorderCommon / 2 - parseFloat(tableTdBorderLeftWidth, 10) / 2;
                             }
                         }
@@ -3696,16 +4223,16 @@ var array = [],
             }
         }
 
-        for (var _i4 = 0; _i4 < arrayCellsWidthFixedHelper.length; _i4++) {
-            if (arrayCellsWidthFixedHelper[_i4]) {
-                tableTdsSumMaxWidthFixed += arrayCellsWidthFixedHelper[_i4];
+        for (var _i8 = 0; _i8 < arrayCellsWidthFixedHelper.length; _i8++) {
+            if (arrayCellsWidthFixedHelper[_i8]) {
+                tableTdsSumMaxWidthFixed += arrayCellsWidthFixedHelper[_i8];
             }
         }
 
         var CellsWidthAutoCount = 0;
-        for (var _i5 = 0; _i5 < arrayCellsWidthAutoHelper.length; _i5++) {
-            if (arrayCellsWidthAutoHelper[_i5]) {
-                tableTdsSumMaxWidthAuto += arrayCellsWidthAutoHelper[_i5];
+        for (var _i9 = 0; _i9 < arrayCellsWidthAutoHelper.length; _i9++) {
+            if (arrayCellsWidthAutoHelper[_i9]) {
+                tableTdsSumMaxWidthAuto += arrayCellsWidthAutoHelper[_i9];
                 CellsWidthAutoCount++;
             }
         }
@@ -3808,26 +4335,22 @@ var array = [],
                             var tableRows = table.rows;
                             var heightIsSet = false;
                             var arrayTdsPrevious = [];
-                            for (var _i6 = 0; _i6 < tableRows.length; _i6++) {
-                                var _row2 = tableRows[_i6];
+                            for (var _i10 = 0; _i10 < tableRows.length; _i10++) {
+                                var _row2 = tableRows[_i10];
                                 var tds = _row2.children;
-                                for (var _j3 = 0; _j3 < tds.length; _j3++) {
-                                    var td = tds[_j3];
+                                for (var _j4 = 0; _j4 < tds.length; _j4++) {
+                                    var td = tds[_j4];
                                     if (td.dataset.yIndex == dataYIndex) {
                                         if (value) {
                                             if (td.rowSpan == rowspan) {
                                                 td.style.height = value + 'px';
                                                 td.removeAttribute('data-wptb-fixed-heidht');
                                                 heightIsSet = true;
-                                                var tableColumnHeightAutoFixedCheckbox = document.getElementById('wptb-table-row-height-auto-fixed');
-                                                if (!tableColumnHeightAutoFixedCheckbox.checked) {
-                                                    tableColumnHeightAutoFixedCheckbox.checked = true;
-                                                }
                                                 continue;
                                             } else {
                                                 td.style.height = null;
                                                 td.dataset.wptbFixedHeight = value;
-                                                if (_j3 == tds.length - 1 && !heightIsSet) {
+                                                if (_j4 == tds.length - 1 && !heightIsSet) {
                                                     tableTdsFor(dataYIndex, rowspan + 1);
                                                 }
                                             }
@@ -3858,6 +4381,8 @@ var array = [],
                     })();
                 }
             }
+
+            WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
         }
     };
 
@@ -3867,14 +4392,14 @@ var array = [],
         table.mergingCellsVertically = false;
         table.dataset.reconstraction = 1;
         var forBreak = 0;
-        for (var _i7 = 0; _i7 < tds.length; _i7++) {
-            if (tds[_i7].colSpan > 1) {
+        for (var _i11 = 0; _i11 < tds.length; _i11++) {
+            if (tds[_i11].colSpan > 1) {
                 table.dataset.reconstraction = 0;
                 table.mergingСellsHorizontally = true;
                 forBreak++;
             }
 
-            if (tds[_i7].rowSpan > 1) {
+            if (tds[_i11].rowSpan > 1) {
                 table.dataset.reconstraction = 0;
                 table.mergingCellsVertically = true;
                 forBreak++;
@@ -3909,6 +4434,7 @@ var array = [],
                 td.getDOMElement().setAttribute('style', currentTdStyle);
                 td.getDOMElement().style.width = null;
                 td.getDOMElement().style.height = null;
+                td.getDOMElement().style.borderColor = WPTB_TableSettingsData.getTableSetting('borderColor');
             }
 
             table.rows[i].appendChild(td.getDOMElement());
@@ -3921,6 +4447,9 @@ var array = [],
         table.addRowHeight();
         WPTB_Helper.dataTitleColumnSet(table);
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -3949,6 +4478,7 @@ var array = [],
                 td.getDOMElement().setAttribute('style', currentTdStyle);
                 td.getDOMElement().style.width = null;
                 td.getDOMElement().style.height = null;
+                td.getDOMElement().style.borderColor = WPTB_TableSettingsData.getTableSetting('borderColor');
             }
             firstCell = table.rows[i].getElementsByTagName('td')[0];
             if (firstCell) {
@@ -3965,6 +4495,9 @@ var array = [],
         table.addRowHeight();
         WPTB_Helper.dataTitleColumnSet(table);
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -3978,96 +4511,78 @@ var array = [],
 
     table.addColumnAfter = function (c_pos) {
         var rows = table.rows,
-            cellPointer = void 0,
-            cellsBuffer = void 0,
-            cell = document.querySelector('.wptb-highlighted'),
-            cellStyle = cell.getAttribute('style'),
-            pos = c_pos != undefined && typeof c_pos === 'number' ? c_pos : getCoords(cell)[1];
+            cell = void 0,
+            cellStyle = void 0,
+            pos = void 0;
 
-        if (maxAmountOfCells - pos - cell.colSpan + 1 == 1) {
-            table.addColumnEnd();
+        if (c_pos != undefined && typeof c_pos === 'number') {
+            pos = c_pos;
+            cell = document.querySelector('[data-x-index="' + pos + '"]');
         } else {
-            var pendingInsertion = false,
-                _stepsToMove = void 0,
-                td = void 0,
-                bro = void 0,
-                _carriedRowspans = [],
-                currentCell = void 0;
+            cell = document.querySelector('.wptb-highlighted');
+            pos = getCoords(cell)[1];
+        }
 
-            for (var i = 0; i < maxAmountOfCells; i++) {
-                _carriedRowspans.push(0);
-            }
+        if (cell) {
+            cellStyle = cell.getAttribute('style');
 
-            for (var i = 0; i < rows.length; i++) {
-                cellPointer = 0;
-                cellsBuffer = rows[i].getElementsByTagName('td');
-                pendingInsertion = false;
-                for (var xPosition = 0; xPosition < maxAmountOfCells; xPosition += _stepsToMove) {
-                    _stepsToMove = 1;
+            if (maxAmountOfCells - pos - cell.colSpan + 1 == 1) {
+                table.addColumnEnd();
+            } else {
+                var newTd = function newTd(cellStyle) {
+                    var td = new WPTB_Cell(mark);
+                    if (cellStyle) {
+                        td.getDOMElement().setAttribute('style', cellStyle);
+                        td.getDOMElement().style.width = null;
+                        td.getDOMElement().style.height = null;
+                    }
+                    td.getDOMElement().style.borderColor = WPTB_TableSettingsData.getTableSetting('borderColor');
+                    return td;
+                };
 
-                    if (pendingInsertion) {
-                        td = new WPTB_Cell(mark);
-                        if (cellStyle) {
-                            td.getDOMElement().setAttribute('style', cellStyle);
-                            td.getDOMElement().style.width = null;
-                            td.getDOMElement().style.height = null;
-                        }
-                        if (currentCell && rows[i].contains(currentCell)) {
-                            bro = currentCell.nextSibling;
-                            if (bro) {
-                                rows[i].insertBefore(td.getDOMElement(), bro);
-                            } else {
-                                rows[i].appendChild(td.getDOMElement());
-                            }
-                        } else {
-                            rows[i].insertBefore(td.getDOMElement(), cellsBuffer[0]);
-                        }
-                        break;
-                    } else if (_carriedRowspans[xPosition] > 0) {
-                        // If no pending insertion, let's check if no rowspan from upper cells is pending in current position
-                        if (pos == xPosition) {
-                            pendingInsertion = true;
-                        }
-                    } else {
-                        currentCell = cellsBuffer[cellPointer++];
-                        if (currentCell.rowSpan > 1) {
-                            _stepsToMove = currentCell.colSpan;
-                            for (var k = 0; k < currentCell.colSpan; k++) {
-                                _carriedRowspans[xPosition + k] = currentCell.rowSpan;
-                                if (xPosition + k == pos) {
-                                    pendingInsertion = true;
+                for (var _i12 = 0; _i12 < rows.length; _i12++) {
+                    var tds = rows[_i12].children;
+                    for (var _j5 = 0; _j5 < tds.length; _j5++) {
+                        if (parseInt(tds[_j5].dataset.xIndex) <= pos) {
+                            if (parseInt(tds[_j5].dataset.xIndex) + tds[_j5].colSpan == pos + cell.colSpan) {
+                                var td = newTd(cellStyle);
+                                var nextSib = tds[_j5].nextSibling;
+                                if (nextSib) {
+                                    rows[_i12].insertBefore(td.getDOMElement(), nextSib);
+                                } else {
+                                    rows[_i12].appendChild(td.getDOMElement());
                                 }
+
+                                break;
+                            } else if (parseInt(tds[_j5].dataset.xIndex) + tds[_j5].colSpan > pos + cell.colSpan) {
+                                tds[_j5].colSpan++;
+                                if (tds[_j5].rowSpan > 1) _i12 += tds[_j5].rowSpan - 1;
+                                break;
                             }
-                        } else if (currentCell.colSpan > 1) {
-                            _stepsToMove = currentCell.colSpan;
-                            for (var k = 0; k < currentCell.colSpan; k++) {
-                                if (xPosition + k == pos) {
-                                    pendingInsertion = true;
-                                }
-                            }
-                        } else if (xPosition == pos) {
-                            pendingInsertion = true;
+                        } else if (parseInt(tds[_j5].dataset.xIndex) > pos) {
+                            var _td = newTd(cellStyle);
+                            rows[_i12].insertBefore(_td.getDOMElement(), tds[_j5]);
+                            break;
                         }
                     }
                 }
 
-                for (var l = 0; l < maxAmountOfCells; l++) {
-                    if (_carriedRowspans[l] > 0) _carriedRowspans[l]--;
+                for (var i = 0; i < array.length; i++) {
+                    array[i].push(0);
                 }
-            }
+                maxAmountOfCells++;
+                drawTable(array);
+                table.recalculateIndexes();
+                table.addColumnWidth();
+                table.addRowHeight();
+                WPTB_Helper.dataTitleColumnSet(table);
+                undoSelect();
 
-            for (var i = 0; i < array.length; i++) {
-                array[i].push(0);
+                WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
+                var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
+                wptbTableStateSaveManager.tableStateSet();
             }
-            maxAmountOfCells++;
-            drawTable(array);
-            table.recalculateIndexes();
-            table.addColumnWidth();
-            table.addRowHeight();
-            WPTB_Helper.dataTitleColumnSet(table);
-            undoSelect();
-            var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
-            wptbTableStateSaveManager.tableStateSet();
         }
     };
 
@@ -4123,6 +4638,9 @@ var array = [],
             table.addColumnWidth();
             WPTB_Helper.dataTitleColumnSet(table);
             undoSelect();
+
+            WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
             var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
             wptbTableStateSaveManager.tableStateSet();
         }
@@ -4164,6 +4682,9 @@ var array = [],
             table.addColumnWidth();
             WPTB_Helper.dataTitleColumnSet(table);
             undoSelect();
+
+            WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
             var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
             wptbTableStateSaveManager.tableStateSet();
         }
@@ -4180,13 +4701,13 @@ var array = [],
             cellStyle = cell.getAttribute('style'),
             row = getCoords(cell)[0],
             cellNew = void 0;
-        for (var _i8 = row - 1; _i8 >= 0; _i8--) {
-            var rowChildren = table.rows[_i8].children;
+        for (var _i13 = row - 1; _i13 >= 0; _i13--) {
+            var rowChildren = table.rows[_i13].children;
             var rowChildrenLength = rowChildren.length;
             if (rowChildrenLength > 0) {
-                for (var _j4 = 0; _j4 < rowChildrenLength; _j4++) {
-                    if (rowChildren[_j4].rowSpan == 1) {
-                        row = _i8;
+                for (var _j6 = 0; _j6 < rowChildrenLength; _j6++) {
+                    if (rowChildren[_j6].rowSpan == 1) {
+                        row = _i13;
                         cellNew = true;
                         break;
                     }
@@ -4228,15 +4749,15 @@ var array = [],
 
         var cellsColSpan = 0;
         if (rowAfter < table.rows.length - 1) {
-            for (var _i9 = 0; _i9 <= rowAfter; _i9++) {
-                var tableRowsIChildren = table.rows[_i9].children,
+            for (var _i14 = 0; _i14 <= rowAfter; _i14++) {
+                var tableRowsIChildren = table.rows[_i14].children,
                     tableRIChildrenLength = tableRowsIChildren.length;
                 if (tableRIChildrenLength > 0) {
-                    for (var _j5 = 0; _j5 < tableRIChildrenLength; _j5++) {
-                        var rowIRowSpan = tableRowsIChildren[_j5].rowSpan;
+                    for (var _j7 = 0; _j7 < tableRIChildrenLength; _j7++) {
+                        var rowIRowSpan = tableRowsIChildren[_j7].rowSpan;
 
-                        if (rowIRowSpan - 1 + _i9 > rowAfter) {
-                            tableRowsIChildren[_j5].rowSpan++;
+                        if (rowIRowSpan - 1 + _i14 > rowAfter) {
+                            tableRowsIChildren[_j7].rowSpan++;
                         }
                     }
                 }
@@ -4247,8 +4768,8 @@ var array = [],
                 rNextChildrenLength = rNextChildren.length;
 
             if (rNextChildrenLength > 0) {
-                for (var _i10 = 0; _i10 < rNextChildrenLength; _i10++) {
-                    cellsColSpan += rNextChildren[_i10].colSpan;
+                for (var _i15 = 0; _i15 < rNextChildrenLength; _i15++) {
+                    cellsColSpan += rNextChildren[_i15].colSpan;
                 }
             }
         } else {
@@ -4260,9 +4781,13 @@ var array = [],
 
         for (j = 0; j < cellsColSpan; j++) {
             var td = new WPTB_Cell(mark);
-            td.getDOMElement().setAttribute('style', cellStyle);
-            td.getDOMElement().style.width = null;
-            td.getDOMElement().style.height = null;
+            var currentTableTd = table.querySelector('[data-x-index="' + j + '"]');
+            if (currentTableTd) {
+                var currentTdStyle = currentTableTd.getAttribute('style');
+
+                td.getDOMElement().setAttribute('style', currentTdStyle);
+                td.getDOMElement().style.height = null;
+            }
             r.appendChild(td.getDOMElement());
         }
 
@@ -4274,6 +4799,9 @@ var array = [],
         table.addColumnWidth();
         WPTB_Helper.dataTitleColumnSet(table);
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after');
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -4362,20 +4890,20 @@ var array = [],
             tds = [].slice.call(document.getElementsByClassName('wptb-highlighted'), 1),
             tdsChildrenNew = [];
 
-        for (var _i11 = 0; _i11 < tds.length; _i11++) {
-            var tdsInternalElements = tds[_i11].getElementsByClassName('wptb-ph-element');
+        for (var _i16 = 0; _i16 < tds.length; _i16++) {
+            var tdsInternalElements = tds[_i16].getElementsByClassName('wptb-ph-element');
             if (tdsInternalElements.length > 0) {
                 var tdsIntElemLength = tdsInternalElements.length;
-                for (var _j6 = 0; _j6 < tdsIntElemLength; _j6++) {
-                    tdsChildrenNew.push(tdsInternalElements[_j6]);
+                for (var _j8 = 0; _j8 < tdsIntElemLength; _j8++) {
+                    tdsChildrenNew.push(tdsInternalElements[_j8]);
                 }
             }
-            var p = tds[_i11].parentNode;
-            p.removeChild(tds[_i11]);
+            var p = tds[_i16].parentNode;
+            p.removeChild(tds[_i16]);
         }
         if (tdsChildrenNew.length > 0) {
-            for (var _i12 = 0; _i12 < tdsChildrenNew.length; _i12++) {
-                first.appendChild(tdsChildrenNew[_i12]);
+            for (var _i17 = 0; _i17 < tdsChildrenNew.length; _i17++) {
+                first.appendChild(tdsChildrenNew[_i17]);
             }
         }
 
@@ -4404,6 +4932,9 @@ var array = [],
         }
         WPTB_Helper.dataTitleColumnSet(table);
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -4427,7 +4958,7 @@ var array = [],
         cell.rowSpan = 1;
         cell.colSpan = 1;
 
-        for (var _i13 = 1; _i13 < colspan; _i13++) {
+        for (var _i18 = 1; _i18 < colspan; _i18++) {
             var td = new WPTB_Cell(mark);
             td.getDOMElement().setAttribute('style', cellStyles);
             td.getDOMElement().classList.add('wptb-highlighted');
@@ -4439,9 +4970,9 @@ var array = [],
         }
 
         if (rowspan > 1) {
-            for (var _i14 = 1; _i14 < rowspan; _i14++) {
+            for (var _i19 = 1; _i19 < rowspan; _i19++) {
                 var rowChildInsertBefore = undefined,
-                    rowNext = table.rows[row + _i14],
+                    rowNext = table.rows[row + _i19],
                     rowChildren = rowNext.children,
                     rowChildrenLength = rowChildren.length;
 
@@ -4453,13 +4984,13 @@ var array = [],
                         }
                     }
                 }
-                for (var _j7 = 0; _j7 < colspan; _j7++) {
-                    var _td = new WPTB_Cell(mark);
-                    _td.getDOMElement().setAttribute('style', cellStyles);
+                for (var _j9 = 0; _j9 < colspan; _j9++) {
+                    var _td2 = new WPTB_Cell(mark);
+                    _td2.getDOMElement().setAttribute('style', cellStyles);
                     if (rowChildInsertBefore != undefined) {
-                        rowNext.insertBefore(_td.getDOMElement(), rowChildInsertBefore);
+                        rowNext.insertBefore(_td2.getDOMElement(), rowChildInsertBefore);
                     } else {
-                        rowNext.appendChild(_td.getDOMElement());
+                        rowNext.appendChild(_td2.getDOMElement());
                     }
                 }
             }
@@ -4471,6 +5002,9 @@ var array = [],
         table.addRowHeight();
         WPTB_Helper.dataTitleColumnSet(table);
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -4556,7 +5090,7 @@ var array = [],
 
         if (rowspan == undefined) rowspan = 1;
 
-        for (var _i15 = 0; _i15 < rowspan; _i15++) {
+        for (var _i20 = 0; _i20 < rowspan; _i20++) {
             thisRow = table.rows[row];
             var thisRowChildren = thisRow.children,
                 nextRow = table.rows[row + 1],
@@ -4567,16 +5101,16 @@ var array = [],
             if (nextRow != undefined) {
                 nextRowChildren = nextRow.children;
                 nextRowChildrenLength = nextRowChildren.length;
-                for (var _j8 = 0; _j8 < thisRowChildren.length; _j8++) {
-                    if (thisRowChildren[_j8].rowSpan > 1) {
+                for (var _j10 = 0; _j10 < thisRowChildren.length; _j10++) {
+                    if (thisRowChildren[_j10].rowSpan > 1) {
                         var td = new WPTB_Cell(mark);
                         td.getDOMElement().setAttribute('style', cellStyles);
-                        td.getDOMElement().colSpan = thisRowChildren[_j8].colSpan;
-                        td.getDOMElement().rowSpan = thisRowChildren[_j8].rowSpan - 1;
+                        td.getDOMElement().colSpan = thisRowChildren[_j10].colSpan;
+                        td.getDOMElement().rowSpan = thisRowChildren[_j10].rowSpan - 1;
 
                         var nextRowChildrenK = undefined;
                         for (var _k5 = 0; _k5 < nextRowChildrenLength; _k5++) {
-                            if (Number(nextRowChildren[_k5].dataset.xIndex) > Number(thisRowChildren[_j8].dataset.xIndex)) {
+                            if (Number(nextRowChildren[_k5].dataset.xIndex) > Number(thisRowChildren[_j10].dataset.xIndex)) {
                                 nextRowChildrenK = nextRowChildren[_k5];
                                 break;
                             }
@@ -4603,11 +5137,11 @@ var array = [],
 
             var tableRows = table.rows;
             if (tableRows.length > 0) {
-                for (var _j9 = 0; _j9 < row; _j9++) {
-                    var jRowChildren = tableRows[_j9].children;
+                for (var _j11 = 0; _j11 < row; _j11++) {
+                    var jRowChildren = tableRows[_j11].children;
                     if (jRowChildren.length > 0) {
                         for (var x = 0; x < jRowChildren.length; x++) {
-                            if (jRowChildren[x].rowSpan - 1 >= row - _j9) {
+                            if (jRowChildren[x].rowSpan - 1 >= row - _j11) {
                                 jRowChildren[x].rowSpan--;
                             }
                         }
@@ -4628,15 +5162,20 @@ var array = [],
                     wptbSaveBtn = wptbSaveBtn[0];
 
                     wptbSaveBtn.classList.add('wptb-save-disabled');
+                    wptbSaveBtn.classList.remove('active');
                 }
             } else {
                 table.recalculateIndexes();
                 WPTB_Helper.tableRowsColorsReinstall(table);
                 WPTB_Helper.dataTitleColumnSet(table);
+                table.reconstraction();
             }
         }
 
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -4652,9 +5191,9 @@ var array = [],
             cellXIndex = cell.dataset.xIndex,
             colspan = cell.colSpan;
 
-        for (var _i16 = 0; _i16 < colspan; _i16++) {
-            for (var _j10 = 0; _j10 < table.rows.length; _j10++) {
-                var rowChildren = table.rows[_j10].children;
+        for (var _i21 = 0; _i21 < colspan; _i21++) {
+            for (var _j12 = 0; _j12 < table.rows.length; _j12++) {
+                var rowChildren = table.rows[_j12].children;
                 var rowChildrenLength = rowChildren.length;
                 if (rowChildrenLength > 0) {
                     for (var _k7 = rowChildrenLength - 1; _k7 >= 0; _k7--) {
@@ -4662,7 +5201,7 @@ var array = [],
                             if (rowChildren[_k7].colSpan > 1) {
                                 rowChildren[_k7].colSpan--;
                             } else {
-                                table.rows[_j10].removeChild(rowChildren[_k7]);
+                                table.rows[_j12].removeChild(rowChildren[_k7]);
                             }
                             break;
                         } else if (Number(rowChildren[_k7].dataset.xIndex) < Number(cellXIndex) && Number(rowChildren[_k7].dataset.xIndex) + Number(rowChildren[_k7].colSpan - 1) >= cellXIndex) {
@@ -4675,8 +5214,8 @@ var array = [],
                 }
             }
 
-            for (var _j11 = 0; _j11 < table.rows.length; _j11++) {
-                if (array[_j11] != undefined) array[_j11].pop();
+            for (var _j13 = 0; _j13 < table.rows.length; _j13++) {
+                if (array[_j13] != undefined) array[_j13].pop();
             }
 
             maxAmountOfCells--;
@@ -4690,15 +5229,20 @@ var array = [],
                     wptbSaveBtn = wptbSaveBtn[0];
 
                     wptbSaveBtn.classList.add('wptb-save-disabled');
+                    wptbSaveBtn.classList.remove('active');
                 }
             } else {
                 table.recalculateIndexes();
                 table.tdDefaultWidth();
                 WPTB_Helper.dataTitleColumnSet(table);
+                table.reconstraction();
             }
         }
 
         undoSelect();
+
+        WPTB_Helper.wptbDocumentEventGenerate('wp-table-builder/table-changed/after', table);
+
         var wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
         wptbTableStateSaveManager.tableStateSet();
     };
@@ -4722,6 +5266,12 @@ var array = [],
     };
 
     WPTB_LeftPanel();
+
+    // event hook to signal that table is generated and ready to be used
+    WPTB_Helper.wptbDocumentEventGenerate('wptb:table:generated', document);
+
+    WPTB_Helper.elementStartScript(table, 'table_setting');
+    WPTB_Helper.elementOptionsSet('table_setting', table);
 
     // this code gets the ID of the active element in the toolbar 
     // and stores it in the data attribute of the common container element "wpcd_fixed_toolbar"
@@ -4756,6 +5306,25 @@ var array = [],
     //            }
     //        }, false );
     //    }
+};
+var WPTB_TableSettingsData = {
+    borderColor: '',
+    /**
+     *
+     * @param {string} name
+     * @param {string} value
+     */
+    setTableSetting: function setTableSetting(name, value) {
+        this[name] = value;
+    },
+    /**
+     *
+     * @param {string} name
+     * @returns {*}
+     */
+    getTableSetting: function getTableSetting(name) {
+        return this[name];
+    }
 };
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -4862,8 +5431,10 @@ var WPTB_TableStateSaveManager = function WPTB_TableStateSaveManager() {
             wptbSaveBtn = wptbSaveBtn[0];
             if (!wptbSaveBtn.dataset.wptbTableStateNumberSave && window.wptbTableStateNumberShow == 0 || window.wptbTableStateNumberShow == wptbSaveBtn.dataset.wptbTableStateNumberSave || !wptbPreviewTable) {
                 wptbSaveBtn.classList.add('wptb-save-disabled');
+                wptbSaveBtn.classList.remove('active');
             } else {
                 wptbSaveBtn.classList.remove('wptb-save-disabled');
+                wptbSaveBtn.classList.add('active');
             }
         }
     };
@@ -4924,7 +5495,9 @@ var WPTB_TableStateSaveManager = function WPTB_TableStateSaveManager() {
                 wptbSaveBtn = wptbSaveBtn[0];
                 if (!wptbSaveBtn.dataset.wptbTableStateNumberSave && window.wptbTableStateNumberShow == 0 || window.wptbTableStateNumberShow == wptbSaveBtn.dataset.wptbTableStateNumberSave) {
                     wptbSaveBtn.classList.add('wptb-save-disabled');
+                    wptbSaveBtn.classList.remove('active');
                 } else {
+                    wptbSaveBtn.classList.add('active');
                     wptbSaveBtn.classList.remove('wptb-save-disabled');
                 }
             }
@@ -4946,6 +5519,7 @@ var WPTB_TableStateSaveManager = function WPTB_TableStateSaveManager() {
                     if (wptbTableSetupNew && wptbTableSetupNew.children.length == 0) {
                         document.getElementsByClassName('wptb-table-generator')[0].style.display = 'table';
                         wptbSaveBtn.classList.add('wptb-save-disabled');
+                        wptbSaveBtn.classList.remove('active');
                     } else {
                         document.getElementsByClassName('wptb-table-generator')[0].style.display = 'none';
                     }
@@ -5030,7 +5604,9 @@ var WPTB_innerElementSet = function WPTB_innerElementSet(element) {
         e.preventDefault();
         WPTB_DropHandle(this, e);
     };
-    element.ondragleave = function () {};
+    element.ondragleave = function (e) {
+        WPTB_DropHandle(this, e, true);
+    };
     element.ondrop = function (e) {
         this.classList.remove('wptb-ondragenter');
         var element = void 0,
@@ -5059,20 +5635,29 @@ var WPTB_innerElementSet = function WPTB_innerElementSet(element) {
             //element.classList.remove( 'wptb-moving-mode' );
         }
 
-        if (wptbDropHandle.style.display == 'block') {
+        if (WPTB_Helper.getDragRelativeType() === 'td_relative') {
+            WPTB_DropHandle(this, e, true);
+            var parentCell = WPTB_Helper.getParentOfType('td', e.target);
+
+            parentCell.appendChild(element);
+            WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
+        } else if (wptbDropHandle.style.display == 'block') {
             var td = void 0;
             if (wptbDropHandle.dataset.text == 'Drop Here') {
                 td = wptbDropHandle.getDOMParentElement();
                 td.appendChild(element);
+                WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
             } else {
                 var innerElement = wptbDropHandle.getDOMParentElement();
                 td = innerElement.parentNode;
 
                 if (wptbDropHandle.dataset.text == 'Above Element') {
                     td.insertBefore(element, innerElement);
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 } else if (wptbDropHandle.dataset.text == 'Below Element') {
                     var innerElementNext = innerElement.nextSibling;
                     td.insertBefore(element, innerElementNext);
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 }
             }
 
@@ -5095,8 +5680,10 @@ var WPTB_innerElementSet = function WPTB_innerElementSet(element) {
             return;
         }
 
-        wptbDropHandle.style.display = 'none';
-        wptbDropBorderMarker.style.display = 'none';
+        if (wptbDropHandle) {
+            wptbDropHandle.style.display = 'none';
+            wptbDropBorderMarker.style.display = 'none';
+        }
 
         WPTB_innerElementSet(element);
 
@@ -5176,8 +5763,8 @@ var applyGenericItemSettings = function applyGenericItemSettings(element, kindIn
                 node.classList.add('wptb-element-' + element.kind + '-' + index);
             }
         }
-        new WPTB_ElementOptions(element, index, kindIndexProt);
         WPTB_Helper.elementStartScript(element.getDOMElement());
+        new WPTB_ElementOptions(element, index, kindIndexProt);
         document.counter.increment(element.kind);
     }
 

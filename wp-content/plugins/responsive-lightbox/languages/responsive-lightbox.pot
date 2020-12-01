@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Responsive Lightbox\n"
-"POT-Creation-Date: 2019-11-11 22:57+0100\n"
+"POT-Creation-Date: 2019-12-16 23:44+0100\n"
 "PO-Revision-Date: 2015-05-12 12:06+0100\n"
 "Last-Translator: Bartosz Arendt <info@dfactory.eu>\n"
 "Language-Team: dFactory <info@dfactory.eu>\n"
@@ -16,65 +16,66 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../includes/class-folders.php:165 ../includes/class-folders.php:193
-#: ../includes/class-folders.php:377 ../includes/class-folders.php:982
-#: ../includes/class-folders.php:1007
+#: ../includes/class-folders.php:176 ../includes/class-folders.php:190
+#: ../includes/class-folders.php:221 ../includes/class-folders.php:235
+#: ../includes/class-folders.php:413 ../includes/class-folders.php:1031
+#: ../includes/class-folders.php:1056 ../includes/class-galleries.php:1163
 msgid "Root Folder"
 msgstr ""
 
-#: ../includes/class-folders.php:189
+#: ../includes/class-folders.php:240
 msgid "Upload files to"
 msgstr ""
 
-#: ../includes/class-folders.php:244 ../includes/class-folders.php:256
-#: ../includes/class-folders.php:979 ../includes/class-folders.php:1006
-#: ../includes/class-folders.php:1016 ../responsive-lightbox.php:1007
+#: ../includes/class-folders.php:280 ../includes/class-folders.php:292
+#: ../includes/class-folders.php:1028 ../includes/class-folders.php:1055
+#: ../includes/class-folders.php:1065 ../responsive-lightbox.php:1009
 msgid "All Files"
 msgstr ""
 
-#: ../includes/class-folders.php:1008
+#: ../includes/class-folders.php:1057
 msgid "New Folder"
 msgstr ""
 
-#: ../includes/class-folders.php:1009
+#: ../includes/class-folders.php:1058
 msgid "Are you sure you want to delete this folder?"
 msgstr ""
 
-#: ../includes/class-folders.php:1010
+#: ../includes/class-folders.php:1059
 msgid "Are you sure you want to delete this folder with all subfolders?"
 msgstr ""
 
-#: ../includes/class-folders.php:1032
+#: ../includes/class-folders.php:1081
 #, php-format
 msgid "Save new %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1033
+#: ../includes/class-folders.php:1082
 #, php-format
 msgid "Cancel adding new %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1035
+#: ../includes/class-folders.php:1084
 #, php-format
 msgid "Save %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1036
+#: ../includes/class-folders.php:1085
 #, php-format
 msgid "Cancel renaming %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1037
+#: ../includes/class-folders.php:1086
 #, php-format
 msgid "Delete %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1038
+#: ../includes/class-folders.php:1087
 #, php-format
 msgid "Expand %s"
 msgstr ""
 
-#: ../includes/class-folders.php:1039
+#: ../includes/class-folders.php:1088
 #, php-format
 msgid "Collapse %s"
 msgstr ""
@@ -104,10 +105,9 @@ msgid "Media File"
 msgstr ""
 
 #: ../includes/class-frontend.php:581 ../includes/class-galleries.php:164
-#: ../includes/class-galleries.php:1163 ../includes/class-settings.php:150
-#: ../includes/class-settings.php:626 ../includes/class-settings.php:685
-#: ../includes/class-widgets.php:93 ../includes/class-widgets.php:340
-#: ../includes/class-widgets.php:347
+#: ../includes/class-settings.php:150 ../includes/class-settings.php:626
+#: ../includes/class-settings.php:685 ../includes/class-widgets.php:93
+#: ../includes/class-widgets.php:340 ../includes/class-widgets.php:347
 msgid "None"
 msgstr ""
 
@@ -169,15 +169,15 @@ msgstr ""
 msgid "Specify the number of columns."
 msgstr ""
 
-#: ../includes/class-galleries.php:85 ../includes/class-galleries.php:3487
+#: ../includes/class-galleries.php:85 ../includes/class-galleries.php:3579
 msgid "Status"
 msgstr ""
 
-#: ../includes/class-galleries.php:86 ../src/gutenberg.js:57
+#: ../includes/class-galleries.php:86
 msgid "Edit image"
 msgstr ""
 
-#: ../includes/class-galleries.php:87 ../responsive-lightbox.php:1166
+#: ../includes/class-galleries.php:87 ../responsive-lightbox.php:1168
 msgid "Remove image"
 msgstr ""
 
@@ -194,7 +194,7 @@ msgstr ""
 msgid "The settings below adjust the contents of the gallery."
 msgstr ""
 
-#: ../includes/class-galleries.php:117 ../includes/class-galleries.php:3898
+#: ../includes/class-galleries.php:117 ../includes/class-galleries.php:3991
 msgid "Media Library"
 msgstr ""
 
@@ -699,7 +699,7 @@ msgid ""
 "button below."
 msgstr ""
 
-#: ../includes/class-galleries.php:1050 ../src/gutenberg.js:159
+#: ../includes/class-galleries.php:1050
 msgid "Edit gallery"
 msgstr ""
 
@@ -707,7 +707,7 @@ msgstr ""
 msgid "Insert gallery into post"
 msgstr ""
 
-#: ../includes/class-galleries.php:1061 ../src/gutenberg.js:194
+#: ../includes/class-galleries.php:1061
 msgid "Select gallery"
 msgstr ""
 
@@ -716,7 +716,7 @@ msgid "Cancel"
 msgstr ""
 
 #: ../includes/class-galleries.php:1277 ../includes/class-widgets.php:140
-#: ../responsive-lightbox.php:1068 ../responsive-lightbox.php:1167
+#: ../responsive-lightbox.php:1070 ../responsive-lightbox.php:1169
 msgid "Select images"
 msgstr ""
 
@@ -765,109 +765,109 @@ msgstr ""
 msgid "No data"
 msgstr ""
 
-#: ../includes/class-galleries.php:2421
+#: ../includes/class-galleries.php:2466
 msgid "&laquo; Previous"
 msgstr ""
 
-#: ../includes/class-galleries.php:2422
+#: ../includes/class-galleries.php:2467
 msgid "Next &raquo;"
 msgstr ""
 
-#: ../includes/class-galleries.php:2552
+#: ../includes/class-galleries.php:2597
 msgid "(no title)"
 msgstr ""
 
-#: ../includes/class-galleries.php:2566
+#: ../includes/class-galleries.php:2611
 msgid "Deselect"
 msgstr ""
 
-#: ../includes/class-galleries.php:3404
+#: ../includes/class-galleries.php:3496
 msgid "Untitled"
 msgstr ""
 
-#: ../includes/class-galleries.php:3479
+#: ../includes/class-galleries.php:3571
 msgid "Aside"
 msgstr ""
 
-#: ../includes/class-galleries.php:3480
+#: ../includes/class-galleries.php:3572
 msgid "Audio"
 msgstr ""
 
-#: ../includes/class-galleries.php:3481
+#: ../includes/class-galleries.php:3573
 msgid "Chat"
 msgstr ""
 
-#: ../includes/class-galleries.php:3482 ../includes/class-galleries.php:3761
+#: ../includes/class-galleries.php:3574 ../includes/class-galleries.php:3854
 #: ../includes/class-widgets.php:57 ../includes/class-widgets.php:65
-#: ../responsive-lightbox.php:802 ../src/gutenberg.js:115
+#: ../responsive-lightbox.php:802
 msgid "Gallery"
 msgstr ""
 
-#: ../includes/class-galleries.php:3483
+#: ../includes/class-galleries.php:3575
 msgid "Link"
 msgstr ""
 
-#: ../includes/class-galleries.php:3484
+#: ../includes/class-galleries.php:3576
 msgid "Photo"
 msgstr ""
 
-#: ../includes/class-galleries.php:3485
+#: ../includes/class-galleries.php:3577
 msgid "Quote"
 msgstr ""
 
-#: ../includes/class-galleries.php:3486
+#: ../includes/class-galleries.php:3578
 msgid "Standard"
 msgstr ""
 
-#: ../includes/class-galleries.php:3488
+#: ../includes/class-galleries.php:3580
 msgid "Video"
 msgstr ""
 
-#: ../includes/class-galleries.php:3567
+#: ../includes/class-galleries.php:3659
 msgid "Default Template"
 msgstr ""
 
-#: ../includes/class-galleries.php:3741
+#: ../includes/class-galleries.php:3834
 msgid ""
 "You can place this gallery anywhere into your posts, pages, custom post "
 "types or widgets by using the shortcode below"
 msgstr ""
 
-#: ../includes/class-galleries.php:3743
+#: ../includes/class-galleries.php:3836
 msgid ""
 "You can also place this gallery into your template files by using the "
 "template tag below"
 msgstr ""
 
-#: ../includes/class-galleries.php:3770
+#: ../includes/class-galleries.php:3863
 msgid "Shortcode"
 msgstr ""
 
-#: ../includes/class-galleries.php:3771
+#: ../includes/class-galleries.php:3864
 msgid "Type"
 msgstr ""
 
-#: ../includes/class-galleries.php:3772
+#: ../includes/class-galleries.php:3865
 msgid "Source"
 msgstr ""
 
-#: ../includes/class-galleries.php:3896
+#: ../includes/class-galleries.php:3989
 msgid "Select gallery featured image source:"
 msgstr ""
 
-#: ../includes/class-galleries.php:3897
+#: ../includes/class-galleries.php:3990
 msgid "First gallery image"
 msgstr ""
 
-#: ../includes/class-galleries.php:3899 ../includes/class-widgets.php:343
+#: ../includes/class-galleries.php:3992 ../includes/class-widgets.php:343
 msgid "Custom URL"
 msgstr ""
 
-#: ../includes/class-galleries.php:3905
+#: ../includes/class-galleries.php:3998
 msgid "Custom featured image URL"
 msgstr ""
 
-#: ../includes/class-galleries.php:3907
+#: ../includes/class-galleries.php:4000
 msgid "Dynamically generated first gallery image"
 msgstr ""
 
@@ -904,10 +904,14 @@ msgid "Upload and Insert"
 msgstr ""
 
 #: ../includes/class-remote-library.php:167
+msgid "Upload and Select"
+msgstr ""
+
+#: ../includes/class-remote-library.php:168
 msgid "Filter by remote library"
 msgstr ""
 
-#: ../includes/class-remote-library.php:344
+#: ../includes/class-remote-library.php:345
 msgid "F j Y"
 msgstr ""
 
@@ -1162,7 +1166,6 @@ msgid "Display single post images as a gallery."
 msgstr ""
 
 #: ../includes/class-settings.php:235 ../includes/class-settings.php:973
-#: ../src/gutenberg.js:116
 msgid "Galleries"
 msgstr ""
 
@@ -2923,8 +2926,7 @@ msgstr ""
 msgid "Justify"
 msgstr ""
 
-#: ../includes/class-widgets.php:462 ../responsive-lightbox.php:1168
-#: ../src/gutenberg.js:88
+#: ../includes/class-widgets.php:462 ../responsive-lightbox.php:1170
 msgid "Select image"
 msgstr ""
 
@@ -3232,110 +3234,62 @@ msgstr ""
 msgid "No tags found."
 msgstr ""
 
-#: ../responsive-lightbox.php:1006
+#: ../responsive-lightbox.php:1008
 msgid "Search Folders"
 msgstr ""
 
-#: ../responsive-lightbox.php:1008
+#: ../responsive-lightbox.php:1010
 msgid "Parent Folder"
 msgstr ""
 
-#: ../responsive-lightbox.php:1009
+#: ../responsive-lightbox.php:1011
 msgid "Parent Folder:"
 msgstr ""
 
-#: ../responsive-lightbox.php:1010
+#: ../responsive-lightbox.php:1012
 msgid "Edit Folder"
 msgstr ""
 
-#: ../responsive-lightbox.php:1011
+#: ../responsive-lightbox.php:1013
 msgid "Update Folder"
 msgstr ""
 
-#: ../responsive-lightbox.php:1012
+#: ../responsive-lightbox.php:1014
 msgid "Add New Folder"
 msgstr ""
 
-#: ../responsive-lightbox.php:1013
+#: ../responsive-lightbox.php:1015
 msgid "New Folder Name"
 msgstr ""
 
-#: ../responsive-lightbox.php:1014
+#: ../responsive-lightbox.php:1016
 msgid "No folders found."
 msgstr ""
 
-#: ../responsive-lightbox.php:1046
+#: ../responsive-lightbox.php:1048
 msgid "Are you sure you want to reset these settings to defaults?"
 msgstr ""
 
-#: ../responsive-lightbox.php:1047
+#: ../responsive-lightbox.php:1049
 msgid "Are you sure you want to reset this script settings to defaults?"
 msgstr ""
 
-#: ../responsive-lightbox.php:1048
+#: ../responsive-lightbox.php:1050
 msgid "Are you sure you want to reset this gallery settings to defaults?"
 msgstr ""
 
-#: ../responsive-lightbox.php:1069 ../responsive-lightbox.php:1169
+#: ../responsive-lightbox.php:1071 ../responsive-lightbox.php:1171
 msgid "Use these images"
 msgstr ""
 
-#: ../responsive-lightbox.php:1070
+#: ../responsive-lightbox.php:1072
 msgid "Edit attachment"
 msgstr ""
 
-#: ../responsive-lightbox.php:1071
+#: ../responsive-lightbox.php:1073
 msgid "Save attachment"
 msgstr ""
 
-#: ../responsive-lightbox.php:1170
+#: ../responsive-lightbox.php:1172
 msgid "Use this image"
-msgstr ""
-
-#: ../src/gutenberg.js:8
-msgid "Remote Library Image"
-msgstr ""
-
-#: ../src/gutenberg.js:9
-msgid "Remote Library images"
-msgstr ""
-
-#: ../src/gutenberg.js:12
-msgid "image"
-msgstr ""
-
-#: ../src/gutenberg.js:12
-msgid "photo"
-msgstr ""
-
-#: ../src/gutenberg.js:47 ../src/gutenberg.js:71
-msgid "Remote Library Images"
-msgstr ""
-
-#: ../src/gutenberg.js:67
-msgid "Responsive Lightbox | Remote Library Image"
-msgstr ""
-
-#: ../src/gutenberg.js:68
-msgid "Select a file from your remote libraries."
-msgstr ""
-
-#: ../src/gutenberg.js:119
-msgid "images"
-msgstr ""
-
-#: ../src/gutenberg.js:119
-msgid "photos"
-msgstr ""
-
-#: ../src/gutenberg.js:119
-msgid "gallery"
-msgstr ""
-
-#: ../src/gutenberg.js:177
-msgid "Responsive Lightbox | Gallery"
-msgstr ""
-
-#: ../src/gutenberg.js:178
-msgid "Select a gallery."
 msgstr ""

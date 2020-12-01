@@ -231,7 +231,7 @@ namespace WPDataAccess\Connection {
 							self::$remote_databases[ $schema_name ]['port'] !== '' &&
 							self::$remote_databases[ $schema_name ]['port'] !== '3306'
 						) {
-							$host .= ':' . self::$remote_databases[ $schema_name ]['post'];
+							$host .= ':' . self::$remote_databases[ $schema_name ]['port'];
 						}
 						self::$db_connections[ $schema_name ] = new \wpdb(
 							self::$remote_databases[ $schema_name ]['username'],
@@ -288,11 +288,11 @@ namespace WPDataAccess\Connection {
 		public function check_remote_database_connection() {
 			echo 'Preparing connection...<br/>';
 
-			$host   = isset( $_REQUEST['host'] ) ? $_REQUEST['host'] : '';
-			$user   = isset( $_REQUEST['user'] ) ? $_REQUEST['user'] : '';
-			$passwd = isset( $_REQUEST['passwd'] ) ? $_REQUEST['passwd'] : '';
-			$port   = isset( $_REQUEST['port'] ) ? $_REQUEST['port'] : '';
-			$schema = isset( $_REQUEST['schema'] ) ? $_REQUEST['schema'] : '';
+			$host   = isset( $_REQUEST['host'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['host'] ) ) : ''; // input var okay.
+			$user   = isset( $_REQUEST['user'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['user'] ) ) : ''; // input var okay.
+			$passwd = isset( $_REQUEST['passwd'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['passwd'] ) ) : ''; // input var okay.
+			$port   = isset( $_REQUEST['port'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['port'] ) ) : ''; // input var okay.
+			$schema = isset( $_REQUEST['schema'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['schema'] ) ) : ''; // input var okay.
 
 			if ( '' === $host || '' === $user || '' === $passwd || '' === $schema ) {
 				return false;

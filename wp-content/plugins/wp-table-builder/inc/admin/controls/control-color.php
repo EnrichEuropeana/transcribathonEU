@@ -55,13 +55,29 @@ class Control_Color extends Base_Control {
                 name,
                 selectors = [],
                 elemContainer,
-                selectorsJson,
-                targetInputAddClass;
+                useDataset,
+                targetInputAddClass,
+                dataSets,
+                startupValueSelector;
              
             if( data.label ) {
                 label = data.label;
             }
-            
+
+            useDataset = data.useDataset;
+
+            startupValueSelector = data.startupValueSelector;
+            let startupJson = null;
+            if(startupValueSelector){
+                startupJson = JSON.stringify(startupValueSelector);
+            }
+
+            dataSets = data.dataSets;
+            let dataSetsJson = null;
+            if(dataSets){
+                dataSetsJson = JSON.stringify(dataSets);
+            }
+
             if( data.name ) {
                 name = data.name;
             }
@@ -74,24 +90,24 @@ class Control_Color extends Base_Control {
                 i++;
             }
             
-            if( selectors && Array.isArray( selectors ) ) {
-                selectorsJson = JSON.stringify( selectors );
-            }
-            
             if( data.elemContainer ) {
                 elemContainer = data.elemContainer;
             }
             
             targetInputAddClass = data.elementControlTargetUnicClass;
-            let dataJson = JSON.stringify( data );
+            if(!window[targetInputAddClass]) window[targetInputAddClass] = [];
+            if(!window[targetInputAddClass]['control-color']) window[targetInputAddClass]['control-color'] = [];
+            window[targetInputAddClass]['control-color']['selectors'] = selectors;
         #>
-        <div class='wptb-settings-item-header' >
-            <p class="wptb-settings-item-title">{{{label}}}</p>
-        </div>
-        <div class="wptb-settings-row wptb-settings-middle-xs" style="padding-top: 25px; padding-bottom: 10px;">
-            <div class='wptb-settings-col-xs-8'>
-                <input type="text" class="wptb-element-property wptb-color-picker {{{targetInputAddClass}}}" 
-                       data-element="{{{elemContainer}}}" data-type="color" value=""/>
+        <div id="{{{targetInputAddClass}}}">
+            <div class='wptb-settings-item-header'>
+                <p class="wptb-settings-item-title">{{{label}}}</p>
+            </div>
+            <div class="wptb-settings-row wptb-settings-middle-xs" style="padding-top: 25px; padding-bottom: 10px;">
+                <div class='wptb-settings-col-xs-8'>
+                    <input type="text" class="wptb-element-property wptb-color-picker {{{targetInputAddClass}}}"
+                           data-element="{{{elemContainer}}}" data-type="color" value=""/>
+                </div>
             </div>
         </div>
         
@@ -119,16 +135,18 @@ class Control_Color extends Base_Control {
                 }
                 
                 if( targetInput && selectorElement ) {
-                    if( '{{{selectorsJson}}}' ) {
-                        let selectors = JSON.parse( '{{{selectorsJson}}}' );
+                    if( window['{{{targetInputAddClass}}}']['control-color']['selectors'] ) {
+                        let selectors = window['{{{targetInputAddClass}}}']['control-color']['selectors'];
                         
                         let thisColorCss, thisColorCssHex;
                         for( let i = 0; i < selectors.length; i++ ) {
                             if( selectors[i] && Array.isArray( selectors[i] ) && selectors[i][0] && selectors[i][1] ) {
                                 let selectorElements = document.querySelectorAll( selectors[i][0] );
                                 if( selectorElements.length > 0 ) {
+                                    let thisColorCssArr = [];
                                     for( let j = 0; j < selectorElements.length; j++ ) {
                                         if( selectors[i][1] ) {
+                                            thisColorCss = '';
                                             if( Array.isArray( selectors[i][1] ) ) {
                                                 for( let k = 0; k < selectors[i][1].length; k++ ) {
                                                     if( selectorElements[j].style[selectors[i][1][k]] ) {
@@ -158,16 +176,28 @@ class Control_Color extends Base_Control {
                                                 }
                                             }
 
-                                            if( thisColorCss ) {
-                                                targetInput.value = thisColorCss;
-                                            }
+                                            thisColorCssArr.push(thisColorCss);
                                         }
+                                    }
+
+                                    if( thisColorCssArr.length > 0 ) {
+                                        targetInput.value = WPTB_Helper.getValueMaxCountSameElementsInArray(thisColorCssArr);
                                     }
                                 }
                             }
                         }
 
-                        function elementColorSet( selectors, color ) {
+                        function elementColorSet( selectors, color) {
+                            const useDataset = 'true' === '{{{useDataset}}}';
+                            if(useDataset){
+                                addDataSet(selectors, color);
+                                return;
+                            }
+
+                            if('' !== '{{{dataSetsJson}}}'){
+                                addToDataSetSelectors(color);
+                            }
+
                             for( let i = 0; i < selectors.length; i++ ) {
                                 if( selectors[i] && Array.isArray( selectors[i] ) && selectors[i][0] && selectors[i][1] ) {
                                     let selectorElements = document.querySelectorAll( selectors[i][0] );
@@ -188,6 +218,52 @@ class Control_Color extends Base_Control {
                             }
                         }
 
+
+                        function addToDataSetSelectors(val) {
+                            const selectorsObj = JSON.parse('{{{dataSetsJson}}}');
+
+                            Object.keys(selectorsObj).map(s => {
+                                if(Object.prototype.hasOwnProperty.call(selectorsObj , s)){
+                                    const tempEl = document.querySelector(s);
+                                    tempEl.dataset[selectorsObj[s]] = val;
+                                }
+                            });
+                        }
+
+                        function assignDataSetsToPicker(selectors){
+                            selectors.map(s => {
+                                const el = document.querySelector(s[0]);
+                                if(el.dataset[s[1]]){
+                                    targetInput.value = el.dataset[s[1]];
+                                }
+                            })
+                        }
+
+                        function assignStartupData(selectors){
+                            Object.keys(selectors).map(s => {
+                                if(Object.prototype.hasOwnProperty.call(selectors , s) ){
+                                    const dataVal = document.querySelector(s).dataset[selectors[s]];
+                                    targetInput.value = dataVal;
+                                }
+                            });
+                        }
+
+                        if('true' === '{{{useDataset}}}'){
+                            assignDataSetsToPicker(selectors);
+                        }
+
+                        if('' !== '{{{startupJson}}}'){
+                            const startupSelectorObj = JSON.parse('{{{startupJson}}}');
+                            assignStartupData(startupSelectorObj);
+                        }
+
+                        function addDataSet(selectors, value){
+                            selectors.map(s => {
+                                const el = document.querySelector(s[0]);
+                                el.dataset[s[1]] = value;
+                            });
+                        }
+
                         jQuery( '.{{{targetInputAddClass}}}' ).wpColorPicker({
                             change: function ( event, ui ) {
                                 let uiColor;
@@ -197,7 +273,7 @@ class Control_Color extends Base_Control {
                                     uiColor = '';
                                 }
 
-                                elementColorSet( selectors, uiColor );
+                                elementColorSet( selectors, uiColor);
 
                                 let targetInput = document.getElementsByClassName( '{{{targetInputAddClass}}}' );
                                 if( targetInput.length > 0 ) {

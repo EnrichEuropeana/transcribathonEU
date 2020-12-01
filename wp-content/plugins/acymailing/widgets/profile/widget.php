@@ -119,7 +119,7 @@ class acym_profile_widget extends WP_Widget
     public function widget($args, $instance)
     {
         require_once rtrim(dirname(dirname(__DIR__)), DS).DS.'back'.DS.'helpers'.DS.'helper.php';
-        if (!acym_isElementorEdition()) acym_loadAssets('front', 'frontusers', 'profile');
+        if (!acym_isElementorEdition()) acym_loadAssets('frontusers', 'profile');
 
         echo $args['before_widget'];
 

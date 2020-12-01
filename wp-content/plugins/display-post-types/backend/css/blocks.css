@@ -166,7 +166,7 @@
 	   object-position: bottom center;
 }
 
-.display-post-types .sub-entry h2.dpt-title {
+.display-post-types .sub-entry h3.dpt-title {
 	font-weight: bold !important;
 	line-height: 1.5 !important;
 
@@ -174,8 +174,8 @@
 	padding: 0 !important;
 }
 
-.display-post-types .sub-entry h2.dpt-title,
-.display-post-types .sub-entry h2.dpt-title a {
+.display-post-types .sub-entry h3.dpt-title,
+.display-post-types .sub-entry h3.dpt-title a {
 	font-size: 15px;
 }
 
@@ -258,16 +258,17 @@
 	margin-bottom: 5px;
 }
 
-.dpt-author {
-	display: inline-block;
-
-	margin-right: 5px;
-}
-
+.dpt-author,
 .dpt-date {
 	display: inline-block;
+}
 
-	margin-left: 5px;
+.dpt-author + .dpt-date:before {
+	display: inline-block;
+
+	margin: 0 5px;
+
+	content: '\00B7';
 }
 
 .dpt-grid2 .dpt-featured-content,
@@ -356,7 +357,7 @@
 	letter-spacing: 0;
 }
 
-.display-post-types .dpt-list2 h2.dpt-title {
+.display-post-types .dpt-list2 h3.dpt-title {
 	line-height: 1.25 !important;
 }
 
@@ -659,8 +660,8 @@ https://flickity.metafizzy.co
 		font-size: 18px;
 	}
 
-	.display-post-types .wide-wrap .sub-entry h2.dpt-title,
-	.display-post-types .wide-wrap .sub-entry h2.dpt-title a {
+	.display-post-types .wide-wrap .sub-entry h3.dpt-title,
+	.display-post-types .wide-wrap .sub-entry h3.dpt-title a {
 		font-size: 16px;
 	}
 }

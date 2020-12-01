@@ -110,6 +110,7 @@ class Easy_Accordion_Free_Shortcode {
 		global $accordion_wraper_class;
 		$accordion_wraper_class = $accordion_theme_class . ' sp-easy-accordion';
 		$accordion_item_class   = 'sp-ea-single';
+		$eap_schema_markup                  = isset( $shortcode_data['eap_schema_markup'] ) ? $shortcode_data['eap_schema_markup'] : false;
 		// Accordion settings.
 		$eap_preloader                   = isset( $shortcode_data['eap_preloader'] ) ? $shortcode_data['eap_preloader'] : false;
 		$eap_active_event                = isset( $shortcode_data['eap_accordion_event'] ) ? $shortcode_data['eap_accordion_event'] : '';
@@ -128,11 +129,11 @@ class Easy_Accordion_Free_Shortcode {
 		$eap_border_color = isset( $eap_border['color'] ) ? $eap_border['color'] : '';
 		// Section title.
 		$section_title_typho       = isset( $shortcode_data['eap_section_title_typography'] ) ? $shortcode_data['eap_section_title_typography'] : '';
-		$section_title_typho_color = isset( $section_title_typho['color'] ) ? $section_title_typho['color'] : '';
+		$section_title_typho_color = isset( $section_title_typho['color'] ) ? $section_title_typho['color'] : '#444';
 		// Accordion title.
 		$eap_title_typho       = isset( $shortcode_data['eap_title_typography'] ) ? $shortcode_data['eap_title_typography'] : '';
 		$eap_title_tag         = isset( $shortcode_data['ea_title_heading_tag'] ) ? $shortcode_data['ea_title_heading_tag'] : '3';
-		$eap_title_typho_color = isset( $shortcode_data['eap_title_color'] ) ? $shortcode_data['eap_title_color'] : '';
+		$eap_title_typho_color = isset( $eap_title_typho['color'] ) ? $eap_title_typho['color'] : '#444';
 		$eap_title_padding     = isset( $shortcode_data['eap_title_padding'] ) ? $shortcode_data['eap_title_padding'] : '';
 		$eap_header_bg         = isset( $shortcode_data['eap_header_bg_color'] ) ? $shortcode_data['eap_header_bg_color'] : '';
 		// header icon.
@@ -146,7 +147,7 @@ class Easy_Accordion_Free_Shortcode {
 		$eap_expand_icon          = 'fa-minus';
 		// Description.
 		$eap_content_typo       = isset( $shortcode_data['eap_content_typography'] ) ? $shortcode_data['eap_content_typography'] : '';
-		$eap_content_typo_color = isset( $shortcode_data['eap_description_color'] ) ? $shortcode_data['eap_description_color'] : '';
+		$eap_content_typo_color = isset( $eap_content_typo['color'] ) ? $eap_content_typo['color'] : '#444';
 		$eap_description_bg     = isset( $shortcode_data['eap_description_bg_color'] ) ? $shortcode_data['eap_description_bg_color'] : '';
 		wp_enqueue_style( 'sp-ea-style' );
 		wp_enqueue_script( 'sp-ea-accordion-js' );

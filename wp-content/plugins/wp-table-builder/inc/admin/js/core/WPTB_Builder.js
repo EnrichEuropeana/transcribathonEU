@@ -38,8 +38,6 @@
                         
                         let wptbTableStateSaveManager = new WPTB_TableStateSaveManager();
                         wptbTableStateSaveManager.tableStateSet();
-                        
-                        WPTB_Helper.elementOptionsSet( 'table_setting', element );
                     } else {
                         document.getElementsByClassName('wptb-table-generator')[0].style.display = 'table';
                     }

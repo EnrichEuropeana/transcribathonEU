@@ -17,8 +17,6 @@ class acyMenu extends acyHook
 
     public function addMenus()
     {
-        $this->loadAcyLibrary();
-
         $capability = 'read';
 
         add_submenu_page(
@@ -64,13 +62,14 @@ class acyMenu extends acyHook
             'ACYM_USERS' => 'users',
             'ACYM_CUSTOM_FIELDS' => 'fields',
             'ACYM_LISTS' => 'lists',
-            'ACYM_CAMPAIGNS' => 'campaigns',
+            'ACYM_EMAILS' => 'campaigns',
             'ACYM_TEMPLATES' => 'mails',
             'ACYM_AUTOMATION' => 'automation',
             'ACYM_QUEUE' => 'queue',
             'ACYM_STATISTICS' => 'stats',
             'ACYM_BOUNCE_HANDLING' => 'bounces',
             empty($nbPluginNotUptodate) ? 'ACYM_ADD_ONS' : acym_translation_sprintf('ACYM_ADD_ONS_X', $nbPluginNotUptodate) => 'plugins',
+            'ACYM_SUBSCRIPTION_FORMS' => 'forms',
             'ACYM_CONFIGURATION' => 'configuration',
         ];
         foreach ($menus as $title => $ctrl) {

@@ -10,7 +10,8 @@ class Meow_Gallery_Custom_Links_Linker {
 	// XXXX: Custom code with $aria, Christoph Letmaier, 14.01.2020
 	function linker( $element, $parent, $mediaId, $url, $rel, $aria, $target ) {
     // Let's look for the closest link tag enclosing the image
-    $title = get_the_title( $mediaId );
+    $media = get_post( $mediaId );
+    $title = the_title_attribute(  array( 'echo' => false, 'post' => $media )  );
     $potentialLinkNode = $parent;
     $maxDepth = 5;
     do {
@@ -46,7 +47,7 @@ class Meow_Gallery_Custom_Links_Linker {
           if ( !empty( $rel ) )
             $potentialLinkNode->attr( 'rel', $rel );
           if ( !empty( $aria ) )
-            $potentialLinkNode->attr{'aria-label'} = $aria;
+            $potentialLinkNode->attr['aria-label'] = $aria;
         }
         return true;
       }

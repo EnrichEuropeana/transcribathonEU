@@ -127,16 +127,6 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'hide_time' => 12,
 				'supported_positions' => array('header'),
 			),
-			// 'lite_survey' => array(
-			// 'title' => _x('Help us to get even better MetaSlider', 'Keep the plugin name "MetaSlider" when possible', 'ml-slider'),
-			// 'text' => __('Let us know how you use MetaSlider by answering 4 simple questions. We will make MetaSlider to suit you better.', 'ml-slider'),
-			// 'image' => 'metaslider_logo.png',
-			// 'button_link' => 'metaslider_survey',
-			// 'button_meta' => 'lets_start',
-			// 'dismiss_time' => 'lite_survey',
-			// 'hide_time' => 12,
-			// 'supported_positions' => array('header'),
-			// ),
 			'pro_layers' => array(
 				'title' => __('Spice up your site with animated layers and video slides', 'ml-slider'),
 				'text' => _x('With the MetaSlider Add-on pack you can give your slideshows a professional look!', 'Keep the plugin name "MetaSlider" when possible', 'ml-slider'),
@@ -208,76 +198,82 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 
         if (defined('METASLIDER_DISABLE_SEASONAL_NOTICES') && METASLIDER_DISABLE_SEASONAL_NOTICES) {
             return array();
-        }
+		}
+		
+		$coupons = json_decode(file_get_contents(METASLIDER_PATH .'seasonal-discounts.json'), true);
 
-        return array(
-			'blackfriday2019' => array(
+        $coupon_object =  array(
+			'blackfriday' => array(
 				'title' => _x('Black Friday - 20% off the MetaSlider Add-on Pack until November 30th', 'Keep the phrase "MetaSlider Add-on Pack" when possible. Also, "Black Friday" is the name of an event in the United States', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/black_friday.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'blackfriday2019',
-				'discount_code' => 'blackfridaysale2019',
-				'valid_from' => '2019-11-20 00:00:00',
-                'valid_to' => '2019-11-30 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'christmas2019' => array(
+			'christmas' => array(
 				'title' => _x('Christmas sale - 20% off the MetaSlider Add-on Pack until December 25th', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/christmas.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'christmas2019',
-				'discount_code' => 'christmassale2019',
-				'valid_from' => '2019-12-01 00:00:00',
-				'valid_to' => '2019-12-25 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'newyear2020' => array(
+			'newyear' => array(
 				'title' => _x('Happy New Year - 20% off the MetaSlider Add-on Pack until January 14th', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/new_year.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'newyear2020',
-				'discount_code' => 'newyearsale2020',
-				'valid_from' => '2019-12-26 00:00:00',
-				'valid_to' => '2020-01-14 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'spring2020' => array(
+			'spring' => array(
 				'title' => _x('Spring sale - 20% off the MetaSlider Add-on Pack until April 30th', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/spring.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'spring2020',
-				'discount_code' => 'springsale2020',
-				'valid_from' => '2020-04-01 00:00:00',
-				'valid_to' => '2020-04-30 23:59:59',
                 'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			),
-			'summer2020' => array(
+			'summer' => array(
 				'title' => _x('Summer sale - 20% off the MetaSlider Add-on Pack until July 31st', 'Keep the phrase "MetaSlider Add-on Pack" when possible', 'ml-slider'),
 				'text' => __('To benefit, use this discount code:', 'ml-slider').' ',
 				'image' => 'seasonal/summer.png',
 				'button_link' => 'metaslider',
 				'button_meta' => 'ml-slider',
-				'dismiss_time' => 'summer2020',
-				'discount_code' => 'summersale2020',
-				'valid_from' => '2020-07-01 00:00:00',
-				'valid_to' => '2020-07-31 23:59:59',
                 'hide_time' => '',
+				'supported_positions' => array('header', 'dashboard'),
+			),
+			'collection' => array(
+				'title' => __('The Updraft Plugin Collection Sale', 'ml-slider'),
+				'text' => __('Get 20% off any of our plugins. But hurry - offer ends 30th September, use this discount code:', 'ml-slider').' ',
+				'image' => 'metaslider_logo.png',
+				'button_link' => 'https://teamupdraft.com',
+				'button_meta' => 'collection',
+				'hide_time' => '',
 				'supported_positions' => array('header', 'dashboard'),
 			)
 		);
+	
+		return array_map(array($this, 'prepare_notice_fields'), array_merge_recursive($coupon_object, $coupons));
     }
+
+	/**
+	 * Add fields needed for an notice to show
+	 * 
+	 * @param string $notice - the name of the notice
+	 * @return array
+	 */
+    public function prepare_notice_fields($notice) {
+		if (!isset($notice['dismiss_time'])) {
+			$notice['dismiss_time'] = $notice['discount_code'];
+		}
+		return $notice;
+	}
 
 	/**
 	 * These appear inside a mega ad. 
@@ -293,20 +289,6 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 				'button_link' => 'metaslider',
                 'button_meta' => 'ml-slider',
 			),
-			// 'wpo_pro' => array(
-			// 'title' => _x('WP-Optimize Premium', 'Keep the phrase "WP-Optimize Premium" when possible', 'ml-slider'), 
-			// 'text' => __('offers unparalleled choice and flexibility, allowing you to select one or a combination of over a dozen optimization options.', 'ml-slider'),
-			// 'image' => '',
-			// 'button_link' => 'wp_optimize',
-            // 'button_meta' => 'ml-slider',
-			// ),
-			// 'udp_pro' => array(
-			// 'title' => _x('UpdraftPlus Premium', 'Keep the phrase "UpdraftPlus Premium" when possible', 'ml-slider), 
-			// 'text' => __('provides personal support, the ability to copy sites, more storage destinations, encrypted backups for security, multiple backup destinations, better reporting, no adverts and plenty more.', 'ml-slider'),
-			// 'image' => '',
-			// 'button_link' => 'updraftplus',
-            // 'button_meta' => 'ml-slider',
-			// ),
 			'udp' => array(
 				'title' => _x('UpdraftPlus', 'Keep the plugin name "UpdraftPlus" when possible', 'ml-slider'), 
 				'text' => __('simplifies backups and restoration. It is the world\'s highest ranking and most popular scheduled backup plugin, with over a million currently-active installs.', 'ml-slider'),
@@ -390,11 +372,11 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 	protected function valid_seasonal_notices() {
         $valid = array();
         $time_now = time();
-        // $time_now = strtotime('2018-11-20 00:00:01'); // Black Friday
-        // $time_now = strtotime('2018-12-01 00:00:01'); // XMAS
-        // $time_now = strtotime('2018-12-26 00:00:01'); // NY
-        // $time_now = strtotime('2018-04-01 00:00:01'); // Spring
-        // $time_now = strtotime('2018-07-01 00:00:01'); // Summer
+        // $time_now = strtotime('2020-11-20 00:00:01'); // Black Friday
+        // $time_now = strtotime('2020-12-01 00:00:01'); // XMAS
+        // $time_now = strtotime('2020-12-26 00:00:01'); // NY
+        // $time_now = strtotime('2020-04-01 00:00:01'); // Spring
+        // $time_now = strtotime('2020-07-01 00:00:01'); // Summer
         foreach($this->seasonal_notices() as $ad_identifier => $notice) {
             $valid_from = strtotime($notice['valid_from']);
             $valid_to = strtotime($notice['valid_to']);
@@ -569,17 +551,17 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 	/**
 	 * Handles any notice related ajax calls
      *
-	 * @return string - (JSON) Sends a success response unless an error is encountered
+	 * @return void
 	 */
 	public function ajax_notice_handler() {
 		if (!wp_verify_nonce($_REQUEST['_wpnonce'], 'metaslider_handle_notices_nonce')) {
-			return wp_send_json_error(array(
+			wp_send_json_error(array(
                 'message' => __('The security check failed. Please refresh the page and try again.', 'ml-slider')
 			), 401);
 		}
 
 		if (is_wp_error($ad_data = $this->ad_exists($_POST['ad_identifier']))) {
-			return wp_send_json_error(array(
+			wp_send_json_error(array(
                 'message' => __('This item does not exist. Please refresh the page and try again.', 'ml-slider')
 			), 401);
 		}
@@ -587,12 +569,12 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 		$result = $this->dismiss_ad($ad_data['dismiss_time'], $ad_data['hide_time']);
         
 		if (is_wp_error($result)) {
-			return wp_send_json_error(array(
+			wp_send_json_error(array(
 				'message' => $result->get_error_message()
 			), 409);
 		}
 		
-		return wp_send_json_success(array(
+		wp_send_json_success(array(
             'message' => __('The option was successfully updated', 'ml-slider'),
         ), 200);
     }
@@ -649,8 +631,18 @@ class MetaSlider_Notices extends Updraft_Notices_1_0 {
 	 * @return bool the data of the ad
 	 */
 	public function ad_exists($ad_identifier) {
-        $all_notices = array_merge($this->pro_notices(), $this->lite_notices());
-        return isset($all_notices[$ad_identifier]) ? $all_notices[$ad_identifier] : new WP_Error('bad_call', __('The requested data does not exist.', 'ml-slider'), array('status' => 401));
+		$all_notices = array_merge($this->pro_notices(), $this->lite_notices());
+		if (isset($all_notices[$ad_identifier])) {
+			return $all_notices[$ad_identifier];
+		}
+
+		// Handle seasonal notices
+		$ad_data = array();
+		foreach ($all_notices as $notice) {
+			if (isset($notice['discount_code']) && $notice['discount_code'] === $ad_identifier)
+			$ad_data = $notice;
+		}
+        return $ad_data ? $ad_data : new WP_Error('bad_call', __('The requested data does not exist.', 'ml-slider'), array('status' => 401));
     } 
 
 	/**

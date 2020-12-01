@@ -22,15 +22,27 @@ class WPTB_Listing  extends \WP_List_Table{
 		parent::__construct( [
 			'singular' => __( 'WPTB Table', 'wp-table-builder' ), 
 			'plural'   => __( 'WPTB Tables', 'wp-table-builder' ), 
-			'ajax'     => false 
+			'ajax'     => false
 		] );
 	}
+
+    protected function get_views() {
+	    $count = self::record_count( 10, '' );
+        $status_links = array(
+            "all"       =>  __( '<a href="' . esc_url( admin_url( 'admin.php?page=wptb-overview' ) ) . '">' .
+                                            'All ' .
+                                            '<span class="count">(' . $count . ')</span></a>', 'wp-table-builde' )
+        );
+        return $status_links;
+    }
  
-	public static function get_tables( $per_page = 5, $page_number = 1 ) {
+	public static function get_tables( $per_page = 5, $page_number = 1, $search_text ) {
 
 		global $wpdb, $post;
 
 		$params = array( 'post_type' => 'wptb-tables', 'posts_per_page' => $per_page, 'paged' => $page_number );
+
+		if( $search_text ) $params['s'] = $search_text;
 
 	  	$params['orderby'] = isset( $_REQUEST['orderby'] ) && ! empty( sanitize_text_field( $_REQUEST['orderby'] ) ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'date';
 	  	$params['order'] = isset( $_REQUEST['order'] ) && ! empty( sanitize_text_field( $_REQUEST['order'] ) ) ? sanitize_text_field( $_REQUEST['order'] ) : 'DESC';
@@ -87,14 +99,16 @@ class WPTB_Listing  extends \WP_List_Table{
 	    	[ 'ID' => $id ],
 	    	[ '%d' ]
 	  	);
-	
 	}
 
-	public static function record_count( $per_page ) {
+	public static function record_count( $per_page, $search_text ) {
 		
 		global $wpdb, $post;
 
 		$params = array( 'post_type' => 'wptb-tables', 'posts_per_page' => $per_page );
+
+		if( $search_text ) $params['s'] = $search_text;
+
 	  	$params['orderby'] = isset( $_REQUEST['orderby'] ) && ! empty( sanitize_text_field( $_REQUEST['orderby'] ) ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'date';
 	  	$params['order'] = isset( $_REQUEST['order'] ) && ! empty( sanitize_text_field( $_REQUEST['order'] ) ) ? sanitize_text_field( $_REQUEST['order'] ) : 'DESC';
 	  	
@@ -149,12 +163,18 @@ class WPTB_Listing  extends \WP_List_Table{
             ),
             home_url()
         );
+
+        $server_request_url = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] );
+        $server_request_url = remove_query_arg( '_wpnonce', $server_request_url );
+        $server_request_url = remove_query_arg( 'action', $server_request_url );
+        $server_request_url = remove_query_arg( 'table_id', $server_request_url );
+        $query = parse_url( $server_request_url, PHP_URL_QUERY );
         
 	  	$actions = [
-	    	'delete' => sprintf( '<a href="?page=%s&action=%s&table_id=%s&_wpnonce=%s">Delete</a>', esc_attr( $_REQUEST['page'] ), 'delete', absint( $item->ID ), $nonce ),
-            'duplicate' => sprintf( '<a href="?page=%s&action=%s&table_id=%s&_wpnonce=%s">Duplicate</a>', esc_attr( $_REQUEST['page'] ), 'duplicate', absint( $item->ID ), $nonce ),
-            'preview_' => sprintf( '<a href="%s" target="_blank">Preview</a>', $wptb_preview_button_url ),
-			'edit' => sprintf( '<a href="?page=wptb-builder&table=%d">Edit</a>',  absint( $item->ID ) )
+	    	'edit' => sprintf( '<a href="?page=wptb-builder&table=%d">Edit</a>',  absint( $item->ID ) ),
+			'duplicate' => '<a href="?' . $query . sprintf( '&action=%s&table_id=%s&_wpnonce=%s', 'duplicate', absint( $item->ID ), $nonce ) . '">Duplicate</a>',
+			'preview_' => sprintf( '<a href="%s" target="_blank">Preview</a>', $wptb_preview_button_url ),
+			'delete' => '<a href="?' . $query . sprintf( '&action=%s&table_id=%s&_wpnonce=%s', 'delete', absint( $item->ID ), $nonce ) . '">Delete</a>'
 	  	];
 
 	  	return $title . $this->row_actions( $actions );
@@ -229,36 +249,45 @@ class WPTB_Listing  extends \WP_List_Table{
 
 	  	$per_page     = $this->get_items_per_page( 'tables_per_page', 10 );
 	  	$current_page = $this->get_pagenum();
-	  	$total_items  = self::record_count( $per_page );
+
+        $search_text = '';
+        if( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) {
+            $search_text = sanitize_text_field($_REQUEST['s']);
+        }
+	  	$total_items  = self::record_count( $per_page, $search_text );
 
 	  	$this->set_pagination_args( [
 	    	'total_items' => $total_items, //WE have to calculate the total number of items
 	    	'per_page'    => $per_page //WE have to determine how many items to show on a page
 	  	] );
-
-	  	$this->items = $this->get_tables( $per_page, $current_page );
-	
+	  	$this->items = $this->get_tables( $per_page, $current_page, $search_text );
 	}
 
+	public function request_url_clear() {
+        $_SERVER['REQUEST_URI'] = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] );
+        $_SERVER['REQUEST_URI'] = remove_query_arg( 'action', $_SERVER['REQUEST_URI'] );
+        $_SERVER['REQUEST_URI'] = remove_query_arg( 'action2', $_SERVER['REQUEST_URI'] );
+        $_SERVER['REQUEST_URI'] = remove_query_arg( 'table_id', $_SERVER['REQUEST_URI'] );
+        $_SERVER['REQUEST_URI'] = remove_query_arg( 'bulk-delete', $_SERVER['REQUEST_URI'] );
+    }
+
 	public function process_bulk_action() {
-        
+
         $nonce = isset( $_REQUEST['_wpnonce'] ) && esc_attr( $_REQUEST['_wpnonce'] ) ? esc_attr( $_REQUEST['_wpnonce'] ) : '';
-        
-        
+
+
 		if ( 'duplicate' === $this->current_action() ) {
 
 	    	if ( ! wp_verify_nonce( $nonce, 'wptb_nonce_table' ) ) {
 	      		die( 'Go get a life script kiddies' );
 			} else {
-	      		$duplicate = $this->duplicate_table( absint( $_GET['table_id'] ) );
-                ?>
-                    <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e( 'Table duplicate successfully.', 'wp-table-builder' ); ?></p>
-                    </div>
-                    <script>window.history.pushState( null, null, window.location.href.split('?')[0] + '?page=wptb-overview' );</script>
+	      		$this->duplicate_table( absint( $_GET['table_id'] ) );
+	      		?>
+	      		<div class="notice notice-success is-dismissible">
+                    <p><?php esc_html_e( 'Table duplicate successfully.', 'wp-table-builder' ); ?></p>
+                </div>
                 <?php
 	    	}
-
 	  	}
 
 		if ( 'delete' === $this->current_action() ) {
@@ -268,38 +297,44 @@ class WPTB_Listing  extends \WP_List_Table{
 			} else {
 	      		$this->delete_table( absint( $_GET['table_id'] ) );
                 ?>
-                    <div class="notice notice-success is-dismissible">
-                        <p><?php esc_html_e( 'Table deleted successfully.', 'wp-table-builder' ); ?></p>
-                    </div>
-                    <script>window.history.pushState( null, null, window.location.href.split('?')[0] + '?page=wptb-overview' );</script>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php esc_html_e( 'Table deleted successfully.', 'wp-table-builder' ); ?></p>
+                </div>
                 <?php
 	    	}
 
 	  	}
 
 	  	// If the delete bulk action is triggered
-	  	if ( ( isset( $_POST['action'] ) && sanitize_text_field( $_POST['action'] ) == 'bulk-delete' ) ||
-                ( isset( $_POST['action2'] ) && sanitize_text_field( $_POST['action2'] ) == 'bulk-delete' ) ) {
-            
+	  	if ( ( isset( $_REQUEST['action'] ) && sanitize_text_field( $_REQUEST['action'] ) == 'bulk-delete' ) ||
+                ( isset( $_REQUEST['action2'] ) && sanitize_text_field( $_REQUEST['action2'] ) == 'bulk-delete' ) ) {
+
             if( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ){
                 die( 'Go get a life script kiddies' );
             } else {
-                $delete_ids = esc_sql( $_POST['bulk-delete'] );
+                $delete_ids = esc_sql( $_REQUEST['bulk-delete'] );
 
                 // loop over the array of record IDs and delete them
                 foreach ( $delete_ids as $id ) {
                     $this->delete_table( absint( $id ) );
                 }
-                
+
                 ?>
                 <div class="notice notice-success is-dismissible">
                     <p><?php esc_html_e( 'Bulk Delete Performed Successfully.', 'wp-table-builder' ); ?></p>
                 </div>
-                <script>window.history.pushState( null, null, window.location.href.split('?')[0] + '?page=wptb-overview' );</script>
-                <?php 
+                <?php
             }
 	  	}
+        $this->request_url_clear();
+        ?>
+        <script>
+            // with sub-folder WordPress installations, this function adding extra invalid url paths to browser history, thus changing all the links that formats themselves according to current url. since the url it created is invalid, most of the links on the page become invalid and broken too.
+            // @deprecated
+            //window.history.pushState( null, null, "<?php //echo home_url() . $_SERVER['REQUEST_URI']; ?>//" );
+        </script>
+        <?php
 	}
 }
 
-$table = new WPTB_Listing(); 
+$table = new WPTB_Listing();

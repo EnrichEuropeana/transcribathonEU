@@ -168,7 +168,7 @@ namespace WPDataAccess\CSV_Files {
 					);
 				}
 
-				function save_mapping(refresh=false) {
+				function save_mapping(refresh=false, exclude_mapping=false) {
 					var dbs_schema_name = '<?php echo esc_attr( $this->schema_name ); ?>';
 					var dbs_table_name = jQuery('#csv_table_name').val();
 
@@ -201,11 +201,19 @@ namespace WPDataAccess\CSV_Files {
 						database = {};
 					}
 
-					var mapping = {
-						settings: settings,
-						database: database,
-						columns: columns
-					};
+					if (exclude_mapping) {
+						var new_mapping = {
+							settings: settings,
+							database: mapping.database,
+							columns: mapping.columns
+						};
+					} else {
+						var new_mapping = {
+							settings: settings,
+							database: database,
+							columns: columns
+						};
+					}
 
 					jQuery.ajax({
 						method: 'POST',
@@ -213,7 +221,7 @@ namespace WPDataAccess\CSV_Files {
 						data: {
 							wpnonce: '<?php echo esc_attr( $this->wpnonce );?>',
 							csv_id: '<?php echo esc_attr(  $this->csv_id );?>',
-							csv_mapping: mapping
+							csv_mapping: new_mapping
 						}
 					}).success(
 						function(msg) {
@@ -230,7 +238,7 @@ namespace WPDataAccess\CSV_Files {
 				}
 
 				function change_delimiter() {
-					save_mapping(true);
+					save_mapping(true, true);
 				}
 
 				function preview(page_number, page_length) {
@@ -366,11 +374,13 @@ namespace WPDataAccess\CSV_Files {
 							<span>Has header columns</span>
 						</label>
 
-						<input type="button"
-							   class="button"
-							   value="Apply settings"
-							   onclick="change_delimiter()"
-						/>
+						<button type="button"
+							   	class="button"
+							   	onclick="change_delimiter()"
+						>
+							<span class="material-icons wpda_icon_on_button">check</span>
+							<?php echo __( 'Apply settings' ); ?>
+						</button>
 					</div>
 				</fieldset>
 				<br/>
@@ -415,7 +425,7 @@ namespace WPDataAccess\CSV_Files {
 					<legend>
 						<?php echo __( 'Column mapping', 'wp-data-access' ); ?>
 						<a href="javascript:void(0)">
-							<span class="dashicons dashicons-editor-help" title="Drag columns from Table to Mapped" style="cursor:pointer;vertical-align:bottom;text-decoration:none;"></span>
+							<span class="dashicons dashicons-editor-help wpda_tooltip" title="Drag columns from Table to Mapped" style="cursor:pointer;vertical-align:bottom;text-decoration:none;"></span>
 						</a>
 					</legend>
 					<div>

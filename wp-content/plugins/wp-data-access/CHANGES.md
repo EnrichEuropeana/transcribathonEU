@@ -1,6 +1,85 @@
 ### ChangeLog for WP Data Access
 
-#### 3.1.1 / -- under development ---
+#### 3.5.0 / --- under construction ---
+
+Updated: Dutch translation
+Added: Shortcode arguments to filter wpdadiehard (forum support - Jack)
+Fixed: inline editing checkbox uses tinyint, must be tinyint(1)
+Fixed: checkbox set to null when disable, should be 0 to support not null (forum support - kooyaya)
+Fixed: load-scripts.php error in WP 5.5
+Removed: publication test from list table (remains available from data entry form)
+Added: query ui darkness images to prevent 404
+Removed: page arguments from public web pages (shortcode wpdadiehard)
+Added: disable auto-updates in WordPress 5.5
+Fixed: wpda_search_column_ values lost after re-order (forum support - Mark)
+Changed: show more|less button label
+Fixed: Data Publisher does not use dynamic filter arguments: wpda_search_column_ (forum support Mark)
+Fixed: cannot export view to csv (forum support mrams93)
+Fixed: cannot redeclare submit_button (forum support - Allen)
+Added: publication name to shortcode (forum support - Andrew)
+Added: sort icons selection from Data Publisher
+Fixed: added permanently delete message to bulk actions buttons
+Added: allow to drop views from bulk actions menu 
+Changed: shorter button labels (support forum - Lawrence)
+Fixed: searching, ordering and paging disabled for publication without pub_id
+Added: parameter nl2br to shortcode wpdataaccess to convert New Lines to BR tags (forum support - Howard)
+Added: notify library to show interactive notifications
+Added: material icons to buttons and tabs
+Added: more help and info icons to improve usability
+Added: jQuery tooltips to help and info titles
+Added: freemius library to support premium plugin version
+
+#### 3.1.5 / 2020-07-05
+
+Updated: Dutch translation
+Fixed: Table settings hyperlink column id and name not unique
+Fixed: Change image width to 100% (forum support - Chiara)
+Fixed: Export button in Data Explorer not working
+Added: Option to Data Publisher to convert NL to BR (forum support - Howard)
+Fixed: Month in date field changes on mousewheel event (Michiel)
+Added: Shortcode arguments to filter publication (forum support - Howard)
+Fixed: Screen options (again!)
+Fixed/Added: One click export for Data Projects including all option sets
+Added: CSV upload table to plugin table array (Michiel)
+Added: Disable attribute to filter wpda_add_column_settings
+Added: Filter wpda_column_default to first column
+Fixed: Apply plugin date format to primary key columns 
+Fixed: Allow lookup on first column in list table
+Fixed: Cookie samesite warning
+Fixed: Removed iframes from project
+Fixed: Show text only if hyperlink column does not contain a URL on frontend (forum support - Howard)
+
+#### 3.1.4 / 2020-06-22
+
+Fixed: Some sanitization issues
+Added: Show text only if hyperlink column does not contain a URL (forum support - Howard)
+Added: Custom items to search
+Fixed: Hidden columns not available in default where construction
+Fixed: Use option set default is named option set is not found
+
+#### 3.1.3 / 2020-06-15
+
+Added: Disable hyperlinks on list tables in Data Projects (parent/child)
+Fixed: Export not available on web pages using wpdadiehard
+Fixed: Responsiveness not working with shortcode wpdadiehard (forum support - nmarlon)
+Fixed: Back to parent list button not working (forum support - alevel)
+Fixed: API doc missing package WPDA_Roles
+Fixed: Search not remembered in list tables
+
+#### 3.1.2 / 2020-05-25
+
+Fixed: ERROR: Wrong arguments [missing WPDA_PARENT_KEY*?] (Michiel)
+Added: Added actions and filters to allow custom settings in Data Projects
+Added: Show column of data type SET as CSV, UL or OL in list table (see plugin settings) 
+Added: Hide ID in lookup list (forum support - hhagmxeu)
+Fixed: Remove Add New button when insert is set to NO (forum support - hhagmxeu)
+Updated: Original WP_List_Table WordPress class
+Added: Add help link to list table and data entry form titles
+Fixed: Invalid table open tag
+Fixed: Data Publisher does not accept blanks in column names (forum support - neiljw)
+Fixed: Need to remap when switching file type (CSV <> TSV)
+
+#### 3.1.1 / 2020-05-08
 
 Fixed: Error when clicking on child tab in Data Project  (forum support #12790240 - maverjk)
 Fixed: CSV repository table not created during update (forum support #12728343 - tobiaseigen)

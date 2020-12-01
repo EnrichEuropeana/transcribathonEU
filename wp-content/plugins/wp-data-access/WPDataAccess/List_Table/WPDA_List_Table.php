@@ -14,10 +14,12 @@ namespace WPDataAccess\List_Table {
 	use WPDataAccess\Plugin_Table_Models\WPDA_Media_Model;
 	use WPDataAccess\Utilities\WPDA_Import;
 	use WPDataAccess\Utilities\WPDA_Message_Box;
+	use WPDataAccess\Utilities\WPDA_Repository;
 	use WPDataAccess\Wordpress_Original;
 	use WPDataAccess\WPDA;
 	use WPDataProjects\WPDP;
 	use WPDataAccess\Plugin_Table_Models\WPDA_Table_Settings_Model;
+	use WPDataAccess\Plugin_Table_Models\WPDP_Project_Design_Table_Model;
 
 	/**
 	 * Class WPDA_List_Table
@@ -280,6 +282,27 @@ namespace WPDataAccess\List_Table {
 		protected $wpda_table_settings = null;
 
 		/**
+		 * Project table settings
+		 *
+		 * @var null|object
+		 */
+		protected $wpda_project_table_settings = null;
+
+		/**
+		 * Show help icon if hrlp url is available
+		 *
+		 * @var null|string
+		 */
+		protected $help_url = null;
+
+		/**
+		 * Store columns in array with column name as index for fast access
+		 *
+		 * @var array
+		 */
+		protected $columns_indexed = [];
+
+		/**
 		 * WPDA_List_Table constructor
 		 *
 		 * A table name must be provided in the constructor call. The table must be a valid MySQL database table to
@@ -429,8 +452,12 @@ namespace WPDataAccess\List_Table {
 			if ( ! ( isset( $args['allow_import'] ) && 'off' === $args['allow_import'] ) ) {
 				try {
 					// Instantiate WPDA_Import.
+					$url =
+						is_admin() ?
+							"?page={$this->page}&schema_name={$this->schema_name}&table_name={$this->table_name}" :
+							"?schema_name={$this->schema_name}&table_name={$this->table_name}";
 					$this->wpda_import = new WPDA_Import(
-						"?page={$this->page}&schema_name={$this->schema_name}&table_name={$this->table_name}",
+						$url,
 						$this->schema_name,
 						$this->table_name
 					);
@@ -499,6 +526,8 @@ namespace WPDataAccess\List_Table {
 			$this->search_value = $this->get_search_value();
 			if ( isset( $_REQUEST["{$this->search_item_name}_old_value"] ) ) {
 				$this->search_value_old = sanitize_text_field( wp_unslash( $_REQUEST["{$this->search_item_name}_old_value"] ) ); // input var okay.
+			} else {
+				$this->search_value_old = $this->search_value;
 			}
 
 			// Get page number(s).
@@ -512,6 +541,14 @@ namespace WPDataAccess\List_Table {
 			$this->page_number_link .= "&paged=" . $this->get_pagenum();
 			$this->page_number_item .= "<input type='hidden' name='" . $this->page_number_item_name . "' value='" . $this->get_pagenum() . "' />";
 
+			// Add search arguments to link to return to same page
+			foreach ( $_REQUEST as $key => $value) {
+				if ( substr( $key, 0, 19) === 'wpda_search_column_' ) {
+					$this->page_number_link .= "&{$key}={$value}";
+					$this->page_number_item .= "<input type='hidden' name='{$key}' value='{$value}' />";
+				}
+			}
+
 			// Check if a WHERE clause (filter) was defined
 			if ( isset( $args[ 'default_where' ] ) ) {
 				$this->where = $args[ 'default_where' ];
@@ -522,9 +559,47 @@ namespace WPDataAccess\List_Table {
 			if ( isset( $wpda_table_settings[0]['wpda_table_settings'] ) ) {
 				$this->wpda_table_settings = json_decode( $wpda_table_settings[0]['wpda_table_settings'] );
 			}
-			
+
+			// Get project table settings
+			global $wpda_project_mode;
+			if ( is_array( $wpda_project_mode ) ) {
+				$setname                        = $wpda_project_mode['setname'];
+				$wpda_project_table_settings    = null;
+				$wpda_project_table_settings_db = WPDP_Project_Design_Table_Model::static_query( $this->schema_name, $this->table_name, $setname );
+				if ( isset( $wpda_project_table_settings_db->tableinfo ) ) {
+					$this->wpda_project_table_settings = $wpda_project_table_settings_db->tableinfo;
+				}
+			}
+
 			if ( isset( $args['show_page_title'] ) && false === $args['show_page_title'] ) {
 				$this->show_page_title = $args['show_page_title'];
+			}
+
+			if ( isset( $args['help_url'] ) ) {
+				$this->help_url = $args['help_url'];
+			}
+
+			foreach( $this->wpda_list_columns->get_table_columns() as $table_columns ) {
+				$this->columns_indexed[ $table_columns['column_name'] ] = $table_columns;
+			}
+		}
+
+		/**
+		 * Overwrite method
+		 *
+		 * @return int|void
+		 */
+		public function get_pagenum() {
+			if ( isset( $_REQUEST['page_number'] ) ) {
+				$pagenum = isset( $_REQUEST['page_number'] ) ? absint( $_REQUEST['page_number'] ) : 0;
+
+				if ( isset( $this->_pagination_args['total_pages'] ) && $pagenum > $this->_pagination_args['total_pages'] ) {
+					$pagenum = $this->_pagination_args['total_pages'];
+				}
+
+				return max( 1, $pagenum );
+			} else {
+				return parent::get_pagenum();
 			}
 		}
 
@@ -672,7 +747,7 @@ namespace WPDataAccess\List_Table {
 				if ( 0 === $count ) {
 					// No actions without a primary key!
 					// This automatically covers view processing correctly.
-					return $this->render_column_content( $item[ $column_name ], $column_name );
+					return $this->render_column_content( $item, $column_name );
 				} else {
 					// Check rights.
 					if ( 'off' === $this->show_view_link && 'off' === $this->allow_update && 'off' === $this->allow_delete ) {
@@ -680,9 +755,9 @@ namespace WPDataAccess\List_Table {
 						$actions = [];
 						$this->column_default_add_action( $item, $column_name, $actions );
 						if ( is_array( $actions ) && count( $actions ) > 0 ) {
-							return sprintf( '%1$s %2$s', $this->render_column_content( $item[ $column_name ], $column_name ), $this->row_actions( $actions ) );
+							return sprintf( '%1$s %2$s', $this->render_column_content( $item, $column_name ), $this->row_actions( $actions ) );
 						} else {
-							return sprintf( '%1$s', $this->render_column_content( $item[ $column_name ], $column_name ) );
+							return sprintf( '%1$s', $this->render_column_content( $item, $column_name ) );
 						}
 					}
 
@@ -698,26 +773,28 @@ namespace WPDataAccess\List_Table {
 						$wp_nonce_keys .= "-{$item[$key]}";
 					}
 
-					// Prepare argument schema name.
-					if ( '' === $this->schema_name ) {
-						$schema_name = '';
+					// Prepare url
+					if ( is_admin() ) {
+						$url = "?page={$this->page}";
 					} else {
-						$schema_name = '&schema_name=' . esc_attr( $this->schema_name );
+						$url = '';
 					}
-
-					// Prepare argument page.
-					$page = esc_attr( $this->page );
-
-					// Prepare argument table name.
-					$table_name = esc_attr( $this->table_name );
+					global $wpdb;
+					if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+						$url .= $url === '' ? '?' : '&';
+						$url .= "schema_name={$this->schema_name}";
+					}
+					$url .= $url === '' ? '?' : '&';
+					$url .= "table_name={$this->table_name}";
+					$url = esc_attr( $url );
 
 					if ( 'on' === $this->show_view_link ) {
 						// Build the row action.
 						// Use jQuery to add form to container.
 						$view_form =
 							"<form" .
-							" id='view_form$form_id'" .
-							" action='?page=$page$schema_name&table_name=$table_name'" .
+							" id='view_form{$form_id}'" .
+							" action='{$url}'" .
 							" method='post'>" .
 							$this->get_key_input_fields( $item ) .
 							$this->add_parent_args_as_string( $item ) .
@@ -735,12 +812,18 @@ namespace WPDataAccess\List_Table {
 						// Add link to submit form.
 						$actions['view'] = sprintf(
 							'<a href="javascript:void(0)" 
-                                    class="edit"  
+                                    class="edit wpda_tooltip"
+                                    title="%s"
                                     onclick="jQuery(\'#%s\').submit()">
-                                    View
+                                    <span style="white-space: nowrap">
+										<span class="material-icons wpda_icon_on_button">visibility</span>
+										%s
+                                    </span>
                                 </a>
                                 ',
-							"view_form$form_id"
+							__( 'View row data', 'wp-data-access' ),
+							"view_form{$form_id}",
+							__( 'View', 'wp-data-access' )
 						);
 					}
 
@@ -749,8 +832,8 @@ namespace WPDataAccess\List_Table {
 						// Use jQuery to add form to container.
 						$edit_form =
 							"<form" .
-							" id='edit_form$form_id'" .
-							" action='?page=$page$schema_name&table_name=$table_name'" .
+							" id='edit_form{$form_id}'" .
+							" action='{$url}'" .
 							" method='post'>" .
 							$this->get_key_input_fields( $item ) .
 							$this->add_parent_args_as_string( $item ) .
@@ -768,12 +851,18 @@ namespace WPDataAccess\List_Table {
 						// Add link to submit form.
 						$actions['edit'] = sprintf(
 							'<a href="javascript:void(0)" 
-                                    class="edit"  
+                                    class="edit wpda_tooltip"
+                                    title="%s"  
                                     onclick="jQuery(\'#%s\').submit()">
-                                    Edit
+                                    <span style="white-space: nowrap">
+										<span class="material-icons wpda_icon_on_button">edit</span>
+										%s
+                                    </span>
                                 </a>
                                 ',
-							"edit_form$form_id"
+							__( 'Edit row data', 'wp-data-access' ),
+							"edit_form{$form_id}",
+							__( 'Edit', 'wp-data-access' )
 						);
 					}
 
@@ -784,8 +873,8 @@ namespace WPDataAccess\List_Table {
 						// Use jQuery to add form to container.
 						$delete_form =
 							"<form" .
-							" id='delete_form$form_id'" .
-							" action='?page=$page$schema_name&table_name=$table_name'" .
+							" id='delete_form{$form_id}'" .
+							" action='{$url}'" .
 							" method='post'>" .
 							$this->get_key_input_fields( $item ) .
 							$this->add_parent_args_as_string( $item ) .
@@ -805,39 +894,46 @@ namespace WPDataAccess\List_Table {
 						$warning           = __( "You are about to permanently delete these items from your site.\\nThis action cannot be undone.\\n\\'Cancel\\' to stop, \\'OK\\' to delete.", 'wp-data-access' );
 						$actions['delete'] = sprintf(
 							'<a href="javascript:void(0)" 
-                                    class="delete"  
+                                    class="delete wpda_tooltip"
+                                    title="%s"
                                     onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
-                                    Delete
+                                    <span style="white-space: nowrap">
+										<span class="material-icons wpda_icon_on_button">delete</span>
+										%s
+                                    </span>
                                 </a>
                                 ',
+							__( 'Delete row data (this cannot be undone)', 'wp-data-access' ),
 							$warning,
-							"delete_form$form_id"
+							"delete_form{$form_id}",
+							__( 'Delete', 'wp-data-access' )
 						);
 					}
 
 					// Developers can add actions by adding their own implementation of following method.
 					$this->column_default_add_action( $item, $column_name, $actions );
 
-					// Array $actions must have at least one element, otherwise we wouldn't be here. Skip IDE message!
-					return sprintf( '%1$s %2$s', $this->render_column_content( $item[ $column_name ], $column_name ), $this->row_actions( $actions ) );
+					if ( has_filter('wpda_column_default') ) {
+						// Use filter
+						$filter = apply_filters(
+							'wpda_column_default',
+							$item,
+							$column_name,
+							$this->table_name,
+							$this->schema_name,
+							$this->wpda_list_columns,
+							self::$list_number,
+							$this
+						);
+
+						if ( null !== $filter ) {
+							return sprintf( '%1$s %2$s', $filter, $this->row_actions( $actions ) );
+						}
+					}
+
+					return sprintf( '%1$s %2$s', $this->render_column_content( $item, $column_name ), $this->row_actions( $actions ) );
 				}
 			} else {
-				if ( has_filter('wpda_column_default') ) {
-					// Use filter
-					$filter = apply_filters(
-						'wpda_column_default',
-						$item,
-						$column_name,
-						$this->table_name,
-						$this->schema_name,
-						$this->wpda_list_columns,
-						self::$list_number
-					);
-					if ( null !== $filter ) {
-						return $filter;
-					}
-				}
-
 				if ( substr( $column_name, 0, 15 ) === 'wpda_hyperlink_') {
 					$hyperlink_no = substr( $column_name, 15 );
 					if ( isset( $this->wpda_table_settings->hyperlinks[$hyperlink_no] ) ) {
@@ -873,7 +969,7 @@ namespace WPDataAccess\List_Table {
 							if ( false !== $url ) {
 								$title     = get_the_title( esc_attr( $image_id ) );
 								$image_src .= '' !== $image_src ? '<br/>' : '';
-								$image_src .= sprintf( '<img src="%s" title="%s" width="100%%">', $url, $title );
+								$image_src .= sprintf( '<img src="%s" class="wpda_tooltip" title="%s" width="100%%">', $url, $title );
 							}
 						}
 
@@ -909,7 +1005,11 @@ namespace WPDataAccess\List_Table {
 								     isset( $hyperlink['url'] ) &&
 								     isset( $hyperlink['target'] )
 								) {
-									return "<a href='{$hyperlink['url']}' target='{$hyperlink['target']}'>{$hyperlink['label']}</a>";
+									if ( '' === $hyperlink['url'] ) {
+										return $hyperlink['label'];
+									} else {
+										return "<a href='{$hyperlink['url']}' target='{$hyperlink['target']}'>{$hyperlink['label']}</a>";
+									}
 								} else {
 									return '';
 								}
@@ -929,7 +1029,7 @@ namespace WPDataAccess\List_Table {
 									$title = get_the_title( esc_attr( $audio_id ) );
 									if ( false !== $url ) {
 										$audio_src .=
-											'<div title="' . $title . '">' .
+											'<div title="' . $title . '" class="wpda_tooltip">' .
 											do_shortcode( '[audio src="' . $url . '"]' ) .
 											'</div>';
 									}
@@ -958,9 +1058,41 @@ namespace WPDataAccess\List_Table {
 					}
 				}
 
-				?>
-				<?php
-				return $this->render_column_content( $item[ $column_name ], $column_name );
+				if ( has_filter('wpda_column_default') ) {
+					// Use filter
+					$filter = apply_filters(
+						'wpda_column_default',
+						$item,
+						$column_name,
+						$this->table_name,
+						$this->schema_name,
+						$this->wpda_list_columns,
+						self::$list_number,
+						$this
+					);
+
+					if ( null !== $filter ) {
+						return $filter;
+					}
+				}
+
+				if (
+					'csv' !== WPDA::get_option( WPDA::OPTION_PLUGIN_SET_FORMAT ) &&
+					isset( $this->columns_indexed[ $column_name ]['data_type'] ) &&
+					'set' === $this->columns_indexed[ $column_name ]['data_type']
+				) {
+					$list      = '<' . WPDA::get_option( WPDA::OPTION_PLUGIN_SET_FORMAT ) . '>';
+					$listarray = explode( ',', $item[ $column_name ] );
+
+					foreach ( $listarray as $listitem ) {
+						$list .= "<li>{$listitem}</li>";
+					}
+					$list .= '</' . WPDA::get_option( WPDA::OPTION_PLUGIN_SET_FORMAT ) . '>';
+
+					return $list;
+				}
+
+				return $this->render_column_content( $item, $column_name );
 			}
 
 		}
@@ -1002,7 +1134,12 @@ namespace WPDataAccess\List_Table {
 		 *
 		 * @return string Rendered column content
 		 */
-		protected function render_column_content( $column_content, $column_name ) {
+		protected function render_column_content( $item, $column_name ) {
+			$column_content =
+				isset( $item[ "lookup_value_{$column_name}" ] ) ?
+					$item[ "lookup_value_{$column_name}" ] :
+					$item[ $column_name ];
+
 			if ( 'off' === WPDA::get_option( WPDA::OPTION_BE_TEXT_WRAP_SWITCH ) &&
 			     WPDA::get_option( WPDA::OPTION_BE_TEXT_WRAP ) < strlen( $column_content )
 			) {
@@ -1010,8 +1147,7 @@ namespace WPDataAccess\List_Table {
 					__( 'Output limited to %1$s characters', 'wp-data-access' ),
 					WPDA::get_option( WPDA::OPTION_BE_TEXT_WRAP )
 				);
-				// return stripslashes( substr( $column_content, 0, WPDA::get_option( WPDA::OPTION_BE_TEXT_WRAP ) ) ) .
-				//	' <a href="javascript:void(0)" title="' . $title . '">&bull;&bull;&bull;</a>';
+
 				return substr( esc_html( str_replace( '&', '&amp;', $column_content ) ), 0, WPDA::get_option( WPDA::OPTION_BE_TEXT_WRAP ) ) .
 				       ' <a href="javascript:void(0)" title="' . $title . '">&bull;&bull;&bull;</a>';
 			} else {
@@ -1036,10 +1172,12 @@ namespace WPDataAccess\List_Table {
 						if ( '' === $column_content || null === $column_content ) {
 							$column_content = '';
 						} else {
-							$column_content = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $column_content ) );
+							$column_content =
+								date_i18n( get_option( 'date_format' ) . ' ' .
+								get_option( 'time_format' ), strtotime( $column_content ) );
 						}
 				}
-				// return stripslashes( $column_content );
+
 				return esc_html( str_replace( '&', '&amp;', $column_content ) );
 			}
 		}
@@ -1072,7 +1210,24 @@ namespace WPDataAccess\List_Table {
 		 * @param string $column_name Column name.
 		 * @param array  $actions Array of actions to be added to row.
 		 */
-		protected function column_default_add_action( $item, $column_name, &$actions ) { }
+		protected function column_default_add_action( $item, $column_name, &$actions ) {
+			if ( has_filter('wpda_column_default_add_action') ) {
+				$filter = apply_filters(
+					'wpda_column_default_add_action',
+					$item,
+					$column_name,
+					$this->table_name,
+					$this->schema_name,
+					$this->wpda_list_columns,
+					self::$list_number,
+					$actions,
+					$this
+				);
+				if ( null !== $filter ) {
+					$actions = $filter;
+				}
+			}
+		}
 
 		/**
 		 * Render bulk edit checkbox
@@ -1149,7 +1304,7 @@ namespace WPDataAccess\List_Table {
 								href="?page=<?php echo esc_attr( $this->page ); ?>"
 								style="display: inline-block; vertical-align: unset;"
 								class="dashicons dashicons-arrow-left-alt"
-								title="<?php echo \WP_Data_Access_Admin::PAGE_MAIN === $this->page ? __( 'Back to Data Explorer', 'wp-data-access' ) : __( 'Back to Favourites', 'wp-data-access' ); ?>"
+								title="<?php echo \WP_Data_Access_Admin::PAGE_MAIN === $this->page ? __( 'Data Explorer', 'wp-data-access' ) : __( 'Favourites', 'wp-data-access' ); ?>"
 						></a>
 
 						<?php
@@ -1170,7 +1325,7 @@ namespace WPDataAccess\List_Table {
 							$help_url = '';
 							break;
 						default:
-							$help_url = '';
+							$help_url = null === $this->help_url ? '' : $this->help_url;
 					}
 					?>
 
@@ -1185,7 +1340,9 @@ namespace WPDataAccess\List_Table {
 						) {
 							$this->subtitle = $this->title;
 							$this->title    = __( 'Data Explorer', 'wp-data-access' );
-							$help_url       = '';
+							if ( wpda_fremius()->is_premium() ) {
+								$this->title = __( 'Premium', 'wp-data-access' ) . ' ' . $this->title;
+							}
 						}
 						echo esc_attr( $this->title );
 						?>
@@ -1194,11 +1351,19 @@ namespace WPDataAccess\List_Table {
 					<?php
 					if ( '' !== $help_url ) {
 						?>
+						&nbsp;
 						<span>
-						<a href="<?php echo $help_url; ?>" target="_blank" title="Plugin Help - open a new tab or window">
-						<span class="dashicons dashicons-editor-help"
-						      style="text-decoration:none;vertical-align:top;font-size:30px;">
-						</span></a>&nbsp;
+							<a href="<?php echo $help_url; ?>" target="_blank"
+							   class="wpda_tooltip" title="Plugin Help - opens in a new tab or window">
+								<span class="material-icons" style="font-size: 26px; vertical-align: sub;">help</span></a>
+							<?php
+							if (
+									self::LIST_BASE_TABLE === $this->table_name &&
+									\WP_Data_Access_Admin::PAGE_MAIN === $this->page
+							) {
+								WPDA_Repository::whats_new();
+							}
+							?>
 						</span>
 						<?php
 					}
@@ -1211,7 +1376,6 @@ namespace WPDataAccess\List_Table {
 				?>
 
 				<div class="wpda_subtitle"><strong><?php echo wp_kses( $this->subtitle, [ 'span' => [ 'class' => [] ] ] ); ?></strong></div>
-				<iframe id="stealth_mode" style="display:none;"></iframe>
 				<div id="wpda_invisible_container" style="display:none;"></div>
 
 				<?php
@@ -1223,12 +1387,28 @@ namespace WPDataAccess\List_Table {
 
 				// Add custom code before the list table
 				do_action_ref_array( 'wpda_before_list_table', [$this] );
+
+				// Prepare url
+				if ( is_admin() ) {
+					$url = "?page={$this->page}";
+				} else {
+					$url = '';
+				}
+				global $wpdb;
+				if ( self::LIST_BASE_TABLE !== $this->table_name ) {
+					if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+						$url .= $url === '' ? '?' : '&';
+						$url .= "schema_name={$this->schema_name}";
+					}
+					$url .= $url === '' ? '?' : '&';
+					$url .= "table_name={$this->table_name}";
+				}
 				?>
 
 				<form
 						id="wpda_main_form"
 						method="post"
-						action="?page=<?php echo esc_attr( $this->page ); ?><?php echo self::LIST_BASE_TABLE === $this->table_name ? '' : ( '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ) ) . '&table_name=' . esc_attr( $this->table_name ); ?>"
+						action="<?php echo esc_attr( $url ); ?>"
 				>
 
 					<?php
@@ -1264,8 +1444,22 @@ namespace WPDataAccess\List_Table {
 					<?php wp_nonce_field( 'wpda-delete-*', '_wpnonce2', false ); ?>
 					<?php wp_nonce_field( 'wpda-drop-*', '_wpnonce3', false ); ?>
 					<?php wp_nonce_field( 'wpda-truncate-*', '_wpnonce4', false ); ?>
+					<?php
+					foreach ( $_REQUEST as $key => $value) {
+						if ( substr( $key, 0, 19) === 'wpda_search_column_' ) {
+							echo "<input type='hidden' name='$key' value='$value'/>";
+						}
+					}
+					?>
 				</form>
 			</div>
+			<script type='text/javascript'>
+				jQuery(document).ready(function() {
+					jQuery(document).ready(function(){
+						jQuery( '.wpda_tooltip' ).tooltip();
+					});
+				});
+			</script>
 			<?php $this->bind_action_buttons(); ?>
 
 			<?php
@@ -1305,7 +1499,6 @@ namespace WPDataAccess\List_Table {
 		 *
 		 */
 		protected function add_header_button( $add_param = '' ) {
-
 			if ( 'off' === $this->allow_insert ) {
 				if ( null !== $this->wpda_import ) {
 					$this->wpda_import->add_button();
@@ -1315,42 +1508,53 @@ namespace WPDataAccess\List_Table {
 				     ( 'on' === WPDA::get_option( WPDA::OPTION_BE_ALLOW_INSERT ) &&
 				       count( $this->wpda_list_columns->get_table_primary_key() ) ) > 0
 				) {
+					$storage_type =
+						WPDA::is_wpda_table( $this->table_name ) ?
+							__( 'respository', 'wp-data-access' ) : __( 'table', 'wp-data-access' );
 
+					// Prepare url
+					if ( is_admin() ) {
+						$url = "?page={$this->page}";
+					} else {
+						$url = '';
+					}
+					global $wpdb;
+					if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+						$url .= $url === '' ? '?' : '&';
+						$url .= "schema_name={$this->schema_name}";
+					}
+					$url .= $url === '' ? '?' : '&';
+					$url .= "table_name={$this->table_name}{$add_param}";
 					?>
-
 					<form
 							method="post"
-							action="?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $add_param ); ?>"
+							action="<?php echo esc_attr( $url ); ?>"
 							style="display: inline-block; vertical-align: baseline;"
 					>
 						<div>
 							<input type="hidden" name="action" value="new">
-							<input type="submit" value="<?php echo __( 'Add New', 'wp-data-access' ); ?>"
-								   class="page-title-action">
-
+							<button type="submit" class="page-title-action wpda_tooltip"
+									title="<?php echo sprintf( __( 'Add new %s to %s', 'wp-data-access' ), $this->_args['singular'], $storage_type ); ?>"
+							>
+								<span class="material-icons wpda_icon_on_button">add_circle</span>
+								<?php echo __( 'Add New', 'wp-data-access' ); ?>
+							</button>
 							<?php
-
 							// Add import button to title.
 							if ( null !== $this->wpda_import ) {
 								$this->wpda_import->add_button();
 							}
-
 							?>
-
 						</div>
 					</form>
-
 					<?php
-
 				} else {
-
 					// Add import button to title.
 					if ( null !== $this->wpda_import ) {
 						$this->wpda_import->add_button();
 					}
 				}
 			}
-
 		}
 
 		/**
@@ -1373,7 +1577,7 @@ namespace WPDataAccess\List_Table {
 			} else {
 				$this->items_per_page = WPDA::get_option( WPDA::OPTION_FE_PAGINATION );
 			}
-			// $this->items_per_page = $this->get_items_per_page( $option, $pagination );
+
 			$this->current_page   = $this->get_pagenum();
 			$total_items          = $this->record_count();
 			$total_pages          = ceil( $total_items / $this->items_per_page );
@@ -1438,7 +1642,7 @@ namespace WPDataAccess\List_Table {
 			return WPDA::construct_where_clause(
 				$this->schema_name,
 				$this->table_name,
-				$this->wpda_list_columns->get_table_columns(),
+				$this->wpda_list_columns->get_searchable_table_columns(),
 				$this->search_value
 			);
 		}
@@ -1724,14 +1928,26 @@ namespace WPDataAccess\List_Table {
 						}
 					}
 
-					// Export rows.
-					echo '
-						<script type=\'text/javascript\'>
-							jQuery(document).ready(function() {
-								jQuery("#stealth_mode").attr("src","' . $querystring . '");
+					// Provide a link to row export (export starts when clicked)
+					$msg = new WPDA_Message_Box(
+						[
+							'message_text' =>
+								"<a id='wpda_export_link' target='_blank' href='$querystring'>" .
+									__( 'Click here to download your export file', 'wp-data-access' ) .
+								'</a>',
+						]
+					);
+					$msg->box();
+					?>
+					<script type="text/javascript">
+						jQuery(document).ready(function() {
+							jQuery('#wpda_export_link').on('mouseup', function() {
+								// Hide link after click to prevent large exports being started more than ones
+								jQuery('#wpda_export_link').parent().parent().hide();
 							});
-						</script>
-					';
+						});
+					</script>
+					<?php
 			}
 
 		}
@@ -1815,7 +2031,33 @@ namespace WPDataAccess\List_Table {
 			if ( isset( $this->wpda_table_settings->hyperlinks ) ) {
 				$i = 0;
 				foreach ( $this->wpda_table_settings->hyperlinks as $hyperlink ) {
-					if ( isset( $hyperlink->hyperlink_list ) && true === $hyperlink->hyperlink_list ) {
+					$skip_column = false;
+
+					if ( null !== $this->wpda_project_table_settings ) {
+						$hyperlink_label = $hyperlink->hyperlink_label;
+
+						if ( ! property_exists( $this, 'is_child') ) {
+							if (
+								isset( $this->wpda_project_table_settings->hyperlinks_parent->$hyperlink_label ) &&
+								! $this->wpda_project_table_settings->hyperlinks_parent->$hyperlink_label
+							) {
+								$skip_column = true;
+							}
+						} else {
+							if (
+								isset( $this->wpda_project_table_settings->hyperlinks_child->$hyperlink_label ) &&
+								! $this->wpda_project_table_settings->hyperlinks_child->$hyperlink_label
+							) {
+								$skip_column = true;
+							}
+						}
+					}
+
+					if (
+						! $skip_column &&
+						isset( $hyperlink->hyperlink_list ) &&
+						true === $hyperlink->hyperlink_list
+					) {
 						$hyperlink_label = isset( $hyperlink->hyperlink_label ) ? $hyperlink->hyperlink_label : '';
 						$hyperlink_html  = isset( $hyperlink->hyperlink_html ) ? $hyperlink->hyperlink_html : '';
 						if ( $hyperlink_label !== '' && $hyperlink_html !== '' ) {
@@ -1928,8 +2170,32 @@ namespace WPDataAccess\List_Table {
 				$i = 0;
 				foreach ( $this->wpda_table_settings->hyperlinks as $hyperlink ) {
 					if ( isset( $hyperlink->hyperlink_list ) && true === $hyperlink->hyperlink_list ) {
-						$hyperlink_label                = isset( $hyperlink->hyperlink_label ) ? $hyperlink->hyperlink_label : '';
-						$columns["wpda_hyperlink_{$i}"] = $hyperlink_label; // Add hyperlink label
+						$skip_column = false;
+
+						if ( null !== $this->wpda_project_table_settings ) {
+							$hyperlink_label = $hyperlink->hyperlink_label;
+
+							if ( ! property_exists( $this, 'is_child') ) {
+								if (
+									isset( $this->wpda_project_table_settings->hyperlinks_parent->$hyperlink_label ) &&
+									! $this->wpda_project_table_settings->hyperlinks_parent->$hyperlink_label
+								) {
+									$skip_column = true;
+								}
+							} else {
+								if (
+									isset( $this->wpda_project_table_settings->hyperlinks_child->$hyperlink_label ) &&
+									! $this->wpda_project_table_settings->hyperlinks_child->$hyperlink_label
+								) {
+									$skip_column = true;
+								}
+							}
+						}
+
+						if ( ! $skip_column ) {
+							$hyperlink_label                = isset( $hyperlink->hyperlink_label ) ? $hyperlink->hyperlink_label : '';
+							$columns["wpda_hyperlink_{$i}"] = $hyperlink_label; // Add hyperlink label
+						}
 					}
 					$i++;
 				}
@@ -1983,7 +2249,13 @@ namespace WPDataAccess\List_Table {
 				<input type="search" id="<?php echo esc_attr( $input_id ); ?>"
 					   name="<?php echo esc_attr( $this->search_item_name ); ?>"
 					   value="<?php echo esc_attr( $this->search_value ); ?>"/>
-				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
+				<?php
+				if ( is_admin() ) {
+					submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) );
+				} else {
+					wpdadiehard_submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) );
+				}
+				?>
 				<input type="hidden" name="<?php echo esc_attr( $this->search_item_name ); ?>_old_value"
 					   value="<?php echo esc_attr( $this->search_value ); ?>"/>
 			</p>
@@ -2011,7 +2283,7 @@ namespace WPDataAccess\List_Table {
 			if ( isset( $_REQUEST[ $this->search_item_name ] ) && '' !== $_REQUEST[ $this->search_item_name ] ) { // input var okay.
 				return sanitize_text_field( wp_unslash( $_REQUEST[ $this->search_item_name ] ) ); // input var okay.
 			} elseif ( isset( $_COOKIE[ $cookie_name ] ) ) {
-				return $_COOKIE[ $cookie_name ];
+				return sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_name ] ) ); // input var okay.
 			} else {
 				return null;
 			}

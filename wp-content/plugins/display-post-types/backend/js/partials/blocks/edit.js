@@ -175,6 +175,7 @@ class DisplayPostTypes extends Component {
 			postType,
 			taxonomy,
 			terms,
+			relation,
 			postIds,
 			pages,
 			number,
@@ -194,6 +195,7 @@ class DisplayPostTypes extends Component {
 			eLength,
 			eTeaser,
 			offset,
+			autoTime,
 		} = attributes;
 		const onChangePostType = value => {
 			setAttributes({ terms: [] });
@@ -211,6 +213,10 @@ class DisplayPostTypes extends Component {
 				{ value: 'meta', label: __( 'Meta Info', 'display-post-types' ) },
 				{ value: 'category', label: __( 'Category', 'display-post-types' ) },
 				{ value: 'excerpt', label: __( 'Excerpt', 'display-post-types' ) },
+				{ value: 'date', label: __( 'Date', 'display-post-types' ) },
+				{ value: 'ago', label: __( 'Ago', 'display-post-types' ) },
+				{ value: 'author', label: __( 'Author', 'display-post-types' ) },
+				{ value: 'content', label: __( 'Content', 'display-post-types' ) },
 			];
 			const supported = this.styleSupport[style];
 			if ( 'undefined' === typeof supported ) return false;
@@ -328,6 +334,18 @@ class DisplayPostTypes extends Component {
 							/>
 						}
 						{
+							(!! termsList.length) &&
+							<SelectControl
+								label={ __( 'Terms Relationship', 'display-post-types' ) }
+								value={ relation }
+								onChange={ ( relation ) => setAttributes( { relation } ) }
+								options={ [
+									{ value: 'IN', label: __( 'Show posts belong to any of the terms checked above.', 'display-post-types' ) },
+									{ value: 'AND', label: __( 'Show posts belong to all of the terms checked above', 'display-post-types' ) },
+								] }
+							/>
+						}
+						{
 							(postType && 'page' !== postType ) &&
 							<RangeControl
 								label={ __( 'Number of items to display', 'display-post-types' ) }
@@ -393,7 +411,6 @@ class DisplayPostTypes extends Component {
 								value={ eLength }
 								onChange={ ( eLength ) => setAttributes( { eLength } ) }
 								min={ 0 }
-								max={ 100 }
 							/>
 						}
 						{
@@ -413,6 +430,16 @@ class DisplayPostTypes extends Component {
 								onChange={ ( colNarr ) => setAttributes( { colNarr } ) }
 								min={ 1 }
 								max={ 8 }
+							/>
+						}
+						{
+							(postType && styles && ifStyleSupport(styles, 'slider')) &&
+							<RangeControl
+								label={ __( 'Auto slide timer (delay in ms)', 'display-post-types' ) }
+								value={ autoTime }
+								onChange={ ( autoTime ) => setAttributes( { autoTime } ) }
+								min={ 0 }
+								step={ 500 }
 							/>
 						}
 						{

@@ -287,14 +287,14 @@ namespace WPDataAccess\Utilities {
 			if ( '' === $label ) {
 				$label = __( 'Import data/Execute script(s)', 'wp-data-access' );
 			}
-
 			?>
-
 			<a href="javascript:void(0)"
 			   onclick="jQuery('#upload_file_container_multi').show()"
-			   class="<?php echo esc_attr( $class ); ?>">
-				<?php echo esc_attr( $label ); ?></a>
-
+			   class="wpda_tooltip <?php echo esc_attr( $class ); ?>"
+			   title="<?php echo __( 'Allows to import data and execute SQL scripts', 'wp-data-access' ); ?>.
+<?php echo __( 'Add a ; and a new line to the end of every SQL statement to run multiple SQL statements', 'wp-data-access' ); ?>."
+			>
+				<span class="material-icons wpda_icon_on_button">code</span> <?php echo esc_attr( $label ); ?></a>
 			<?php
 		}
 
@@ -332,37 +332,49 @@ namespace WPDataAccess\Utilities {
 
 			<div id="upload_file_container_multi" style="display: none">
 				<div>&nbsp;</div>
-				<div class="wpda_upload">
+				<div>
 					<?php if ( $file_uploads_enabled ) { ?>
 						<p>
-							<strong><?php echo $this->info_title; ?></strong>
-							<a href="https://wpdataaccess.com/docs/documentation/data-explorer/exports-and-imports/" target="_blank" title="Plugin Help - open a new tab or window">
-								<span class="dashicons dashicons-editor-help "style="text-decoration:none;vertical-align:middle;font-size:18px;">
-							</span></a>
-						</p>
-						<p class="wpda_list_indent">
-							<?php
-							echo $this->info_text . ' ' . __( 'Maximum supported file size is', 'wp-data-access' ) . ' <strong>' . @ini_get( 'upload_max_filesize' ) . '</strong>.';
-							?>
 						</p>
 						<form id="form_import_multi_table" method="post"
 							  action="<?php echo esc_attr( $this->url ); ?>&impchk"
 							  enctype="multipart/form-data">
-							<input type="file" name="filename" id="filename"
-								   accept="<?php echo esc_attr( $file_extentions ); ?>">
-							<input type="submit"
-								   value="<?php echo __( 'Import file/Execute script(s)', 'wp-data-access' ); ?>"
-								   class="button button-secondary"
-								   onclick="return before_submit_upload()">
-							<a href="javascript:void(0)"
-							   onclick="jQuery('#upload_file_container_multi').hide()"
-							   class="button button-secondary"><?php echo __( 'Cancel', 'wp-data-access' ); ?></a>
-							<label style="vertical-align:baseline;">
-								<input type="checkbox" name="hide_errors" style="vertical-align:sub;" checked>
-								<?php echo __( 'Hide errors', 'wp-data-access' ); ?>
-							</label>
-							<input type="hidden" name="action" value="import">
-							<?php wp_nonce_field( "wpda-import-from-data-explorer", '_wpnonceimport', false ); ?>
+							<fieldset class="wpda_fieldset">
+								<legend>
+								<span>
+									<strong><?php echo $this->info_title; ?></strong>
+									<a href="https://wpdataaccess.com/docs/documentation/data-explorer/exports-and-imports/" target="_blank" class="wpda_tooltip" title="Plugin Help - open a new tab or window">
+										<span class="dashicons dashicons-editor-help "style="text-decoration:none;vertical-align:middle;font-size:18px;">
+									</span></a>
+								</span>
+								</legend>
+								<p class="wpda_list_indent">
+									<?php
+									echo $this->info_text . ' ' . __( 'Maximum supported file size is', 'wp-data-access' ) . ' <strong>' . @ini_get( 'upload_max_filesize' ) . '</strong>. ';
+									echo __( 'Add a ; and a new line to the end of every SQL statement to run multiple SQL statements', 'wp-data-access' ) . '.';
+									?>
+								</p>
+								<input type="file" name="filename" id="filename" class="wpda_tooltip"
+									   accept="<?php echo esc_attr( $file_extentions ); ?>">
+								<button type="submit"
+									   	class="button button-secondary"
+									   	onclick="return before_submit_upload()">
+									<span class="material-icons wpda_icon_on_button">code</span>
+									<?php echo __( 'Import file/Execute script(s)', 'wp-data-access' ); ?>
+								</button>
+								<a href="javascript:void(0)"
+								   onclick="jQuery('#upload_file_container_multi').hide()"
+								   class="button button-secondary">
+									<span class="material-icons wpda_icon_on_button">cancel</span>
+									<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+								</a>
+								<label style="vertical-align:baseline;">
+									<input type="checkbox" name="hide_errors" style="vertical-align:sub;" checked>
+									<?php echo __( 'Hide errors', 'wp-data-access' ); ?>
+								</label>
+								<input type="hidden" name="action" value="import">
+								<?php wp_nonce_field( "wpda-import-from-data-explorer", '_wpnonceimport', false ); ?>
+							</fieldset>
 						</form>
 					<?php } else { ?>
 						<p>

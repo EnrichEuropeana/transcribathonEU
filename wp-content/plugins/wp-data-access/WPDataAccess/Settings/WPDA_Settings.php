@@ -262,7 +262,7 @@ namespace WPDataAccess\Settings {
 			<div class="wrap">
 				<h1>
 					<?php echo __( 'WP Data Access Settings', 'wp-data-access' ); ?>
-					<a href="<?php echo 'https://wpdataaccess.com/docs/documentation/'; ?>" target="_blank" title="Plugin Help - open a new tab or window">
+					<a href="<?php echo 'https://wpdataaccess.com/docs/documentation/plugin-settings/'; ?>" target="_blank" class="wpda_tooltip" title="Plugin Help - open a new tab or window">
 					<span class="dashicons dashicons-editor-help"
 						  style="text-decoration:none;vertical-align:top;font-size:30px;">
 						</span></a>
@@ -541,6 +541,13 @@ namespace WPDataAccess\Settings {
 								sanitize_text_field( wp_unslash( $_REQUEST['time_placeholder'] ) ) // input var okay.
 							);
 						}
+
+						if ( isset( $_REQUEST['set_format'] ) ) {
+							WPDA::set_option(
+								WPDA::OPTION_PLUGIN_SET_FORMAT,
+								sanitize_text_field( wp_unslash( $_REQUEST['set_format'] ) ) // input var okay.
+							);
+						}
 					} elseif ( 'setdefaults' === $action ) {
 						// Set all back-end settings back to default.
 						WPDA::set_option( WPDA::OPTION_PLUGIN_HIDE_ADMIN_MENU );
@@ -560,6 +567,7 @@ namespace WPDataAccess\Settings {
 						WPDA::set_option( WPDA::OPTION_PLUGIN_DATE_PLACEHOLDER );
 						WPDA::set_option( WPDA::OPTION_PLUGIN_TIME_FORMAT );
 						WPDA::set_option( WPDA::OPTION_PLUGIN_TIME_PLACEHOLDER );
+						WPDA::set_option( WPDA::OPTION_PLUGIN_SET_FORMAT );
 					}
 				}
 
@@ -588,6 +596,8 @@ namespace WPDataAccess\Settings {
 			$date_placeholder = WPDA::get_option( WPDA::OPTION_PLUGIN_DATE_PLACEHOLDER );
 			$time_format      = WPDA::get_option( WPDA::OPTION_PLUGIN_TIME_FORMAT );
 			$time_placeholder = WPDA::get_option( WPDA::OPTION_PLUGIN_TIME_PLACEHOLDER );
+
+			$set_format       = WPDA::get_option( WPDA::OPTION_PLUGIN_SET_FORMAT );
 
 			$remote_databases = WPDADB::get_remote_databases( true );
 			?>
@@ -905,10 +915,11 @@ namespace WPDataAccess\Settings {
 								<a href="javascript:void(0)"
 								   onclick="delete_remote_database('<?php echo $i; ?>')"
 								   style="text-decoration:none;"
+								   class="wpda_tooltip"
 								   title="<?php echo __( 'Delete remote database connection from plugin repository', 'wp-data-acces' ); ?>">
 									<span class="dashicons dashicons-trash" style="font-size:18px;"></span>
 								</a>
-								<label title="<?php echo __( 'Disable remote database connection', 'wp-data-acces' ); ?>">
+								<label class="wpda_tooltip" title="<?php echo __( 'Disable remote database connection', 'wp-data-acces' ); ?>">
 									<input type="checkbox" name="remote_database[]" id="remote_database<?php echo $i; ?>" onclick="update_rdb_setting('<?php echo $i; ?>')" <?php echo $checked; ?>>
 									<input type="hidden" name="remote_database_name[]" id="remote_database_name<?php echo $i; ?>" value="<?php echo esc_attr( $remote_database ); ?>">
 									<input type="hidden" name="remote_database_enabled[]" id="remote_database_enabled<?php echo $i; ?>" value="<?php echo $enabled; ?>">
@@ -917,6 +928,7 @@ namespace WPDataAccess\Settings {
 								<a href="javascript:void(0)"
 								   onclick="edit_rdb_setting('<?php echo esc_attr( $remote_database ); ?>')"
 								   style="text-decoration:none;"
+								   class="wpda_tooltip"
 								   title="<?php echo __( 'Edit remote database connection', 'wp-data-acces' ); ?>">
 									<span class="dashicons dashicons-edit" style="font-size:18px;"></span>
 								</a><br/>
@@ -957,7 +969,7 @@ namespace WPDataAccess\Settings {
 					<tr>
 						<th><?php echo __( 'Date format' ); ?></th>
 						<td>
-							<span class="settings_label"><?php echo __( 'Ouput', 'wp-data-access' ); ?></span>
+							<span class="settings_label"><?php echo __( 'Output', 'wp-data-access' ); ?></span>
 							<input type="text" value="<?php echo get_option( 'date_format' ); ?>" class="item_width"
 								   readonly/>
 							<?php echo __( '(WordPress format)', 'wp-data-access' ); ?>
@@ -1062,6 +1074,17 @@ namespace WPDataAccess\Settings {
 						<td>
 							<input type="button" id="init_datetime" value="Test DataTimePicker" class="button item_width"/>
 							<input type="text" class="item_width" id="test_datetime" style="display:none;" />
+						</td>
+					</tr>
+					<tr>
+						<th><?php echo __( 'Set format' ); ?></th>
+						<td>
+							<span><?php echo __( 'Show columns of data type set in list table as' ); ?></span>
+							<select name="set_format">
+								<option value="csv" <?php echo 'csv'===$set_format ? 'selected' : ''; ?>>Comma seperated values</option>
+								<option value="ul" <?php echo 'ul'===$set_format ? 'selected' : ''; ?>>Unordered list</option>
+								<option value="ol" <?php echo 'ol'===$set_format ? 'selected' : ''; ?>>Ordered list</option>
+							</select>
 						</td>
 					</tr>
 					<tr>
@@ -1194,10 +1217,10 @@ namespace WPDataAccess\Settings {
 						}
 					});
 					text_to_clipboard.on('success', function (e) {
-						alert('<?php echo __( 'System info successfully copied to clipboard!' ); ?>');
+						jQuery.notify('<?php echo __( 'System info successfully copied to clipboard!' ); ?>','info');
 					});
 					text_to_clipboard.on('error', function (e) {
-						console.log('<?php echo __( 'Could not copy system info to clipboard!' ); ?>');
+						jQuery.notify('<?php echo __( 'Could not copy system info to clipboard!' ); ?>','error');
 					});
 				});
 			</script>
@@ -1214,6 +1237,7 @@ namespace WPDataAccess\Settings {
 								<td style="float:right">
 									<a id="button-copy-to-clipboard" href="javascript:void(0)"
 									   class="button button-primary">
+										<span class="material-icons wpda_icon_on_button">content_copy</span>
 										<?php echo __( 'Copy to clipboard' ); ?>
 									</a>
 								</td>
@@ -2462,7 +2486,6 @@ namespace WPDataAccess\Settings {
 
 			?>
 
-			<iframe id="stealth_mode" style="display:none"></iframe>
 			<form id="wpda_settings_uninstall" method="post"
 				  action="?page=<?php echo esc_attr( $this->page ); ?>&tab=uninstall">
 				<table class="wpda-table-settings">
@@ -2894,7 +2917,6 @@ namespace WPDataAccess\Settings {
 
 			?>
 
-			<iframe id="stealth_mode" style="display:none"></iframe>
 			<form id="wpda_settings_repository" method="post"
 				  action="?page=<?php echo esc_attr( $this->page ); ?>&tab=repository">
 				<table class="wpda-table-settings">

@@ -6,7 +6,7 @@
  * Plugin Name: MetaSlider
  * Plugin URI:  https://www.metaslider.com
  * Description: Easy to use slideshow plugin. Create SEO optimised responsive slideshows with Nivo Slider, Flex Slider, Coin Slider and Responsive Slides.
- * Version:     3.16.4
+ * Version:     3.17.1
  * Author:      Team Updraft
  * Author URI:  https://www.metaslider.com
  * License:     GPL-2.0+
@@ -32,7 +32,7 @@ class MetaSliderPlugin {
      *
      * @var string
      */
-    public $version = '3.16.4';
+    public $version = '3.17.1';
 
 	/**
      * Pro installed version number
@@ -92,7 +92,6 @@ class MetaSliderPlugin {
 		// Load in slideshow related classes
 		require_once(METASLIDER_PATH . 'admin/slideshows/bootstrap.php');
 		$this->themes = MetaSlider_Themes::get_instance();
-		$this->slideshows = MetaSlider_Slideshows::get_instance();
 		
 		// Default to WP (4.4) REST API but backup with admin ajax
 		require_once(METASLIDER_PATH . 'admin/routes/api.php');
@@ -119,14 +118,9 @@ class MetaSliderPlugin {
 			define('METASLIDER_ASSETS_URL', METASLIDER_BASE_URL . 'assets/');
 			define('METASLIDER_ADMIN_URL', METASLIDER_BASE_URL . 'admin/');
 			define('METASLIDER_ADMIN_ASSETS_URL', METASLIDER_ADMIN_URL . 'assets/');
-			
-			// Use the themes in the plugin dir if it's there (useful for developing)
-			$has_themes_repo = file_exists(trailingslashit(WP_PLUGIN_DIR) . 'ml-slider-themes/manifest.php');
-			$themes_path = $has_themes_repo ? trailingslashit(WP_PLUGIN_DIR) . 'ml-slider-themes/' : METASLIDER_PATH . 'themes/';
-			$themes_url = $has_themes_repo ? trailingslashit(plugins_url('ml-slider-themes/')) : METASLIDER_BASE_URL . 'themes/';
 
-			define('METASLIDER_THEMES_PATH', $themes_path);
-			define('METASLIDER_THEMES_URL', $themes_url);
+			define('METASLIDER_THEMES_PATH', METASLIDER_PATH . 'themes/');
+			define('METASLIDER_THEMES_URL', METASLIDER_BASE_URL . 'themes/');
 		}
 	}
 
@@ -149,6 +143,7 @@ class MetaSliderPlugin {
             'metaslider_notices'     => METASLIDER_PATH . 'admin/Notices.php',
             'metaslider_admin_pages' => METASLIDER_PATH . 'admin/Pages.php',
 			'metaslider_slideshows'  => METASLIDER_PATH . 'admin/Slideshows/Slideshows.php',
+			'metaslider_settings'    => METASLIDER_PATH . 'admin/Slideshows/Settings.php',
 			'metaslider_slide'  	 => METASLIDER_PATH . 'admin/Slideshows/slides/Slide.php',
 			'metaslider_themes'  	 => METASLIDER_PATH . 'admin/Slideshows/Themes.php',
 			'metaslider_image'  	 => METASLIDER_PATH . 'admin/Slideshows/Image.php',
@@ -356,11 +351,10 @@ class MetaSliderPlugin {
     * Add the menu pages
     */
     public function register_admin_pages() {
-        if (metaslider_pro_is_active()) {
-            $this->admin->add_page('MetaSlider Pro', 'metaslider');
-        } else {
-            $this->admin->add_page('MetaSlider');
-        }
+        $title = metaslider_pro_is_active() ? 'MetaSlider Pro' : 'MetaSlider';
+		
+		$this->admin->add_page($title, 'metaslider');
+		$this->admin->add_page(__('Settings', 'default'), 'metaslider-settings', 'metaslider');
 
         if (metaslider_user_sees_upgrade_page()) {
             $this->admin->add_page(__('Add-ons', 'ml-slider'), 'upgrade-metaslider', 'metaslider');
@@ -764,63 +758,13 @@ class MetaSliderPlugin {
      * Create a new slider
      */
     public function create_slider() {
+        check_admin_referer('metaslider_create_slider');
+        $capability = apply_filters('metaslider_capability', 'edit_others_posts');
+        if (!current_user_can($capability)) return;
 
-        // check nonce
-        check_admin_referer( "metaslider_create_slider" );
+		$id = MetaSlider_Slideshows::create();
 
-        $capability = apply_filters( 'metaslider_capability', 'edit_others_posts' );
-
-        if ( ! current_user_can( $capability ) ) {
-            return;
-        }
-
-        $defaults = array();
-
-        // if possible, take a copy of the last edited slider settings in place of default settings
-        if ( $last_modified = $this->find_slider( 'modified', 'DESC' ) ) {
-            $defaults = get_post_meta( $last_modified, 'ml-slider_settings', true );
-        }
-
-        // insert the post
-        $id = wp_insert_post( array(
-                'post_title' => __("New Slideshow", "ml-slider"),
-                'post_status' => 'publish',
-                'post_type' => 'ml-slider'
-            )
-        );
-
-        // use the default settings if we can't find anything more suitable.
-        if ( empty( $defaults ) ) {
-            $slider = new MetaSlider( $id, array() );
-            $defaults = $slider->get_default_parameters();
-		}
-		
-		// Get the latest slideshow used
-		$theme = get_post_meta($last_modified, 'metaslider_slideshow_theme', true);
-
-		// Lets users set their own default theme
-		if (apply_filters('metaslider_default_theme', '')) {
-			$theme = $this->themes->get_theme_object(null, apply_filters('metaslider_default_theme', ''));
-		}
-
-		// @codingStandardsIgnoreStart
-		// If nothing found (a first time user) use a random theme (I think this might be confusing to new users)
-		// if (!$last_modified && !isset($theme['folder'])) {
-		// 	$theme = $this->themes->get_theme_object(null, $this->themes->random());
-		// }
-		// @codingStandardsIgnoreEnd
-
-		// Set the theme if we found something
-		if (isset($theme['folder'])) update_post_meta($id, 'metaslider_slideshow_theme', $theme);
-
-        // insert the post meta
-        add_post_meta( $id, 'ml-slider_settings', $defaults, true );
-
-        // create the taxonomy term, the term is the ID of the slider itself
-        wp_insert_term( $id, 'ml-slider' );
-
-        wp_redirect( admin_url( "admin.php?page=metaslider&id={$id}" ) );
-
+        wp_redirect(admin_url("admin.php?page=metaslider&id={$id}"));
     }
 
 
@@ -1122,7 +1066,7 @@ class MetaSliderPlugin {
 		$theme_id = isset($theme['folder']) ? $theme['folder'] : false;
 		
 		?>
-        <div id="metaslider-ui" class="metaslider metaslider-ui min-h-screen p-0 pb-24 bg-gray-lightest">
+        <div id="metaslider-ui" class="metaslider metaslider-ui block min-h-screen p-0 pb-24 bg-gray-lightest">
 		<?php 
 			$slider_settings = get_post_meta($slider_id, 'ml-slider_settings', true);
 			$tour_position = get_option('metaslider_tour_cancelled_on');

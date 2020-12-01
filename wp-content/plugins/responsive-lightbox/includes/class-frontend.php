@@ -1482,6 +1482,9 @@ class Responsive_Lightbox_Frontend {
 		// get main instance
 		$rl = Responsive_Lightbox();
 
+		if ( ! is_array( $shortcode_atts ) )
+			$shortcode_atts = wp_parse_args( $shortcode_atts, $defaults );
+
 		// is there rl_gallery ID?
 		$rl_gallery_id = $defaults['rl_gallery_id'] = ! empty( $shortcode_atts['rl_gallery_id'] ) ? (int) $shortcode_atts['rl_gallery_id'] : 0;
 
@@ -1694,6 +1697,9 @@ class Responsive_Lightbox_Frontend {
 		// get main instance
 		$rl = Responsive_Lightbox();
 
+		if ( ! is_array( $shortcode_atts ) )
+			$shortcode_atts = wp_parse_args( $shortcode_atts, $defaults );
+
 		// is there rl_gallery ID?
 		$rl_gallery_id = $defaults['rl_gallery_id'] = ! empty( $shortcode_atts['rl_gallery_id'] ) ? (int) $shortcode_atts['rl_gallery_id'] : 0;
 
@@ -1881,6 +1887,9 @@ class Responsive_Lightbox_Frontend {
 
 		// get main instance
 		$rl = Responsive_Lightbox();
+
+		if ( ! is_array( $shortcode_atts ) )
+			$shortcode_atts = wp_parse_args( $shortcode_atts, $defaults );
 
 		// is there rl_gallery ID?
 		$rl_gallery_id = $defaults['rl_gallery_id'] = ! empty( $shortcode_atts['rl_gallery_id'] ) ? (int) $shortcode_atts['rl_gallery_id'] : 0;

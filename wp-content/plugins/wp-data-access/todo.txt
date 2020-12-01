@@ -4,12 +4,28 @@
 + Recreate repository not working as expected on WordPress multisite
 + Cannot not use Screen Options for child tables when having more than one child tabs
 + Data Project pages not editable when a remote host is down (solution: use ajax to fill listboxes; does this apply to other plugin pages as well?)
-+ API doc missing package WPDA_Roles
++ Disable caching for all javascript ajax calls
++ When you perform a reconcile, your lookup database/table combinations are messed up (Amy)
 
 *** WORK IN PROGRESS ***
 
++ Add premium videos
++ SSL test, see: https://blog.amezmo.com/how-to-enable-ssl-in-wordpress-without-plugins/
++ Built layer around wpdb class to limit dcl, ddl and some dml access to admin users only
++ Load attachment in TEXT column to allow full-text indexing
++ Add remove remote database connection to documentation
++ Add Export to PDF to publication (support forum Danielle)
++ Add setting: allow only add existing + delete relationship on child tables for n:m relationship (Mieke)
++ Make parent readonly and child editable (forum support - larryhines)
++ Is it possible to add data to the relationship table in a n:m relationship (Michiel)
++ Use parent column value in child default where (forum support - bb-4)
++ Edit set with checkboxes instead of multi line listbox (Michiel)
++ Overwrite media in WordPress media library (Michiel)
+
++ Showing child rows in edit mode (single child with back-next buttons) (vincent)
++ Add forward/backward buttons to data entry forms related to selection in Data Explorer (form post #12275882 - dizwell)
+
 + Create unique element IDs for parent and child tables having the same column name
-+ Language pack updaten
 + Capitalize text input (Wolter)
 + Change recreate repository button/action to repair repository
 + Add default order by to Data Projects page (parent) (forum support #12394953 - mitfi)
@@ -34,7 +50,6 @@
 *** NEXT & FEATURE REQUESTS ***
 
 + Search on date column (from-to) (forum: georg2791 - #12490607)
-+ Add forward/backward buttons to data entry forms related to selection in Data Explorer (form post #12275882 - dizwell)
 + Display multiple lookup columns
 + Implement foreign keys in Data Designer
 + Implement compare in Data Designer

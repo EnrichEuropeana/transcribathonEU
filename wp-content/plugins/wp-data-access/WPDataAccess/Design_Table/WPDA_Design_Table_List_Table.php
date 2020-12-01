@@ -48,8 +48,10 @@ namespace WPDataAccess\Design_Table {
 			>
 				<div>
 					<input type="hidden" name="action" value="edit">
-					<input type="submit" value="<?php echo __( 'Design new table', 'wp-data-access' ); ?>"
-						   class="page-title-action">
+					<button type="submit" class="page-title-action">
+						<span class="material-icons wpda_icon_on_button">add_circle</span>
+						<?php echo __( 'Design new table', 'wp-data-access' ); ?>
+					</button>
 					<?php
 					// Add import button to title.
 					if ( null !== $this->wpda_import ) {

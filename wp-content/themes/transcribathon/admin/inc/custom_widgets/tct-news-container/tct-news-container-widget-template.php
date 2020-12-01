@@ -49,7 +49,7 @@ $content .= "<script>
                             $content .= "<p class='theme-color news-subline'>".get_post_meta($newsPost->ID, "tct_news_subheadline")[0]."</p>";
                             $content .= "<p id='news-article-1-text' class='news-description'>".get_post_meta($newsPost->ID, "tct_news_excerpt")[0]."</p>";
                         $content .= "</div>";
-                        $content .= "<a target=”_blank” href='https://europeana.transcribathon.eu/?post_type=news'>more</a>";
+                        $content .= "<a target=”_blank” href='".$newsPost->guid."'>more</a>";
                     $content .= "</div>";
                 }
                 /*$content .= "<div class='news-article'>";

@@ -36,7 +36,7 @@ class Responsive_Lightbox_Galleries {
 		add_action( 'admin_init', array( $this, 'init_admin' ) );
 		add_action( 'edit_form_after_title', array( $this, 'after_title_nav_menu' ) );
 		add_action( 'admin_footer', array( $this, 'modal_gallery_template' ) );
-		add_action( 'media_buttons', array( $this, 'add_gallery_button') );
+		add_action( 'media_buttons', array( $this, 'add_gallery_button' ) );
 		add_action( 'add_meta_boxes_rl_gallery', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post_rl_gallery', array( $this, 'save_post' ), 10, 3 );
 		add_action( 'manage_rl_gallery_posts_custom_column', array( $this, 'gallery_columns_content' ), 10, 2 );
@@ -95,9 +95,6 @@ class Responsive_Lightbox_Galleries {
 	 * @return void
 	 */
 	public function init() {
-		if ( ! is_admin() )
-			add_filter( 'get_post_metadata', array( $this, 'filter_preview_metadata' ), 10, 4 );
-
 		// register shortcode
 		add_shortcode( 'rl_gallery', array( $this, 'gallery_shortcode' ) );
 
@@ -107,6 +104,7 @@ class Responsive_Lightbox_Galleries {
 		$config_menu_items = apply_filters( 'rl_gallery_types', $rl->gallery_types );
 		$config_menu_items['default'] = __( 'Global', 'responsive-lightbox' );
 
+		// set tabs
 		$this->tabs = apply_filters(
 			'rl_gallery_tabs',
 			array(
@@ -143,12 +141,10 @@ class Responsive_Lightbox_Galleries {
 		);
 
 		// add folders if active
-		// if ( $rl->options['folders']['active'] )
-			$this->tabs['images']['menu_items']['folders'] = __( 'Media Folders', 'responsive-lightbox' );
+		$this->tabs['images']['menu_items']['folders'] = __( 'Media Folders', 'responsive-lightbox' );
 
 		// add remote library if active
-		// if ( $rl->options['remote_library']['active'] )
-			$this->tabs['images']['menu_items']['remote_library'] = __( 'Remote Library', 'responsive-lightbox' );
+		$this->tabs['images']['menu_items']['remote_library'] = __( 'Remote Library', 'responsive-lightbox' );
 
 		// use sizes as keys and values
 		$this->sizes = $this->get_image_sizes();
@@ -169,6 +165,7 @@ class Responsive_Lightbox_Galleries {
 		// merge titles
 		$merged_titles = array( 'global' => __( 'Global', 'responsive-lightbox' ) ) + $rl->settings->image_titles;
 
+		// set fields
 		$this->fields = apply_filters(
 			'rl_gallery_tab_fields',
 			array(
@@ -803,6 +800,10 @@ class Responsive_Lightbox_Galleries {
 	 * @return string Generated gallery shortcode
 	 */
 	public function gallery_shortcode( $args ) {
+		// enable only for frontend previews
+		if ( ! is_admin() && is_preview() )
+			add_filter( 'get_post_metadata', array( $this, 'filter_preview_metadata' ), 10, 4 );
+
 		// prepare defaults
 		$defaults = array(
 			'id' => 0
@@ -817,13 +818,13 @@ class Responsive_Lightbox_Galleries {
 		// is it gallery?
 		if ( get_post_type( $args['id'] ) !== 'rl_gallery' )
 			return '';
-		
+
 		// get images
 		$images = $this->get_gallery_images( $args['id'], array( 'exclude' => true ) );
 
 		if ( ! $images )
 			return '';
-		
+
 		$attachments = array();
 
 		// build config
@@ -831,7 +832,7 @@ class Responsive_Lightbox_Galleries {
 			if ( ! empty( $image['id'] ) )
 				$attachments[] = $image['id'];
 		}
-		
+
 		// get config data
 		$config = get_post_meta( $args['id'], '_rl_config', true );
 
@@ -944,6 +945,15 @@ class Responsive_Lightbox_Galleries {
 	 * @return void
 	 */
 	public function enqueue_gallery_scripts_styles() {
+		// count how many times function was executed
+		static $run = 0;
+
+		// allow this only once
+		if ( $run > 0 )
+			return;
+
+		$run++; 
+
 		// assign main instance
 		$rl = Responsive_Lightbox();
 
@@ -2123,6 +2133,9 @@ class Responsive_Lightbox_Galleries {
 					// get attachment ids
 					$attachments = ! empty( $data[$menu_item]['attachments']['ids'] ) ? array_map( 'absint', $data[$menu_item]['attachments']['ids'] ) : array();
 
+					// filter attachments
+					$attachments = apply_filters( 'rl_get_gallery_images_attachments', $attachments );
+
 					if ( $attachments ) {
 						if ( $args['exclude'] )
 							$excluded = ! empty( $data[$menu_item]['attachments']['exclude'] ) ? $data[$menu_item]['attachments']['exclude'] : array();
@@ -2140,6 +2153,12 @@ class Responsive_Lightbox_Galleries {
 					break;
 
 				case 'featured':
+					// only for featured frontend galleries
+					if ( ! is_admin() ) {
+						// prepare featured fields
+						$this->fields['images']['featured'] = $this->prepare_featured_fields( $this->fields['images']['featured'] );
+					}
+
 					// copy arguments
 					$query_args = $args;
 
@@ -2160,6 +2179,9 @@ class Responsive_Lightbox_Galleries {
 
 					// get attachment ids
 					$attachments = $this->gallery_query( array_merge( $data[$menu_item], $query_args ) );
+
+					// filter attachments
+					$attachments = apply_filters( 'rl_get_gallery_images_attachments', $attachments );
 
 					if ( $attachments ) {
 						if ( $args['exclude'] )
@@ -2229,20 +2251,22 @@ class Responsive_Lightbox_Galleries {
 								);
 
 								$tax_query = array(
-									'relation' => 'OR',
 									array(
-										'taxonomy'			=> $args['taxonomy'],
-										'field'				=> 'term_id',
-										'terms'				=> ( ! is_wp_error( $all_folders ) ) ? $all_folders : $folder_id,
-										'include_children'	=> $include_children,
-										'operator'			=> 'IN'
-									),
-									array(
-										'taxonomy'			=> $args['taxonomy'],
-										'field'				=> 'term_id',
-										'terms'				=> $folder_id,
-										'include_children'	=> $include_children,
-										'operator'			=> 'NOT EXISTS'
+										'relation' => 'OR',
+										array(
+											'taxonomy'			=> $args['taxonomy'],
+											'field'				=> 'term_id',
+											'terms'				=> ( ! is_wp_error( $all_folders ) ) ? $all_folders : $folder_id,
+											'include_children'	=> $include_children,
+											'operator'			=> 'IN'
+										),
+										array(
+											'taxonomy'			=> $args['taxonomy'],
+											'field'				=> 'term_id',
+											'terms'				=> $folder_id,
+											'include_children'	=> $include_children,
+											'operator'			=> 'NOT EXISTS'
+										)
 									)
 								);
 							} else {
@@ -2287,7 +2311,7 @@ class Responsive_Lightbox_Galleries {
 						}
 
 						// run query
-						$query = new WP_Query( $wp_query_args );
+						$query = new WP_Query( apply_filters( 'rl_folders_query_args', $wp_query_args ) );
 
 						// get attachment IDs
 						$attachments = $query->get_posts();
@@ -2299,6 +2323,9 @@ class Responsive_Lightbox_Galleries {
 
 							// make sure to skip duplicates
 							$attachments = array_unique( $attachments );
+
+							// filter attachments
+							$attachments = apply_filters( 'rl_get_gallery_images_attachments', $attachments );
 
 							if ( $args['exclude'] )
 								$excluded = ! empty( $data[$menu_item]['attachments']['exclude'] ) ? $data[$menu_item]['attachments']['exclude'] : array();
@@ -2958,15 +2985,18 @@ class Responsive_Lightbox_Galleries {
 		$featured_image = get_post_meta( $gallery_id, '_rl_featured_image', true );
 
 		switch ( $featured_image_type ) {
+			// custom url
 			case 'url':
 				$image = esc_url( $featured_image );
 				break;
 
+			// attachment id
 			case 'id':
 				$featured_image = (int) $featured_image;
 				$image = wp_attachment_is_image( $featured_image ) ? $featured_image : $this->maybe_generate_thumbnail();
 				break;
 
+			// first image
 			case 'image':
 			default:
 				// get gallery images
@@ -3043,7 +3073,7 @@ class Responsive_Lightbox_Galleries {
 					$args['post_type'][] = $post_type;
 			}
 		} else
-			$args['post_type'] = 'any';
+			$args['post_type'] = $this->get_post_types( true );
 
 		// post status
 		if ( ! empty( $args['post_status'] ) ) {
@@ -3142,8 +3172,17 @@ class Responsive_Lightbox_Galleries {
 
 		// post term
 		if ( ! empty( $args['post_term'] ) ) {
+			$terms = array();
+
+			// get all terms
+			if ( ! empty( $fields['post_term']['options'] ) ) {
+				foreach ( $fields['post_term']['options'] as $tax => $data ) {
+					$terms = array_merge( $terms, array_map( 'intval', array_keys( $data['terms'] ) ) );
+				}
+			}
+
 			foreach ( $args['post_term'] as $post_term ) {
-				if ( array_key_exists( $post_term, $fields['post_term']['options'] ) ) {
+				if ( in_array( $post_term, $terms ) ) {
 					$term = get_term( $post_term );
 
 					$tax_queries['post_term'][] = array(
@@ -3287,11 +3326,8 @@ class Responsive_Lightbox_Galleries {
 		global $pagenow;
 
 		// prepare query arguments if needed
-		if ( ( $pagenow === 'post.php' && ( ( isset( $_GET['post'] ) && get_post_type( $_GET['post'] ) === 'rl_gallery' ) || ( isset( $_POST['post_ID'] ) && get_post_type( $_POST['post_ID'] ) === 'rl_gallery' ) ) ) || ( in_array( $pagenow, array( 'edit.php', 'post-new.php'), true ) && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'rl_gallery' ) || ( $pagenow === 'admin-ajax.php' && isset( $_POST['action'] ) && in_array( $_POST['action'], array( 'rl-get-preview-content', 'rl-post-gallery-preview', 'rl-get-menu-content' ), true ) ) ) {
-			foreach ( array( 'post_type', 'post_status', 'post_format', 'post_term', 'post_author', 'page_parent', 'page_template' ) as $option ) {
-				$this->fields['images']['featured'][$option]['options'] = $this->prepare_query_args( $option );
-			}
-		}
+		if ( ( $pagenow === 'post.php' && ( ( isset( $_GET['post'] ) && get_post_type( $_GET['post'] ) === 'rl_gallery' ) || ( isset( $_POST['post_ID'] ) && get_post_type( $_POST['post_ID'] ) === 'rl_gallery' ) ) ) || ( in_array( $pagenow, array( 'edit.php', 'post-new.php'), true ) && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'rl_gallery' ) || ( $pagenow === 'admin-ajax.php' && isset( $_POST['action'] ) && in_array( $_POST['action'], array( 'rl-get-preview-content', 'rl-post-gallery-preview', 'rl-get-menu-content' ), true ) ) )
+			$this->fields['images']['featured'] = $this->prepare_featured_fields( $this->fields['images']['featured'] );
 
 		// add default thumbnail image if needed
 		if ( Responsive_Lightbox()->options['builder']['gallery_builder'] && $pagenow === 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'rl_gallery' ) 
@@ -3304,7 +3340,7 @@ class Responsive_Lightbox_Galleries {
 	 * @return int Thumbnail ID
 	 */
 	public function maybe_generate_thumbnail() {
-		// get attachment
+		// get old attachment
 		$thumbnail_id = get_posts(
 			array(
 				'name'			 => 'responsive-lightbox-thumbnail',
@@ -3317,50 +3353,107 @@ class Responsive_Lightbox_Galleries {
 
 		// no attachment?
 		if ( empty( $thumbnail_id ) ) {
-			// get upload directory data
-			$wp_upload_dir = wp_upload_dir();
-
-			// get file path
-			$filepath = str_replace( '\\', '/', RESPONSIVE_LIGHTBOX_PATH . 'images/responsive-lightbox-thumbnail.png' );
-
-			// get file name
-			$filename = basename( $filepath );
-
-			// new filepath in upload dir
-			$new_filepath = $wp_upload_dir['path'] . '/' . $filename;
-
-			// copty file to upload dir
-			copy( $filepath, $new_filepath );
-
-			// get type of file
-			$filetype = wp_check_filetype( $filename );
-
-			// insert attachment
-			$thumbnail_id = wp_insert_attachment(
+			// get new attachment
+			$thumbnail_id = get_posts(
 				array(
-					'guid'				=> $wp_upload_dir['url'] . '/' . $filename, 
-					'post_mime_type'	=> $filetype['type'],
-					'post_title'		=> preg_replace( '/\.[^.]+$/', '', $filename ),
-					'post_content'		=> '',
-					'post_parent'		=> 0,
-					'post_status'		=> 'inherit'
-				),
-				$new_filepath,
-				0
+					'name'			 => 'responsive-lightbox-thumbnail',
+					'post_type'		 => 'attachment',
+					'post_status'	 => 'pending',
+					'numberposts'	 => 1,
+					'fields'		 => 'ids'
+				)
 			);
 
-			// success?
-			if ( $thumbnail_id ) {
-				// make sure that this file is included
-				require_once( ABSPATH . 'wp-admin/includes/image.php' );
+			// no attachment?
+			if ( empty( $thumbnail_id ) ) {
+				// get upload directory data
+				$wp_upload_dir = wp_upload_dir();
 
-				// update database with generated metadata for the attachment
-				wp_update_attachment_metadata( $thumbnail_id, wp_generate_attachment_metadata( $thumbnail_id, $new_filepath ) );
-			}
-		} else
-			$thumbnail_id = $thumbnail_id[0];
+				// get file path
+				$filepath = str_replace( '\\', '/', RESPONSIVE_LIGHTBOX_PATH . 'images/responsive-lightbox-thumbnail.png' );
+
+				// get file name
+				$filename = basename( $filepath );
+
+				// new filepath in upload dir
+				$new_filepath = $wp_upload_dir['path'] . '/' . $filename;
+
+				// copty file to upload dir
+				copy( $filepath, $new_filepath );
+
+				// get type of file
+				$filetype = wp_check_filetype( $filename );
+
+				// force pending status for the attachment
+				add_filter( 'wp_insert_attachment_data', array( $this, 'set_attachment_post_status' ) );
+
+				// insert attachment
+				$thumbnail_id = wp_insert_attachment(
+					array(
+						'guid'				=> $wp_upload_dir['url'] . '/' . $filename, 
+						'post_mime_type'	=> $filetype['type'],
+						'post_title'		=> preg_replace( '/\.[^.]+$/', '', $filename ),
+						'post_content'		=> '',
+						'post_parent'		=> 0,
+						'post_status'		=> 'inherit'
+					),
+					$new_filepath,
+					0
+				);
+
+				remove_filter( 'wp_insert_attachment_data', array( $this, 'set_attachment_post_status' ) );
+
+				// success?
+				if ( $thumbnail_id ) {
+					// make sure that this file is included
+					require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+					// update database with generated metadata for the attachment
+					wp_update_attachment_metadata( $thumbnail_id, wp_generate_attachment_metadata( $thumbnail_id, $new_filepath ) );
+				}
+			} else
+				$thumbnail_id = $thumbnail_id[0];
+		} else {
+			// force pending status for the attachment
+			add_filter( 'wp_insert_attachment_data', array( $this, 'set_attachment_post_status' ) );
+
+			$thumbnail_id = wp_update_post(
+				array(
+					'ID'			=> $thumbnail_id[0],
+					'post_status'	=> 'pending'
+				)
+			);
+
+			remove_filter( 'wp_insert_attachment_data', array( $this, 'set_attachment_post_status' ) );
+		}
 
 		return (int) $thumbnail_id;
+	}
+
+	/**
+	 * Change status of new attachment thumbnail replacement.
+	 *
+	 * @param array $data Post data
+	 * @return array
+	 */
+	function set_attachment_post_status( $data ) {
+		$data['post_status'] = 'pending';
+
+		return $data;
+	}
+
+	/**
+	 * Prepare featured content fields.
+	 *
+	 * @param array $fields
+	 * @return array
+	 */
+	public function prepare_featured_fields( $fields ) {
+		foreach ( array( 'post_type', 'post_status', 'post_format', 'post_term', 'post_author', 'page_parent', 'page_template' ) as $option ) {
+			$fields[$option]['options'] = $this->prepare_query_args( $option );
+		}
+
+		return $fields;
 	}
 
 	/**
@@ -3470,9 +3563,11 @@ class Responsive_Lightbox_Galleries {
 	/**
 	 * Get public post types.
 	 *
+	 * @param bool $simple Which data should be returned
+	 * @param bool $skip Which post types should be skipped
 	 * @return array Post types
 	 */
-	public function get_post_types() {
+	public function get_post_types( $simple = false, $skip = array( 'attachment', 'rl_gallery' ) ) {
 		$post_types = get_post_types(
 			array(
 				'public' => true
@@ -3485,15 +3580,19 @@ class Responsive_Lightbox_Galleries {
 
 		if ( ! empty( $post_types ) ) {
 			foreach ( $post_types as $post_type => $cpt ) {
-				// skip gallery and attachment post types
-				if ( $post_type === 'rl_gallery' || $post_type === 'attachment' )
+				// skip unwanted post types
+				if ( in_array( $post_type, $skip, true ) )
 					continue;
 
-				$data[$post_type] = $cpt->labels->singular_name;
+				if ( $simple )
+					$data[] = $post_type;
+				else
+					$data[$post_type] = $cpt->labels->singular_name;
 			}
 		}
 
-		asort( $data );
+		if ( ! $simple )
+			asort( $data );
 
 		return $data;
 	}
@@ -3557,6 +3656,30 @@ class Responsive_Lightbox_Galleries {
 		if ( array_key_exists( 'post_format', $taxonomies ) )
 			unset( $taxonomies['post_format'] );
 
+		// get main instance
+		$rl = Responsive_Lightbox();
+
+		// remove gallery categories
+		if ( $rl->options['builder']['categories'] && array_key_exists( 'rl_category', $taxonomies ) )
+			unset( $taxonomies['rl_category'] );
+
+		// remove gallery tags
+		if ( $rl->options['builder']['tags'] && array_key_exists( 'rl_tag', $taxonomies ) )
+			unset( $taxonomies['rl_tag'] );
+
+		if ( $rl->options['folders']['active'] ) {
+			// remove media folders categories
+			unset( $taxonomies['rl_media_folder'] );
+
+			// remove custom media folders categories
+			if ( $rl->options['folders']['media_taxonomy'] !== 'rl_media_folder' )
+				unset( $taxonomies[$rl->options['folders']['media_taxonomy']] );
+
+			// remove media folders tags
+			if ( $rl->options['folders']['media_tags'] )
+				unset( $taxonomies['rl_media_tag'] );
+		}
+
 		$data = array();
 
 		if ( ! empty( $taxonomies ) ) {
@@ -3565,6 +3688,7 @@ class Responsive_Lightbox_Galleries {
 			}
 		}
 
+		// sort taxonomies
 		asort( $data );
 
 		return $data;
@@ -3604,11 +3728,8 @@ class Responsive_Lightbox_Galleries {
 		$data = array();
 		$page_templates = wp_get_theme()->get_page_templates();
 
-		if ( ! empty( $page_templates ) ) {
-			$page_templates = array_flip( $page_templates );
-
+		if ( ! empty( $page_templates ) )
 			asort( $page_templates );
-		}
 
 		$data = array_merge( array( 'default' => apply_filters( 'default_page_template_title', __( 'Default Template' ) ) ), $page_templates );
 
@@ -3710,18 +3831,19 @@ class Responsive_Lightbox_Galleries {
 		$featured_image_type = ! empty( $post_data['rl_gallery_featured_image'] ) && in_array( $post_data['rl_gallery_featured_image'], array( 'id', 'url', 'image' ), true ) ? $post_data['rl_gallery_featured_image'] : 'id';
 
 		switch ( $featured_image_type ) {
+			// custom url
 			case 'url':
 				$thumbnail_id = $this->maybe_generate_thumbnail();
-
 				$featured_image = isset( $post_data['_rl_thumbnail_url'] ) ? esc_url( $post_data['_rl_thumbnail_url'] ) : '';
 				break;
 
+			// first image
 			case 'image':
 				$thumbnail_id = $this->maybe_generate_thumbnail();
-
 				$featured_image = '';
 				break;
 
+			// attachment id
 			case 'id':
 			default:
 				$featured_image = $thumbnail_id = isset( $post_data['_thumbnail_id'] ) ? (int) $post_data['_thumbnail_id'] : 0;

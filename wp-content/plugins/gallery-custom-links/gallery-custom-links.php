@@ -3,7 +3,7 @@
 Plugin Name: Gallery Custom Links
 Plugin URI: https://meowapps.com
 Description: Gallery Custom Links allows you to link images from galleries to a specified URL. Tested with WordPress Gallery, Gutenberg, the Meow Gallery and others.
-Version: 1.2.6
+Version: 1.2.7
 Author: Jordy Meow
 Author URI: https://meowapps.com
 Text Domain: gallery-custom-links
@@ -23,7 +23,7 @@ if ( class_exists( 'Meow_Gallery_Custom_Links' ) ) {
 }
 
 global $mgcl_version;
-$mgcl_version = '1.2.6';
+$mgcl_version = '1.2.7';
 
 include "mgcl_admin.php";
 $mgcl_admin = new Meow_Gallery_Custom_Links_Admin( 'mgcl', __FILE__, 'gallery-custom-links' );

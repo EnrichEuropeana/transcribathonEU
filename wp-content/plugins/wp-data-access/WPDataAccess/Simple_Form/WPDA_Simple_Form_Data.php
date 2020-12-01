@@ -247,7 +247,7 @@ namespace WPDataAccess\Simple_Form {
 						// will automatically convert them if necessarry. Values supplied in a wrong format will be handed
 						// over to MySQL as is and might result in unpredictable results. For our simple form we rely on
 						// the users judgement.
-						$where_current .= " `$pk_column` = %f";
+						$where_current .= " `$pk_column` = %d";
 					} else {
 						// Column data type is string:
 						// Quotes will be added to all non numeric values. We might have issues with date and time fields.
@@ -271,6 +271,34 @@ namespace WPDataAccess\Simple_Form {
 								wp_die( __( 'ERROR: Wrong arguments [missing primary key value]', 'wp-data-access' ) );
 							}
 							$pkvalue = $this->calling_form->get_old_value( $pk_column );
+						}
+					}
+
+					if (
+						WPDA::get_type( $table_columns[ $pk_column ] ) === 'date' ||
+						WPDA::get_type( $table_columns[ $pk_column ] ) === 'time'
+					) {
+						// Get date format
+						switch ( $table_columns[ $pk_column ] ) {
+							case 'time':
+								$date_format = WPDA::get_option( WPDA::OPTION_PLUGIN_TIME_FORMAT );
+								$db_format   = WPDA::DB_TIME_FORMAT;
+								break;
+							case 'date':
+								$date_format = WPDA::get_option( WPDA::OPTION_PLUGIN_DATE_FORMAT );
+								$db_format   = WPDA::DB_DATE_FORMAT;
+								break;
+							default:
+								$date_format =
+									WPDA::get_option( WPDA::OPTION_PLUGIN_DATE_FORMAT ) .
+									' ' .
+									WPDA::get_option( WPDA::OPTION_PLUGIN_TIME_FORMAT );
+								$db_format   = WPDA::DB_DATETIME_FORMAT;
+						}
+
+						$convert_date  = \DateTime::createFromFormat( $date_format, $pkvalue );
+						if ( false !== $convert_date ) {
+							$pkvalue = $convert_date->format( $db_format );
 						}
 					}
 

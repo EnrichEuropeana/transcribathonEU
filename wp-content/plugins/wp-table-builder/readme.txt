@@ -2,8 +2,8 @@
 Contributors: wptb, imtiazrayhan, istiakrayhan, ultimateblocks, wpcdplugin, wpleaders1
 Tags: table, table builder, drag and drop
 Requires at least: 4.9
-Tested up to: 5.4
-Stable tag: 1.1.8
+Tested up to: 5.5
+Stable tag: 1.2.6
 Requires PHP: 5.6
 License: GPL3+
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
@@ -45,18 +45,15 @@ You can also get the shortcode from the 'All Tables' list under 'Table Builder' 
 
 ## Import Tables
 
-You can import tables from CSV and XML files. You can import both single and multiple CSV/XML files. Multiple files will have to be zipped.
+You can import tables from CSV or XML files. You can import both single and multiple CSV or XML files. Multiple files will have to be zipped.
 
 You can also import tables from TablePress plugin.
 
 ## Export Tables
 
-Similar to importing, exporting to CSV and XML files are availabe.
+Just like importing you can import the tables to CSV or XML files. 
 
-If you just want the data of the tables, exporting to CSV file is the better choice.
-
-If you are looking to move tables to another site using WP Table Builder, exporting to XML files would be the better choice.
-It will export the table settings, design values.
+If you are looking to move tables created with WP Table Builder to another site, XML is the better choice as it will preserve table settings.
 
 == Frequently Asked Questions ==
 
@@ -72,6 +69,7 @@ That's it. You're done!
 ## Join Us To Get Updates and Resources
 
 * [Visit WP Table Builder Website](https://wptablebuilder.com/)
+* [WP Table Builder Support Community](https://wptablebuilder.com/community/)
 * [Follow Us on Twitter](https://twitter.com/wptbplugin)
 * [Join Our Facebook Group](https://www.facebook.com/groups/497986907442780/)
 
@@ -87,6 +85,61 @@ That's it. You're done!
 8. Shortcode in WP Table Builder.
 
 == Changelog ==
+
+= 1.2.6 =
+
+* NEW: Vertical align option for table cells.
+* NEW: More border customizations.
+* NEW: Target width option for responsive menu.
+* NEW: `nofollow` option for text links.
+* IMPROVEMENT: Element control show/hide logic updated.
+* IMPROVEMENT: Visibility of main tab buttons updated.
+* IMPROVEMENT: Better suffix display for range sliders.
+* FIX: An issue affecting sub-folder WordPress installations.
+* FIX: An issue targeting usage of YouTube embeds in Custom HTML element.
+* UPDATE: Freemius SDK.
+
+= 1.2.5 =
+
+* NEW: Static Top Row Option for Responsive Builder.
+* FIX: Issue of Some Elements Being Removed from Custom HTML.
+* FIX: Row Color Logic is Updated for Responsive Builder.
+* IMPROVEMENT: Minor Control Related Updates to Both Functionality And Visuals.
+* IMPROVEMENT: Cell Management Operations.
+* IMPROVEMENT: Updates to App Security and Performance.
+
+= 1.2.4 =
+
+* NEW: Option to Change Link Color in Text Element.
+* NEW: Sticky Top Menu Bar.
+* NEW: Freemius SDK.
+* FIX: Issue of Indent on List Element.
+
+= 1.2.3 =
+
+* NEW: Responsive Table System with more controls.
+* NEW: German Translation. Thanks to Stefan Butz.
+* NEW: Option to Control List Item Font Size.
+* NEW: Option to control List Item Spacing.
+* NEW: Option to Toggle Header Inner Border.
+* NEW: Search and Pagination options in Table List.
+
+= 1.2.2 =
+
+* HOTFIX: JavaScript Error that Broke Some Pages and Conflicts with Other Plugin.
+
+= 1.2.1 =
+
+* FIX: Internationalization Fixes for Better Translation Options.
+* ADD: Relative Link Support for Elements with URL Controls.
+* IMPROVEMENT: Better Custom HTML Element Parsing and Rendering.
+* IMPROVEMENT: Responsive Table Events.
+
+= 1.2.0 =
+
+* ADD: Button Hover Settings.
+* ADD: Button Icon Settings.
+* IMPROVEMENT: Builder Interface Redesign for Faster, Better Table Building.
 
 = 1.1.8 =
 

@@ -195,33 +195,48 @@ namespace WPDataProjects\Parent_Child {
 		 * Overwrites method display_edit_form to add parent-child functionality
 		 */
 		protected function display_edit_form() {
-			if ( 'view' === $this->mode || ( ! $this->child_request && 'view' === $this->action ) ) {
+			if (
+				'view' === $this->mode &&
+				'only' !== $this->allow_insert ||
+				( ! $this->child_request && 'view' === $this->action )
+			) {
 				$edit_form_class = 'WPDataProjects\\Parent_Child\\WPDP_Parent_Form_View';
 				$mode            = 'view';
 			} else {
 				$edit_form_class = 'WPDataProjects\\Parent_Child\\WPDP_Parent_Form';
 				$mode            = 'edit';
 			}
+
 			if ( null !== $this->parent_edit_form_class ) {
 				$edit_form_class = $this->parent_edit_form_class;
 			}
+
+			$args = [
+				'title'               => null === $this->title ? __( 'Back', 'wp-data-access' ) : $this->title,
+				'subtitle'            => $this->subtitle,
+				'add_action_to_title' => 'FALSE',
+				'mode'                => $mode,
+				'child_request'       => $this->child_request,
+			];
+			if ( 'off' === $this->allow_insert || 'only' === $this->allow_insert ) {
+				$args['hide_add_new'] = true;
+			}
+			if ( 'only' === $this->allow_insert ) {
+				$args['action'] = 'new';
+			}
+
 			$this->wpda_list_columns = WPDP_List_Columns_Cache::get_list_columns( $this->schema_name, $this->table_name, 'tableform', $this->setname );
 			$form                    = new $edit_form_class(
 				$this->schema_name,
 				$this->table_name,
 				$this->wpda_list_columns,
-				[
-					'title'               => null === $this->title ? __( 'Back', 'wp-data-access' ) : $this->title,
-					'subtitle'            => $this->subtitle,
-					'add_action_to_title' => 'FALSE',
-					'mode'                => $mode,
-					'child_request'       => $this->child_request,
-				],
+				$args,
 				[
 					'parent'   => $this->parent,
 					'children' => $this->children,
 				]
 			);
+
 			$form->show();
 		}
 

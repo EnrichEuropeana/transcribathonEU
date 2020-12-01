@@ -10,6 +10,7 @@ namespace WPDataProjects\Project {
 
 	use WPDataAccess\Data_Dictionary\WPDA_Dictionary_Exist;
 	use WPDataAccess\Data_Dictionary\WPDA_Dictionary_Lists;
+	use WPDataAccess\Plugin_Table_Models\WPDA_Table_Settings_Model;
 	use WPDataProjects\Data_Dictionary\WPDP_List_Columns_Cache;
 	use WPDataAccess\Utilities\WPDA_Message_Box;
 	use WPDataAccess\Plugin_Table_Models\WPDP_Project_Design_Table_Model;
@@ -324,11 +325,14 @@ namespace WPDataProjects\Project {
 							   value="<?php echo esc_attr( $this->wpda_table_name ); ?>">
 						<input type="hidden" name="wpda_table_setname"
 							   value="<?php echo esc_attr( $this->wpda_table_setname ); ?>"/>
-						<input type="submit" class="page-title-action"
-							   onclick="return (confirm('<?php echo __( 'Reconcile table? Your current modifications will be lost!' ); ?>'));"
-							   value="<?php echo __( 'Reconcile Table', 'wp-data-access' ); ?>">
-						<label style="vertical-align:text-bottom;"><input type="checkbox" name="keep_options">Keep
-							options?</label>
+						<button type="submit" class="page-title-action wpda_tooltip"
+							   	onclick="return (confirm('<?php echo __( 'Reconcile table? Your current modifications will be lost!' ); ?>'));"
+								title="Update table design from database table (overwrites current design)"
+						>
+							<span class="material-icons wpda_icon_on_button">history</span>
+							<?php echo __( 'Reconcile Table', 'wp-data-access' ); ?>
+						</button>
+						<label style="line-height:30px;padding-bottom:8px"><input type="checkbox" name="keep_options" style="vertical-align:middle;">Keep options?</label>
 					</div>
 				</form>
 			</div>
@@ -351,6 +355,7 @@ namespace WPDataProjects\Project {
 					jQuery('#wpda_table_structure').sortable();
 					jQuery('#wpda_list_table_options').sortable();
 					jQuery('#wpda_form_options').sortable();
+					jQuery('.wpda_tooltip').tooltip();
 				});
 			</script>
 			<?php
@@ -378,12 +383,69 @@ namespace WPDataProjects\Project {
 				$wpda_table_name = $this->wpda_table_name . ' (' . $this->wpda_schema_name . ')';
 			}
 
-			$tab_label      = isset( $this->table_structure->tableinfo->tab_label ) ?
+			$tab_label         = isset( $this->table_structure->tableinfo->tab_label ) ?
 				$this->table_structure->tableinfo->tab_label : '';
-			$defaul_where   = isset( $this->table_structure->tableinfo->default_where ) ?
+			$defaul_where      = isset( $this->table_structure->tableinfo->default_where ) ?
 				$this->table_structure->tableinfo->default_where : '';
-			$defaul_orderby = isset( $this->table_structure->tableinfo->default_orderby ) ?
+			$defaul_orderby    = isset( $this->table_structure->tableinfo->default_orderby ) ?
 				$this->table_structure->tableinfo->default_orderby : '';
+			$hyperlinks_parent = isset( $this->table_structure->tableinfo->hyperlinks_parent ) ?
+				$this->table_structure->tableinfo->hyperlinks_parent : [];
+			$hyperlinks_child  = isset( $this->table_structure->tableinfo->hyperlinks_child ) ?
+				$this->table_structure->tableinfo->hyperlinks_child : [];
+
+			$html       = '';
+			$html_child = '';
+
+			$settings_db = WPDA_Table_Settings_Model::query( $this->wpda_table_name, $this->wpda_schema_name );
+			if ( isset( $settings_db[0]['wpda_table_settings'] ) && '' !== $settings_db[0]['wpda_table_settings'] ) {
+				$settings = json_decode( $settings_db[0]['wpda_table_settings'] );
+				if ( isset( $settings->hyperlinks ) && is_array( $settings->hyperlinks ) ) {
+					foreach ( $settings->hyperlinks as $hyperlink ) {
+						if ( isset( $hyperlink->hyperlink_label ) ) {
+							$hyperlink_label = $hyperlink->hyperlink_label;
+
+							if ( isset( $hyperlinks_parent->$hyperlink_label ) ) {
+								$checked = $hyperlinks_parent->$hyperlink_label ? 'checked' : '';
+							} else {
+								$checked = 'checked';
+							}
+							$html .=
+								"<label style='padding-right: 10px;'>
+									<input type='checkbox' name='{$hyperlink_label}_hyperlink' style='width: 16px; height: 16px;' {$checked}/>
+									{$hyperlink_label}
+								</label>";
+
+							if ( isset( $hyperlinks_child->$hyperlink_label ) ) {
+								$checked = $hyperlinks_child->$hyperlink_label ? 'checked' : '';
+							} else {
+								$checked = 'checked';
+							}
+							$html_child .=
+								"<label style='padding-right: 10px;'>
+									<input type='checkbox' name='{$hyperlink_label}_hyperlink_child' style='width: 16px; height: 16px;' {$checked}/>
+									{$hyperlink_label}
+								</label>";
+						}
+					}
+				}
+			}
+
+			if ( '' === $html && '' === $html_child ) {
+				$hint = '';
+			} else {
+				$hint =
+					__( 'Uncheck to disable', 'wp-data-access' ) .
+					' <span class="dashicons dashicons-editor-help wpda_tooltip" title="Only hyperlinks on list tables can be disabled"></span>';
+			}
+
+			if ( '' === $html ) {
+				$html = '--';
+			}
+
+			if ( '' === $html_child ) {
+				$html_child = '--';
+			}
 			?>
 			<form id="wpdp_form_table_info" method="post">
 				<fieldset class="wpda_fieldset">
@@ -419,6 +481,28 @@ namespace WPDataProjects\Project {
 							</td>
 						</tr>
 						<tr>
+							<td style="text-align: right; padding-right: 5px; padding-top: 10px;">
+								<label>
+									<?php echo __( 'Hyperlinks parent', 'wp-data-access' ) ?>
+								</label>
+							</td>
+							<td style="padding-top: 10px;">
+								<?php echo $html; ?>
+								<span style="float: right;"><?php echo $hint; ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; padding-right: 5px;">
+								<label>
+									<?php echo __( 'Hyperlinks child', 'wp-data-access' ) ?>
+								</label>
+							</td>
+							<td>
+								<?php echo $html_child; ?>
+							</td>
+						</tr>
+						<?php do_action( 'wpda_data_projects_add_table_option', $this->wpda_schema_name, $this->wpda_table_name ); ?>
+						<tr>
 							<td colspan="2" class="wpda-table-structure-first-column-left" style="text-align:left;padding-top:10px;padding-bottom:5px;">
 								<label style="font-weight: normal;">
 									<?php echo __( 'Child table setting only (parent table settings are available on Data Projects page)', 'wp-data-access' ); ?>
@@ -436,8 +520,9 @@ namespace WPDataProjects\Project {
 									<tr>
 										<td><input type="text" name="default_where" value="<?php echo esc_attr( $defaul_where ); ?>"/></td>
 										<td style="width:5px;"></td>
-										<td style="width:1%;"><span title="Enter a valid sql where clause
-Example: name like 'Peter%'" class="button">?</span></td>
+										<td style="width:1%;">
+											<span title="Enter a valid sql where clause, for example: name like 'Peter%'" class="material-icons pointer wpda_tooltip">help</span>
+										</td>
 									</tr>
 								</table>
 							</td>
@@ -453,8 +538,9 @@ Example: name like 'Peter%'" class="button">?</span></td>
 									<tr>
 										<td><input type="text" name="default_orderby" value="<?php echo esc_attr( $defaul_orderby ); ?>"/></td>
 										<td style="width:5px;"></td>
-										<td style="width:1%;"><span title="Enter a valid sql order by clause
-Example: course_date desc, student_name asc" class="button">?</span></td>
+										<td style="width:1%;">
+											<span title="Enter a valid sql order by clause, for example: course_date desc, student_name asc" class="material-icons pointer wpda_tooltip">help</span>
+										</td>
 									</tr>
 								</table>
 							</td>
@@ -470,9 +556,10 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									   value="<?php echo esc_attr( $this->wpda_table_name ); ?>"/>
 								<input type="hidden" name="action" value="edit"/>
 								<input type="hidden" name="action2" value="tableinfo"/>
-								<input type="submit"
-									   class="button button-primary"
-									   value="<?php echo __( 'Save table info', 'wp-data-access' ); ?>"/>
+								<button type="submit" class="button button-primary">
+									<span class="material-icons wpda_icon_on_button">check</span>
+									<?php echo __( 'Save table info', 'wp-data-access' ); ?>
+								</button>
 							</td>
 						</tr>
 						</tfoot>
@@ -603,12 +690,12 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 						'</td>' +
 						'<td class="wpda-table-structure-top">' +
 						'    <a href="javascript:void(0)" style="vertical-align:-webkit-baseline-middle;padding-top:7px;"' +
-						'       class="dashicons dashicons-plus"title="Add column"' +
+						'       class="dashicons dashicons-plus wpda_tooltip" title="Add column"' +
 						'       onclick="add_column(' + row_num + ')" id="remove_column_names_' + row_num + '"' +
 						'    ></a>' +
 						'</td>' +
 						'<td class="wpda-table-structure-top">' +
-						'    <select id="target_schema_name_' + row_num + '" name="target_schema_name[]" onchange="wpdp_get_tables(jQuery(this).val(), ' + row_num + ', \'#target_table_name_' + row_num + '\', \'\')" title="Create lookup to other database"' + (relation_type==="lookup" ? "" : "style=\'display:none;\'") + '>' +
+						'    <select id="target_schema_name_' + row_num + '" name="target_schema_name[]" onchange="wpdp_get_tables(jQuery(this).val(), ' + row_num + ', \'#target_table_name_' + row_num + '\', \'\')" class="wpda_tooltip" title="Create lookup to other database"' + (relation_type==="lookup" ? "" : "style=\'display:none;\'") + '>' +
 						<?php
 						foreach ( $available_databases as $available_database ) {
 						?>
@@ -712,7 +799,7 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 						'<div id="remove_column_names_' + index + '_' + (col_num[index] + 1) + '" style="padding-top:4px;">' +
 						'    <a href="javascript:void(0)"' +
 						'       style="vertical-align:-webkit-baseline-middle;padding-top:5px;"' +
-						'       class="dashicons dashicons-minus"' +
+						'       class="dashicons dashicons-minus wpda_tooltip"' +
 						'       title="Remove column"' +
 						'       onclick="rem_column(' + index + ',' + (col_num[index] + 1) + ')"' +
 						'    ></a>' +
@@ -765,12 +852,14 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 								<?php echo __( 'Target table name', 'wp-data-access' ) ?>
 							</th>
 							<th>
-								<?php echo __( 'Target column name', 'wp-data-access' ) ?>
+								<?php echo __( 'Target column name()', 'wp-data-access' ) ?>
 							</th>
 							<th>
-								<?php echo __( 'Relation table name (only n:m)', 'wp-data-access' ) ?>
+								<span style="vertical-align:inherit">
+									<?php echo __( 'Relation table name (only n:m)', 'wp-data-access' ) ?>
+								</span>
 								<span
-										class="dashicons dashicons-info"
+										class="dashicons dashicons-info wpda_tooltip"
 										title="<?php echo __( 'Table shown on the other end of the n:m relationship (instead of target table shown for 1:n relationships). Not available for 1:n relationships.', 'wp-data-access' ) ?>"
 										style="cursor:pointer;"
 								></span>
@@ -800,9 +889,10 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									   value="<?php echo esc_attr( $this->wpda_table_setname ); ?>"/>
 								<input type="hidden" name="action" value="edit"/>
 								<input type="hidden" name="action2" value="relation"/>
-								<input type="submit"
-									   class="button button-primary"
-									   value="<?php echo __( 'Save relationships', 'wp-data-access' ); ?>"/>
+								<button type="submit" class="button button-primary">
+									<span class="material-icons wpda_icon_on_button">check</span>
+									<?php echo __( 'Save relationships', 'wp-data-access' ); ?>
+								</button>
 							</td>
 						</tr>
 						</tfoot>
@@ -1044,7 +1134,7 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 						</tbody>
 						<tfoot>
 						<tr>
-							<td colspan="11">
+							<td colspan="12">
 								<input type="hidden" name="tab" value="tables"/>
 								<input type="hidden" name="wpda_schema_name"
 									   value="<?php echo esc_attr( $this->wpda_schema_name_db ); ?>"/>
@@ -1056,9 +1146,10 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									   value="<?php echo esc_attr( $this->wpda_table_setname ); ?>"/>
 								<input type="hidden" name="action" value="edit"/>
 								<input type="hidden" name="action2" value="listtable"/>
-								<input type="submit"
-									   class="button button-primary"
-									   value="<?php echo __( 'Save list table columns', 'wp-data-access' ); ?>"/>
+								<button type="submit" class="button button-primary">
+									<span class="material-icons wpda_icon_on_button">check</span>
+									<?php echo __( 'Save list table columns', 'wp-data-access' ); ?>
+								</button>
 							</td>
 						</tr>
 						</tfoot>
@@ -1124,6 +1215,17 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 							<th>
 								<?php echo __( 'Lookup', 'wp-data-access' ) ?>
 							</th>
+							<th>
+								<span style="vertical-align:inherit">
+									<?php echo __( 'ID?', 'wp-data-access' ) ?>
+								</span>
+								<span
+										class="dashicons dashicons-info wpda_tooltip"
+										title="<?php echo __( 'Enable to hide ID in lookup', 'wp-data-access' ) ?>"
+										style="cursor:pointer;"
+								></span>
+
+							</th>
 						</tr>
 						</thead>
 						<tbody id="wpda_form_options">
@@ -1181,6 +1283,11 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 								$default_on_form = esc_html( $column->default );
 							} else {
 								$default_on_form = '';
+							}
+							if ( isset( $column->hide_lookup_key ) ) {
+								$hide_id = 'on' === $column->hide_lookup_key ? 'checked' : '';;
+							} else {
+								$hide_id = 'checked';
 							}
 							$i ++;
 							?>
@@ -1246,7 +1353,7 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									/>
 								</td>
 								<td></td>
-								<td class="wpda-table-structure-last-column">
+								<td>
 									<?php
 									$has_lookup = false;
 									if ( isset( $this->table_structure->relationships ) ) {
@@ -1284,6 +1391,15 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									}
 									?>
 								</td>
+								<td class="wpda-table-structure-last-column">
+									<?php if ( $has_lookup ) { ?>
+										<input type="checkbox"
+											   name="<?php echo esc_attr( $column_name ); ?>_hide_lookup_key"
+											   <?php echo $hide_id; ?>
+											   style="vertical-align:middle;width:16px;height:16px;"
+										/>
+									<?php } ?>
+								</td>
 							</tr>
 							<?php
 						}
@@ -1291,7 +1407,7 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 						</tbody>
 						<tfoot>
 						<tr>
-							<td colspan="14">
+							<td colspan="15">
 								<input type="hidden" name="tab" value="tables"/>
 								<input type="hidden" name="wpda_schema_name"
 									   value="<?php echo esc_attr( $this->wpda_schema_name_db ); ?>"/>
@@ -1303,9 +1419,10 @@ Example: course_date desc, student_name asc" class="button">?</span></td>
 									   value="<?php echo esc_attr( $this->wpda_table_setname ); ?>"/>
 								<input type="hidden" name="action" value="edit"/>
 								<input type="hidden" name="action2" value="tableform"/>
-								<input type="submit"
-									   class="button button-primary"
-									   value="<?php echo __( 'Save data entry form columns', 'wp-data-access' ); ?>"/>
+								<button type="submit" class="button button-primary">
+									<span class="material-icons wpda_icon_on_button">check</span>
+									<?php echo __( 'Save data entry form columns', 'wp-data-access' ); ?>
+								</button>
 							</td>
 						</tr>
 						</tfoot>

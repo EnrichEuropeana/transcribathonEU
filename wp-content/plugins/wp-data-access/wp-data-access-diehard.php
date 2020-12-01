@@ -44,62 +44,56 @@ if ( ! function_exists( 'get_column_headers' ) ) {
 	}
 }
 
-// Stolen from: wp-admin/includes/template.php
-// Last robbery date: 30-07-2019
-if ( ! function_exists( 'submit_button' ) ) {
-	function submit_button( $text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null ) {
-		echo get_submit_button( $text, $type, $name, $wrap, $other_attributes );
-	}
+// Duplicated from: wp-admin/includes/template.php (24-07-2020)
+function wpdadiehard_submit_button( $text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null ) {
+	echo wpdadiehard_get_submit_button( $text, $type, $name, $wrap, $other_attributes );
 }
 
-// Stolen from: wp-admin/includes/template.php
-// Last robbery date: 30-07-2019
-if ( ! function_exists( 'get_submit_button' ) ) {
-	function get_submit_button( $text = '', $type = 'primary large', $name = 'submit', $wrap = true, $other_attributes = '' ) {
-		if ( ! is_array( $type ) ) {
-			$type = explode( ' ', $type );
-		}
-
-		$button_shorthand = array( 'primary', 'small', 'large' );
-		$classes          = array( 'button' );
-		foreach ( $type as $t ) {
-			if ( 'secondary' === $t || 'button-secondary' === $t ) {
-				continue;
-			}
-			$classes[] = in_array( $t, $button_shorthand ) ? 'button-' . $t : $t;
-		}
-		// Remove empty items, remove duplicate items, and finally build a string.
-		$class = implode( ' ', array_unique( array_filter( $classes ) ) );
-
-		$text = $text ? $text : __( 'Save Changes' );
-
-		// Default the id attribute to $name unless an id was specifically provided in $other_attributes
-		$id = $name;
-		if ( is_array( $other_attributes ) && isset( $other_attributes['id'] ) ) {
-			$id = $other_attributes['id'];
-			unset( $other_attributes['id'] );
-		}
-
-		$attributes = '';
-		if ( is_array( $other_attributes ) ) {
-			foreach ( $other_attributes as $attribute => $value ) {
-				$attributes .= $attribute . '="' . esc_attr( $value ) . '" '; // Trailing space is important
-			}
-		} elseif ( ! empty( $other_attributes ) ) { // Attributes provided as a string
-			$attributes = $other_attributes;
-		}
-
-		// Don't output empty name and id attributes.
-		$name_attr = $name ? ' name="' . esc_attr( $name ) . '"' : '';
-		$id_attr   = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-
-		$button = '<input type="submit"' . $name_attr . $id_attr . ' class="' . esc_attr( $class );
-		$button .= '" value="' . esc_attr( $text ) . '" ' . $attributes . ' />';
-
-		if ( $wrap ) {
-			$button = '<p class="submit">' . $button . '</p>';
-		}
-
-		return $button;
+// Duplicated from: wp-admin/includes/template.php (24-07-2020)
+function wpdadiehard_get_submit_button( $text = '', $type = 'primary large', $name = 'submit', $wrap = true, $other_attributes = '' ) {
+	if ( ! is_array( $type ) ) {
+		$type = explode( ' ', $type );
 	}
+
+	$button_shorthand = array( 'primary', 'small', 'large' );
+	$classes          = array( 'button' );
+	foreach ( $type as $t ) {
+		if ( 'secondary' === $t || 'button-secondary' === $t ) {
+			continue;
+		}
+		$classes[] = in_array( $t, $button_shorthand ) ? 'button-' . $t : $t;
+	}
+	// Remove empty items, remove duplicate items, and finally build a string.
+	$class = implode( ' ', array_unique( array_filter( $classes ) ) );
+
+	$text = $text ? $text : __( 'Save Changes' );
+
+	// Default the id attribute to $name unless an id was specifically provided in $other_attributes.
+	$id = $name;
+	if ( is_array( $other_attributes ) && isset( $other_attributes['id'] ) ) {
+		$id = $other_attributes['id'];
+		unset( $other_attributes['id'] );
+	}
+
+	$attributes = '';
+	if ( is_array( $other_attributes ) ) {
+		foreach ( $other_attributes as $attribute => $value ) {
+			$attributes .= $attribute . '="' . esc_attr( $value ) . '" '; // Trailing space is important.
+		}
+	} elseif ( ! empty( $other_attributes ) ) { // Attributes provided as a string.
+		$attributes = $other_attributes;
+	}
+
+	// Don't output empty name and id attributes.
+	$name_attr = $name ? ' name="' . esc_attr( $name ) . '"' : '';
+	$id_attr   = $id ? ' id="' . esc_attr( $id ) . '"' : '';
+
+	$button  = '<input type="submit"' . $name_attr . $id_attr . ' class="' . esc_attr( $class );
+	$button .= '" value="' . esc_attr( $text ) . '" ' . $attributes . ' />';
+
+	if ( $wrap ) {
+		$button = '<p class="submit">' . $button . '</p>';
+	}
+
+	return $button;
 }

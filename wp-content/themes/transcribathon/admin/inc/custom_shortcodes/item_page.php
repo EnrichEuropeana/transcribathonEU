@@ -25,18 +25,24 @@ function _TCT_item_page( $atts ) {
 
         // Save image data
         $itemData = json_decode($result, true);
-        $itemData = $itemData[0];
 
-        // Set request parameters for story data
-        $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
-        $requestType = "GET";
+        if ($itemData['StoryId'] != null) {
+            // Set request parameters for story data
+            $url = home_url()."/tp-api/itemPage/".$itemData['StoryId'];
+            $requestType = "GET";
+   
+            // Execude http request
+            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+   
+            // Save story data
+            $itemPageData = json_decode($result, true);
 
-        // Execude http request
-        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-        // Save story data
-        $storyData = json_decode($result, true);
-        $storyData = $storyData[0];
+            $statusTypes = $itemPageData['CompletionStatus'];
+            $fieldMappings = $itemPageData['FieldMappings'];
+            $languages = $itemPageData['Languages'];
+            $categories = $itemPageData['Categories'];
+            $itemImages = $itemPageData['ItemImages'];
+         }
         
         //include theme directory for text hovering
         $theme_sets = get_theme_mods();
@@ -155,8 +161,6 @@ function _TCT_item_page( $atts ) {
                                 if (response.code == "200") {
                                     return 1;
                                 }
-                                else {
-                                }
                                 });
                             }, 55 * 1000);
                         </script>';
@@ -205,16 +209,6 @@ function _TCT_item_page( $atts ) {
 
         // Editor tab
         $editorTab = "";
-            // Set request parameters for status data
-            $url = home_url()."/tp-api/completionStatus";
-            $requestType = "GET";
-
-            // Execude http request
-            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-            // Save status data
-            $statusTypes = json_decode($result, true);
-
             $progressData = array(
                 $itemData['TranscriptionStatusName'],
                 $itemData['DescriptionStatusName'],
@@ -314,18 +308,11 @@ function _TCT_item_page( $atts ) {
                             }
                         }
                     }
-                        $editorTab .= $CompletedBar;
-                        $editorTab .= $ReviewBar;
-                        $editorTab .= $EditBar;
-                        $editorTab .= $NotStartedBar;
-                    $editorTab .= '</div>';
-                /*$editorTab .= '<div class="prog-refer">';
-                    $editorTab .= '<ul>';
-                        foreach ($statusTypes as $statusType) {
-                            $editorTab .= '<li><span class="colorbox" style="background-color: '.$statusType['ColorCode'].';"></span> '.$statusType['Name'].'</li>';
-                        }
-                    $editorTab .= '</ul>';
-                $editorTab .= '</div>'; */
+                    $editorTab .= $CompletedBar;
+                    $editorTab .= $ReviewBar;
+                    $editorTab .= $EditBar;
+                    $editorTab .= $NotStartedBar;
+                $editorTab .= '</div>';
             $editorTab .= '</div>';
 
 
@@ -339,31 +326,10 @@ function _TCT_item_page( $atts ) {
                     //status-changer
                     $editorTab .= "<div class='item-page-section-headline-right-site'>";
                         $editorTab .= '<div id="transcription-status-changer" class="status-changer section-status-changer login-required">';
-                            //if (current_user_can('administrator')) {
-                                $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
-                                                    style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';"
-                                                    onclick="event.stopPropagation(); document.getElementById(\'transcription-status-dropdown\').classList.toggle(\'show\')"></i>';
-                            /*}
-                            else {
-                                $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
-                                                    style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';">
-                                                    </i>';
-                            }*/
+                            $editorTab .= '<i id="transcription-status-indicator" class="fal fa-circle status-indicator"
+                                                style="color: '.$itemData['TranscriptionStatusColorCode'].'; background-color:'.$itemData['TranscriptionStatusColorCode'].';"
+                                                onclick="event.stopPropagation(); document.getElementById(\'transcription-status-dropdown\').classList.toggle(\'show\')"></i>';
                             $editorTab .= '<div id="transcription-status-dropdown" class="sub-status status-dropdown-content">';
-
-                            /*    foreach ($statusTypes as $statusType) {
-                                    if ($itemData['TranscriptionStatusId'] == $statusType['CompletionStatusId']) {
-                                        $editorTab .= "<div class='status-dropdown-option status-dropdown-option-current'
-                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                        $editorTab .= "<i class='fal fa-circle' style='color: transparent;
-                                                            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'>
-                                                        </i>".$statusType['Name']."</div>";
-                                    } else {
-                                        $editorTab .= "<div class='status-dropdown-option'
-                                                            onclick=\"changeStatus(".$_GET['item'].", null, '".$statusType['Name']."', 'TranscriptionStatusId', ".$statusType['CompletionStatusId'].", '".$statusType['ColorCode']."', ".sizeof($progressData).", this)\">";
-                                        $editorTab .= "<i class='fal fa-circle' style='color: transparent; background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, ".$statusType['ColorCode']."), color-stop(1, ".$statusType['ColorCodeGradient']."));'></i>".$statusType['Name']."</div>";
-                                    }
-                                }*/
 
                                 foreach ($statusTypes as $statusType) {
                                     if ($statusType['CompletionStatusId'] != 4 || current_user_can('administrator')) {
@@ -412,16 +378,6 @@ function _TCT_item_page( $atts ) {
               
                     $editorTab .= "<div class='transcription-mini-metadata'>";
                         $editorTab .= '<div id="transcription-language-selector" class="language-selector-background language-selector login-required">';
-                                // Set request parameters for language data
-                            $url = home_url()."/tp-api/languages";
-                            $requestType = "GET";
-
-                                // Execude http request
-                            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-                                // Save language data
-                            $languages = json_decode($result, true);
-
                             $editorTab .= '<select>';
                                 $editorTab .= '<option value="" disabled selected hidden>';
                                     $editorTab .= 'Language(s) of the Document';
@@ -522,16 +478,6 @@ function _TCT_item_page( $atts ) {
                 $editorTab .= '<div style="clear: both;"></div>';
                     $editorTab .= "<div id=\"description-area\" class=\"description-save collapse show\">";
                         $editorTab .= "<div id=\"category-checkboxes\" class=\"login-required\">";
-                            // Set request parameters for category data
-                            $url = home_url()."/tp-api/properties?PropertyType=Category";
-                            $requestType = "GET";
-
-                            // Execude http request
-                            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-                            // Save category data
-                            $categories = json_decode($result, true);
-
                             foreach ($categories as $category) {
                                 $checked = "";
                                 if ($itemData['Properties'] != null) {
@@ -546,7 +492,7 @@ function _TCT_item_page( $atts ) {
                                     $editorTab .= $category['PropertyValue'];
                                     $editorTab .= '<input class="category-checkbox" id="type-'.$category['PropertyValue'].'-checkbox" type="checkbox" '.$checked.'
                                                         name="'.$category['PropertyValue'].'"value="'.$category['PropertyId'].'"
-                                                        onClick="addItemProperty('.$_GET['item'].', '.get_current_user_id().', \'category\', \''.$statusTypes[1]['ColorCode'].'\', '.sizeof($progressData).', this)">';
+                                                        onClick="addItemProperty('.$_GET['item'].', '.get_current_user_id().', \'category\', \''.$statusTypes[1]['ColorCode'].'\', '.sizeof($progressData).', \''.$category['PropertyValue'].'\', this)" />';
                                     $editorTab .= '<span  class="theme-color-background item-checkmark checkmark"></span>';
                                 $editorTab .= '</label>';
                             }
@@ -693,68 +639,58 @@ function _TCT_item_page( $atts ) {
                 $infoTab .= "<h4 class='theme-color item-page-section-headline'>";
                     $infoTab .= "Title: ".$itemData['Title'];
                 $infoTab .= "</h4>";
-                /*$infoTab .= "<p class='item-page-property-value'>";
-                    $infoTab .= $itemData['Description'];
-                $infoTab .= "</p>";*/
-
-                // Set request parameters
-                $url = home_url()."/tp-api/fieldMappings";
-                $requestType = "GET";
-
-                // Execude request
-                include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-                // Display data
-                $fieldMappings = json_decode($result, true);
 
                 $fields = array();
                 foreach ($fieldMappings as $fieldMapping) {
                     $fields[$fieldMapping['Name']] = $fieldMapping['DisplayName'];
                 }
-                foreach ($storyData as $key => $value) {
-                    if ($fields[$key] != null && $fields[$key] != "") {
-                        $infoTab .= "<p class='item-page-property'>";
-                            $infoTab .= "<span class='item-page-property-key' style='font-weight:bold;'>";
-                                $infoTab .= $fields[$key].": ";
-                            $infoTab .= "</span>";
-                            $infoTab .= "<span class='item-page-property-value'>";
-                            $valueList = explode(" || ", $value);
-                            $valueList = array_unique($valueList);
-                            $i = 0;
-                            foreach ($valueList as $singleValue) {
-                                if ($singleValue != "") {
-                                    if ($i == 0) {
-                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                foreach ($itemData as $key => $value) {
+                    if (substr($key, 0, 5) == "Story") {
+                        $key = substr($key, 5);
+                        if ($fields[$key] != null && $fields[$key] != "") {
+                            $infoTab .= "<p class='item-page-property'>";
+                                $infoTab .= "<span class='item-page-property-key' style='font-weight:bold;'>";
+                                    $infoTab .= $fields[$key].": ";
+                                $infoTab .= "</span>";
+                                $infoTab .= "<span class='item-page-property-value'>";
+                                $valueList = explode(" || ", $value);
+                                $valueList = array_unique($valueList);
+                                $i = 0;
+                                foreach ($valueList as $singleValue) {
+                                    if ($singleValue != "") {
+                                        if ($i == 0) {
+                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                                $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                            }
+                                            else {
+                                                $infoTab .= $singleValue;
+                                            }
                                         }
                                         else {
-                                            $infoTab .= $singleValue;
+                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                                $infoTab .= "</br>";
+                                                $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                            }
+                                            else {
+                                                $infoTab .= "</br>";
+                                                $infoTab .= $singleValue;
+                                            }
                                         }
                                     }
-                                    else {
-                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                            $infoTab .= "</br>";
-                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
-                                        }
-                                        else {
-                                            $infoTab .= "</br>";
-                                            $infoTab .= $singleValue;
-                                        }
-                                    }
+                                    $i += 1;
                                 }
-                                $i += 1;
-                            }
-                                
-                            $infoTab .= "</span></br>";
-                        $infoTab .= "</p>";
+                                    
+                                $infoTab .= "</span></br>";
+                            $infoTab .= "</p>";
+                        }
                     }
                 }
                 $location = "";
-                if ($storyData['PlaceName'] != null && $storyData['PlaceName'] != "") {
-                    $location .= $storyData['PlaceName'];
+                if ($itemData['StoryPlaceName'] != null && $itemData['StoryPlaceName'] != "") {
+                    $location .= $itemData['StoryPlaceName'];
                 }
-                if ($storyData['PlaceLatitude'] != null && $storyData['PlaceLatitude'] != "" && $storyData['PlaceLongitude'] != null && $storyData['PlaceLongitude'] != "") {
-                    $location .= " (".$storyData['PlaceLatitude'].", ".$storyData['PlaceLongitude'].")";
+                if ($itemData['StoryPlaceLatitude'] != null && $itemData['StoryPlaceLatitude'] != "" && $itemData['StoryPlaceLongitude'] != null && $itemData['StoryPlaceLongitude'] != "") {
+                    $location .= " (".$itemData['StoryPlaceLatitude'].", ".$itemData['StoryPlaceLongitude'].")";
                 }
                 if ($location != "") {
                     $infoTab .= "<p class='item-page-property'>";
@@ -773,15 +709,16 @@ function _TCT_item_page( $atts ) {
         $taggingTab = "";
             // Location section
 	    $taggingTab .= "<div id='full-view-map'>";
+            $taggingTab .= "<i class='far fa-map map-placeholder'></i>";
 	    $taggingTab .= "</div>";
 	    $taggingTab .= "<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.min.js'></script>
 						<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.1/mapbox-gl-geocoder.css' type='text/css' />";
 	
        $taggingTab .= "<div id='location-section' class='item-page-section'>";
            
-            $taggingTab .= "<div class='item-page-section-headline-container collapse-headline collapse-controller login-required' data-toggle='collapse' href='#location-input-section'>";
+            $taggingTab .= "<div class='item-page-section-headline-container login-required' data-toggle='collapse' href='#location-input-section'>";
                 $taggingTab .= "<i class='fal fa-map-marker-alt theme-color' style='padding-right: 3px; font-size: 17px; margin-right:8px;'></i>";
-                $taggingTab .= "<h4 id='location-position' class='theme-color item-page-section-headline' title='Click to add a location'>";
+                $taggingTab .= "<h4 id='location-position' class='theme-color item-page-section-headline collapse-headline collapse-controller' title='Click to add a location'>";
                     $taggingTab .= "Locations";
                     $taggingTab .= '<i class="fas fa-plus-circle" style="margin-left:5px; font-size:15px; position: absolute; top: 10px;"></i>';
                 $taggingTab .= "</h4>";
@@ -1572,7 +1509,7 @@ function _TCT_item_page( $atts ) {
             $prevItem = null;
             $nextItem = null;
             $lastItem = null;
-            foreach ($storyData['Items'] as $item) {
+            foreach ($itemImages as $item) {
                 if ($i == 0) {
                     $firstItem = $item['ItemId'];
                 }
@@ -1602,19 +1539,9 @@ function _TCT_item_page( $atts ) {
                     $imageLink .= "/full";
                 }
                 $imageLink .= "/250,250/0/default.jpg";
-/*
-                $image = json_decode($item['ImageLink'], true);
-                $imageLink = $image['service']['@id'];
-                if ($image["width"] <= $image["height"]) {
-                    $imageLink .= "/0,0,".$image["width"].",".$image["width"];
-                }
-                else {
-                    $imageLink .= "/0,0,".$image["height"].",".$image["height"];
-                }
-                $imageLink .= "/250,250/0/default.jpg";
-                */
+
                 if ($initialSlide == null && $item['ItemId'] == $_GET['item']){
-                    $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."' class='slider-current-item'>";
+                    $content .= "<a href='".home_url()."/documents/story/item/?story=".$itemData['StoryId']."&item=".$item['ItemId']."' class='slider-current-item'>";
                         $content .= "<div class='slider-current-item-pointer'></div>";
                         $content .= "<div class='label-img-status shadow-img-corner'></div>";
                         $content .= "<div class='label-img-status' 
@@ -1629,7 +1556,7 @@ function _TCT_item_page( $atts ) {
                     $i++;
                 }
                 else {
-                    $content .= "<a href='".home_url()."/documents/story/item?story=".$storyData['StoryId']."&item=".$item['ItemId']."'>";
+                    $content .= "<a href='".home_url()."/documents/story/item/?story=".$itemData['StoryId']."&item=".$item['ItemId']."'>";
                         $content .= "<div class='label-img-status shadow-img-corner'></div>";
                         $content .= "<div class='label-img-status' 
                                         style='border-color: ".$item['CompletionStatusColorCode']." transparent transparent ".$item['CompletionStatusColorCode']."'></div>";
@@ -1643,115 +1570,118 @@ function _TCT_item_page( $atts ) {
                     $i++;
                 }
             }
-            $lastItem = $storyData['Items'][($i - 1)]['ItemId'];
+            $lastItem = $itemImages[($i - 1)]['ItemId'];
 
         $content .= "</div>";
 
 // Image slider JavaScript
 $infinite = "true";
-if (sizeof($storyData['Items']) > 100) {
+if (sizeof($itemImages) > 100) {
 $infinite = "false";
 }
 $content .= "<script>
-            var width = window.innerWidth;
-            var slidesToShow = 3;
-            if (width > 520) {
-                slidesToShow = 4;
-            }
-            if (width > 670) {
-                slidesToShow = 5;
-            }
-            if (width > 820) {
-                slidesToShow = 6;
-            }
-            if (width > 970) {
-                slidesToShow = 7;
-            }
-            if (width > 1120) {
-                slidesToShow = 8;
-            }
-            if (width > 1270) {
-                slidesToShow = 9;
-            }
-            if (width > 1420) {
-                slidesToShow = 10;
-            }
-            if (width > 1570) {
-                slidesToShow = 11;
-            }
-            if (width > 1720) {
-                slidesToShow = 12;
-            }
-            if (width > 1920) {
-                slidesToShow = 13;
-            }
-            var slideIndex = ".($initialSlide + 1).";
-            var initialSlide = ".$initialSlide." - Math.floor(slidesToShow / 2);
-            if (initialSlide < 1) {
-                initialSlide = 0;
-            }
-            jQuery('.item-page-slider').slick({
-                dots: true,
-                arrows: true,
-                infinite: ".$infinite.",
-                speed: 300,
-                slidesToShow: 13,
-                slidesToScroll: 13,
-                lazyLoad: 'ondemand',
-                initialSlide: initialSlide,
-                responsive: [
-                    {
-                        breakpoint: 1920,
-                        settings: { slidesToShow: 12, slidesToScroll: 12, }
-                    },
-                    {
-                        breakpoint: 1720,
-                        settings: { slidesToShow: 11, slidesToScroll: 11, }
-                    },
-                    {
-                        breakpoint: 1570,
-                        settings: { slidesToShow: 10, slidesToScroll: 10, }
-                    },
-                    {
-                        breakpoint: 1420,
-                        settings: { slidesToShow: 9, slidesToScroll: 9, }
-                    },
-                    {
-                        breakpoint: 1270,
-                        settings: { slidesToShow: 8, slidesToScroll: 8, }
-                    },
-                    {
-                        breakpoint: 1120,
-                        settings: { slidesToShow: 7, slidesToScroll: 7, }
-                    },
-                    {
-                        breakpoint: 970,
-                        settings: { slidesToShow: 6, slidesToScroll: 6, }
-                    },
-                    {
-                        breakpoint: 820,
-                        settings: { slidesToShow: 5, slidesToScroll: 5, }
-                    },
-                    {
-                        breakpoint: 670,
-                        settings: { slidesToShow: 4, slidesToScroll: 4, }
-                    },
-                    {
-                        breakpoint: 520,
-                        settings: { slidesToShow: 3, slidesToScroll: 3, }
-                    },
-                ]
-            });
-    </script>";
+                jQuery(window).load(function() {
+                    var width = window.innerWidth;
+                    var slidesToShow = 3;
+                    if (width > 520) {
+                        slidesToShow = 4;
+                    }
+                    if (width > 670) {
+                        slidesToShow = 5;
+                    }
+                    if (width > 820) {
+                        slidesToShow = 6;
+                    }
+                    if (width > 970) {
+                        slidesToShow = 7;
+                    }
+                    if (width > 1120) {
+                        slidesToShow = 8;
+                    }
+                    if (width > 1270) {
+                        slidesToShow = 9;
+                    }
+                    if (width > 1420) {
+                        slidesToShow = 10;
+                    }
+                    if (width > 1570) {
+                        slidesToShow = 11;
+                    }
+                    if (width > 1720) {
+                        slidesToShow = 12;
+                    }
+                    if (width > 1920) {
+                        slidesToShow = 13;
+                    }
+                    var slideIndex = ".($initialSlide + 1).";
+                    var initialSlide = ".$initialSlide." - Math.floor(slidesToShow / 2);
+                    if (initialSlide < 1) {
+                        initialSlide = 0;
+                    }
+                    jQuery('.item-page-slider').slick({
+                        dots: true,
+                        arrows: true,
+                        infinite: ".$infinite.",
+                        speed: 300,
+                        slidesToShow: 13,
+                        slidesToScroll: 13,
+                        lazyLoad: 'ondemand',
+                        initialSlide: initialSlide,
+                        responsive: [
+                            {
+                                breakpoint: 1920,
+                                settings: { slidesToShow: 12, slidesToScroll: 12, }
+                            },
+                            {
+                                breakpoint: 1720,
+                                settings: { slidesToShow: 11, slidesToScroll: 11, }
+                            },
+                            {
+                                breakpoint: 1570,
+                                settings: { slidesToShow: 10, slidesToScroll: 10, }
+                            },
+                            {
+                                breakpoint: 1420,
+                                settings: { slidesToShow: 9, slidesToScroll: 9, }
+                            },
+                            {
+                                breakpoint: 1270,
+                                settings: { slidesToShow: 8, slidesToScroll: 8, }
+                            },
+                            {
+                                breakpoint: 1120,
+                                settings: { slidesToShow: 7, slidesToScroll: 7, }
+                            },
+                            {
+                                breakpoint: 970,
+                                settings: { slidesToShow: 6, slidesToScroll: 6, }
+                            },
+                            {
+                                breakpoint: 820,
+                                settings: { slidesToShow: 5, slidesToScroll: 5, }
+                            },
+                            {
+                                breakpoint: 670,
+                                settings: { slidesToShow: 4, slidesToScroll: 4, }
+                            },
+                            {
+                                breakpoint: 520,
+                                settings: { slidesToShow: 3, slidesToScroll: 3, }
+                            },
+                        ]
+                    });
+                });
+            </script>";
     
     // Image viewer
     $imageViewer = "";
             $imageViewer .= '<div id="openseadragon">';
+                $imageViewer .= '<input type="hidden" id="image-data-holder" value=\''.$itemData['ImageLink'].'\'>';
                 $imageViewer .= "<div id=next-item-main-view>";
-                    if ($initialSlide < sizeof($storyData['Items']) - 1) {
+                    if ($initialSlide < sizeof($itemImages) - 1) {
                         $imageViewer .= '<button id="viewer-next-item" 
                                                 onClick="switchItem('.$nextItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\', 
-                                                            '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($storyData['Items']).', 
+                                                            '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($itemImages).', 
                                                             '.$firstItem.', '.$lastItem.')" 
                                                 type="button" style="cursor: pointer;">';
                             $imageViewer .= '<a><i class="fas fa-chevron-right" style="font-size: 20px; color: black;"></i></a>';
@@ -1762,7 +1692,7 @@ $content .= "<script>
                     if ($initialSlide != 0) {
                         $imageViewer .= '<button id="viewer-previous-item" 
                                                 onClick="switchItem('.$prevItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\',
-                                                            '.sizeof($progressData).', '.($initialSlide).', '.sizeof($storyData['Items']).', 
+                                                            '.sizeof($progressData).', '.($initialSlide).', '.sizeof($itemImages).', 
                                                             '.$firstItem.', '.$lastItem.')" 
                                                 type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-left" style="font-size: 20px; color: black;"></i></a></button>';   
                     } 
@@ -1810,18 +1740,18 @@ $content .= "<script>
                 $content .= '<ul class="item-navigation-content-container right" style="">';
                     $content .= '<div class="item-navigation-prev">';
                         if ($prevItem != null) {
-                            $content .= '<li><a title="first" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$firstItem.'"><i class="fal fa-angle-double-left"></i></a></li>';
-                            $content .=  '<li class="rgt"><a title="previous" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$prevItem.'"><i class="fal fa-angle-left"></i></a></li>';
+                            $content .= '<li><a title="first" href="'.home_url().'/documents/story/item/?story='.$itemData['StoryId'].'&item='.$firstItem.'"><i class="fal fa-angle-double-left"></i></a></li>';
+                            $content .=  '<li class="rgt"><a title="previous" href="'.home_url().'/documents/story/item/?story='.$itemData['StoryId'].'&item='.$prevItem.'"><i class="fal fa-angle-left"></i></a></li>';
                         }
                     $content .= '</div>';
                     $content .=  '<li class="rgt">';
-                        $content .= '<a title="Story:'.$storyData['dcTitle'].'" href="'.home_url().'/documents/story?story='.$storyData['StoryId'].'">';
+                        $content .= '<a title="Story:'.$itemData['StorydcTitle'].'" href="'.home_url().'/documents/story?story='.$itemData['StoryId'].'">';
                         $content .= '<i class="fal fa-book"></i></a>';
                     $content .= '</li>';
                     $content .= '<div class="item-navigation-next">';
                         if ($nextItem != null) {
-                            $content .= '<li class="rgt"><a title="next" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$nextItem.'"><i class="fal fa-angle-right"></i></a></li>';
-                            $content .= '<li class="rgt"><a title="last" href="'.home_url().'/documents/story/item?story='.$storyData['StoryId'].'&item='.$lastItem.'"><i class="fal fa-angle-double-right"></i></a></li>';
+                            $content .= '<li class="rgt"><a title="next" href="'.home_url().'/documents/story/item/?story='.$itemData['StoryId'].'&item='.$nextItem.'"><i class="fal fa-angle-right"></i></a></li>';
+                            $content .= '<li class="rgt"><a title="last" href="'.home_url().'/documents/story/item/?story='.$itemData['StoryId'].'&item='.$lastItem.'"><i class="fal fa-angle-double-right"></i></a></li>';
                         }
                     $content .= '</div>';
                 $content .= '</ul>';
@@ -1870,10 +1800,10 @@ $content .= "<script>
             $content .= "<div id='item-image-section' class='panel-left'>";
                 $content .= '<div id="openseadragonFS">';
                     $content .= "<div id=next-item-full-view>";
-                        if ($initialSlide < sizeof($storyData['Items']) - 1) {
+                        if ($initialSlide < sizeof($itemImages) - 1) {
                             $content .= '<button id="viewer-next-item" 
                                             onClick="switchItem('.$nextItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\', 
-                                                        '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($storyData['Items']).', 
+                                                        '.sizeof($progressData).', '.($initialSlide + 2).', '.sizeof($itemImages).', 
                                                         '.$firstItem.', '.$lastItem.')" 
                                             type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-right" style="font-size: 20px; color: black;"></i></a></button>';
                         }
@@ -1882,7 +1812,7 @@ $content .= "<script>
                         if ($initialSlide != 0) {
                             $content .= '<button id="viewer-previous-item" 
                                             onClick="switchItem('.$prevItem.', '.get_current_user_id().', \''.$statusTypes[1]['ColorCode'].'\',
-                                                        '.sizeof($progressData).', '.($initialSlide).', '.sizeof($storyData['Items']).', 
+                                                        '.sizeof($progressData).', '.($initialSlide).', '.sizeof($itemImages).', 
                                                         '.$firstItem.', '.$lastItem.')"  
                                             type="button" style="cursor: pointer;"><a><i class="fas fa-chevron-left" style="font-size: 20px; color: black;"></i></a></button>';    
                         }
@@ -1952,13 +1882,6 @@ $content .= "<script>
                             $content .= "</div>";
                         $content .= "</li>";
 
-                        /*$content .= "<li>";
-                            $content .= "<div class='theme-color theme-color-hover tablinks'
-                                            onclick='switchItemTab(event, \"settings-tab\")'>";
-                                $content .= '<i class="fal fa-sliders-h"></i>';
-                            $content .= "</div>";
-                        $content .= "</li>";*/
-
                         $content .= "<li>";
                             $content .= "<div class='theme-color theme-color-hover tablinks' title='Tutorial'
                                             onclick='switchItemTab(event, \"help-tab\")'>";
@@ -1966,93 +1889,79 @@ $content .= "<script>
                             $content .= "</div>";
                         $content .= "</li>";
                     $content .= '</ul>';
-                    //////////////////////////////////////////////////////////////////////////////////////
+                    
+
                     //Status Chart
+                    $content .= "<div id='item-status-doughnut-chart' class='item-status-chart'>";
+                        $content .= "<canvas id='item-status-doughnut-chart-canvas' style='display:inline;' width='38' height='38'>";
+                        $content .= "</canvas>";
+                        $content .= '<div id="item-status-doughnut-info-box" class="item-status-info-box">';
+                            $content .= '<ul class="item-status-info-box-list">';
+                                foreach ($statusTypes as $statusType) {
+                                    $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
+                                    $content .= '<li>';
+                                        $content .= '<span class="status-info-box-color-indicator" style="background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';
+                                                            background-image: -webkit-gradient(linear, left top, left bottom,
+                                                            color-stop(0, '.$statusType['ColorCode'].'), color-stop(1, '.$statusType['ColorCodeGradient'].'));">';
+                                        $content .= '</span>';
+                                        $content .= '<span id="progress-doughnut-overlay-'.str_replace(' ', '-', $statusType['Name']).'-section" class="status-info-box-percentage" style="width: 20%;">';
+                                            $content .= $percentage.'%';
+                                        $content .= '</span>';
+                                        $content .= '<span class="status-info-box-text">';
+                                            $content .= $statusType['Name'];
+                                        $content .= '</span>';
+                                    $content .= '</li>';
+                                }
+                            $content .= '</ul>';
+                        $content .= '</div>';
+                    $content .= "</div>";
 
-                    // Set request parameters for status data
-                    $url = home_url()."/tp-api/completionStatus";
-                    $requestType = "GET";
-
-                    // Execude http request
-                    include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-                    // Save status data
-                    $statusTypes = json_decode($result, true);
-
-                    // Save status data
-                    $statusTypes = json_decode($result, true);
-
-
-                                $content .= "<div id='item-status-doughnut-chart' class='item-status-chart'>";
-                                    $content .= "<canvas id='item-status-doughnut-chart-canvas' style='display:inline;' width='38' height='38'>";
-                                    $content .= "</canvas>";
-                                    $content .= '<div id="item-status-doughnut-info-box" class="item-status-info-box">';
-                                        $content .= '<ul class="item-status-info-box-list">';
-                                            foreach ($statusTypes as $statusType) {
-                                                $percentage = ($progressCount[$statusType['Name']] / sizeof($progressData)) * 100;
-                                                $content .= '<li>';
-                                                    $content .= '<span class="status-info-box-color-indicator" style="background-color:'.$statusType['ColorCode'].'; color:'.$statusType['ColorCode'].';
-                                                                        background-image: -webkit-gradient(linear, left top, left bottom,
-                                                                        color-stop(0, '.$statusType['ColorCode'].'), color-stop(1, '.$statusType['ColorCodeGradient'].'));">';
-                                                    $content .= '</span>';
-                                                    $content .= '<span id="progress-doughnut-overlay-'.str_replace(' ', '-', $statusType['Name']).'-section" class="status-info-box-percentage" style="width: 20%;">';
-                                                        $content .= $percentage.'%';
-                                                    $content .= '</span>';
-                                                    $content .= '<span class="status-info-box-text">';
-                                                        $content .= $statusType['Name'];
-                                                    $content .= '</span>';
-                                                $content .= '</li>';
-                                            }
-                                        $content .= '</ul>';
-                                    $content .= '</div>';
-                                $content .= "</div>";
-
-                                $content .= "<script>
-                                                var ctx = document.getElementById('item-status-doughnut-chart-canvas');
-                                                var statusDoughnutChart = new Chart(ctx, {
-                                                    type: 'doughnut',
-                                                    data: {
-                                                        labels :['Not Started','Edit','Review','Completed'],
-                                                        datasets: [{
-                                                            data: [".$progressCount['Not Started'].", ".$progressCount['Edit'].", ".$progressCount['Review'].", ".$progressCount['Completed']."],
-                                                            backgroundColor: [";
-                                                                foreach ($statusTypes as $statusType) {
-                                                                    $content .= '"'.$statusType['ColorCode'].'", ';
-                                                                }
-                                $content .=                 "],
-                                                            borderWidth: 0
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        cutoutPercentage: 26,
-                                                        borderWidth: 4,
-                                                        borderColor: '#000',
-                                                        tooltips: {enabled: false},
-                                                        hover: {mode: null},
-                                                        legend : {
-                                                                    display: false
-                                                                },
-                                                        responsive: false,
-                                                        segmentShowStroke: false
-                                                    },
-                                                });
-                                                function updateDoughnutStatus(oldStatusName, newStatusName) {
-                                                    var labels = statusDoughnutChart.data.labels;
-                                                    for (var i = 0; i < labels.length; i++){
-                                                        if (labels[i] == oldStatusName) {
-                                                            var oldStatusIndex = i;
-                                                        }
-                                                        if (labels[i] == newStatusName) {
-                                                            var newStatusIndex = i;
-                                                        }
+                    $content .= "<script>
+                                    var ctx = document.getElementById('item-status-doughnut-chart-canvas');
+                                    var statusDoughnutChart = new Chart(ctx, {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels :['Not Started','Edit','Review','Completed'],
+                                            datasets: [{
+                                                data: [".$progressCount['Not Started'].", ".$progressCount['Edit'].", ".$progressCount['Review'].", ".$progressCount['Completed']."],
+                                                backgroundColor: [";
+                                                    foreach ($statusTypes as $statusType) {
+                                                        $content .= '"'.$statusType['ColorCode'].'", ';
                                                     }
+                    $content .=                 "],
+                                                borderWidth: 0
+                                            }]
+                                        },
+                                        options: {
+                                            cutoutPercentage: 26,
+                                            borderWidth: 4,
+                                            borderColor: '#000',
+                                            tooltips: {enabled: false},
+                                            hover: {mode: null},
+                                            legend : {
+                                                        display: false
+                                                    },
+                                            responsive: false,
+                                            segmentShowStroke: false
+                                        },
+                                    });
+                                    function updateDoughnutStatus(oldStatusName, newStatusName) {
+                                        var labels = statusDoughnutChart.data.labels;
+                                        for (var i = 0; i < labels.length; i++){
+                                            if (labels[i] == oldStatusName) {
+                                                var oldStatusIndex = i;
+                                            }
+                                            if (labels[i] == newStatusName) {
+                                                var newStatusIndex = i;
+                                            }
+                                        }
 
-                                                    statusDoughnutChart.data.datasets[0].data[oldStatusIndex] -= 1;
-                                                    statusDoughnutChart.update();
-                                                    statusDoughnutChart.data.datasets[0].data[newStatusIndex] += 1;
-                                                    statusDoughnutChart.update();
-                                                }
-                                            </script>";
+                                        statusDoughnutChart.data.datasets[0].data[oldStatusIndex] -= 1;
+                                        statusDoughnutChart.update();
+                                        statusDoughnutChart.data.datasets[0].data[newStatusIndex] += 1;
+                                        statusDoughnutChart.update();
+                                    }
+                                </script>";
 
 
                     //////////////////////////////////////////////////////////////////////////////////////

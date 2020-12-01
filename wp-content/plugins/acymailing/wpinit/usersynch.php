@@ -22,7 +22,6 @@ class acyUsersynch extends acyHook
 
     public function addProfileFields()
     {
-        if (!$this->loadAcyLibrary()) return;
 
         $config = acym_config();
         if (!$config->get('regacy', 0)) return;
@@ -50,7 +49,7 @@ class acyUsersynch extends acyHook
 			</tbody>
 		</table>
 		<input type="hidden" value="<?php echo implode(',', array_keys($regacyHelper->lists)); ?>" name="regacy_visible_lists" />
-		<input type="hidden" value="wordpress_profile" name="acy_source" />
+		<input type="hidden" value="WordPress user profile" name="acy_source" />
         <?php
     }
 
@@ -61,8 +60,6 @@ class acyUsersynch extends acyHook
         $isnew = empty($oldUser);
         $cmsUser = get_user_by('id', $userId);
         if (empty($cmsUser->user_email)) return;
-
-        $this->loadAcyLibrary();
 
         $user = [
             'email' => $cmsUser->user_email,
@@ -86,8 +83,6 @@ class acyUsersynch extends acyHook
     {
         $cmsUser = get_user_by('id', $userId);
         if (empty($cmsUser->user_email)) return;
-
-        $this->loadAcyLibrary();
 
         $userClass = acym_get('class.user');
         $userClass->synchDeleteCmsUser($cmsUser->user_email);

@@ -30,6 +30,6 @@ class Easy_Accordion_Free_Activator {
 	 * @return void
 	 */
 	public static function activate() {
-
+		deactivate_plugins( 'easy-accordion-pro/easy-accordion-pro.php' );
 	}
 }

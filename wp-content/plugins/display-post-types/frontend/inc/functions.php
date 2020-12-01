@@ -17,7 +17,7 @@
  * @param string   $close     Markup wrapper closing div.
  * @return void
  */
-function dpt_markup( $class = '', $callbacks = [], $open = '<div%s>', $close = '</div>' ) {
+function dpt_markup( $class = '', $callbacks = array(), $open = '<div%s>', $close = '</div>' ) {
 	if ( ! $class ) {
 		return;
 	}
@@ -48,7 +48,7 @@ function dpt_markup( $class = '', $callbacks = [], $open = '<div%s>', $close = '
 		return;
 	}
 
-	printf( $open, dpt_get_attr( $context, [ 'class' => $classes ] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	printf( $open, dpt_get_attr( $context, array( 'class' => $classes ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	foreach ( $callbacks as $callback ) {
 		$callback = (array) $callback;
@@ -83,7 +83,7 @@ function dpt_markup( $class = '', $callbacks = [], $open = '<div%s>', $close = '
  * @param  str   $slug The slug/ID of the element (e.g., 'sidebar').
  * @param  array $attr Array of attributes to pass in (overwrites filters).
  */
-function dpt_attr( $slug, $attr = [] ) {
+function dpt_attr( $slug, $attr = array() ) {
 	echo dpt_get_attr( $slug, $attr ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
@@ -100,7 +100,7 @@ function dpt_attr( $slug, $attr = [] ) {
  * @param  array $attr Array of attributes to pass in (overwrites filters).
  * @return string
  */
-function dpt_get_attr( $slug, $attr = [] ) {
+function dpt_get_attr( $slug, $attr = array() ) {
 	if ( ! $slug ) {
 		return '';
 	}

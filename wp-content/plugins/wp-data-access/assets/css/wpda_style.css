@@ -156,7 +156,7 @@ table.wpda_simple_table tbody td.icon {
 }
 
 .wpda-table-structure {
-    border-collapse: inherit;
+    border-collapse: collapse;
     width: 100%;
 }
 
@@ -325,20 +325,20 @@ span.drop-index:active, span.drop-index:hover {
     font-size: 90% !important;
 }
 
+.wpda_settings_icon {
+    padding-top: 1px;
+    padding-right: 2px;
+}
+
+.wpda_settings_label {
+    padding-left: 2px;
+}
+
 /* END TABLE SETTINGS */
 
 .label_disabled {
     color: grey;
     pointer-events: none;
-}
-
-.export_image {
-    background-image: url(../img/export.png);
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    width:800px;
-    height:280px;
-    padding-top: 20px;
 }
 
 .nobr {
@@ -420,7 +420,21 @@ fieldset.wpda_fieldset {
 fieldset.wpda_fieldset legend {
     font-weight: bold;
 }
-
+.no-close .ui-dialog-titlebar-close {
+    display: none;
+}
+.pointer {
+    cursor: pointer;
+}
+.notifyjs-corner {
+    margin-top: 42px !important;
+}
+.wpda_icon_on_button {
+    font-size: 16px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    vertical-align: text-bottom !important;
+}
 .wpda_text_uppercase {
     text-transform: uppercase;
 }
@@ -429,4 +443,7 @@ fieldset.wpda_fieldset legend {
 }
 .wpda_text_capitalize {
     text-transform: capitalize;
+}
+.ui-tooltip {
+    white-space: pre-line;
 }

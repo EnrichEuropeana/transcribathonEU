@@ -66,7 +66,12 @@ namespace WPDataProjects\Project {
 					<input type="hidden" name="action" value="new">
 					<input type="hidden" name="mode" value="edit">
 					<input type="hidden" name="table_name" value="<?php echo esc_attr( $this->table_name ); ?>">
-					<input type="submit" value="Add New" class="page-title-action">
+					<button type="submit" class="page-title-action wpda_tooltip"
+							title="Add new project to repository"
+					>
+						<span class="material-icons wpda_icon_on_button">add_circle</span>
+						<?php echo __( 'Add New', 'wp-data-access' ); ?>
+					</button>
 				</div>
 			</form>
 			<?php
@@ -91,11 +96,15 @@ namespace WPDataProjects\Project {
 			$src               = '?action=wpda_export_project&project_id=' . $item['project_id'] . '&wpnonce=' . $wp_nonce;
 			$actions['export'] = sprintf(
 				'
-					<a href="javascript:void(0)" onclick="javascript:jQuery(\'#stealth_mode\').attr(\'src\',\'%s\')" title="Export project">
-						Export
+					<a href="%s" target="_blank" title="Export project" class="wpda_tooltip">
+						<span style="white-space:nowrap">
+							<span class="material-icons wpda_icon_on_button">cloud_download</span>
+							%s
+						</span>
 					</a>
 				',
-				$src
+				$src,
+				__( 'Export', 'wp-data-access' )
 			);
 		}
 

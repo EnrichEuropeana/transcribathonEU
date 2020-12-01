@@ -105,16 +105,22 @@ namespace WPDataProjects\Parent_Child {
 				</script>
 				<?php
 				if ( 'off' !== $this->allow_delete ) {
+					$title             = __( 'Delete parent row and its child rows', 'wp-data-access' );
 					$actions['delete'] = sprintf(
 						'
-					    <a  href="javascript:void(0)"
+					    <a  href="javascript:void(0)" class="wpda_tooltip"
+					    	title="' . $title . '"
 					        onclick="if (confirm(\'%s\')) jQuery(\'%s\').submit()"
 					        >
-					        Delete
+							<span style="white-space:nowrap">
+								<span class="material-icons wpda_icon_on_button">delete</span>
+								%s
+					        </span>
                         </a>
                     ',
 						$this->message_confirm_delete,
-						'#delete_form_' . strval( self::$list_number - 1 )
+						'#delete_form_' . strval( self::$list_number - 1 ),
+						__( 'Delete', 'wp-data-access' )
 					);
 				}
 			}
@@ -166,9 +172,7 @@ namespace WPDataProjects\Parent_Child {
 			}
 
 			if ( 'off' !== $this->allow_delete ) {
-				$actions = [
-					'bulk-delete' => __( 'Delete Permanently', 'wp-data-access' ),
-				];
+				$actions = parent::get_bulk_actions();
 			} else {
 				$actions = [];
 			}
@@ -236,17 +240,25 @@ namespace WPDataProjects\Parent_Child {
 		 */
 		protected function add_header_button( $add_param = '' ) {
 			if ( 'edit' === $this->project->get_mode() && 'off' !== $this->allow_insert ) {
+				if ( is_admin() ) {
+					$url = "?page={$this->page}";
+				} else {
+					$url = '';
+				}
 				?>
 				<form
 						method="post"
-						action="?page=<?php echo esc_attr( $this->page ); ?>"
+						action="<?php echo esc_attr( $url ); ?>"
 						style="display: inline-block; vertical-align: unset;"
 				>
 					<div>
 						<input type="hidden" name="action" value="new">
 						<input type="hidden" name="mode" value="edit">
 						<input type="hidden" name="table_name" value="<?php echo esc_attr( $this->table_name ); ?>">
-						<input type="submit" value="Add New" class="page-title-action">
+						<button type="submit" class="page-title-action">
+							<span class="material-icons wpda_icon_on_button">add_circle</span>
+							<?php echo __( 'Add New', 'wp-data-access' ); ?>
+						</button>
 					</div>
 				</form>
 				<?php

@@ -206,7 +206,21 @@ namespace WPDataProjects\Simple_Form {
 									}
 
 									foreach ( $rows as $row ) {
-										$lov_value = $row[ $lookup_column_name[ $source_column_name ] ] . ' (' . $row[ $target_column_name ] . ')';
+										$hide_id = false;
+										foreach ( $tableform as $tableformitem ) {
+											if ( isset( $tableformitem->column_name ) ) {
+												if ( $tableformitem->column_name === $source_column_name ) {
+													$hide_id = isset( $tableformitem->hide_lookup_key ) ?
+														'on' === $tableformitem->hide_lookup_key : false;
+													break;
+												}
+											}
+										}
+										if ( $hide_id ) {
+											$lov_value = $row[ $lookup_column_name[ $source_column_name ] ];
+										} else {
+											$lov_value = $row[ $lookup_column_name[ $source_column_name ] ] . ' (' . $row[ $target_column_name ] . ')';
+										}
 										array_push( $lov_values, $lov_value );
 										array_push( $lov_options, $row[ $target_column_name ] );
 									}

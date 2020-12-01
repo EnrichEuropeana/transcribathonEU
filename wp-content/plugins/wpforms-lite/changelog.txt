@@ -1,5 +1,50 @@
 == Changelog ==
 
+= 1.6.2.2 =
+- Added: Caching friendly anti-spam protection (form tokens).
+- Added: Native integration with Elementor: add to the page and create new forms right inside its builder.
+- Added: Add a preview to the WPForms Gutenberg block.
+- Changed: Greatly improve WPForms Challenge experience.
+- Changed: Improve word counting when the Limit Length field option is used with Single Line Text/Paragraph Text fields.
+- Changed: Improve Number field input restrictions with various browsers.
+- Changed: Form field validation will now fail if input mask is enabled and user input does not complete required input mask elements.
+- Changed: Icon for the Multiple Choice field is now more representative.
+- Changed: Hide Delete button for a "Default Notification" in the Form Builder.
+- Changed: Improve Lite migrations for WordPress Multisite installations.
+- Changed: Update Constant Contact logos because of their rebranding.
+- Changed: Improve descriptions of various plugin options and add more context to them.
+- Fixed: Properly map fields in various addons when the first field is added in the Form Builder.
+- Fixed: Issue when editing Checkbox field entry values when dynamic choices were enabled and multiple values were saved.
+- Fixed: Refresh the list of form fields that are required to properly render marketing addons.
+- Fixed: "Invalid Form" error for logged out users upon submitting an AJAX form on some server configurations.
+- Fixed: Multiple Choice fields had issues in the builder with image choices with empty labels.
+- Fixed: Make bulk actions at the bottom of the Forms Overview work.
+- Fixed: "Single Line Text" and "Paragraph Text" calculate empty field word count incorrectly.
+- Fixed: Do not allow Action Scheduler to generate errors during the plugin uninstallation procedure.
+- Fixed: Input mask validation produces a JS error on jQuery 3.x.
+
+= 1.6.1 =
+- Added: Display a list of scheduled actions on WPForms > Tools > Scheduled Actions page.
+- Added: Multiple select option for Dropdown field (off by default).
+- Added: New Modern style option for Dropdown field (off by default).
+- Added: Support Smart Tags in form descriptions.
+- Fixed: Properly handle multiple clicks on various accordion-like elements on Form Builder and Settings > Integrations pages.
+- Fixed: Remove all the plugin-related information on uninstall from the DB when opted-in in plugin settings.
+- Fixed: Replace all new lines characters with spaces in notification email subjects (e.g., when an address field value is used in a subject via a smart tag).
+- Fixed: Make sure the plugin doesn't crash when `iconv` PHP extension is not installed on a server.
+- Fixed: Properly handle fields with choices with new lines in their labels when connected to Conditional Logic.
+- Fixed: Google Invisible v2 reCAPTCHA should show Submit Button Processing Text when the form is submitted.
+- Fixed: Display the list of countries in the "Countries" preset and in the Address field in alphabetical order regardless of the current site language.
+
+= 1.6.0.2 =
+- Fixed: The default value 0 (zero) of the Paragraph Text field does not display on the frontend.
+- Fixed: Product education URL encoding issues.
+- Fixed: Securely store WPForms anonymized cookie, so it cannot be sent along with cross-site requests (samesite).
+- Fixed: Various PHP notices that may appear during wildly complicated forms submissions.
+- Fixed: Improved escaping inside Form Builder live preview, props Fortinet Fortiguard Labs.
+- Fixed: Incorrect interval value was used when running a cleanup job after notifications sent.
+- Fixed: Delete orphaned plugin translation files when cleanup option in plugin settings is checked and the plugin is deleted from the site.
+
 = 1.6.0.1 =
 - Added: Admin bar menu item.
 - Added: Form Builder alert when using browser "Back" button if form contains unsaved changes.

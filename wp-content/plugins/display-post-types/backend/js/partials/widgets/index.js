@@ -52,7 +52,7 @@
 				wrapper.find('.page-panel').show();
 				wrapper.find('.post-panel').hide();
 			} else {
-				wrapper.find('.page-panel, .terms-panel').hide();
+				wrapper.find('.page-panel, .terms-panel, .terms-relation').hide();
 				wrapper.find('.post-panel').show();
 				taxSelec.find( 'option' ).hide();
 				taxSelec.find( '.' + postType ).show();
@@ -76,6 +76,7 @@
 			align  = [ 'dpt-list1', 'dpt-list2' ],
 			multicol = [ 'dpt-grid1', 'dpt-grid2', 'dpt-slider1' ],
 			excerpt = [ 'dpt-list1', 'dpt-grid1' ],
+			slider  = ['dpt-slider1'],
 			supported, custEx;
 
 		if (multicol.includes(style)) {
@@ -99,18 +100,25 @@
 			parent.nextAll('.custom-excerpts').hide();
 		}
 
+		if (slider.includes(style)) {
+			parent.nextAll('.autotime').show();
+		} else {
+			parent.nextAll('.autotime').hide();
+		}
+
 		supported = parent.nextAll('.styles-supported');
 		supported.find('.style_sup-checklist li').hide();
 		supported.find('.' + style).show();
 	}
 
 	function showTerms( taxonomy ) {
+		var wrapper = taxonomy.closest('.dpt-settings-content');
 		if ( taxonomy.val() ) {
-			taxonomy.parent().next('.terms-panel').show();
-			taxonomy.parent().next('.terms-panel').find( '.terms-checklist li' ).hide();
-			taxonomy.parent().next('.terms-panel').find( '.terms-checklist .' + taxonomy.val() ).show();
+			wrapper.find('.terms-panel, .terms-relation').show();
+			wrapper.find('.terms-panel').find( '.terms-checklist li' ).hide();
+			wrapper.find('.terms-panel').find( '.terms-checklist .' + taxonomy.val() ).show();
 		} else {
-			taxonomy.parent().next('.terms-panel').hide();
+			wrapper.find('.terms-panel, .terms-relation').hide();
 		}
 	}
 

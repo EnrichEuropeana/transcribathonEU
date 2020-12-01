@@ -42,7 +42,7 @@ namespace WPDataAccess {
 		/**
 		 * Option wpda_version and it's default value
 		 */
-		const OPTION_WPDA_VERSION = [ 'wpda_version', '3.1.1' ];
+		const OPTION_WPDA_VERSION = [ 'wpda_version', '3.5.0' ];
 		/**
 		 * Option wpda_setup_error and it's default value
 		 */
@@ -60,11 +60,11 @@ namespace WPDataAccess {
 		/**
 		 * Option wpda_uninstall_tables and it's default value
 		 */
-		const OPTION_WPDA_UNINSTALL_TABLES = [ 'wpda_uninstall_tables', 'on' ]; // On uninstall drop WPDA tables.
+		const OPTION_WPDA_UNINSTALL_TABLES = [ 'wpda_uninstall_tables', 'off' ]; // On uninstall drop WPDA tables.
 		/**
 		 * Option wpda_uninstall_options and it's default value
 		 */
-		const OPTION_WPDA_UNINSTALL_OPTIONS = [ 'wpda_uninstall_options', 'on' ]; // On uninstall delety WPDA options.
+		const OPTION_WPDA_UNINSTALL_OPTIONS = [ 'wpda_uninstall_options', 'off' ]; // On uninstall delety WPDA options.
 		/**
 		 * Option wpda_datatables_version and it's default value
 		 */
@@ -99,6 +99,7 @@ namespace WPDataAccess {
 		const OPTION_PLUGIN_DATE_PLACEHOLDER = [ 'wpda_plugin_date_placeholder', 'yyyy-mm-dd' ];
 		const OPTION_PLUGIN_TIME_FORMAT      = [ 'wpda_plugin_time_format', 'H:i' ];
 		const OPTION_PLUGIN_TIME_PLACEHOLDER = [ 'wpda_plugin_time_placeholder', 'hh:mi' ];
+		const OPTION_PLUGIN_SET_FORMAT       = [ 'wpda_plugin_set_format', 'csv' ];
 
 		// Back-end options.
 		/**
@@ -265,6 +266,7 @@ namespace WPDataAccess {
 			'wpda_project'        => true,
 			'wpda_project_page'   => true,
 			'wpda_project_table'  => true,
+			'wpda_csv_uploads'    => true,
 		];
 
 		/**
@@ -800,6 +802,8 @@ namespace WPDataAccess {
 		 * @return string Where clause between ()
 		 */
 		public static function construct_where_clause( $schema_name, $table_name, $columns, $search ) {
+			$where_search_args = wpda::add_wpda_search_args( $columns );
+
 			if ( has_filter('wpda_construct_where_clause') ) {
 				// Use search filter
 				$filter = apply_filters(
@@ -811,13 +815,21 @@ namespace WPDataAccess {
 					$search
 				);
 				if ( null !== $filter ) {
-					return $filter;
+					if ( '' === $where_search_args ) {
+						return $filter;
+					} else {
+						if ( '' === $filter ) {
+							return $where_search_args;
+						} else {
+							return "{$filter} and {$where_search_args}";
+						}
+					}
 				}
 			}
 
 			// Default search behaviour
 			if ( '' === $search || null === $search || ! is_array( $columns ) ) {
-				return '';
+				return $where_search_args;
 			}
 
 			global $wpdb;
@@ -830,10 +842,42 @@ namespace WPDataAccess {
 			}
 
 			if ( 0 === count( $where_columns ) ) {
-				return ' (1=2) ';
+				return '' === $where_search_args ? ' (1=2) ' : $where_search_args;
 			}
 
-			return ' (' . implode( ' or ', $where_columns ) . ') ';
+			if ( '' === $where_search_args ) {
+				return ' (' . implode( ' or ', $where_columns ) . ') ';
+			} else {
+				return ' (' . implode( ' or ', $where_columns ) . ') ' . "and {$where_search_args}";
+			}
+		}
+
+		public static function add_wpda_search_args( $columns ) {
+			$where_columns = [];
+
+			if ( is_array( $columns ) ) {
+				global $wpdb;
+				foreach ( $columns as $column ) {
+					$column_name = $column['column_name'];
+					if ( isset( $_REQUEST["wpda_search_column_{$column_name}"] ) ) {
+						$column_date_type = $column['data_type'];
+						$column_value     = sanitize_text_field( wp_unslash( $_REQUEST["wpda_search_column_{$column_name}"] ) ); // input var okay.
+						if ( '' !== $column_value ) {
+							if ( 'string' === WPDA::get_type( $column_date_type ) ) {
+								$where_columns[] = $wpdb->prepare( "`{$column_name}` like '%s'", esc_attr( $column_value ) ); // WPCS: unprepared SQL OK.
+							} elseif ( 'number' === WPDA::get_type( $column_date_type ) ) {
+								$where_columns[] = $wpdb->prepare( "`{$column_name}` = '%d'", esc_attr( $column_value ) ); // WPCS: unprepared SQL OK.
+							}
+						}
+					}
+				}
+			}
+
+			if ( 0 === count( $where_columns ) ) {
+				return '';
+			} else {
+				return ' (' . implode( ' and ', $where_columns ) . ') ';
+			}
 		}
 
 		/**

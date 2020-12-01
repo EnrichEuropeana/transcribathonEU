@@ -123,7 +123,7 @@ namespace WPDataProjects\Project {
 
 					#overlay_project_text {
 						height: 360px;
-						width: 430px;
+						width: 400px;
 						padding: 10px;
 						position: relative;
 						top: 50%;
@@ -142,15 +142,17 @@ namespace WPDataProjects\Project {
 					</div>
 					<div style="position: absolute; bottom: 0; right: 0; padding-right: 5px; padding-bottom: 10px;">
 						<a id="button-copy-clipboard" href="javascript:void(0)" class="button button-secondary"
-						   style="text-align:center;width:120px;"
+						   style="text-align:center;width:145px;"
 						   data-clipboard-text="<?php echo str_replace( '<br/>', "\n", str_replace( '"', '&quot;', $project_info ) ); ?>">
+							<span class="material-icons wpda_icon_on_button">content_copy</span>
 							<?php echo __('Copy to clipboard', 'wp-data-access'); ?>
 						</a>
 						<br/>
 						<div style="height: 5px;"></div>
 						<a href="javascript:void(0)" class="button button-primary"
-						   style="text-align:center;width:120px;"
+						   style="text-align:center;width:145px;"
 						   onclick="jQuery('#overlay_project').hide()">
+							<span class="material-icons wpda_icon_on_button">cancel</span>
 							<?php echo __('Close', 'wp-data-access'); ?>
 						</a>
 					</div>
@@ -162,10 +164,10 @@ namespace WPDataProjects\Project {
 					jQuery(document).ready(function () {
 						var sql_to_clipboard = new ClipboardJS('#button-copy-clipboard');
 						sql_to_clipboard.on('success', function (e) {
-							alert('<?php echo __( 'Info copied to clipboard!', 'wp-data-access'); ?>');
+							jQuery.notify('<?php echo __( 'Info copied to clipboard!', 'wp-data-access'); ?>','info');
 						});
 						sql_to_clipboard.on('error', function (e) {
-							console.log('<?php echo __('Could not copy info to clipboard!', 'wp-data-access'); ?>');
+							jQuery.notify('<?php echo __('Could not copy info to clipboard!', 'wp-data-access'); ?>','error');
 						});
 					});
 				</script>

@@ -20,6 +20,7 @@ class WPForms_Overview {
 		// Setup screen options. Needs to be here as admin_init hook it too late.
 		add_action( 'load-toplevel_page_wpforms-overview', array( $this, 'screen_options' ) );
 		add_filter( 'set-screen-option', array( $this, 'screen_options_set' ), 10, 3 );
+		add_filter( 'set_screen_option_wpforms_forms_per_page', [ $this, 'screen_options_set' ], 10, 3 );
 	}
 
 	/**
@@ -201,6 +202,10 @@ class WPForms_Overview {
 
 		$ids    = isset( $_GET['form_id'] ) ? array_map( 'absint', (array) $_GET['form_id'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification
 		$action = ! empty( $_REQUEST['action'] ) ? sanitize_key( $_REQUEST['action'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification
+
+		if ( $action === '-1' ) {
+			$action = ! empty( $_REQUEST['action2'] ) ? sanitize_key( $_REQUEST['action2'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification
+		}
 
 		// Checking the sortable column link.
 		$is_orderby_link = ! empty( $_REQUEST['orderby'] ) && ! empty( $_REQUEST['order'] );

@@ -23,17 +23,19 @@ function _TCT_item_page_test( $atts ) {
 
         // Save image data
         $imageData = json_decode($result, true);
-        $imageData = $imageData[0];
-        // Set request parameters for story data
-        $url = home_url()."/tp-api/stories/".$imageData['StoryId'];
-        $requestType = "GET";
-    
-        // Execude http request
-        include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-        // Save story data
-        $storyData = json_decode($result, true);
-        $storyData = $storyData[0];
+        
+        if ($itemData['StoryId'] != null) {
+            // Set request parameters for story data
+            $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
+            $requestType = "GET";
+   
+            // Execude http request
+            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+   
+            // Save story data
+            $storyData = json_decode($result, true);
+            $storyData = $storyData[0];
+         }
 
         // Build Item page content
         $content = "";

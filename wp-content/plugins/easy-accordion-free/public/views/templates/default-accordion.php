@@ -47,7 +47,7 @@ foreach ( $content_sources as $key => $content_source ) {
 	if ( ! empty( $content_description ) ) {
 		$content_description_markup = sprintf(
 			'<div class="ea-body"> %1$s </div>',
-			$content_description
+			do_shortcode( $content_description )
 		);
 	} elseif ( empty( $content_description ) ) {
 		$content_description_markup = sprintf(
@@ -66,5 +66,32 @@ foreach ( $content_sources as $key => $content_source ) {
 		echo '</div>';
 		echo '</div>';
 	$ea_key++;
+}
+if ( $eap_schema_markup ) {
+	$markup = '<script type="application/ld+json">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "FAQPage",
+	  "mainEntity": [';
+	foreach ( $content_sources as $keys => $content_source ) {
+		$content_title       = $content_source['accordion_content_title'];
+		$content_description = $content_source['accordion_content_description'];
+		$markup             .= '{
+			"@type": "Question",
+			"name": "' . esc_attr( wp_strip_all_tags( $content_title ) ) . '",
+			"acceptedAnswer": {
+			  "@type": "Answer",
+			  "text": "' . esc_html( $content_description ) . '"
+			}
+		  }';
+		if ( $keys !== $key ) {
+			$markup .= ',';
+		}
+	}
+	  $markup .= ']
+	}
+	</script>';
+
+	echo $markup;
 }
 echo '</div>';

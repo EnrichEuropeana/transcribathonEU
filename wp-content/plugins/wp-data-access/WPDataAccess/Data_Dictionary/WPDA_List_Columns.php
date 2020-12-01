@@ -48,6 +48,13 @@ namespace WPDataAccess\Data_Dictionary {
 		protected $table_columns = [];
 
 		/**
+		 * Columns of $this->searchable_table_columns
+		 *
+		 * @var array
+		 */
+		protected $searchable_table_columns = [];
+
+		/**
 		 * Column data type sorted on column name
 		 *
 		 * @var array
@@ -227,6 +234,19 @@ namespace WPDataAccess\Data_Dictionary {
 		}
 
 		/**
+		 * Get searchable columns
+		 *
+		 * @return array Column of $this->table_name.
+		 * @since   1.0.0
+		 *
+		 */
+		public function get_searchable_table_columns() {
+
+			return $this->searchable_table_columns;
+
+		}
+
+		/**
 		 * Set table columns
 		 *
 		 * Column info is taken from the MySQL data dictionary. For each column in $this->table_name the following
@@ -263,15 +283,16 @@ namespace WPDataAccess\Data_Dictionary {
 				]
 			);
 
-			$this->table_columns = $this->wpdadb->get_results( $query, 'ARRAY_A' ); // WPCS: unprepared SQL OK; db call ok; no-cache ok.
+			$this->table_columns            = $this->wpdadb->get_results( $query, 'ARRAY_A' ); // WPCS: unprepared SQL OK; db call ok; no-cache ok.
+			$this->searchable_table_columns = $this->table_columns; // Contains all columns and is not modified
 
 			foreach ( $this->table_columns as $column ) {
 				if ( isset( $column['column_name'] ) && isset( $column[ 'data_type' ] ) ) {
-					$this->table_column_data_type[ $column['column_name'] ] = $column['data_type']; // column_type???
+					$this->table_column_data_type[ $column['column_name'] ] = $column['data_type'];
 				}
 
 				if ( isset( $column['column_name'] ) && isset( $column[ 'column_type' ] ) ) {
-					$this->table_column_type[ $column['column_name'] ] = $column['column_type']; // column_type???
+					$this->table_column_type[ $column['column_name'] ] = $column['column_type'];
 				}
 			}
 

@@ -3,9 +3,9 @@ Contributors: matchalabs, DavidAnderson, dnutbourne, kbat82
 Tags: slideshow, slider, image slider, carousel, gallery, flexslider, wordpress slider, nivoslider, rotating banner, responsive slideshow, seo slideshow, unsplash
 Donate link: https://david.dw-perspective.org.uk/donate
 Requires at least: 3.5
-Stable tag: 3.16.4
+Stable tag: 3.17.1
 Requires PHP: 5.2
-Tested up to: 5.4
+Tested up to: 5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,7 @@ Apply one of our professional slidehow designs to really make your website stand
 * Compatible with translation plugins (WPML, PolyLang & qTranslate)
 * Extensive developer API (hooks & filters)
 * Fast - only the minimum JavaScript/CSS is included on your page
+* Import/Export slideshows.
 * Free basic support (covering installation issues and theme/plugin conflicts)
 * Lightbox support with the [MetaSlider Lightbox](https://wordpress.org/plugins/ml-slider-lightbox/) add-on
 
@@ -166,6 +167,19 @@ See https://www.metaslider.com/documentation/image-cropping/
 6. Administration panel - selecting slides
 
 == Changelog ==
+
+= 3.17.1 - 2020/Aug/13 =
+
+* TWEAK: Adds permission_callback check to register_rest_route as an added redundency
+* TWEAK: Updates colorbox's jQuery .live() function to use .on()
+
+= 3.17.0 - 2020/Aug/5 =
+
+* FEATURE: Adds setting page to update some default settings
+* FEATURE: Adds export and import functionality
+* TWEAK: Updates jQuery to work with WP 5.5 (while maintaining backwards compatibility)
+* FIX: Fixes a bug where FlexSlider carousel doesn't calculate margins properly
+* FIX: Fixes a bug where custom themes would show on fresh slideshows
 
 = 3.16.4 - 2020/April/16 =
 
@@ -842,4 +856,4 @@ More info/Comments: http://www.metaslider.com/coming-soon-meta-slider-2-6-free/
 * Initial version
 
 == Upgrade Notice ==
-* 3.16.4 : Update now use the latest Gutenberg block library in MetaSlider (fix in 3.16.3 was incorrect)
+* 3.17.1 : This update just adds an extra permissions check to the REST route endpoints

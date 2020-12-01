@@ -37,14 +37,16 @@ class Frontend {
 	 * @since 1.0.0
 	 */
 	public static function init() {
+		$inst = self::get_instance();
 		require_once DISPLAY_POST_TYPES_DIR . '/frontend/inc/functions.php';
-		add_filter( 'dpt_styles', [ self::get_instance(), 'styles' ] );
-		add_filter( 'dpt_wrapper_classes', [ self::get_instance(), 'wrapper_classes' ], 10, 2 );
-		add_filter( 'dpt_entry_classes', [ self::get_instance(), 'entry_classes' ], 10, 2 );
-		add_action( 'dpt_entry', [ self::get_instance(), 'entry' ] );
-		add_action( 'dpt_before_wrapper', [ self::get_instance(), 'inline_css' ], 10, 2 );
-		add_action( 'wp_enqueue_scripts', [ self::get_instance(), 'enqueue_scripts' ] );
-		add_filter( 'body_class', [ self::get_instance(), 'add_body_classes' ] );
+		add_filter( 'dpt_styles', array( $inst, 'styles' ) );
+		add_filter( 'dpt_wrapper_classes', array( $inst, 'wrapper_classes' ), 10, 2 );
+		add_filter( 'dpt_html_attributes', array( $inst, 'html_attr' ), 10, 2 );
+		add_filter( 'dpt_entry_classes', array( $inst, 'entry_classes' ), 10, 2 );
+		add_action( 'dpt_entry', array( $inst, 'entry' ) );
+		add_action( 'dpt_before_wrapper', array( $inst, 'inline_css' ), 10, 2 );
+		add_action( 'wp_enqueue_scripts', array( $inst, 'enqueue_scripts' ) );
+		add_filter( 'body_class', array( $inst, 'add_body_classes' ) );
 	}
 
 	/**
@@ -53,28 +55,28 @@ class Frontend {
 	 * @return array Array of supported display styles.
 	 */
 	public function styles() {
-		return [
-			'dpt-list1'   => [
+		return array(
+			'dpt-list1'   => array(
 				'label'   => esc_html__( 'List - Full', 'display-post-types' ),
-				'support' => [ 'thumbnail', 'title', 'meta', 'category', 'excerpt', 'ialign' ],
-			],
-			'dpt-list2'   => [
+				'support' => array( 'thumbnail', 'title', 'meta', 'category', 'excerpt', 'ialign' ),
+			),
+			'dpt-list2'   => array(
 				'label'   => esc_html__( 'List - Mini', 'display-post-types' ),
-				'support' => [ 'thumbnail', 'title', 'meta', 'category', 'ialign' ],
-			],
-			'dpt-grid1'   => [
+				'support' => array( 'thumbnail', 'title', 'meta', 'category', 'ialign' ),
+			),
+			'dpt-grid1'   => array(
 				'label'   => esc_html__( 'Grid - Normal', 'display-post-types' ),
-				'support' => [ 'thumbnail', 'title', 'meta', 'category', 'excerpt', 'multicol' ],
-			],
-			'dpt-grid2'   => [
+				'support' => array( 'thumbnail', 'title', 'meta', 'category', 'excerpt', 'multicol' ),
+			),
+			'dpt-grid2'   => array(
 				'label'   => esc_html__( 'Grid - Overlay', 'display-post-types' ),
-				'support' => [ 'thumbnail', 'title', 'meta', 'category', 'multicol' ],
-			],
-			'dpt-slider1' => [
+				'support' => array( 'thumbnail', 'title', 'meta', 'category', 'multicol' ),
+			),
+			'dpt-slider1' => array(
 				'label'   => esc_html__( 'Slider - Normal', 'display-post-types' ),
-				'support' => [ 'thumbnail', 'title', 'meta', 'category', 'multicol', 'slider' ],
-			],
-		];
+				'support' => array( 'thumbnail', 'title', 'meta', 'category', 'multicol', 'slider' ),
+			),
+		);
 	}
 
 	/**
@@ -96,7 +98,7 @@ class Frontend {
 	 */
 	public function filter_display_map( $items, $args ) {
 		if ( ! $args['style_sup'] ) {
-			return [];
+			return array();
 		}
 		foreach ( $items as $key => $item ) {
 			if ( is_array( $item ) ) {
@@ -199,7 +201,7 @@ class Frontend {
 		if ( $style ) {
 			?>
 			<style type="text/css">
-			<?php echo wp_strip_all_tags( $style, true ); ?>
+			<?php echo wp_strip_all_tags( $style, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</style>
 			<?php
 		}
@@ -252,6 +254,20 @@ class Frontend {
 	}
 
 	/**
+	 * Add html attributes to DPT wrapper.
+	 *
+	 * @param array $attr HTML attributes associative array.
+	 * @param array $args Settings for the current instance.
+	 */
+	public function html_attr( $attr, $args ) {
+		if ( isset( $args['autotime'] ) && $args['autotime'] ) {
+			$attr['data-autotime'] = $args['autotime'];
+		}
+
+		return $attr;
+	}
+
+	/**
 	 * Add entry classes.
 	 *
 	 * @param str   $classes  Comma separated entry posts classes.
@@ -279,22 +295,22 @@ class Frontend {
 
 		switch ( $style ) {
 			case 'dpt-list1':
-				$d = [ 'thumbnail-medium', [ 'meta', 'title', 'excerpt', 'category' ] ];
+				$d = array( 'thumbnail-medium', array( 'meta', 'title', 'excerpt', 'category' ) );
 				break;
 			case 'dpt-list2':
-				$d = [ 'thumbnail-medium', [ 'category', 'title', 'meta' ] ];
+				$d = array( 'thumbnail-medium', array( 'category', 'title', 'meta' ) );
 				break;
 			case 'dpt-grid1':
-				$d = [ 'thumbnail-medium', [ 'meta', 'title', 'excerpt', 'category' ] ];
+				$d = array( 'thumbnail-medium', array( 'meta', 'title', 'excerpt', 'category' ) );
 				break;
 			case 'dpt-grid2':
-				$d = [ 'thumbnail-medium', [ 'meta', 'title', 'category' ] ];
+				$d = array( 'thumbnail-medium', array( 'meta', 'title', 'category' ) );
 				break;
 			case 'dpt-slider1':
-				$d = [ 'thumbnail-large', [ 'meta', 'title', 'category' ] ];
+				$d = array( 'thumbnail-large', array( 'meta', 'title', 'category' ) );
 				break;
 			default:
-				$d = [];
+				$d = array();
 		}
 
 		return apply_filters( 'dpt_style_args', $d, $style );
@@ -309,7 +325,7 @@ class Frontend {
 	public function render_entry( $items, $args ) {
 		foreach ( $items as $item ) {
 			if ( is_array( $item ) ) {
-				dpt_markup( 'sub-entry', [ [ [ $this, 'render_entry' ], $item, $args ] ] );
+				dpt_markup( 'sub-entry', array( array( array( $this, 'render_entry' ), $item, $args ) ) );
 			} else {
 				switch ( $item ) {
 					case 'title':
@@ -365,7 +381,7 @@ class Frontend {
 		wp_enqueue_script(
 			'dpt-bricklayer',
 			plugin_dir_url( __FILE__ ) . 'js/bricklayer.build.js',
-			[],
+			array(),
 			DISPLAY_POST_TYPES_VERSION,
 			true
 		);
@@ -373,7 +389,7 @@ class Frontend {
 		wp_enqueue_script(
 			'dpt-flickity',
 			plugin_dir_url( __FILE__ ) . 'js/flickity.pkgd.min.js',
-			[],
+			array(),
 			DISPLAY_POST_TYPES_VERSION,
 			true
 		);
@@ -381,7 +397,7 @@ class Frontend {
 		wp_enqueue_script(
 			'dpt-scripts',
 			plugin_dir_url( __FILE__ ) . 'js/scripts.build.js',
-			[ 'dpt-bricklayer', 'dpt-flickity' ],
+			array( 'dpt-bricklayer', 'dpt-flickity' ),
 			DISPLAY_POST_TYPES_VERSION,
 			true
 		);
@@ -404,10 +420,10 @@ class Frontend {
 		if ( get_the_title() ) {
 			the_title(
 				sprintf(
-					'<h2 class="dpt-title"><a class="dpt-title-link" href="%s" rel="bookmark">',
+					'<h3 class="dpt-title"><a class="dpt-title-link" href="%s" rel="bookmark">',
 					esc_url( get_permalink() )
 				),
-				'</a></h2>'
+				'</a></h3>'
 			);
 		}
 	}
@@ -485,10 +501,10 @@ class Frontend {
 
 			dpt_markup(
 				'dpt-featured-content',
-				[
-					[ [ $this, 'permalink' ] ],
-					[ [ $this, 'thumbnail' ], $size ],
-				]
+				array(
+					array( array( $this, 'permalink' ) ),
+					array( array( $this, 'thumbnail' ), $size ),
+				)
 			);
 		}
 	}
@@ -547,8 +563,11 @@ class Frontend {
 			return;
 		}
 
+		$is_excerpt = false;
+
 		if ( has_excerpt() ) {
-			$text = get_the_excerpt();
+			$text       = get_the_excerpt();
+			$is_excerpt = true;
 		} else {
 			$text = get_the_content( '' );
 		}
@@ -578,7 +597,7 @@ class Frontend {
 			$screen_reader = sprintf( '<span class="screen-reader-text">%s</span>', $exrpt_title );
 		}
 
-		$excerpt_teaser = sprintf( '<p class="dpt-link-more"><a class="dpt-more-link" href="%1$s">%2$s &rarr; %3$s</a></p>', $exrpt_url, $exrpt_text, $screen_reader );
+		$excerpt_teaser = sprintf( '<p class="dpt-link-more"><a class="dpt-more-link" href="%1$s">%2$s %3$s</a></p>', $exrpt_url, $exrpt_text, $screen_reader );
 
 		/**
 		 * Filters the string in the "more" link displayed after a trimmed excerpt.
@@ -588,7 +607,12 @@ class Frontend {
 		 * @param string $more_string The string shown within the more link.
 		 */
 		$excerpt_more = apply_filters( 'dpt_excerpt_more', ' ' . $excerpt_teaser, $args );
-		$text         = wp_trim_words( $text, $excerpt_length, $excerpt_more );
+		if ( $is_excerpt ) {
+			$text = wp_trim_words( $text, $excerpt_length, '' );
+			$text = $text ? $text . $excerpt_more : $text;
+		} else {
+			$text = wp_trim_words( $text, $excerpt_length, $excerpt_more );
+		}
 
 		printf( '<div class="dpt-excerpt">%s</div>', $text ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
@@ -612,7 +636,6 @@ class Frontend {
 	public function meta() {
 		echo '<div class="dpt-meta">';
 		$this->author();
-		esc_html_e( 'on', 'display-post-types' );
 		$this->date();
 		echo '</div>';
 	}

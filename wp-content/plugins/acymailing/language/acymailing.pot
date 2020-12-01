@@ -1,0 +1,5299 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AcyMailing 6.14.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2020-08-19\n"
+"X-Domain: acymailing\n"
+
+
+msgid "The selected lists will be checked by default on the subscription form if they are visible"
+msgstr ""
+
+msgid "Your server failed to send the email"
+msgstr ""
+
+msgid "Could not load the max execution time value : %s"
+msgstr ""
+
+msgid "Specify a language"
+msgstr ""
+
+msgid "No detailed statistics available for this email"
+msgstr ""
+
+msgid "You are about to remove the translation for the current language, are you sure?"
+msgstr ""
+
+msgid "Click here to remove this translation"
+msgstr ""
+
+msgid "You removed the following languages: %s. All the related email translations will be deleted, are you sure?"
+msgstr ""
+
+msgid "The subject cannot be empty"
+msgstr ""
+
+msgid "No email version set for this language."
+msgstr ""
+
+msgid "Leave it this way if you want the default language email to be sent, or:"
+msgstr ""
+
+msgid "Copy content from default"
+msgstr ""
+
+msgid "New version from scratch"
+msgstr ""
+
+msgid "This email will be sent based on the user's preferred language. If the email isn't translated in this language, the version for the default language will be sent instead."
+msgstr ""
+
+msgid "Display the fields labels"
+msgstr ""
+
+msgid "Display the lists"
+msgstr ""
+
+msgid "Display the subscription form at the top of your screen"
+msgstr ""
+
+msgid "Display the subscription form at the bottom of your screen"
+msgstr ""
+
+msgid "Display the subscription form in a popup and set it to be displayed based on specific conditions"
+msgstr ""
+
+msgid "Put a shortcode wherever you want. It will be automatically replaced by the subscription form"
+msgstr ""
+
+msgid "Module"
+msgstr ""
+
+msgid "Widget"
+msgstr ""
+
+msgid "Use the Joomla! default module"
+msgstr ""
+
+msgid "Use the WordPress default widget"
+msgstr ""
+
+msgid "What kind of subscription form would you like to create?"
+msgstr ""
+
+msgid "Default language"
+msgstr ""
+
+msgid "If the version of an email for a specific language doesn't exist, the version of this language will be taken instead"
+msgstr ""
+
+msgid "Your site uses multiple languages, do you want to activate the multilingual options?"
+msgstr ""
+
+msgid "Select the languages that will have a different version of your emails"
+msgstr ""
+
+msgid "Languages used"
+msgstr ""
+
+msgid "Multilingual emails"
+msgstr ""
+
+msgid "Multilingual"
+msgstr ""
+
+msgid "Translations"
+msgstr ""
+
+msgid "Footer"
+msgstr ""
+
+msgid "You need to have the Enterprise version to create this type of form"
+msgstr ""
+
+msgid "New form"
+msgstr ""
+
+msgid "Please copy / paste this shortcode in your content to replace it by this subscription form"
+msgstr ""
+
+msgid "Please save the form to get the shortcode"
+msgstr ""
+
+msgid "Choose an image"
+msgstr ""
+
+msgid "Change"
+msgstr ""
+
+msgid "All pages"
+msgstr ""
+
+msgid "Header"
+msgstr ""
+
+msgid "Shortcode"
+msgstr ""
+
+msgid "Create your first one and allow your users to subscribe to your lists!"
+msgstr ""
+
+msgid "You don't have any subscription forms"
+msgstr ""
+
+msgid "Subscription forms"
+msgstr ""
+
+msgid "Please fill the form name"
+msgstr ""
+
+msgid "Form well saved"
+msgstr ""
+
+msgid "Something went wrong while saving the subscription form"
+msgstr ""
+
+msgid "Something went wrong on the form generation"
+msgstr ""
+
+msgid "Could not get form information"
+msgstr ""
+
+msgid "Popup"
+msgstr ""
+
+msgid "Border size"
+msgstr ""
+
+msgid "Outset"
+msgstr ""
+
+msgid "Inset"
+msgstr ""
+
+msgid "Ridge"
+msgstr ""
+
+msgid "Groove"
+msgstr ""
+
+msgid "Double"
+msgstr ""
+
+msgid "Dashed"
+msgstr ""
+
+msgid "Dotted"
+msgstr ""
+
+msgid "Solid"
+msgstr ""
+
+msgid "Border type"
+msgstr ""
+
+msgid "Border color"
+msgstr ""
+
+msgid "Text color"
+msgstr ""
+
+msgid "Number of seconds to wait before displaying the popup"
+msgstr ""
+
+msgid "Delay"
+msgstr ""
+
+msgid "Select the pages where you want to display this subscription form"
+msgstr ""
+
+msgid "Page selection"
+msgstr ""
+
+msgid "Form name"
+msgstr ""
+
+msgid "Please wait while we're generating thumbnail"
+msgstr ""
+
+msgid "Show filters"
+msgstr ""
+
+msgid "Hide filters"
+msgstr ""
+
+msgid "Tag"
+msgstr ""
+
+msgid "Subscription status"
+msgstr ""
+
+msgid "Track this campaign"
+msgstr ""
+
+msgid "If this option is disabled, the open and click statistics won't be tracked for this campaign"
+msgstr ""
+
+msgid "Track this list"
+msgstr ""
+
+msgid "If this option is disabled, the open and click statistics won't be tracked for this list"
+msgstr ""
+
+msgid "Track this user"
+msgstr ""
+
+msgid "If this option is disabled, the open and click statistics won't be tracked for this user"
+msgstr ""
+
+msgid "Don't apply 'a' tag style settings"
+msgstr ""
+
+msgid "GIFs will be previewed in low-resolution in this modal for performance reasons, but they will be inserted in high-resolution in your email"
+msgstr ""
+
+msgid "Giphy"
+msgstr ""
+
+msgid "Could not load GIFs from Giphy, please try again in few minutes"
+msgstr ""
+
+msgid "Search GIFs"
+msgstr ""
+
+msgid "Insert GIF"
+msgstr ""
+
+msgid "Search for GIFs..."
+msgstr ""
+
+msgid "Apply filters"
+msgstr ""
+
+msgid "Clear all filters"
+msgstr ""
+
+msgid "Not confirmed"
+msgstr ""
+
+msgid "This feature allows to customize/override the way the content will be displayed in the emails. The custom view will have priority on display options in editor. HTML experts only"
+msgstr ""
+
+msgid "End date simple"
+msgstr ""
+
+msgid "Start date simple"
+msgstr ""
+
+msgid "Start date"
+msgstr ""
+
+msgid "Assign the column %s to a field"
+msgstr ""
+
+msgid "Duplicate field \"%1$s\" for the column %2$s"
+msgstr ""
+
+msgid "Please assign a column for the e-mail field"
+msgstr ""
+
+msgid "Please fill all information"
+msgstr ""
+
+msgid "Only insert products in stock"
+msgstr ""
+
+msgid "Price with tax"
+msgstr ""
+
+msgid "Hide past events"
+msgstr ""
+
+msgid "Menu ID"
+msgstr ""
+
+msgid "Don't show this content insertion option"
+msgstr ""
+
+msgid "Display the current user's elements"
+msgstr ""
+
+msgid "Display all elements"
+msgstr ""
+
+msgid "Front-end access"
+msgstr ""
+
+msgid "HTML tag image"
+msgstr ""
+
+msgid "Link download"
+msgstr ""
+
+msgid "Custom view not found"
+msgstr ""
+
+msgid "If your custom view doesn't have any tags (for example {title} to display the title of your article) we will display the default layout"
+msgstr ""
+
+msgid "Dynamic content"
+msgstr ""
+
+msgid "You need a Pro version to see the results"
+msgstr ""
+
+msgid "Has the %1$s field %2$s %3$s %4$s"
+msgstr ""
+
+msgid "By group"
+msgstr ""
+
+msgid "You need the Enterprise version to see the results"
+msgstr ""
+
+msgid "Registration date of the user"
+msgstr ""
+
+msgid "Email field to use"
+msgstr ""
+
+msgid "Generate a form-tag for an AcyMailing subscription."
+msgstr ""
+
+msgid "File size"
+msgstr ""
+
+msgid "File type"
+msgstr ""
+
+msgid "Get Enterprise version"
+msgstr ""
+
+msgid "Custom view well deleted"
+msgstr ""
+
+msgid "Could not delete the custom view"
+msgstr ""
+
+msgid "If you reset the custom view of this add-on, the file will be deleted and all modifications will be lost. Are you sure?"
+msgstr ""
+
+msgid "Reset view"
+msgstr ""
+
+msgid "Failed to save custom view"
+msgstr ""
+
+msgid "Edit custom view"
+msgstr ""
+
+msgid "Sending type"
+msgstr ""
+
+msgid "This campaign is not being tracked"
+msgstr ""
+
+msgid "This campaign is being tracked"
+msgstr ""
+
+msgid "Custom view"
+msgstr ""
+
+msgid "Custom view well saved"
+msgstr ""
+
+msgid "Custom view for %s"
+msgstr ""
+
+msgid "Could not save the settings"
+msgstr ""
+
+msgid "By tag"
+msgstr ""
+
+msgid "The email field is empty or there is no email field in this form"
+msgstr ""
+
+msgid "AcyMailing Lists"
+msgstr ""
+
+msgid "Leave empty if you want to import all users, regardless of the group"
+msgstr ""
+
+msgid "Some changes have been made, please save to see them"
+msgstr ""
+
+msgid "Tricky part. You should keep the default ones created by Acyba.<br />Except if you're kind of a superhero!<br />Here you should define which regular expression found in the email part will trigger the actions defined below."
+msgstr ""
+
+msgid "Actions applied on the user we have sent the email to."
+msgstr ""
+
+msgid "Actions applied on the email we are handling."
+msgstr ""
+
+msgid "Applied on"
+msgstr ""
+
+msgid "Bounce rule conditions"
+msgstr ""
+
+msgid "Set 0 or leave empty if you don't want to set a maximum number of characters"
+msgstr ""
+
+msgid "Maximum characters"
+msgstr ""
+
+msgid "Load custom field values from a database table"
+msgstr ""
+
+msgid "Field content"
+msgstr ""
+
+msgid "Field style"
+msgstr ""
+
+msgid "Field values"
+msgstr ""
+
+msgid "Field properties"
+msgstr ""
+
+msgid "Why use custom fields?"
+msgstr ""
+
+msgid "To stop sending unwanted content and make people unsubscribe or complain about what they have received.<br />Why sending them information about the next Google product if they are Apple fans?<br />Stop wasting your time (and money) and use these fields to filter who would be interested by what you're going to send them.<br /><br />It also allows to insert custom information in your emails: <br />\" Hey <b>_username_</b>,<br />We know <b>_userchildname_</b> loves all these sports <b>_favoritessports_</b> so that's why we decided to inform you that...\" "
+msgstr ""
+
+msgid "What are custom fields?"
+msgstr ""
+
+msgid "What if you would like to store extra information about your users? <br /> Favorite football club, hobbies, astrological sign, favorite brand and so on...<br /><br />Definitely something interesting right?<br />There is no better thing than knowing as much as possible people who subscribed to your newsletters."
+msgstr ""
+
+msgid "Create welcome email"
+msgstr ""
+
+msgid "Create unsubscribe email"
+msgstr ""
+
+msgid "You don't have access to this list"
+msgstr ""
+
+msgid "If you allow your site's users to manage their own lists, you can give them access to this list with this option by selecting the user groups"
+msgstr ""
+
+msgid "List access"
+msgstr ""
+
+msgid "Manage subscribers"
+msgstr ""
+
+msgid "Nothing to show here. You don't have any elements yet, all the elements have been selected in the right panel"
+msgstr ""
+
+msgid "Please click on a left panel element to select it"
+msgstr ""
+
+msgid "Manage subscription"
+msgstr ""
+
+msgid "Select an email"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Default templates already installed, delete them if you want to install them again"
+msgstr ""
+
+msgid "The custom headers allow you to add html content in the head tag of your email. Only add something if you are sure what you're doing otherwise this could break your email."
+msgstr ""
+
+msgid "No more results"
+msgstr ""
+
+msgid "Pictures"
+msgstr ""
+
+msgid "Dimensions"
+msgstr ""
+
+msgid "Only import users from the following groups"
+msgstr ""
+
+msgid "Type a message to inform recipient(s) that it's a test"
+msgstr ""
+
+msgid "Test note"
+msgstr ""
+
+msgid "If you allow your site's users to manage their own users and emails, you can give them access to this template with this option by selecting the user groups"
+msgstr ""
+
+msgid "Allowed groups"
+msgstr ""
+
+msgid "View all emails"
+msgstr ""
+
+msgid "Select one or more lists"
+msgstr ""
+
+msgid "Only available in our Essential version"
+msgstr ""
+
+msgid "Only available in our Enterprise version"
+msgstr ""
+
+msgid "Which kind of mail do you want to create?"
+msgstr ""
+
+msgid "Create your campaign, schedule it in the future, switch off your computer and relax"
+msgstr ""
+
+msgid "Send newsletter every day/week/month with dynamic content into it"
+msgstr ""
+
+msgid "Send an email when someone unsubscribe from your list"
+msgstr ""
+
+msgid "Send an email when someone subscribe to your list"
+msgstr ""
+
+msgid "Choose your template, insert your content, send it to your users. As simple as that"
+msgstr ""
+
+msgid "Scheduled campaign"
+msgstr ""
+
+msgid "Automatic Campaign"
+msgstr ""
+
+msgid "Unsubscribe Email"
+msgstr ""
+
+msgid "Welcome Email"
+msgstr ""
+
+msgid "Classic Campaign"
+msgstr ""
+
+msgid "This option is preselected depending on the choice you've made in the first step"
+msgstr ""
+
+msgid "Next trigger"
+msgstr ""
+
+msgid "Last generation"
+msgstr ""
+
+msgid "Error while recovering the campaigns triggers"
+msgstr ""
+
+msgid "You don't have any %s"
+msgstr ""
+
+msgid "Create new email"
+msgstr ""
+
+msgid "Emails"
+msgstr ""
+
+msgid "Unsubscribe emails"
+msgstr ""
+
+msgid "Welcome emails"
+msgstr ""
+
+msgid "Automatic campaigns"
+msgstr ""
+
+msgid "Could not duplicate the template: template not found"
+msgstr ""
+
+msgid "The report of the last cron call, showing what automatic actions have been made"
+msgstr ""
+
+msgid "IP address of the last source that called your site's cron URL, to trigger the automatic features of AcyMailing"
+msgstr ""
+
+msgid "Re-subscribe to all"
+msgstr ""
+
+msgid "Let's go!"
+msgstr ""
+
+msgid "What is bounce handling?"
+msgstr ""
+
+msgid "This icon is the best one to illustrate the bounce process.<br />In fact, you already know what it is. \"Delivery Status Notification (Failure)\" you know it right?<br />In short, sometimes, after sending an email, you receive one saying your message hasn't been delivered for some reason.<br />Vacation/Auto-reply message, your email has been blocked by the recipient email server, receiver email address doesn't exist and so on..."
+msgstr ""
+
+msgid "What are the risks?"
+msgstr ""
+
+msgid "You will start being considered as SPAM by mail servers as you're getting to much bounce emails.<br />If you don't optimize this then your emails won't be received anymore. That's that simple!"
+msgstr ""
+
+msgid "How AcyMailing can help?"
+msgstr ""
+
+msgid "Bounce handling feature allows to stop sending emails to invalid recipients and stop receiving bounces to not be considered as SPAM.<br />Here are some actions you will be able to define:<br /> - Delete a user from your receivers when its email address doesn't exist <br /> - Forward the message to your email address when it is a Vacation/Auto-Reply message <br /> - Unsubscribe users from the list <br /> - So many more ..."
+msgstr ""
+
+msgid "Curl error message: %s"
+msgstr ""
+
+msgid "Could not upload this csv file"
+msgstr ""
+
+msgid "And many more features you're probably missing. What are you waiting for?"
+msgstr ""
+
+msgid "Filter users based on fields data and many more..."
+msgstr ""
+
+msgid "Send dynamic newsletters Hello [first name]"
+msgstr ""
+
+msgid "Birthdate, phone number, city, country, favorite brand and so on."
+msgstr ""
+
+msgid "Add additional information to your user profiles."
+msgstr ""
+
+msgid "Check if you can send it safely or if you need to improve it a bit to make sure your users will receive it"
+msgstr ""
+
+msgid "Is your campaign going to be received or considered as SPAM?"
+msgstr ""
+
+msgid "Campaign quality tests"
+msgstr ""
+
+msgid "Subscribe, assign your website to your license and let AcyMailing do some magic."
+msgstr ""
+
+msgid "In our pro versions, everything is automatically executed."
+msgstr ""
+
+msgid "Using AcyMailing Free version, there is nothing done automatically, everything needs to be done manually."
+msgstr ""
+
+msgid "As you're running the free version we will simply display some features which are available in these versions."
+msgstr ""
+
+msgid "This section is for users using one of our pro versions."
+msgstr ""
+
+msgid "Come on, we're not talking about your favorite camera..."
+msgstr ""
+
+msgid "Go Pro!"
+msgstr ""
+
+msgid "Never"
+msgstr ""
+
+msgid "The date of the last time the cron URL has been called by a cron service."
+msgstr ""
+
+msgid "Your site will be loaded with the specified language when clicking on dynamic links inserted in your email, such as unsubscribe links or links of inserted articles"
+msgstr ""
+
+msgid "Language assigned to this email"
+msgstr ""
+
+msgid "Insert dynamic text"
+msgstr ""
+
+msgid "Get Pro version"
+msgstr ""
+
+msgid "See more"
+msgstr ""
+
+msgid "The name will be generated from the first part of the email address. Numbers and some special characters will be removed."
+msgstr ""
+
+msgid "You can use the first line to define the column names. Use one line per user to import and separate each data with a comma. Here is an example:"
+msgstr ""
+
+msgid "Import from database"
+msgstr ""
+
+msgid "Import %s users"
+msgstr ""
+
+msgid "By default only the administrators have access to AcyMailing. The users having one of the selected roles will also have access to it when connected"
+msgstr ""
+
+msgid "Allow these user groups to access AcyMailing"
+msgstr ""
+
+msgid "Permissions"
+msgstr ""
+
+msgid "Joomla permissions"
+msgstr ""
+
+msgid "Total click"
+msgstr ""
+
+msgid "This will create a copy of the selected email for this automation"
+msgstr ""
+
+msgid "Add the AcyMailing subscription form on your Ultimate Member registration page"
+msgstr ""
+
+msgid "Add default templates"
+msgstr ""
+
+msgid "Request failed for timeout"
+msgstr ""
+
+msgid "The cron link is the link called by our server to trigger the automatic process on your website. This means if you click on it you can trigger the cron on your AcyMailing."
+msgstr ""
+
+msgid "Cron link"
+msgstr ""
+
+msgid "The website you're trying to unlink is not attached to this license key"
+msgstr ""
+
+msgid "Send process frequency"
+msgstr ""
+
+msgid "1 hour"
+msgstr ""
+
+msgid "30 minutes"
+msgstr ""
+
+msgid "15 minutes"
+msgstr ""
+
+msgid "If you enabled the automatic send process this means you can send scheduled campaigns or the automation will be trigger"
+msgstr ""
+
+msgid "Deactivate it"
+msgstr ""
+
+msgid "Activate it"
+msgstr ""
+
+msgid "Activated"
+msgstr ""
+
+msgid "Deactivated"
+msgstr ""
+
+msgid "Automatic send process:"
+msgstr ""
+
+msgid "Could not set the automatic send for this website, please contact us for more information"
+msgstr ""
+
+msgid "The automatic send process has been deactivated on this website"
+msgstr ""
+
+msgid "The automatic send process has been activated on this website"
+msgstr ""
+
+msgid "An error occurred while the process on acymailing.com"
+msgstr ""
+
+msgid "Your license has been successfully unlinked from this website"
+msgstr ""
+
+msgid "You've reached the maximum number of websites attached to your multisite license (max 20 sites)"
+msgstr ""
+
+msgid "Your license is already attached to another website, please go to acymailing.com to manage your licenses"
+msgstr ""
+
+msgid "An error occurred while attaching your license to your website, please contact us for more information"
+msgstr ""
+
+msgid "Your license is well attached to this website"
+msgstr ""
+
+msgid "The license key that you've entered is not matching any license on our website"
+msgstr ""
+
+msgid "Website not found, please contact us for more information"
+msgstr ""
+
+msgid "An error occurred while calling acymailing.com"
+msgstr ""
+
+msgid "Please set a license key"
+msgstr ""
+
+msgid "Get my license key!"
+msgstr ""
+
+msgid "Your license key:"
+msgstr ""
+
+msgid "Attach my license"
+msgstr ""
+
+msgid "Unlink my license"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+msgid "My license"
+msgstr ""
+
+msgid "We couldn't set the license key attached to this website, try to assign it in the configuration"
+msgstr ""
+
+msgid "On the module itself"
+msgstr ""
+
+msgid "In the header"
+msgstr ""
+
+msgid "How should AcyMailing add the necessary JS files"
+msgstr ""
+
+msgid "Load javascript module"
+msgstr ""
+
+msgid "Could not save the thumbnail of this template. Error: %s"
+msgstr ""
+
+msgid "%s emails removed from the queue for unconfirmed or inactive users"
+msgstr ""
+
+msgid "Some duplicated URLs have been removed, but there are still duplicates. Script interrupted to avoid impacting performances. You can re-run the check to continue until a success message is displayed"
+msgstr ""
+
+msgid "[OK]Problem solved: Duplicated URLs successfully removed"
+msgstr ""
+
+msgid "Duplicated URLs found in the acym_url table"
+msgstr ""
+
+msgid "[ERROR]Could not add the %1$s on the table %2$s : %3$s"
+msgstr ""
+
+msgid "[OK]Problem solved: Added %1$s to %2$s"
+msgstr ""
+
+msgid "%1$s missing in %2$s"
+msgstr ""
+
+msgid "[ERROR]Could not add the column %1$s on the table %2$s : %3$s"
+msgstr ""
+
+msgid "[OK]Problem solved: Added %1$s in %2$s"
+msgstr ""
+
+msgid "Column %1$s missing in %2$s"
+msgstr ""
+
+msgid "[ERROR]Could not create the table %1$s : %2$s"
+msgstr ""
+
+msgid "[OK]Problem solved: Table %s created"
+msgstr ""
+
+msgid "[ERROR]Could not repair the table %1$s : %2$s"
+msgstr ""
+
+msgid "[OK]Problem solved: Table %s repaired"
+msgstr ""
+
+msgid "Could not load columns from the table %1$s : %2$s"
+msgstr ""
+
+msgid "Registered to %1$s"
+msgstr ""
+
+msgid "Could not delete the attachment"
+msgstr ""
+
+msgid "Attachment well deleted"
+msgstr ""
+
+msgid "%1$s and %2$s:"
+msgstr ""
+
+msgid "Space between blocks:"
+msgstr ""
+
+msgid "When a new user is created, send an e-mail to"
+msgstr ""
+
+msgid "New subscriber on your website"
+msgstr ""
+
+msgid "A new user has been created in AcyMailing:"
+msgstr ""
+
+msgid "When a user unsubscribes from a list, send an e-mail to"
+msgstr ""
+
+msgid "A user unsubscribed"
+msgstr ""
+
+msgid "The following user unsubscribed from your list(s):"
+msgstr ""
+
+msgid "When a user unsubscribes from all lists, send an e-mail to"
+msgstr ""
+
+msgid "A user unsubscribed from all your lists"
+msgstr ""
+
+msgid "The following user unsubscribed from all your lists:"
+msgstr ""
+
+msgid "When a user submits the subscription form"
+msgstr ""
+
+msgid "New contact from your website"
+msgstr ""
+
+msgid "A user submitted the subscription form:"
+msgstr ""
+
+msgid "When a user changes their profile"
+msgstr ""
+
+msgid "A user subscribed or modified their subscription"
+msgstr ""
+
+msgid "A user changed their profile:"
+msgstr ""
+
+msgid "When a user confirms their subscription"
+msgstr ""
+
+msgid "A user confirmed their subscription"
+msgstr ""
+
+msgid "The following user confirmed their subscription:"
+msgstr ""
+
+msgid "This button will confirm the user subscription and then redirect him to your homepage"
+msgstr ""
+
+msgid "This button will redirect the user to the unsubscribe page or it will unsubscribe him directly, depending on the configuration"
+msgstr ""
+
+msgid "Subscription confirmation"
+msgstr ""
+
+msgid "Button type"
+msgstr ""
+
+msgid "Call to action"
+msgstr ""
+
+msgid "Template created"
+msgstr ""
+
+msgid "Save as template"
+msgstr ""
+
+msgid "Be careful this will delete all the elements linked to the automation"
+msgstr ""
+
+msgid "Content bottom margin"
+msgstr ""
+
+msgid "Resize the columns of the selected row:"
+msgstr ""
+
+msgid "Structure"
+msgstr ""
+
+msgid "Error when trying to create a management list"
+msgstr ""
+
+msgid "User management page"
+msgstr ""
+
+msgid "Allow users to manage their own users on the front-end of your site, BIND THIS MENU TO A SPECIFIC USER GROUP"
+msgstr ""
+
+msgid "Campaigns management page"
+msgstr ""
+
+msgid "Allow users to manage their own campaigns on the front-end of your site, BIND THIS MENU TO A SPECIFIC USER GROUP"
+msgstr ""
+
+msgid "Display %s entries"
+msgstr ""
+
+msgid "Redirect to an unsubscribe page after the user clicks on an unsubscribe link"
+msgstr ""
+
+msgid "Show the site's header"
+msgstr ""
+
+msgid "Unsubscribe page"
+msgstr ""
+
+msgid "Delete the user"
+msgstr ""
+
+msgid "Remove the user's subscription"
+msgstr ""
+
+msgid "Delete button behavior"
+msgstr ""
+
+msgid "Should the delete button really delete the user or simply unsubscribe him from the current list?"
+msgstr ""
+
+msgid "Front-end edition"
+msgstr ""
+
+msgid "Interfaces"
+msgstr ""
+
+msgid "Edition"
+msgstr ""
+
+msgid "Frontend %s"
+msgstr ""
+
+msgid "Backend %s"
+msgstr ""
+
+msgid "Prevent hyphens in text paragraphs"
+msgstr ""
+
+msgid "This will not work on mobile version for languages without spaces, like Chinese for example."
+msgstr ""
+
+msgid "without imap extension"
+msgstr ""
+
+msgid "Unauthorized access"
+msgstr ""
+
+msgid "List management page"
+msgstr ""
+
+msgid "Allow users to manage their own lists on the front-end of your site, BIND THIS MENU TO A SPECIFIC USER GROUP"
+msgstr ""
+
+msgid "When the user confirms his subscription"
+msgstr ""
+
+msgid "When the user unsubscribes"
+msgstr ""
+
+msgid "out of"
+msgstr ""
+
+msgid "Run spam test"
+msgstr ""
+
+msgid "Invisible"
+msgstr ""
+
+msgid "In the past"
+msgstr ""
+
+msgid "In the future"
+msgstr ""
+
+msgid "Visible"
+msgstr ""
+
+msgid "Weekly stats"
+msgstr ""
+
+msgid "Daily stats"
+msgstr ""
+
+msgid "Monthly stats"
+msgstr ""
+
+msgid "Bounce rule"
+msgstr ""
+
+msgid "Last open date"
+msgstr ""
+
+msgid "Send date"
+msgstr ""
+
+msgid "Bounces detailed"
+msgstr ""
+
+msgid "Bounces"
+msgstr ""
+
+msgid "Total opens"
+msgstr ""
+
+msgid "Unique opens"
+msgstr ""
+
+msgid "Total send failed"
+msgstr ""
+
+msgid "Total successfully sent"
+msgstr ""
+
+msgid "Total receivers"
+msgstr ""
+
+msgid "Mail id"
+msgstr ""
+
+msgid "Full data"
+msgstr ""
+
+msgid "Formatted data"
+msgstr ""
+
+msgid "Charts"
+msgstr ""
+
+msgid "Export method not found"
+msgstr ""
+
+msgid "Edit HTML"
+msgstr ""
+
+msgid "Revert"
+msgstr ""
+
+msgid "Please edit the source code only if you know what you're doing. This might break the whole editor behavior. Use it at your own risk, support won't be provided for custom modifications."
+msgstr ""
+
+msgid "Edit block's HTML"
+msgstr ""
+
+msgid "Click here if you wish to do some changes"
+msgstr ""
+
+msgid "Here are the lists you're subscribed to:"
+msgstr ""
+
+msgid "Your newsletter subscriptions"
+msgstr ""
+
+msgid "Could not submit the form, please contact the admin of the website."
+msgstr ""
+
+msgid "No data to display"
+msgstr ""
+
+msgid "Unsubscribe from all"
+msgstr ""
+
+msgid "Only the elements created/published since the last sent automatic campaign will be inserted in your email."
+msgstr ""
+
+msgid "AcyMailing will wait for the number of elements found to reach the value you specify before sending your automatic campaign."
+msgstr ""
+
+msgid "Automatic campaigns options"
+msgstr ""
+
+msgid "All emails"
+msgstr ""
+
+msgid "Download my first one!"
+msgstr ""
+
+msgid "You don't have add-ons yet."
+msgstr ""
+
+msgid "An error occurred when deleting the file %s, please delete it manually"
+msgstr ""
+
+msgid "Add-on successfully updated"
+msgstr ""
+
+msgid "Could not update add-on"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Add-ons (%s)"
+msgstr ""
+
+msgid "Check for updates"
+msgstr ""
+
+msgid "Could not save add-on"
+msgstr ""
+
+msgid "Are you sure you want to delete this add-on? Make sure no campaign or automation uses its features!"
+msgstr ""
+
+msgid "Add-on successfully deleted"
+msgstr ""
+
+msgid "Add-on not found"
+msgstr ""
+
+msgid "You need the latest version of AcyMailing to download add-ons"
+msgstr ""
+
+msgid "Purchase"
+msgstr ""
+
+msgid "Domain missing"
+msgstr ""
+
+msgid "You're not allowed to download, please attach your website to a valid license first"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Could not load all information"
+msgstr ""
+
+msgid "You don't have the right AcyMailing edition to download this add-on, you need at least AcyMailing "
+msgstr ""
+
+msgid "An issue occurred while installing the add-on"
+msgstr ""
+
+msgid "An issue occurred while downloading the add-on"
+msgstr ""
+
+msgid "There are no add-ons to display"
+msgstr ""
+
+msgid "Add-on successfully installed"
+msgstr ""
+
+msgid "Features"
+msgstr ""
+
+msgid "AcyMailing edition"
+msgstr ""
+
+msgid "Events management"
+msgstr ""
+
+msgid "User management"
+msgstr ""
+
+msgid "Subscription system"
+msgstr ""
+
+msgid "Content management"
+msgstr ""
+
+msgid "E-commerce solutions"
+msgstr ""
+
+msgid "Files management"
+msgstr ""
+
+msgid "Available add-ons"
+msgstr ""
+
+msgid "My add-ons"
+msgstr ""
+
+msgid "Add-ons"
+msgstr ""
+
+msgid "Only newly created"
+msgstr ""
+
+msgid "Only featured elements"
+msgstr ""
+
+msgid "Start from empty template"
+msgstr ""
+
+msgid "Users have been exported to %s"
+msgstr ""
+
+msgid "Unable to write in the file %s"
+msgstr ""
+
+msgid " %1$s the category %2$s"
+msgstr ""
+
+msgid "The RSS feed could not be loaded"
+msgstr ""
+
+msgid "Min. number of elements"
+msgstr ""
+
+msgid "Author"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Save & Send a test"
+msgstr ""
+
+msgid "See how amazing your email is!"
+msgstr ""
+
+msgid "Open the campaigns in a popup"
+msgstr ""
+
+msgid "If turned Off, the campaigns will be opened in a new tab"
+msgstr ""
+
+msgid "Only the campaigns sent to the selected lists will be shown. Leave blank for all lists"
+msgstr ""
+
+msgid "If you specify a welcome email, the users will receive it when they subscribe to the list"
+msgstr ""
+
+msgid "If you specify an unsubscribe email, the users will receive it when they unsubscribe from the list"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "Fail rate"
+msgstr ""
+
+msgid "Save the list first"
+msgstr ""
+
+msgid "Delivery rate"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Please enter a start date under the end date"
+msgstr ""
+
+msgid "The content %s could not be found"
+msgstr ""
+
+msgid "Not enough elements for the dynamic content %1$s: %2$s/%3$s"
+msgstr ""
+
+msgid "Activate"
+msgstr ""
+
+msgid "The campaign will also be sent to the email addresses you specify but they will be invisible for original subscribers. Note that the BCC is added on every email so if you send the newsletter to 1500 users, your BCC address will get 1500 emails in its mailbox!"
+msgstr ""
+
+msgid "Additional settings"
+msgstr ""
+
+msgid "Deactivate"
+msgstr ""
+
+msgid "%s campaign(s) generated"
+msgstr ""
+
+msgid "Campaign [%s] not generated: %s"
+msgstr ""
+
+msgid "The initial automatic campaign has been deleted"
+msgstr ""
+
+msgid "Occurrence number of the automatic campaign"
+msgstr ""
+
+msgid "Reply-to:"
+msgstr ""
+
+msgid "Waiting for confirmation"
+msgstr ""
+
+msgid "Ask for confirmation before sending the generated campaigns"
+msgstr ""
+
+msgid "Generated"
+msgstr ""
+
+msgid "This campaign has been disabled"
+msgstr ""
+
+msgid "This campaign has been sent on the %s"
+msgstr ""
+
+msgid "Could not load the campaign"
+msgstr ""
+
+msgid "Lists:"
+msgstr ""
+
+msgid "This campaign has been generated from %s"
+msgstr ""
+
+msgid "From:"
+msgstr ""
+
+msgid "This campaign will automatically generate and send a new campaign"
+msgstr ""
+
+msgid "Deactivate campaign"
+msgstr ""
+
+msgid "Activate campaign"
+msgstr ""
+
+msgid "This campaign is now active and will generate new campaigns"
+msgstr ""
+
+msgid "Automatic"
+msgstr ""
+
+msgid "Be careful you've set a date in the past, this campaign will be directly sent"
+msgstr ""
+
+msgid "You don't have any date custom field in AcyMailing. If you want to use this trigger, you have to create one. Please go to the \"Custom fields\" menu to create one."
+msgstr ""
+
+msgid "for the %1$s field <strong>%2$s</strong>"
+msgstr ""
+
+msgid "at %1$s:%2$s"
+msgstr ""
+
+msgid "%s day(s) before the user's birthday"
+msgstr ""
+
+msgid "The automation will be triggered every year based on the \"Field\" provided"
+msgstr ""
+
+msgid "Trigger %s day(s) before the date at %s&nbsp;:&nbsp;%s"
+msgstr ""
+
+msgid "Field"
+msgstr ""
+
+msgid "On user birthday"
+msgstr ""
+
+msgid "Are you sure you want to replace the content of your email by your selection?"
+msgstr ""
+
+msgid "No user found"
+msgstr ""
+
+msgid "This campaign has already been sent, do you want to send it to your new users only?"
+msgstr ""
+
+msgid "No, send to all users"
+msgstr ""
+
+msgid "Selected lists"
+msgstr ""
+
+msgid "Available lists"
+msgstr ""
+
+msgid "Selected users"
+msgstr ""
+
+msgid "Available users"
+msgstr ""
+
+msgid "Well done, now drop it here!"
+msgstr ""
+
+msgid "Drag a block from the \"contents\" section then drop it here to start"
+msgstr ""
+
+msgid "Your template is empty!"
+msgstr ""
+
+msgid "Content type"
+msgstr ""
+
+msgid "Operation not found: %s"
+msgstr ""
+
+msgid "m/d/Y"
+msgstr ""
+
+msgid "Content to insert"
+msgstr ""
+
+msgid "Other options"
+msgstr ""
+
+msgid "This is a preview, the content that will be sent can be seen on the summary page"
+msgstr ""
+
+msgid "No content found based on the criteria you've selected"
+msgstr ""
+
+msgid "Preview"
+msgstr ""
+
+msgid "Change image"
+msgstr ""
+
+msgid "Position"
+msgstr ""
+
+msgid "Encoding not supported: %s"
+msgstr ""
+
+msgid "You may need to turn ON the option %s"
+msgstr ""
+
+msgid "Notification not found"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
+
+msgid "Delete all"
+msgstr ""
+
+msgid "You don't have any notifications"
+msgstr ""
+
+msgid "We're loading your data"
+msgstr ""
+
+msgid "Subscribe users to these lists"
+msgstr ""
+
+msgid "Missing parameter(s)"
+msgstr ""
+
+msgid "available"
+msgstr ""
+
+msgid "selected"
+msgstr ""
+
+msgid "Select all +"
+msgstr ""
+
+msgid "Unselect all -"
+msgstr ""
+
+msgid "An error occurred while installing the template %s"
+msgstr ""
+
+msgid "Skip and import your first users"
+msgstr ""
+
+msgid "In HTML the id of an element is unique and used for the CSS"
+msgstr ""
+
+msgid "Block HTML id"
+msgstr ""
+
+msgid "Unable to retrieve AcyMailing test email. Please try to re-install AcyMailing"
+msgstr ""
+
+msgid "Unable to retrieve AcyMailing testing list. Please try to re-install AcyMailing"
+msgstr ""
+
+msgid "AcyMailing first email"
+msgstr ""
+
+msgid "The email address or the password is empty"
+msgstr ""
+
+msgid "As you're using AcyMailing on a local website, emails can't be sent from your server.<br />That's why your Gmail information are needed. These information are <b>only</b> asked to connect to your Gmail account and send a test email."
+msgstr ""
+
+msgid "Why do we need this?"
+msgstr ""
+
+msgid "Your Gmail account"
+msgstr ""
+
+msgid "The receivers will see this value for the sender's email address when receiving your emails"
+msgstr ""
+
+msgid "The receivers will see this value for the sender's name when receiving your emails"
+msgstr ""
+
+msgid "During this step, we will configure the information displayed when an email is received."
+msgstr ""
+
+msgid "The email will be sent from your own server, so based on your server configuration it may end up in the SPAM folder. But don't worry, we will help you to fix this if it happens 😀"
+msgstr ""
+
+msgid "Your email configuration"
+msgstr ""
+
+msgid "Please make sure the email isn’t in the SPAM folder 😉"
+msgstr ""
+
+msgid "No, I didn't"
+msgstr ""
+
+msgid "Yes I did!"
+msgstr ""
+
+msgid "The Email has been sent based on your server's configuration, but you may not have received it."
+msgstr ""
+
+msgid "Did you receive it?"
+msgstr ""
+
+msgid "Email sent! 🚀"
+msgstr ""
+
+msgid "Your first receiver list"
+msgstr ""
+
+msgid "During the next step we will send the test email to a newly created testing list."
+msgstr ""
+
+msgid "Only your email address will be subscribed to this list, but if you want you can add other testing email addresses by clicking the \"Add new\" button."
+msgstr ""
+
+msgid "Receivers for the testing list"
+msgstr ""
+
+msgid "Email address"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "An error occurred when creating your testing list"
+msgstr ""
+
+msgid "Please add at least one user to your testing list."
+msgstr ""
+
+msgid "The following email addresses are incorrect: %s"
+msgstr ""
+
+msgid "Testing list"
+msgstr ""
+
+msgid "Something went wrong, please send us an email via the contact form on our website"
+msgstr ""
+
+msgid "Send a new test"
+msgstr ""
+
+msgid "Your Gmail password"
+msgstr ""
+
+msgid "Your Gmail address"
+msgstr ""
+
+msgid "These information are only asked to connect to your Gmail account by SMTP and send a test email from AcyMailing. Be sure that we don't store any of these information."
+msgstr ""
+
+msgid "Try with Gmail integration"
+msgstr ""
+
+msgid "Ask for support"
+msgstr ""
+
+msgid "Contact me"
+msgstr ""
+
+msgid "Simply provide us with your email address and we will get back to you as soon as we can 😉"
+msgstr ""
+
+msgid "Don't worry our support team will contact you and help you find a solution!"
+msgstr ""
+
+msgid "Well it seems that something went wrong."
+msgstr ""
+
+msgid "What's next?"
+msgstr ""
+
+msgid "This is Houston, we copy!"
+msgstr ""
+
+msgid "Don't worry, the AcyMailing support team will contact you as soon as possible."
+msgstr ""
+
+msgid "They will provide you with all the needed information to help you send your first email with AcyMailing."
+msgstr ""
+
+msgid "If you don't receive our message after some days, don't hesitate to directly %s"
+msgstr ""
+
+msgid "get in touch with us"
+msgstr ""
+
+msgid "Please re-install AcyMailing to install the first email"
+msgstr ""
+
+msgid "Here is how it looks like. Feel free to modify it (and test our drag and drop editor) if you want to!"
+msgstr ""
+
+msgid "Your first email"
+msgstr ""
+
+msgid "We are going to configure AcyMailing through a simple test email."
+msgstr ""
+
+msgid "Finish"
+msgstr ""
+
+msgid "Hurrah!"
+msgstr ""
+
+msgid "We're glad everything went well, time to import your users!"
+msgstr ""
+
+msgid "We hope you will enjoy AcyMailing as much as we do 😃"
+msgstr ""
+
+msgid "No, you don't deserve it"
+msgstr ""
+
+msgid "Leave a 5 ⭐️ review"
+msgstr ""
+
+msgid "This will help us to grow on WordPress and keep up the good job. Thanks a lot!"
+msgstr ""
+
+msgid "So if you love our plugin or if you think the job done on AcyMailing deserves a 5⭐ rating then please do it!"
+msgstr ""
+
+msgid "Sometimes, even super heroes need some help 😉"
+msgstr ""
+
+msgid "Help AcyMailing to grow its visibility on WordPress"
+msgstr ""
+
+msgid "We need your help!"
+msgstr ""
+
+msgid "HTML tag"
+msgstr ""
+
+msgid "Links"
+msgstr ""
+
+msgid "Display a subscribe option on %s checkout"
+msgstr ""
+
+msgid "Let the user choose if he wants to subscribe during checkout."
+msgstr ""
+
+msgid "If the user chooses to subscribe, he will be automatically subscribed to the selected lists (not displayed on your subscription form)."
+msgstr ""
+
+msgid "Subscribe to the newsletter"
+msgstr ""
+
+msgid "Subscribe zone label"
+msgstr ""
+
+msgid "Text displayed next to the lists selection zone. If you don't specify anything, a default text will be used."
+msgstr ""
+
+msgid "Text displayed next to the subscribe checkbox. If you don't specify anything, a default text will be used."
+msgstr ""
+
+msgid "Display the lists after"
+msgstr ""
+
+msgid "Loading error, please refresh the page and retry."
+msgstr ""
+
+msgid "Sure!"
+msgstr ""
+
+msgid "Contact email"
+msgstr ""
+
+msgid "Thank you for installing AcyMailing! 🤩"
+msgstr ""
+
+msgid "Let's walk through some steps to get started"
+msgstr ""
+
+msgid "AcyMailing news & coupon codes"
+msgstr ""
+
+msgid "No, thank you"
+msgstr ""
+
+msgid "Would you like to receive AcyMailing news and coupon codes?"
+msgstr ""
+
+msgid "%s translation(s) successfully installed"
+msgstr ""
+
+msgid "Our server didn't find the language(s) %s, you can start your own translation in the AcyMailing configuration page, tab \"Languages\" then share it"
+msgstr ""
+
+msgid "Could not load the language files from our server, you can update them in the AcyMailing configuration page, tab \"Languages\" or start your own translation and share it"
+msgstr ""
+
+msgid "Average open rate"
+msgstr ""
+
+msgid "Average click rate"
+msgstr ""
+
+msgid "Lists n° %s"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Modified"
+msgstr ""
+
+msgid "Confirmed"
+msgstr ""
+
+msgid "Unsubscribed"
+msgstr ""
+
+msgid "Subscribed"
+msgstr ""
+
+msgid "Bounced"
+msgstr ""
+
+msgid "History"
+msgstr ""
+
+msgid "View details"
+msgstr ""
+
+msgid "View source"
+msgstr ""
+
+msgid "IP"
+msgstr ""
+
+msgid "This website isn't attached to any valid AcyMailing license. Click the \"Check Again\" button on the Updates page after attaching it."
+msgstr ""
+
+msgid "Thanks 🙂"
+msgstr ""
+
+msgid "If you love AcyMailing please help us by posting a %s review. Thanks for your help!"
+msgstr ""
+
+msgid "Mail"
+msgstr ""
+
+msgid "Not Opened"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Not sent"
+msgstr ""
+
+msgid "Where the user has the status %1$s for %2$s [ID: %3$s]"
+msgstr ""
+
+msgid "Background"
+msgstr ""
+
+msgid "Transparent background"
+msgstr ""
+
+msgid "Background image"
+msgstr ""
+
+msgid "Add new"
+msgstr ""
+
+msgid "Padding"
+msgstr ""
+
+msgid "Alignment"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Font family"
+msgstr ""
+
+msgid "Link"
+msgstr ""
+
+msgid "Formatting"
+msgstr ""
+
+msgid "The button will take all the width available"
+msgstr ""
+
+msgid "Full width"
+msgstr ""
+
+msgid "Font"
+msgstr ""
+
+msgid "Cron URL"
+msgstr ""
+
+msgid "This URL is needed if you want to use your own cron task. It is the heart of the automatic features"
+msgstr ""
+
+msgid "You have an old version"
+msgstr ""
+
+msgid "Click to update to %s"
+msgstr ""
+
+msgid "When %1$s order status changed to %2$s"
+msgstr ""
+
+msgid "End date"
+msgstr ""
+
+msgid "Any plan"
+msgstr ""
+
+msgid "an event in"
+msgstr ""
+
+msgid "The file %1$s is missing in the folder <pre>%2$s</pre>, please make sure that your host doesn't automatically delete this file using a security script"
+msgstr ""
+
+msgid "When an order is placed"
+msgstr ""
+
+msgid "Any status"
+msgstr ""
+
+msgid "New email"
+msgstr ""
+
+msgid "Go to the configuration"
+msgstr ""
+
+msgid "Add to the queue"
+msgstr ""
+
+msgid "Empty the queue"
+msgstr ""
+
+msgid "HTML Editor"
+msgstr ""
+
+msgid "Less than"
+msgstr ""
+
+msgid "More than"
+msgstr ""
+
+msgid "Execute this automation..."
+msgstr ""
+
+msgid "The email preview line is a short text displayed in the receiver's inbox, next to the subject"
+msgstr ""
+
+msgid "Email preview line"
+msgstr ""
+
+msgid "Featured image"
+msgstr ""
+
+msgid "Campaign resume failed"
+msgstr ""
+
+msgid "Campaign pause failed"
+msgstr ""
+
+msgid "Campaign successfully duplicated"
+msgstr ""
+
+msgid "Campaign successfully resumed"
+msgstr ""
+
+msgid "Campaign successfully paused"
+msgstr ""
+
+msgid "Resume campaign"
+msgstr ""
+
+msgid "%s not found"
+msgstr ""
+
+msgid "Couldn't duplicate the email"
+msgstr ""
+
+msgid "Are you sure you want to duplicate this email?"
+msgstr ""
+
+msgid "Choose existing"
+msgstr ""
+
+msgid "Any"
+msgstr ""
+
+msgid "Registered to %1$s and the registration status is %2$s"
+msgstr ""
+
+msgid "Any event"
+msgstr ""
+
+msgid "Fields"
+msgstr ""
+
+msgid "When should AcyMailing send a report?"
+msgstr ""
+
+msgid "Which report should AcyMailing save in the log file?"
+msgstr ""
+
+msgid "You can enter one or several e-mail addresses, AcyMailing will send the report to those users."
+msgstr ""
+
+msgid "Location of the log file"
+msgstr ""
+
+msgid "A user has been modified in AcyMailing"
+msgstr ""
+
+msgid "A new user has been created in AcyMailing"
+msgstr ""
+
+msgid "Hello"
+msgstr ""
+
+msgid "User not found"
+msgstr ""
+
+msgid "Wrong date"
+msgstr ""
+
+msgid "User triggering the automation"
+msgstr ""
+
+msgid "User modification"
+msgstr ""
+
+msgid "This automation allows you to send a message to the admin when a user is modified"
+msgstr ""
+
+msgid "Send notification on user modification"
+msgstr ""
+
+msgid "User creation"
+msgstr ""
+
+msgid "This automation allows you to send a message to the admin when a user is created"
+msgstr ""
+
+msgid "Send notification on user creation"
+msgstr ""
+
+msgid "Custom headers"
+msgstr ""
+
+msgid "WARNING: Your session will end in 1 minute, don't forget to save your work!"
+msgstr ""
+
+msgid "%s of clicks"
+msgstr ""
+
+msgid "%1$s sent emails bounced back out of %2$s"
+msgstr ""
+
+msgid "%1$s users out of %2$s clicked a link"
+msgstr ""
+
+msgid "%1$s mails opened out of %2$s"
+msgstr ""
+
+msgid "%1$s mails successfully sent out of %2$s"
+msgstr ""
+
+msgid "Click map"
+msgstr ""
+
+msgid "%1$s clicks out of %2$s"
+msgstr ""
+
+msgid "All mails"
+msgstr ""
+
+msgid "The system plugin %s must be activated for these options to work"
+msgstr ""
+
+msgid "Send a confirmation email in addition to the site account creation email"
+msgstr ""
+
+msgid "Delete the user on site account deletion"
+msgstr ""
+
+msgid "Create a user on site account creation"
+msgstr ""
+
+msgid "%s integration"
+msgstr ""
+
+msgid "The icon has been successfully imported"
+msgstr ""
+
+msgid "Select a new icon"
+msgstr ""
+
+msgid "Social icons"
+msgstr ""
+
+msgid "AcyMailing found recent unsaved modifications, do you want to use them?"
+msgstr ""
+
+msgid "Are you sure you selected the right port? You can leave it empty if you do not know what to specify"
+msgstr ""
+
+msgid "No subscription linked to this email"
+msgstr ""
+
+msgid "Email not found"
+msgstr ""
+
+msgid "Special content like shortcodes, widgets and embeds are not displayed in the inserted content."
+msgstr ""
+
+msgid "Content"
+msgstr ""
+
+msgid "Page"
+msgstr ""
+
+msgid "Article"
+msgstr ""
+
+msgid "Set action targets"
+msgstr ""
+
+msgid "Number of users per list"
+msgstr ""
+
+msgid "Toss"
+msgstr ""
+
+msgid "The automation will have a one-in-two chance of being executed"
+msgstr ""
+
+msgid "AcyMailing users"
+msgstr ""
+
+msgid "Exactly"
+msgstr ""
+
+msgid "There is"
+msgstr ""
+
+msgid "Number of users"
+msgstr ""
+
+msgid "Format"
+msgstr ""
+
+msgid "Send mails manually"
+msgstr ""
+
+msgid "Mail from automation will be sent to: "
+msgstr ""
+
+msgid "Mails"
+msgstr ""
+
+msgid "%s in the past"
+msgstr ""
+
+msgid "%s in the future"
+msgstr ""
+
+msgid "Bought %1$s in %2$s"
+msgstr ""
+
+msgid "Created an order with %1$s %2$s day(s) ago and status is %3$s"
+msgstr ""
+
+msgid "Select the targets of your actions"
+msgstr ""
+
+msgid "Actions targets"
+msgstr ""
+
+msgid "You didn't set any condition for this automation"
+msgstr ""
+
+msgid "Please set a <b>condition</b> or click on <b>save & continue</b> if you don't want conditions"
+msgstr ""
+
+msgid "Has his account field %1$s %2$s %3$s"
+msgstr ""
+
+msgid "Is subscribed"
+msgstr ""
+
+msgid "Is unsubscribed"
+msgstr ""
+
+msgid "Is not subscribed"
+msgstr ""
+
+msgid " %1$s to the list %2$s"
+msgstr ""
+
+msgid "Has the field %1$s %2$s %3$s"
+msgstr ""
+
+msgid "the user"
+msgstr ""
+
+msgid "This automation will be executed if %s"
+msgstr ""
+
+msgid "Add condition"
+msgstr ""
+
+msgid "Select condition"
+msgstr ""
+
+msgid "Execute conditions on all users"
+msgstr ""
+
+msgid "Execute conditions on the user triggering the automation"
+msgstr ""
+
+msgid "Select your conditions"
+msgstr ""
+
+msgid "Conditions"
+msgstr ""
+
+msgid "Bought"
+msgstr ""
+
+msgid "At least one product"
+msgstr ""
+
+msgid "Any category"
+msgstr ""
+
+msgid "Any payment method"
+msgstr ""
+
+msgid "Purchased a product"
+msgstr ""
+
+msgid "Placed an order %1$s days ago and the order status is currently %2$s"
+msgstr ""
+
+msgid "Reminder"
+msgstr ""
+
+msgid "%1$s - %2$s"
+msgstr ""
+
+msgid "Choose a column"
+msgstr ""
+
+msgid "V5 data migration"
+msgstr ""
+
+msgid "Here are some gifs to wait"
+msgstr ""
+
+msgid "You are not connected. The newsletter may include some user information, so they may not be displayed correctly."
+msgstr ""
+
+msgid "Number of campaigns to display"
+msgstr ""
+
+msgid "Keep 0 if you want to display all campaigns"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "Please check the Terms and Conditions / Privacy policy"
+msgstr ""
+
+msgid "I agree with the %1$s and the %2$s"
+msgstr ""
+
+msgid "I agree with the %s"
+msgstr ""
+
+msgid "Select an article"
+msgstr ""
+
+msgid "Terms and conditions"
+msgstr ""
+
+msgid "Privacy policy"
+msgstr ""
+
+msgid "Display the article(s) in a popup"
+msgstr ""
+
+msgid "Form CSS class"
+msgstr ""
+
+msgid "A CSS class added to the subscription form. This allows individual form styling"
+msgstr ""
+
+msgid "This option enables you to align the text inside the subscription form"
+msgstr ""
+
+msgid "Right"
+msgstr ""
+
+msgid "Left"
+msgstr ""
+
+msgid "Center"
+msgstr ""
+
+msgid "Subscribe button text for logged in users"
+msgstr ""
+
+msgid "Text displayed on the subscribe button when the user is logged in"
+msgstr ""
+
+msgid "Before the fields"
+msgstr ""
+
+msgid "After the fields"
+msgstr ""
+
+msgid "Redirection after unsubscribing"
+msgstr ""
+
+msgid "The user will be redirected to this URL after clicking the unsubscribe button"
+msgstr ""
+
+msgid "Discount code"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Short description"
+msgstr ""
+
+msgid "Overwrite existing user's information"
+msgstr ""
+
+msgid "Excel security"
+msgstr ""
+
+msgid "If this option is active, values starting with a =, +, - or @ will be prefixed by a tab to avoid any CSV injection when opening the exported file with Excel.<br />Make sure the tab is automatically removed or turn Off this option if you import the file somewhere else than AcyMailing"
+msgstr ""
+
+msgid "Some CSS code is not compatible with all the editors, prefer using th.your_class rather than th[class=\"your_class\"]"
+msgstr ""
+
+msgid "Error copying folder from %1$s to %2$s"
+msgstr ""
+
+msgid "Can't find file"
+msgstr ""
+
+msgid "Sent with automation"
+msgstr ""
+
+msgid "Automated tasks"
+msgstr ""
+
+msgid "Execute daily tasks at %1$s : %2$s"
+msgstr ""
+
+msgid "if you want a thumbnail in the listing"
+msgstr ""
+
+msgid "all your images"
+msgstr ""
+
+msgid "your CSS files (*.css)"
+msgstr ""
+
+msgid "your html code"
+msgstr ""
+
+msgid "template.zip"
+msgstr ""
+
+msgid "If you want to import your template please upload a zip with this structure: "
+msgstr ""
+
+msgid "An error occurred"
+msgstr ""
+
+msgid "Unknown operator: %s"
+msgstr ""
+
+msgid "Please select actions"
+msgstr ""
+
+msgid "Please select filters"
+msgstr ""
+
+msgid "Content top margin"
+msgstr ""
+
+msgid "Select a list"
+msgstr ""
+
+msgid "Please set at least one action"
+msgstr ""
+
+msgid "When the user subscribes"
+msgstr ""
+
+msgid "Create new mail"
+msgstr ""
+
+msgid "View all automations"
+msgstr ""
+
+msgid "Please format the date like 21/12/2010 your format is %s"
+msgstr ""
+
+msgid "%s users subscribed"
+msgstr ""
+
+msgid "%s user subscriptions removed"
+msgstr ""
+
+msgid "%s users unsubscribed"
+msgstr ""
+
+msgid "Automation not found"
+msgstr ""
+
+msgid "%s emails removed from the queue"
+msgstr ""
+
+msgid "%s emails added to the queue"
+msgstr ""
+
+msgid "%s users updated"
+msgstr ""
+
+msgid "deleted"
+msgstr ""
+
+msgid "activated"
+msgstr ""
+
+msgid "blocked"
+msgstr ""
+
+msgid "unconfirmed"
+msgstr ""
+
+msgid "confirmed"
+msgstr ""
+
+msgid "%1$s users %2$s"
+msgstr ""
+
+msgid "not subscribed"
+msgstr ""
+
+msgid "Mass action"
+msgstr ""
+
+msgid "removed from"
+msgstr ""
+
+msgid "subscribed to"
+msgstr ""
+
+msgid "unsubscribed from"
+msgstr ""
+
+msgid "Will be %1$s the list %2$s"
+msgstr ""
+
+msgid "Will not receive the mail %s"
+msgstr ""
+
+msgid "Will receive the mail %1$s on the %2$s"
+msgstr ""
+
+msgid "Will have the field %1$s %2$s %3$s"
+msgstr ""
+
+msgid "Will be deleted"
+msgstr ""
+
+msgid "Will be blocked"
+msgstr ""
+
+msgid "Will be activated"
+msgstr ""
+
+msgid "Will be unconfirmed"
+msgstr ""
+
+msgid "Will be confirmed"
+msgstr ""
+
+msgid "The users selected by this %s "
+msgstr ""
+
+msgid "With the account field %1$s %2$s %3$s"
+msgstr ""
+
+msgid "including sub groups"
+msgstr ""
+
+msgid " %1$s the group %2$s"
+msgstr ""
+
+msgid " is lower than %s"
+msgstr ""
+
+msgid " is higher than %s"
+msgstr ""
+
+msgid " where the %1$s"
+msgstr ""
+
+msgid "one AcyMailing user"
+msgstr ""
+
+msgid "all AcyMailing users"
+msgstr ""
+
+msgid "This %1$s will be applied to %2$s"
+msgstr ""
+
+msgid "With the field %1$s %2$s %3$s"
+msgstr ""
+
+msgid "Triggers"
+msgstr ""
+
+msgid "The automation will be triggered:"
+msgstr ""
+
+msgid "Every %1$s %2$s"
+msgstr ""
+
+msgid "On the %1$s %2$s of each month"
+msgstr ""
+
+msgid "Every weeks on %s"
+msgstr ""
+
+msgid "Every day at %1$s:%2$s"
+msgstr ""
+
+msgid "Total: <b>%s</b> AcyMailing users match these conditions"
+msgstr ""
+
+msgid "<b>%s</b> AcyMailing users match this condition"
+msgstr ""
+
+msgid "Begins with"
+msgstr ""
+
+msgid "Ends with"
+msgstr ""
+
+msgid "Contains"
+msgstr ""
+
+msgid "Does not contain"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Active automation"
+msgstr ""
+
+msgid "Process mass action"
+msgstr ""
+
+msgid "Every"
+msgstr ""
+
+msgid "On the"
+msgstr ""
+
+msgid "First"
+msgstr ""
+
+msgid "Second"
+msgstr ""
+
+msgid "Third"
+msgstr ""
+
+msgid "Last"
+msgstr ""
+
+msgid "of the month"
+msgstr ""
+
+msgid "After"
+msgstr ""
+
+msgid "Before"
+msgstr ""
+
+msgid "Hour"
+msgstr ""
+
+msgid "Specific date"
+msgstr ""
+
+msgid "Relative date"
+msgstr ""
+
+msgid "Add at the beginning"
+msgstr ""
+
+msgid "Add at the end"
+msgstr ""
+
+msgid "Activate user"
+msgstr ""
+
+msgid "Unconfirm user"
+msgstr ""
+
+msgid "Confirm user subscription"
+msgstr ""
+
+msgid "Remove an email from the queue"
+msgstr ""
+
+msgid "Add an email to the queue"
+msgstr ""
+
+msgid "Set user value"
+msgstr ""
+
+msgid "Action on user"
+msgstr ""
+
+msgid "Unsubscribe users from"
+msgstr ""
+
+msgid "Remove users from"
+msgstr ""
+
+msgid "Subscribe users to"
+msgstr ""
+
+msgid "%s subscriptions have been inserted"
+msgstr ""
+
+msgid "Last check:"
+msgstr ""
+
+msgid "Assign your website to your licence!"
+msgstr ""
+
+msgid "Your licence has expired"
+msgstr ""
+
+msgid "Click to renew it!"
+msgstr ""
+
+msgid "Valid Until: %s"
+msgstr ""
+
+msgid "Add action"
+msgstr ""
+
+msgid "Select the actions"
+msgstr ""
+
+msgid "Every day at"
+msgstr ""
+
+msgid "Every week on"
+msgstr ""
+
+msgid "Please select at least one trigger"
+msgstr ""
+
+msgid "Unsubscription date"
+msgstr ""
+
+msgid "In"
+msgstr ""
+
+msgid "Not in"
+msgstr ""
+
+msgid "Include sub-groups"
+msgstr ""
+
+msgid "Site account user field"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Execute actions on the user triggering the automation"
+msgstr ""
+
+msgid "Execute actions on all users"
+msgstr ""
+
+msgid "And"
+msgstr ""
+
+msgid "AcyMailing field"
+msgstr ""
+
+msgid "Or"
+msgstr ""
+
+msgid "Add filter"
+msgstr ""
+
+msgid "No subscription status"
+msgstr ""
+
+msgid "AcyMailing list"
+msgstr ""
+
+msgid "Select filter"
+msgstr ""
+
+msgid "New automation"
+msgstr ""
+
+msgid "New mass actions"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "When a user opens an email"
+msgstr ""
+
+msgid "When a user clicks on a link in an email"
+msgstr ""
+
+msgid "On user modification"
+msgstr ""
+
+msgid "On user creation"
+msgstr ""
+
+msgid "All triggers"
+msgstr ""
+
+msgid "Drag the triggers here"
+msgstr ""
+
+msgid "Information"
+msgstr ""
+
+msgid "Classic trigger"
+msgstr ""
+
+msgid "Trigger based on user actions"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "Please enable the javascript to submit this form"
+msgstr ""
+
+msgid "Please fill in the field %s"
+msgstr ""
+
+msgid "Please confirm your subscription"
+msgstr ""
+
+msgid "You've subscribed to our newsletters from our website"
+msgstr ""
+
+msgid "We need you to activate your subscription by clicking the link below:"
+msgstr ""
+
+msgid "Error Uploading file: %s"
+msgstr ""
+
+msgid "Could not copy the file %1$s to %2$s"
+msgstr ""
+
+msgid "Couldn't upload file, check permissions for the folder %s"
+msgstr ""
+
+msgid "The file has been rejected for safety reason"
+msgstr ""
+
+msgid "Could not move the file"
+msgstr ""
+
+msgid "Could not find source file, check permissions: %s"
+msgstr ""
+
+msgid "Failed to delete %s"
+msgstr ""
+
+msgid "Copy file %s failed, check permissions"
+msgstr ""
+
+msgid "Cannot open source folder"
+msgstr ""
+
+msgid "Cannot create destination folder"
+msgstr ""
+
+msgid "Folder %s already exists"
+msgstr ""
+
+msgid "Folder %s does not exist"
+msgstr ""
+
+msgid "%s is not a folder"
+msgstr ""
+
+msgid "%s is not a file"
+msgstr ""
+
+msgid "Could not delete folder %s"
+msgstr ""
+
+msgid "The uploaded file exceeds the upload_max_filesize directive in php configuration."
+msgstr ""
+
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form."
+msgstr ""
+
+msgid "The uploaded file was only partially uploaded."
+msgstr ""
+
+msgid "No file was uploaded."
+msgstr ""
+
+msgid "Error uploading the file on the server, unknown error %s."
+msgstr ""
+
+msgid "Can not upload the file, please make sure file_uploads is enabled on your php.ini file."
+msgstr ""
+
+msgid "Error uploading the file from %1$s to %2$s."
+msgstr ""
+
+msgid "File %s deleted from the template pack."
+msgstr ""
+
+msgid "Error extracting the file %1$s to %2$s."
+msgstr ""
+
+msgid "Error installing template."
+msgstr ""
+
+msgid "%s templates Installed"
+msgstr ""
+
+msgid "You are up to date"
+msgstr ""
+
+msgid "Export both"
+msgstr ""
+
+msgid "User account ID"
+msgstr ""
+
+msgid "User active status"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "Add tags"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All tags"
+msgstr ""
+
+msgid "Automation"
+msgstr ""
+
+msgid "Bounce email address"
+msgstr ""
+
+msgid "no-reply@example.com"
+msgstr ""
+
+msgid "Campaign"
+msgstr ""
+
+msgid "Campaigns"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Cancel Scheduling"
+msgstr ""
+
+msgid "Invisible reCaptcha"
+msgstr ""
+
+msgid "Check database integrity"
+msgstr ""
+
+msgid "Click"
+msgstr ""
+
+msgid "Color"
+msgstr ""
+
+msgid "Comma (,)"
+msgstr ""
+
+msgid "Configuration"
+msgstr ""
+
+msgid "Advanced configuration"
+msgstr ""
+
+msgid "Captcha"
+msgstr ""
+
+msgid "Charset"
+msgstr ""
+
+msgid "Database maintenance"
+msgstr ""
+
+msgid "DKIM"
+msgstr ""
+
+msgid "Embed attachments"
+msgstr ""
+
+msgid "Embed images"
+msgstr ""
+
+msgid "Encoding format"
+msgstr ""
+
+msgid "Use https"
+msgstr ""
+
+msgid "Queue process"
+msgstr ""
+
+msgid "Automatic only"
+msgstr ""
+
+msgid "Automatic / Manual"
+msgstr ""
+
+msgid "Manual only"
+msgstr ""
+
+msgid "Queue processing"
+msgstr ""
+
+msgid "Languages"
+msgstr ""
+
+msgid "Mail settings"
+msgstr ""
+
+msgid "How do you want to send your emails?"
+msgstr ""
+
+msgid "Multiple parts"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Subscription"
+msgstr ""
+
+msgid "Create new list"
+msgstr ""
+
+msgid "Create segment"
+msgstr ""
+
+msgid "Create new template"
+msgstr ""
+
+msgid "Create automation"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Creation date"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgid "Default sender information"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete user"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Error saving"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Export users"
+msgstr ""
+
+msgid "Couldn't save the file %s"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Use same settings for REPLY-TO"
+msgstr ""
+
+msgid "From email"
+msgstr ""
+
+msgid "sender@example.com"
+msgstr ""
+
+msgid "From name"
+msgstr ""
+
+msgid "Company name, your name etc."
+msgstr ""
+
+msgid "Import users"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "January"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "Library"
+msgstr ""
+
+msgid "List"
+msgstr ""
+
+msgid "Lists"
+msgstr ""
+
+msgid "The list doesn't exist"
+msgstr ""
+
+msgid "List ID"
+msgstr ""
+
+msgid "The list %s is saved"
+msgstr ""
+
+msgid "List name"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No list selected"
+msgstr ""
+
+msgid "The field(s) %1$s are not in the allowed fields: %2$s"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Recipients"
+msgstr ""
+
+msgid "Reply-to email"
+msgstr ""
+
+msgid "contact@example.com"
+msgstr ""
+
+msgid "Reply-to name"
+msgstr ""
+
+msgid "Save & continue"
+msgstr ""
+
+msgid "Save & exit"
+msgstr ""
+
+msgid "Scheduled"
+msgstr ""
+
+msgid "Search..."
+msgstr ""
+
+msgid "Semicolon (;)"
+msgstr ""
+
+msgid "Sending"
+msgstr ""
+
+msgid "Sent"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "SMTP Server"
+msgstr ""
+
+msgid "Sort by:"
+msgstr ""
+
+msgid "Statistics"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Subscribers"
+msgstr ""
+
+msgid "Subscription date"
+msgstr ""
+
+msgid "Successfully saved"
+msgstr ""
+
+msgid "Tags"
+msgstr ""
+
+msgid "Template name"
+msgstr ""
+
+msgid "Templates"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Subscribe"
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Users"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Welcome email"
+msgstr ""
+
+msgid "Unsubscribe email"
+msgstr ""
+
+msgid "Optional"
+msgstr ""
+
+msgid "Campaign will be sent to a total of:"
+msgstr ""
+
+msgid "Choose lists"
+msgstr ""
+
+msgid "Show all lists"
+msgstr ""
+
+msgid "Show only selected lists"
+msgstr ""
+
+msgid "New list"
+msgstr ""
+
+msgid "New user"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Create empty template"
+msgstr ""
+
+msgid "Start from"
+msgstr ""
+
+msgid "Sending date"
+msgstr ""
+
+msgid "The campaign couldn't be saved"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Attachments"
+msgstr ""
+
+msgid "Send settings"
+msgstr ""
+
+msgid "This campaign will be sent"
+msgstr ""
+
+msgid "Save as draft"
+msgstr ""
+
+msgid "Confirm campaign"
+msgstr ""
+
+msgid "Now"
+msgstr ""
+
+msgid "The campaign was successfully saved as draft"
+msgstr ""
+
+msgid "The campaign information are not available"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit template"
+msgstr ""
+
+msgid "Campaign will be sent to a total of %s recipients"
+msgstr ""
+
+msgid "This campaign will be sent on %1$s at %2$s"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "New campaign"
+msgstr ""
+
+msgid "Main options"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Displayed lists"
+msgstr ""
+
+msgid "Automatically subscribe to"
+msgstr ""
+
+msgid "Display text mode"
+msgstr ""
+
+msgid "Inside"
+msgstr ""
+
+msgid "Outside"
+msgstr ""
+
+msgid "Subscribe button text"
+msgstr ""
+
+msgid "Unsubscribe button text"
+msgstr ""
+
+msgid "Display mode"
+msgstr ""
+
+msgid "Horizontal"
+msgstr ""
+
+msgid "Vertical"
+msgstr ""
+
+msgid "Tableless"
+msgstr ""
+
+msgid "Advanced options"
+msgstr ""
+
+msgid "Unsubscribe button"
+msgstr ""
+
+msgid "Intro text"
+msgstr ""
+
+msgid "Post text"
+msgstr ""
+
+msgid "Display user information if logged in"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Redirect link"
+msgstr ""
+
+msgid "Please enter your name"
+msgstr ""
+
+msgid "Please enter a valid e-mail address"
+msgstr ""
+
+msgid "The captcha is invalid, please try again"
+msgstr ""
+
+msgid "Please select the lists you want to subscribe to"
+msgstr ""
+
+msgid "Security key"
+msgstr ""
+
+msgid "Please log in"
+msgstr ""
+
+msgid "Advanced email verification"
+msgstr ""
+
+msgid "Check if the domain exists"
+msgstr ""
+
+msgid "Could not save the user"
+msgstr ""
+
+msgid "An e-mail has been sent to confirm your subscription"
+msgstr ""
+
+msgid "You have successfully subscribed"
+msgstr ""
+
+msgid "You have successfully unsubscribed"
+msgstr ""
+
+msgid "You are already subscribed"
+msgstr ""
+
+msgid "The e-mail address %s is not in the list of users"
+msgstr ""
+
+msgid "You were not subscribed"
+msgstr ""
+
+msgid "Google site key"
+msgstr ""
+
+msgid "Google secret key"
+msgstr ""
+
+msgid "Help"
+msgstr ""
+
+msgid "The selected lists will be added on the subscription form to let the users opt-in (if they are not selected as automatically subscribed)."
+msgstr ""
+
+msgid "The user will be automatically subscribed to the selected lists. They won't be displayed on your subscription form."
+msgstr ""
+
+msgid "Display the labels inside or outside the fields?"
+msgstr ""
+
+msgid "Text displayed on the subscribe button. You can use a custom translation key for it (create it in the acym configuration page, tab Languages)"
+msgstr ""
+
+msgid "Select whether you want to display the form horizontally, vertically or without table (recommended)"
+msgstr ""
+
+msgid "This text will be displayed before the subscription form inside a div with the class 'acym_introtext'"
+msgstr ""
+
+msgid "This text will be displayed after the subscription form inside a div with the class 'acym_posttext'"
+msgstr ""
+
+msgid "Do you want the logged in users to be automatically identified in the module?"
+msgstr ""
+
+msgid "The source indicates from where your subscribers came from. You will be able to filter them afterwards based on if they came from a subscription form, an imported file, an account creation..."
+msgstr ""
+
+msgid "The user will be redirected to this URL after subscribing. If no URL is specified, the form is refreshed using ajax."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Back to listing"
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+msgid "Disable"
+msgstr ""
+
+msgid "Choose an action"
+msgstr ""
+
+msgid "Stop the scheduling and set campaign as draft"
+msgstr ""
+
+msgid "Sender information"
+msgstr ""
+
+msgid "BCC"
+msgstr ""
+
+msgid "When do you want your email to be sent?"
+msgstr ""
+
+msgid "Your campaign will be sent as soon as you confirm it"
+msgstr ""
+
+msgid "This campaign will be sent at: "
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Family"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Style"
+msgstr ""
+
+msgid "Design"
+msgstr ""
+
+msgid "Background color"
+msgstr ""
+
+msgid "Blocks"
+msgstr ""
+
+msgid "Contents"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Choose a <b>CSV</b> file with your user data"
+msgstr ""
+
+msgid "Please make sure the contacts you import accepted to receive emails from you"
+msgstr ""
+
+msgid "Please browse for a file to import"
+msgstr ""
+
+msgid "Could not open the file %s"
+msgstr ""
+
+msgid "Ignore"
+msgstr ""
+
+msgid "Ignore unassigned columns"
+msgstr ""
+
+msgid "Click to edit"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "re-subscribe"
+msgstr ""
+
+msgid "Ascending sort (click for descending sort)"
+msgstr ""
+
+msgid "Descending sort (click for ascending sort)"
+msgstr ""
+
+msgid "l, j F Y"
+msgstr ""
+
+msgid "l, j F Y H:i"
+msgstr ""
+
+msgid "Could not upload the file %1$s to %2$s"
+msgstr ""
+
+msgid "Please make sure the folder ( %s ) is writable"
+msgstr ""
+
+msgid "Uploaded file not found:"
+msgstr ""
+
+msgid "Columns not found"
+msgstr ""
+
+msgid "The first line of your file (%s) must contain only columns of the acym_user table"
+msgstr ""
+
+msgid "You need at least the column <b>email</b> <br /> Example: name,email"
+msgstr ""
+
+msgid "You need %s arguments per line, one or more line(s) couldn't be imported"
+msgstr ""
+
+msgid "Click here to download all lines containing errors"
+msgstr ""
+
+msgid "<b>%1$s</b> users in the imported file: <br /> - <b>%2$s</b> new users <b>imported</b><br /> - <b>%3$s</b> <b>invalid</b> lines or email addresses<br /> - <b>%4$s</b> already <b>existing</b> users or <b>duplicate</b> entries"
+msgstr ""
+
+msgid "The column %1$s is not in the list of possible columns: %2$s"
+msgstr ""
+
+msgid "The uploaded file exceeds the upload_max_filesize directive in php configuration"
+msgstr ""
+
+msgid "The uploaded file was only partially uploaded"
+msgstr ""
+
+msgid "No file was uploaded"
+msgstr ""
+
+msgid "Error uploading the file on the server, unknown error: %s"
+msgstr ""
+
+msgid "Import from file"
+msgstr ""
+
+msgid "Import from text"
+msgstr ""
+
+msgid "%s AcyMailing users updated"
+msgstr ""
+
+msgid "%s AcyMailing users deleted"
+msgstr ""
+
+msgid "%s new users imported"
+msgstr ""
+
+msgid "There are <b>%s</b> users on your website"
+msgstr ""
+
+msgid "There are <b>%s</b> registered users in AcyMailing"
+msgstr ""
+
+msgid "If you click on the 'import' button, the system will:"
+msgstr ""
+
+msgid "<b>Update</b> the AcyMailing users from your %s users"
+msgstr ""
+
+msgid "<b>Delete</b> the AcyMailing users if they were linked to a %s user that does not exist any more"
+msgstr ""
+
+msgid "<b>Add</b> all your %s users into AcyMailing if they are not already there"
+msgstr ""
+
+msgid "<b>Subscribe</b> all your %s users to the selected lists if they are not already subscribed or unsubscribed from it"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
+msgid "Allowed files"
+msgstr ""
+
+msgid "Empty textarea"
+msgstr ""
+
+msgid "Database"
+msgstr ""
+
+msgid "Please select a table name from your database"
+msgstr ""
+
+msgid "Please select a field for the email"
+msgstr ""
+
+msgid "The field \"%1$s\" could not be found. Please specify a field from the table:<br /><b>%2$s</b>"
+msgstr ""
+
+msgid "Require confirmation"
+msgstr ""
+
+msgid "Import the users as confirmed"
+msgstr ""
+
+msgid "Parameters"
+msgstr ""
+
+msgid "Unassigned"
+msgstr ""
+
+msgid "Import this file"
+msgstr ""
+
+msgid "Required field"
+msgstr ""
+
+msgid "Please set a valid data"
+msgstr ""
+
+msgid "Please set a valid number"
+msgstr ""
+
+msgid "Template design"
+msgstr ""
+
+msgid "Border"
+msgstr ""
+
+msgid "Radius"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Width"
+msgstr ""
+
+msgid "Height"
+msgstr ""
+
+msgid "My button"
+msgstr ""
+
+msgid "Button"
+msgstr ""
+
+msgid "Space"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Video"
+msgstr ""
+
+msgid "Follow"
+msgstr ""
+
+msgid "Share"
+msgstr ""
+
+msgid "Edit email"
+msgstr ""
+
+msgid "Choose template"
+msgstr ""
+
+msgid "Campaign not found"
+msgstr ""
+
+msgid "Campaign name"
+msgstr ""
+
+msgid "Email subject"
+msgstr ""
+
+msgid "Apply"
+msgstr ""
+
+msgid "remove"
+msgstr ""
+
+msgid "%s subscriptions added. Please click on the save button to confirm them."
+msgstr ""
+
+msgid "There is no Subject or Body in this e-mail"
+msgstr ""
+
+msgid "Error sending message %1$s to %2$s"
+msgstr ""
+
+msgid "Message %1$s successfully sent to %2$s"
+msgstr ""
+
+msgid "User not found: %s"
+msgstr ""
+
+msgid "Send a test"
+msgstr ""
+
+msgid "If you receive this message, that means your configuration is Ok"
+msgstr ""
+
+msgid "The PHP Extension openssl is not enabled on your server, this extension is required to use an SSL connection, please enable it"
+msgstr ""
+
+msgid "The specified bounce e-mail address %s might cause the problem, please delete it (leave the field bounce address empty) and try again."
+msgstr ""
+
+msgid "You specified an SMTP password but you don't require an authentification, you might want to turn the SMTP authentication ON."
+msgstr ""
+
+msgid "Your local website may not have a mail server. Please make sure you can send e-mails with the site first (password request, registration confirmation...)."
+msgstr ""
+
+msgid "The port you specified (%s) is not a common port for smtp connexions... Please leave the port empty and give it a new try"
+msgstr ""
+
+msgid "Add names"
+msgstr ""
+
+msgid "Accept special chars in email addresses"
+msgstr ""
+
+msgid "SendMail Path"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Secure method"
+msgstr ""
+
+msgid "Keep Alive"
+msgstr ""
+
+msgid "Authentication"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Which port can I use from my website?"
+msgstr ""
+
+msgid "The port %s is available."
+msgstr ""
+
+msgid "The port %1$s is not opened on your server: %2$s"
+msgstr ""
+
+msgid "fsockopen is not enabled, please contact your hosting company to enable it"
+msgstr ""
+
+msgid "API key"
+msgstr ""
+
+msgid "REST API"
+msgstr ""
+
+msgid "DKIM Settings"
+msgstr ""
+
+msgid "Please save your AcyMailing configuration to generate the DKIM keys"
+msgstr ""
+
+msgid "Configure your DNS by adding a TXT record on your domain %s using the key/value as shown below:"
+msgstr ""
+
+msgid "Key"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Let me enter my own keys."
+msgstr ""
+
+msgid "Domain"
+msgstr ""
+
+msgid "Selector"
+msgstr ""
+
+msgid "Passphrase"
+msgstr ""
+
+msgid "Identity"
+msgstr ""
+
+msgid "Private key"
+msgstr ""
+
+msgid "Public Key"
+msgstr ""
+
+msgid "Cron"
+msgstr ""
+
+msgid "The domain name is not valid (%s). If you use your own cron system, please make sure you trigger AcyMailing with the full domain name."
+msgstr ""
+
+msgid "AcyMailing Triggered at %s"
+msgstr ""
+
+msgid "The system won't be triggered before %s"
+msgstr ""
+
+msgid "Automatic send process"
+msgstr ""
+
+msgid "Send %1$s e-mails every %2$s"
+msgstr ""
+
+msgid "Seconds"
+msgstr ""
+
+msgid "Minutes"
+msgstr ""
+
+msgid "Hours"
+msgstr ""
+
+msgid "Days"
+msgstr ""
+
+msgid "Weeks"
+msgstr ""
+
+msgid "Months"
+msgstr ""
+
+msgid "Manual send process"
+msgstr ""
+
+msgid "Send %1$s e-mails and then wait %2$s before sending another batch"
+msgstr ""
+
+msgid "Maximum execution time"
+msgstr ""
+
+msgid "Based on your server configuration, each batch can run for %s seconds"
+msgstr ""
+
+msgid "We are currently checking your real maximum execution time... At least %s seconds so far"
+msgstr ""
+
+msgid "Based on our check, we can run each batch for %s seconds"
+msgstr ""
+
+msgid "Calculate the real maximum execution time again"
+msgstr ""
+
+msgid "Order the send process by"
+msgstr ""
+
+msgid "Random"
+msgstr ""
+
+msgid "You should not use the random ordering if you use the multiple queue system."
+msgstr ""
+
+msgid "Your cron does not seem to be enabled, don't forget to create it!"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Send a report"
+msgstr ""
+
+msgid "Send the report to"
+msgstr ""
+
+msgid "Save the report"
+msgstr ""
+
+msgid "Save the report to"
+msgstr ""
+
+msgid "Delete the report"
+msgstr ""
+
+msgid "See the report"
+msgstr ""
+
+msgid "Each time AcyMailing is triggered"
+msgstr ""
+
+msgid "Only if AcyMailing executes an action"
+msgstr ""
+
+msgid "Simplified Report"
+msgstr ""
+
+msgid "Detailed Report"
+msgstr ""
+
+msgid "Only if an error occurs"
+msgstr ""
+
+msgid "%s minutes ago"
+msgstr ""
+
+msgid "Your current time is %s"
+msgstr ""
+
+msgid "The log file must only contain alphanumeric characters and end with .log"
+msgstr ""
+
+msgid "The log file is empty"
+msgstr ""
+
+msgid "Log file successfully deleted"
+msgstr ""
+
+msgid "Could not delete the Log file"
+msgstr ""
+
+msgid "Log file does not exist"
+msgstr ""
+
+msgid "Last Cron"
+msgstr ""
+
+msgid "Last Run time"
+msgstr ""
+
+msgid "Triggered from the IP"
+msgstr ""
+
+msgid "Send"
+msgstr ""
+
+msgid "The campaign <b>%s</b> has been added to the queue"
+msgstr ""
+
+msgid "Couldn't add the campaign %s to the queue"
+msgstr ""
+
+msgid "This campaign is already in the queue"
+msgstr ""
+
+msgid "Queue"
+msgstr ""
+
+msgid "Automated emails"
+msgstr ""
+
+msgid "Detailed queue"
+msgstr ""
+
+msgid "Paused"
+msgstr ""
+
+msgid "%1$s emails have been added to the queue for the Scheduled Campaign %2$s"
+msgstr ""
+
+msgid "Select a table"
+msgstr ""
+
+msgid "Field matching"
+msgstr ""
+
+msgid "Please match <b>AcyMailing standard fields</b> (email, name...) with the <b>fields you are importing</b>."
+msgstr ""
+
+msgid "Encoding"
+msgstr ""
+
+msgid "Users from lists"
+msgstr ""
+
+msgid "All users"
+msgstr ""
+
+msgid "Users to export"
+msgstr ""
+
+msgid "Please select at least one list"
+msgstr ""
+
+msgid "Please select at least one field to export"
+msgstr ""
+
+msgid "Data will be exported to CSV format"
+msgstr ""
+
+msgid "Fields to export"
+msgstr ""
+
+msgid "%s recipients"
+msgstr ""
+
+msgid "Sending..."
+msgstr ""
+
+msgid "Ready to be sent"
+msgstr ""
+
+msgid "Cancel campaign"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "The number of arguments doesn't match with number of columns"
+msgstr ""
+
+msgid "One or more address(es) are invalid and couldn't be imported"
+msgstr ""
+
+msgid "Invalid address"
+msgstr ""
+
+msgid "All the users will be exported"
+msgstr ""
+
+msgid "Some users are subscribed to several lists, but they are counted only one time on this total. They will received only one email."
+msgstr ""
+
+msgid "Audience"
+msgstr ""
+
+msgid "View all lists"
+msgstr ""
+
+msgid "Create list"
+msgstr ""
+
+msgid "Campaigns scheduled"
+msgstr ""
+
+msgid "None of your campaigns are scheduled. Go schedule one!"
+msgstr ""
+
+msgid "your.mail@example.com"
+msgstr ""
+
+msgid "From mail address"
+msgstr ""
+
+msgid "Using your server"
+msgstr ""
+
+msgid "Using an external server"
+msgstr ""
+
+msgid "PHP Mail Function"
+msgstr ""
+
+msgid "Safe check"
+msgstr ""
+
+msgid "Coming soon"
+msgstr ""
+
+msgid "You configured AcyMailing to use the automatic send process only. You can't trigger the send process via this button unless you allow the manual send process via the AcyMailing configuration page"
+msgstr ""
+
+msgid "Try"
+msgstr ""
+
+msgid "There is nothing to send"
+msgstr ""
+
+msgid "Send Process"
+msgstr ""
+
+msgid "You must keep this popup opened to continue sending. If you want to be able to close the page and turn Off your computer, you can let the cron task run the automatic send process (only available in our commercial versions)"
+msgstr ""
+
+msgid "Send process running in parallel detected, the system stopped but you will be able to resume it"
+msgstr ""
+
+msgid "Next try in %s minutes"
+msgstr ""
+
+msgid "Process refreshed to avoid a time limit"
+msgstr ""
+
+msgid "Process refreshed to avoid a possible loss of connection"
+msgstr ""
+
+msgid "The Send Process stopped because there are too many errors"
+msgstr ""
+
+msgid "The system kept all non delivered e-mails in the queue, so you will be able to resume the send process later"
+msgstr ""
+
+msgid "Please verify your mail configuration and make sure you can send a test of this e-mail"
+msgstr ""
+
+msgid "If you recently, successfully, sent a lot of e-mails, those errors may also be due to your server limitations"
+msgstr ""
+
+msgid "Your server apparently refuses to send more e-mails"
+msgstr ""
+
+msgid "Using one of our commercial versions, the system would be able to continue automatically the send process using a Cron"
+msgstr ""
+
+msgid "If you configured a cron task, the system will automatically continue the send process"
+msgstr ""
+
+msgid "Try %s times to deliver the message."
+msgstr ""
+
+msgid "If it still fails, %s"
+msgstr ""
+
+msgid "Maximum number of tries"
+msgstr ""
+
+msgid "If AcyMailing can not send the e-mail after X tries, AcyMailing will delete the e-mail from the queue."
+msgstr ""
+
+msgid "Do nothing"
+msgstr ""
+
+msgid "Delete the user subscription"
+msgstr ""
+
+msgid "Unsubscribe the user"
+msgstr ""
+
+msgid "Subscribe the user"
+msgstr ""
+
+msgid "Block the user"
+msgstr ""
+
+msgid "Send now"
+msgstr ""
+
+msgid "Send all"
+msgstr ""
+
+msgid "%s campaign(s) scheduled"
+msgstr ""
+
+msgid "%1$s messages processed: %2$s successful, %3$s failed"
+msgstr ""
+
+msgid "The name of the picture is not correct and may not be displayed on some mail clients. Do you want to insert it?"
+msgstr ""
+
+msgid "It's not a valid url. Please correct it and try again."
+msgstr ""
+
+msgid "Subscribed users"
+msgstr ""
+
+msgid "Unsubscribed users"
+msgstr ""
+
+msgid "Collapse"
+msgstr ""
+
+msgid "You didn't send any campaign yet."
+msgstr ""
+
+msgid "You don't have any statistics in this campaign, send it!"
+msgstr ""
+
+msgid "Here are some examples of what you'll see."
+msgstr ""
+
+msgid "Fail"
+msgstr ""
+
+msgid "Click rate"
+msgstr ""
+
+msgid "Open rate"
+msgstr ""
+
+msgid "And awesome chart lines!"
+msgstr ""
+
+msgid "Start: "
+msgstr ""
+
+msgid "End: "
+msgstr ""
+
+msgid "By hour"
+msgstr ""
+
+msgid "By day"
+msgstr ""
+
+msgid "By month"
+msgstr ""
+
+msgid "<b>You don't have any open data/click data on this campaign</b>"
+msgstr ""
+
+msgid "Here is an example of what you can get when you will have data!"
+msgstr ""
+
+msgid "Global statistics"
+msgstr ""
+
+msgid "Detailed statistics"
+msgstr ""
+
+msgid "Mails open"
+msgstr ""
+
+msgid "Open date"
+msgstr ""
+
+msgid "You don't have any user."
+msgstr ""
+
+msgid "You don't have any list."
+msgstr ""
+
+msgid "Create your first one!"
+msgstr ""
+
+msgid "You don't have any template."
+msgstr ""
+
+msgid "Create an amazing template with our amazing editor!"
+msgstr ""
+
+msgid "Create one now!"
+msgstr ""
+
+msgid "You don't have any automation"
+msgstr ""
+
+msgid "Create one and let AcyMailing do it!"
+msgstr ""
+
+msgid "Opened"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Create one"
+msgstr ""
+
+msgid "Create or import your first one!"
+msgstr ""
+
+msgid "Add recipients to send this campaign"
+msgstr ""
+
+msgid "You don't have any campaign in the queue"
+msgstr ""
+
+msgid "Send one and see how amazing the queue is!"
+msgstr ""
+
+msgid "Campaign has been sent to a total of %s recipients"
+msgstr ""
+
+msgid "This campaign has been sent on %1$s at %2$s"
+msgstr ""
+
+msgid "Are you sure you want to delete these elements?"
+msgstr ""
+
+msgid "Are you sure you want to disable these elements?"
+msgstr ""
+
+msgid "Are you sure you want to enable these elements?"
+msgstr ""
+
+msgid "Please create a template with our amazing editor or create a campaign with an empty template"
+msgstr ""
+
+msgid "%s already exist"
+msgstr ""
+
+msgid "Website links"
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "Subscriber"
+msgstr ""
+
+msgid "Receiver information"
+msgstr ""
+
+msgid "First part of the user name"
+msgstr ""
+
+msgid "Last part of the user name"
+msgstr ""
+
+msgid "For example the first part of the user John Doe is John"
+msgstr ""
+
+msgid "For example the last part of the user John Doe is Doe"
+msgstr ""
+
+msgid "User id"
+msgstr ""
+
+msgid "User name"
+msgstr ""
+
+msgid "User email"
+msgstr ""
+
+msgid "User creation date"
+msgstr ""
+
+msgid "User source"
+msgstr ""
+
+msgid "User confirmed"
+msgstr ""
+
+msgid "User last send date"
+msgstr ""
+
+msgid "User last open date"
+msgstr ""
+
+msgid "User last click date"
+msgstr ""
+
+msgid "Insert"
+msgstr ""
+
+msgid "d F Y"
+msgstr ""
+
+msgid "Y-m-d"
+msgstr ""
+
+msgid "Insert an <b>unsubscribe / modify your subscription</b> link in your email"
+msgstr ""
+
+msgid "Insert a <b>confirm your subscription</b> link in your email"
+msgstr ""
+
+msgid "Insert a <b>subscribe</b> link in your email"
+msgstr ""
+
+msgid "Click here to confirm your subscription"
+msgstr ""
+
+msgid "List names"
+msgstr ""
+
+msgid "Dynamic text"
+msgstr ""
+
+msgid "Time format"
+msgstr ""
+
+msgid "List(s) selected: "
+msgstr ""
+
+msgid "Click here to view it online"
+msgstr ""
+
+msgid "Insert a <b>view it online</b> link in your email"
+msgstr ""
+
+msgid "%s user"
+msgstr ""
+
+msgid "Login name of the user"
+msgstr ""
+
+msgid "User groups"
+msgstr ""
+
+msgid "No group"
+msgstr ""
+
+msgid "Custom fields"
+msgstr ""
+
+msgid "Visitor"
+msgstr ""
+
+msgid "Default"
+msgstr ""
+
+msgid "The campaign has been confirmed. It will be add to the queue at <b>%s</b>"
+msgstr ""
+
+msgid "The campaign couldn't be confirmed"
+msgstr ""
+
+msgid "Your template has been changed please save the modifications by clicking the save button"
+msgstr ""
+
+msgid "Migrated template"
+msgstr ""
+
+msgid "First of all, do you want to migrate some data from your old AcyMailing component?"
+msgstr ""
+
+msgid "Which data do you want to migrate?"
+msgstr ""
+
+msgid "Migrate"
+msgstr ""
+
+msgid "No, I don't want to migrate my data"
+msgstr ""
+
+msgid "Migration done!"
+msgstr ""
+
+msgid "Continue"
+msgstr ""
+
+msgid "Newsletters"
+msgstr ""
+
+msgid "Restart from error"
+msgstr ""
+
+msgid "Ignore errors and continue"
+msgstr ""
+
+msgid "If you choose to migrate your old AcyMailing data (5.X version) then your AcyMailing 6 data will be overwritten. So please make sure you won't lose any important data stored in your AcyMailing 6 instance."
+msgstr ""
+
+msgid "Clean error"
+msgstr ""
+
+msgid "Insert error"
+msgstr ""
+
+msgid "Field type"
+msgstr ""
+
+msgid "Required"
+msgstr ""
+
+msgid "Listing"
+msgstr ""
+
+msgid "You can't delete core elements"
+msgstr ""
+
+msgid "Textarea"
+msgstr ""
+
+msgid "Radio"
+msgstr ""
+
+msgid "Checkbox"
+msgstr ""
+
+msgid "Single dropdown"
+msgstr ""
+
+msgid "Multiple dropdown"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Phone"
+msgstr ""
+
+msgid "Custom text"
+msgstr ""
+
+msgid "Category"
+msgstr ""
+
+msgid "Editable on user creation"
+msgstr ""
+
+msgid "Editable on user modification"
+msgstr ""
+
+msgid "Custom error message"
+msgstr ""
+
+msgid "Number only"
+msgstr ""
+
+msgid "Letters only"
+msgstr ""
+
+msgid "Numbers and letters only"
+msgstr ""
+
+msgid "My regular expression"
+msgstr ""
+
+msgid "Authorized content"
+msgstr ""
+
+msgid "Default value"
+msgstr ""
+
+msgid "Error message to display if content isn't respected"
+msgstr ""
+
+msgid "Rows"
+msgstr ""
+
+msgid "Columns"
+msgstr ""
+
+msgid "Add a new value"
+msgstr ""
+
+msgid "Where"
+msgstr ""
+
+msgid "Where value"
+msgstr ""
+
+msgid "Where operation"
+msgstr ""
+
+msgid "Order by"
+msgstr ""
+
+msgid "Sort ordering"
+msgstr ""
+
+msgid "Tables"
+msgstr ""
+
+msgid "Input width (px)"
+msgstr ""
+
+msgid "%1$s to enter the %2$s"
+msgstr ""
+
+msgid "Day"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Year"
+msgstr ""
+
+msgid "For example with the format %d%m%y the date will be 14/06/1997"
+msgstr ""
+
+msgid "No country"
+msgstr ""
+
+msgid "No file chosen"
+msgstr ""
+
+msgid "Choose file"
+msgstr ""
+
+msgid "Fields to display"
+msgstr ""
+
+msgid "Can't access to campaign"
+msgstr ""
+
+msgid "Are you sure you want to cancel this campaign? If the campaign was sent to, at least, one receiver, you won't be able to edit or resend the campaign"
+msgstr ""
+
+msgid "Couldn't pause campaign"
+msgstr ""
+
+msgid "Couldn't resume campaign"
+msgstr ""
+
+msgid "Load the latest version from our server"
+msgstr ""
+
+msgid "Custom translations"
+msgstr ""
+
+msgid "The following strings won't be overwritten if you update/upgrade AcyMailing"
+msgstr ""
+
+msgid "AcyMailing is currently not translated in this language."
+msgstr ""
+
+msgid "The English version will be loaded so that you can translate it."
+msgstr ""
+
+msgid "Once done, don't forget to share your translation with the rest of the community! Even 10 lines translated will make the difference ;)"
+msgstr ""
+
+msgid "This Language File <b>will be sent to the Acyba translation team</b> and may be included in the next version."
+msgstr ""
+
+msgid "By sharing this file, you allow Acyba to use your work for any purpose."
+msgstr ""
+
+msgid "You can add a personal message in the following area which will be included in the e-mail sent to the team."
+msgstr ""
+
+msgid "Thank you for your contribution!"
+msgstr ""
+
+msgid "Send campaign"
+msgstr ""
+
+msgid "Share your translation"
+msgstr ""
+
+msgid "Email body:"
+msgstr ""
+
+msgid "Are you sure you want to send us this translation? Please do not send it if you didn't modify the translation."
+msgstr ""
+
+msgid "The message has been sent to Acyba's support team."
+msgstr ""
+
+msgid "Redirection after confirmation"
+msgstr ""
+
+msgid "You have already confirmed your subscription"
+msgstr ""
+
+msgid "Your subscription has been confirmed"
+msgstr ""
+
+msgid "Tests"
+msgstr ""
+
+msgid "Safe check tests need to be run before you can send your campaign."
+msgstr ""
+
+msgid "test@example.com..."
+msgstr ""
+
+msgid "Send test mail to"
+msgstr ""
+
+msgid "SPAM score > 80%"
+msgstr ""
+
+msgid "Safe content"
+msgstr ""
+
+msgid "All links checked"
+msgstr ""
+
+msgid "The following expressions are not recommended:"
+msgstr ""
+
+msgid "Missing test mail address"
+msgstr ""
+
+msgid "Could not load your information from our server"
+msgstr ""
+
+msgid "Test email sent, waiting for the report..."
+msgstr ""
+
+msgid "AcyMailing: %s"
+msgstr ""
+
+msgid "Newsletter subscription form"
+msgstr ""
+
+msgid "Form used by your users to subscribe to the contact lists in order to receive your newsletters"
+msgstr ""
+
+msgid "User profile"
+msgstr ""
+
+msgid "This element gives your visitors or logged-in users a way to subscribe / modify their subscription."
+msgstr ""
+
+msgid "Visible lists"
+msgstr ""
+
+msgid "The following selected lists will be displayed on your subscribe form."
+msgstr ""
+
+msgid "Lists in a dropdown"
+msgstr ""
+
+msgid "Display the visible lists in a dropdown"
+msgstr ""
+
+msgid "Lists checked by default"
+msgstr ""
+
+msgid "Allow non-logged in users"
+msgstr ""
+
+msgid "The subscription is restricted to logged in users"
+msgstr ""
+
+msgid "User Information"
+msgstr ""
+
+msgid "Data collection"
+msgstr ""
+
+msgid "Confidentiality"
+msgstr ""
+
+msgid "Tracking"
+msgstr ""
+
+msgid "Track clicks with"
+msgstr ""
+
+msgid "Track links for external websites"
+msgstr ""
+
+msgid "Allow users to export their data from their profile page"
+msgstr ""
+
+msgid "Export my data"
+msgstr ""
+
+msgid "Delete all my data"
+msgstr ""
+
+msgid "This will permanently delete all your data"
+msgstr ""
+
+msgid "Modify your Subscription"
+msgstr ""
+
+msgid "Save Changes"
+msgstr ""
+
+msgid "Auto-generate User's name"
+msgstr ""
+
+msgid "You are not allowed to modify this user"
+msgstr ""
+
+msgid "Allow user data modifications without identification"
+msgstr ""
+
+msgid "Only their subscription"
+msgstr ""
+
+msgid "This email address is already taken by another user"
+msgstr ""
+
+msgid "Subscription successfully updated"
+msgstr ""
+
+msgid "An email to verify your identity has been sent.<br />Please click on the link in the email to be able to modify your subscription."
+msgstr ""
+
+msgid "New custom field"
+msgstr ""
+
+msgid "Upload folder"
+msgstr ""
+
+msgid "Attach a new file"
+msgstr ""
+
+msgid "(total max upload file size: %s)"
+msgstr ""
+
+msgid "File successfully uploaded"
+msgstr ""
+
+msgid "An image with this name already exists. Image has been renamed as %s"
+msgstr ""
+
+msgid "This file type (%1$s) is not accepted, the accepted file types are: %2$s"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "No file here"
+msgstr ""
+
+msgid "Drag & Drop Editor"
+msgstr ""
+
+msgid "Load style sheet"
+msgstr ""
+
+msgid "Add custom style sheet"
+msgstr ""
+
+msgid "Here you can paste your style sheet"
+msgstr ""
+
+msgid "Successfully sent"
+msgstr ""
+
+msgid "The selected fields will be displayed on the registration form. The email field is always displayed"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Skip"
+msgstr ""
+
+msgid "Here you can add dynamic text to your email"
+msgstr ""
+
+msgid "Here is you template"
+msgstr ""
+
+msgid "You can drag these blocks to your template to add them"
+msgstr ""
+
+msgid "You can then drag these contents in the blocks"
+msgstr ""
+
+msgid "Here are the settings of your template"
+msgstr ""
+
+msgid "You can customize your font here"
+msgstr ""
+
+msgid "Here you can import your stylesheet"
+msgstr ""
+
+msgid "The safe check analyses the content of your email, it checks if there is any spam word then all the links if they are not broken and it finaly checks your mail using our spam test tool"
+msgstr ""
+
+msgid "Here you can configure your sending method"
+msgstr ""
+
+msgid "Here is the advanced configuration, this is where you configure the technical part."
+msgstr ""
+
+msgid "DKIM is a way to prove that all the emails you send come from you"
+msgstr ""
+
+msgid "The cron is a process that checks every 15 minutes if there are actions to do like sending queued emails, sending scheduled emails, processing the bounce handling, etc..."
+msgstr ""
+
+msgid "Here you can set the settings of the email which is sent when a user subscribes"
+msgstr ""
+
+msgid "This button will check if there is any issue in the database like a missing table/column etc...<br />If you have any issue with your database it's the first thing to do"
+msgstr ""
+
+msgid "The test was successfully sent"
+msgstr ""
+
+msgid "Error sending the test"
+msgstr ""
+
+msgid "Custom field"
+msgstr ""
+
+msgid "Be careful if you insert background image, not all the email clients display them"
+msgstr ""
+
+msgid "Separator"
+msgstr ""
+
+msgid "Intro only"
+msgstr ""
+
+msgid "Full text"
+msgstr ""
+
+msgid "Publishing date"
+msgstr ""
+
+msgid "Clickable title"
+msgstr ""
+
+msgid "Resized"
+msgstr ""
+
+msgid "No results found"
+msgstr ""
+
+msgid "One by one"
+msgstr ""
+
+msgid "By category"
+msgstr ""
+
+msgid "Max. number of elements"
+msgstr ""
+
+msgid "Modification date"
+msgstr ""
+
+msgid "Ascending"
+msgstr ""
+
+msgid "Descending"
+msgstr ""
+
+msgid "Read more"
+msgstr ""
+
+msgid "Title only"
+msgstr ""
+
+msgid "Display"
+msgstr ""
+
+msgid "Truncate the text"
+msgstr ""
+
+msgid "After %s characters"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "To"
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Price"
+msgstr ""
+
+msgid "Apply discounts"
+msgstr ""
+
+msgid "Coupon"
+msgstr ""
+
+msgid "Please check your e-mail to see the coupon"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Copy default translations"
+msgstr ""
+
+msgid "This will override the current custom translations and keep the additional language keys you may have created."
+msgstr ""
+
+msgid "To use this feature please upgrade your version to %s"
+msgstr ""
+
+msgid "Upgrade now!"
+msgstr ""
+
+msgid "No discount"
+msgstr ""
+
+msgid "Newsletters archive"
+msgstr ""
+
+msgid "Show the sent newsletters"
+msgstr ""
+
+msgid "Last %s newsletters"
+msgstr ""
+
+msgid "Bounce handling"
+msgstr ""
+
+msgid "Connection method"
+msgstr ""
+
+msgid "Self-signed certificate"
+msgstr ""
+
+msgid "Connection timeout (seconds)"
+msgstr ""
+
+msgid "Maximum number of e-mails"
+msgstr ""
+
+msgid "Enable the automatic bounce handling"
+msgstr ""
+
+msgid "Frequency"
+msgstr ""
+
+msgid "Next run time"
+msgstr ""
+
+msgid "Action on the user"
+msgstr ""
+
+msgid "Forward the message to"
+msgstr ""
+
+msgid "Successfully connected to %s"
+msgstr ""
+
+msgid "There are %s messages in your mailbox"
+msgstr ""
+
+msgid "Rule"
+msgstr ""
+
+msgid "Handle the messages now"
+msgstr ""
+
+msgid "Execute the regex on"
+msgstr ""
+
+msgid "Increment the bounce statistics if the rule matches"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Body"
+msgstr ""
+
+msgid "Global information"
+msgstr ""
+
+msgid "Regex"
+msgstr ""
+
+msgid "Execute the following actions only after receiving %s bounce messages from this user"
+msgstr ""
+
+msgid "Action on the email"
+msgstr ""
+
+msgid "Empty the queue for the user"
+msgstr ""
+
+msgid "Save message in database"
+msgstr ""
+
+msgid "Delete the message from your mailbox"
+msgstr ""
+
+msgid "Action required"
+msgstr ""
+
+msgid "Acknowledgement of receipt - in subject"
+msgstr ""
+
+msgid "Feedback loop"
+msgstr ""
+
+msgid "Feedback loop - in body"
+msgstr ""
+
+msgid "Mailbox Full"
+msgstr ""
+
+msgid "Blocked by Google Groups"
+msgstr ""
+
+msgid "Mailbox does not exist 1"
+msgstr ""
+
+msgid "Message blocked by recipient filters"
+msgstr ""
+
+msgid "Mailbox does not exist 2"
+msgstr ""
+
+msgid "Domain does not exist"
+msgstr ""
+
+msgid "Temporary failures"
+msgstr ""
+
+msgid "Failed Permanently"
+msgstr ""
+
+msgid "Acknowledgement of receipt - in body"
+msgstr ""
+
+msgid "Final Rule"
+msgstr ""
+
+msgid "Reset to default rules"
+msgstr ""
+
+msgid "Run bounce handling"
+msgstr ""
+
+msgid "Configure"
+msgstr ""
+
+msgid "Please create a rule to process the bounce handling"
+msgstr ""
+
+msgid "You can't delete a user and save the mail in the same rule"
+msgstr ""
+
+msgid "Bounce rate"
+msgstr ""
+
+msgid "AcyMailing received %1$s messages from the user %2$s"
+msgstr ""
+
+msgid "Actions will be executed after %s messages"
+msgstr ""
+
+msgid "Successfully deleted %s record(s)"
+msgstr ""
+
+msgid "Message deleted"
+msgstr ""
+
+msgid "Click here to handle all messages until your mailbox is empty"
+msgstr ""
+
+msgid "Please configure the bounce handling from the configuration page first"
+msgstr ""
+
+msgid "Error connecting to %s"
+msgstr ""
+
+msgid "Identication error %s"
+msgstr ""
+
+msgid "Error uploading the attachment %1$s: %2$s"
+msgstr ""
+
+msgid "User %s deleted"
+msgstr ""
+
+msgid "User %1$s subscribed to %2$s"
+msgstr ""
+
+msgid "User %1$s not subscribed to %2$s: "
+msgstr ""
+
+msgid "User already subscribed"
+msgstr ""
+
+msgid "User already unsubscribed"
+msgstr ""
+
+msgid "User %1$s removed from lists %2$s"
+msgstr ""
+
+msgid "User %s not subscribed"
+msgstr ""
+
+msgid "User %1$s unsubscribed from lists %2$s"
+msgstr ""
+
+msgid "User %s blocked"
+msgstr ""
+
+msgid "User %1$s queue: %2$s"
+msgstr ""
+
+msgid "The forward e-mail address is the same as the bounce one... AcyMailing will not forward the message"
+msgstr ""
+
+msgid "Message saved (user %s)"
+msgstr ""
+
+msgid "Forwarded to %s"
+msgstr ""
+
+msgid "Couldn't forward to %1$s: %2$s"
+msgstr ""
+
+msgid "Duplicate"
+msgstr ""
+
+msgid "If you add some CSS style you will have to save to see the modifications. Note that not all editors allow you to load custom CSS"
+msgstr ""

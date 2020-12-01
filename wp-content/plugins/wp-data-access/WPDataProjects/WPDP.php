@@ -35,16 +35,21 @@ namespace WPDataProjects {
 		const PAGE_MAIN = 'wpda_wpdp';
 
 		/**
-		 * Page and menu title
-		 */
-		const PAGE_TITLE = 'Data Projects';
-
-		/**
 		 * Menu slug taken from URL
 		 *
 		 * @var null
 		 */
 		protected $page = null;
+
+		/**
+		 * Page title
+		 */
+		protected $page_title;
+
+		/**
+		 * Menu title
+		 */
+		protected $menu_title;
 
 		/**
 		 * Available tabs
@@ -120,6 +125,12 @@ namespace WPDataProjects {
 					$this->current_tab = $tab;
 				}
 			}
+
+			$this->page_title = __( 'Data Projects', 'wp-data-access' );
+			$this->menu_title = __( 'Data Projects', 'wp-data-access' );
+			if ( wpda_fremius()->is_premium() ) {
+				$this->page_title = __( 'Premium', 'wp-data-access' ) . ' ' . $this->page_title;
+			}
 		}
 
 		/**
@@ -148,8 +159,8 @@ namespace WPDataProjects {
 				}
 				$this->wpdp_projects_menu = add_submenu_page(
 					\WP_Data_Access_Admin::PAGE_MAIN,
-					self::PAGE_TITLE,
-					self::PAGE_TITLE,
+					$this->menu_title,
+					$this->menu_title,
 					'manage_options',
 					self::PAGE_MAIN,
 					[ $this, $data_projects_page ]
@@ -186,11 +197,12 @@ namespace WPDataProjects {
 			?>
 			<div class="wrap">
 				<h1 class="wp-heading-inline">
-					<span><?php echo self::PAGE_TITLE; ?></span>
-					<a href="<?php echo 'https://wpdataaccess.com/docs/documentation/data-projects/'; ?>" target="_blank" title="Plugin Help - open a new tab or window">
-						<span class="dashicons dashicons-editor-help"
-							  style="text-decoration:none;vertical-align:top;font-size:30px;">
-						</span></a>
+					<span><?php echo $this->page_title; ?></span>
+					<span style="padding-left:10px">
+						<a href="<?php echo 'https://wpdataaccess.com/docs/documentation/data-projects/'; ?>" target="_blank"
+						   title="Plugin Help - opens in a new tab or window" class="wpda_tooltip">
+							<span class="material-icons" style="font-size: 26px; vertical-align: sub;">help</span></a>
+					</span>
 				</h1>
 				<?php
 				$this->add_tabs();
@@ -209,7 +221,7 @@ namespace WPDataProjects {
 			?>
 			<div class="wrap">
 				<h1 class="wp-heading-inline">
-					<span><?php echo self::PAGE_TITLE; ?></span>
+					<span><?php echo $this->page_title; ?></span>
 					<a href="<?php echo 'https://wpdataaccess.com/docs/documentation/data-projects/'; ?>" target="_blank">
 						<span class="dashicons dashicons-editor-help"
 							  style="text-decoration:none;vertical-align:top;font-size:30px;">

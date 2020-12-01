@@ -4,7 +4,7 @@ Tags: post masonry, post grid, post slider, show posts, display posts
 Requires at least: 4.9
 Tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 1.4.0
+Stable tag: 1.6.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -60,6 +60,20 @@ Installing “Display Post Types” can be done either by searching for “Displ
 3. Display post types block use.
 
 == Changelog ==
+
+= 1.6.0 =
+* Error Fix: Exclude self from the fetch post query
+* Error Fix: Container aware responsiveness
+* Error Fix: Remove arrow icon from excerpt teaser text
+* Add: Auto slide with wait time option
+
+= 1.5.0 =
+* Error Fix: Remove excerpt length limitation from DPT block.
+* Error Fix: Remove on text from date meta.
+* Modify: Change DPT title heading tag from H2 to H3
+* Modify: Comply with latest WP coding standards
+* Modify: Minor code improvements
+* Add: Add AND/OR relationship option for Terms selection
 
 = 1.4.0 =
 * Error Fix: Wrap DPT in a div wrapper to make compatible with Twenty Twenty theme

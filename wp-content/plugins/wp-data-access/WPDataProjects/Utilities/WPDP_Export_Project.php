@@ -10,6 +10,9 @@ namespace WPDataProjects\Utilities {
 
 	use WPDataAccess\WPDA;
 	use WPDataAccess\Data_Dictionary\WPDA_List_Columns_Cache;
+	use WPDataAccess\Plugin_Table_Models\WPDP_Project_Model;
+	use WPDataAccess\Plugin_Table_Models\WPDP_Page_Model;
+	use WPDataAccess\Plugin_Table_Models\WPDP_Project_Design_Table_Model;
 
 	/**
 	 * Class WPDP_Export_Project
@@ -25,6 +28,13 @@ namespace WPDataProjects\Utilities {
 		 * @var string
 		 */
 		protected $project_id = null;
+
+		/**
+		 * Options set to be exported
+		 *
+		 * @var array
+		 */
+		protected $optionsets = [];
 
 		/**
 		 * Main method to start export
@@ -61,10 +71,21 @@ namespace WPDataProjects\Utilities {
 			$this->db_begin();
 
 			global $wpdb;
-			$this->insert_rows( $wpdb->prefix . 'wpda_project', 'where project_id = ' . $this->project_id );
-			$this->insert_rows( $wpdb->prefix . 'wpda_project_page', 'where project_id = ' . $this->project_id );
-			// For now table options have to be exported seperately.
-			// $this->insert_rows( $wpdb->prefix . 'wpda_project_table' );
+			$this->insert_rows(
+				WPDP_Project_Model::get_base_table_name(),
+				$wpdb->prepare( 'where project_id = %d', [ $this->project_id ] ),
+				WPDP_Project_Model::BASE_TABLE_NAME
+			);
+			$this->insert_rows(
+				WPDP_Page_Model::get_base_table_name(),
+				$wpdb->prepare( 'where project_id = %d', [ $this->project_id ] ),
+				WPDP_Page_Model::BASE_TABLE_NAME
+			);
+
+			if ( sizeof( $this->optionsets ) > 0 ) {
+				$this->get_child_optionsets();
+				$this->insert_optionsets();
+			}
 
 			$this->db_end();
 		}
@@ -104,7 +125,7 @@ namespace WPDataProjects\Utilities {
 		 * @since   2.0.0
 		 *
 		 */
-		public function insert_rows( $table_name, $where = '' ) {
+		public function insert_rows( $table_name, $where, $table_name_without_prefix ) {
 
 			global $wpdb;
 
@@ -127,21 +148,13 @@ namespace WPDataProjects\Utilities {
 				echo '-- Export table `' . esc_attr( $table_name ) . "`\n";
 				echo "--\n";
 
-				if ( 'on' === WPDA::get_option( WPDA::OPTION_BE_EXPORT_VARIABLE_PREFIX ) ) {
-					if ( strpos( $table_name, $wpdb->prefix ) === 0 ) {
-						echo 'INSERT INTO `{wp_prefix}' . esc_attr( substr( $table_name, strlen( $wpdb->prefix ) ) ) . "` ";
-					} else {
-						echo 'INSERT INTO `' . esc_attr( $table_name ) . '` ';
-					}
-				} else {
-					echo 'INSERT INTO `' . esc_attr( $table_name ) . '` ';
-				}
+				echo "INSERT INTO `{wp_prefix}{$table_name_without_prefix}` ";
 
 				$process_first_row = true;
 				foreach ( $rows[0] as $column_name => $column_value ) {
 					if (
-						! ( $wpdb->prefix . 'wpda_project' === $table_name && 'project_id' === $column_name ) &&
-						! ( $wpdb->prefix . 'wpda_project_page' === $table_name && 'page_id' === $column_name )
+						! ( WPDP_Project_Model::get_base_table_name() === $table_name && 'project_id' === $column_name ) &&
+						! ( WPDP_Page_Model::get_base_table_name() === $table_name && 'page_id' === $column_name )
 					) {
 						echo $process_first_row ? '(' : ', ';
 						echo '`' . esc_attr( $column_name ) . '`';
@@ -165,11 +178,11 @@ namespace WPDataProjects\Utilities {
 					$last_column = end( $keys );
 					foreach ( $row as $column_name => $column_value ) {
 						if (
-							! ( $wpdb->prefix . 'wpda_project' === $table_name && 'project_id' === $column_name ) &&
-							! ( $wpdb->prefix . 'wpda_project_page' === $table_name && 'page_id' === $column_name )
+							! ( WPDP_Project_Model::get_base_table_name() === $table_name && 'project_id' === $column_name ) &&
+							! ( WPDP_Page_Model::get_base_table_name() === $table_name && 'page_id' === $column_name )
 						) {
 							if ( $this->is_numeric( $column_data_types[ $column_name ] ) ) {
-								if ( $wpdb->prefix . 'wpda_project_page' === $table_name && 'project_id' === $column_name ) {
+								if ( WPDP_Page_Model::get_base_table_name() === $table_name && 'project_id' === $column_name ) {
 									echo '@PROJECT_ID';
 								} else {
 									if ( null === $column_value ) {
@@ -180,8 +193,16 @@ namespace WPDataProjects\Utilities {
 								}
 							} else {
 								if (
-									$wpdb->prefix . 'wpda_project_page' === $table_name &&
-									'page_schema_name' === $column_name &&
+									(
+										(
+											WPDP_Page_Model::get_base_table_name() === $table_name &&
+											'page_schema_name' === $column_name
+										) ||
+										(
+											WPDP_Project_Design_Table_Model::get_base_table_name() === $table_name &&
+											'wpda_schema_name' === $column_name
+										)
+									) &&
 									( '' === $column_value || $wpdb->dbname === $column_value )
 								) {
 									echo "'{wp_schema}'";
@@ -200,10 +221,18 @@ namespace WPDataProjects\Utilities {
 					}
 
 					echo ')';
+
+					if ( WPDP_Page_Model::get_base_table_name() === $table_name ) {
+						$this->add_optionset(
+							$row['page_schema_name'],
+							$row['page_table_name'],
+							$row['page_setname']
+						);
+					}
 				}
 
 				echo ';';
-				if ( $wpdb->prefix . 'wpda_project' === $table_name ) {
+				if ( WPDP_Project_Model::get_base_table_name() === $table_name ) {
 					echo "\n";
 					echo 'SET @PROJECT_ID = LAST_INSERT_ID();';
 				}
@@ -217,6 +246,69 @@ namespace WPDataProjects\Utilities {
 
 			$wpdb->suppress_errors = $save_suppress_errors;
 
+		}
+
+		protected function add_optionset( $schema_name, $table_name, $setname ) {
+			if ( ! isset( $this->optionsets[ $schema_name ][ $table_name ][ $setname ] ) ) {
+				$this->optionsets[ $schema_name ][ $table_name ][ $setname ] = true;
+			}
+		}
+
+		protected function insert_optionsets() {
+			$where = 'where ';
+			foreach ( $this->optionsets as $schema_name => $tables ) {
+				$where .= "(`wpda_schema_name`='{$schema_name}' and (";
+				$first_optionset = true;
+				foreach ( $tables as $table_name => $optionsets ) {
+					foreach ( $optionsets as $optionset => $dummy ) {
+						if ( ! $first_optionset ) {
+							$where .= ' or ';
+						}
+						$where .= "(`wpda_table_name`='{$table_name}' and `wpda_table_setname`='$optionset')";
+						$first_optionset = false;
+					}
+				}
+				$where .= '))';
+			}
+
+			$this->insert_rows(
+				WPDP_Project_Design_Table_Model::get_base_table_name(),
+				$where,
+				WPDP_Project_Design_Table_Model::BASE_TABLE_NAME
+			);
+		}
+
+		protected function get_child_optionsets() {
+			foreach ( $this->optionsets as $schema_name => $tables ) {
+				foreach ( $tables as $table_name => $optionsets ) {
+					foreach ( $optionsets as $optionset => $dummy ) {
+						$set = WPDP_Project_Design_Table_Model::static_query( $schema_name, $table_name, $optionset );
+						if ( isset( $set->relationships ) ) {
+							foreach ( $set->relationships as $relationship ) {
+								if ( isset( $relationship->relation_type ) ) {
+									if ( '1n' === $relationship->relation_type ) {
+										if ( isset( $relationship->target_table_name ) ) {
+											$this->add_optionset(
+												$schema_name,
+												$relationship->target_table_name,
+												$optionset
+											);
+										}
+									} elseif ( 'nm' === $relationship->relation_type ) {
+										if ( isset( $relationship->relation_table_name ) ) {
+											$this->add_optionset(
+												$schema_name,
+												$relationship->relation_table_name,
+												$optionset
+											);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		/**

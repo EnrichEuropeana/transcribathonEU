@@ -1,10 +1,10 @@
 === WP Data Access ===
-Contributors: peterschulznl
+Contributors: peterschulznl, freemius
 Tags: wp data access, database, tables, table, tools, manage, manager
 Donate link: https://www.paypal.me/kpsch
 Requires at least: 4.8.3
-Tested up to: 5.4
-Stable tag: 3.1.1
+Tested up to: 5.5
+Stable tag: 3.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ For advanced users, the plugin support more complex features like remote databas
 * Database administration (rename, copy, drop, truncate...)
 * Data administration (search, insert, update, delete...)
 * Export to SQL, XML, JSON, CSV and Excel
-* Import SQL files
+* Import SQL and CSV files
 * WordPress Media Library integration
 * Create dynamic hyperlinks (column value substitution)
 
@@ -66,9 +66,8 @@ For advanced users, the plugin support more complex features like remote databas
 ## Plugin Links
 - [Plugin Website](https://wpdataaccess.com/)
 - [Download Plugin](https://wordpress.org/plugins/wp-data-access/)
-- [Download Source Code](https://bitbucket.org/wpdataaccess/wp-data-access/src)
-- [Changelog](https://bitbucket.org/wpdataaccess/wp-data-access/src/master/CHANGES.md)
-- [Actual TODO List](https://bitbucket.org/wpdataaccess/wp-data-access/src/master/todo.txt)
+- [What's New](https://wpdataaccess.com/docs/documentation/getting-started/whats-new/)
+- [Known Limitations](https://wpdataaccess.com/docs/documentation/getting-started/known-limitations/)
 
 == Installation ==
 (1) Upload the WP Data Access plugin to your blog

@@ -11,7 +11,7 @@ if (!isset(MetaSlider_Theme_Base::$themes['simply-dark'])) {
 		array( 			// assets
 			array(
 				'type' => 'css',
-				'file' => '/v1.0.0/style.css',
+				'file' => '/v1.0.0/style.min.css',
 				'dependencies' => array('metaslider-public')
 			)
 		)

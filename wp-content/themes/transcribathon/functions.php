@@ -44,9 +44,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/datasets-admin-pag
 // Custom shortcodes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
-require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_item_slider.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_menu.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/documents_map.php');
@@ -141,7 +139,7 @@ function embedd_custom_javascripts_and_css() {
  }
  add_action('wp_enqueue_scripts', 'embedd_custom_javascripts_and_css');
 
- wp_register_script( 'my-script', '/myscript_url' );
+ wp_register_script( 'my-script', '' );
  wp_enqueue_script( 'my-script' );
  $translation_array = array( 
                         'home_url' => home_url(),
@@ -194,6 +192,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-search-documents/t
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-horizontal-line-hr/tct-horizontal-line-widget.php'); // Adds the widget for headline (hr)
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-tutorial-slider/tct-tutorial-slider-widget.php'); // Adds the widget for tutorial slider
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-storyboxes/tct-storyboxes-widget.php'); // Adds the widget for storyboxes
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-itemboxes/tct-itemboxes-widget.php'); // Adds the widget for itemboxes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-menulist/tct-menulist-widget.php'); // Adds the widget for menulist
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-headline/tct-headline-widget.php'); // Adds the widget for headline
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-colcontent/tct-colcontent-widget.php'); // Adds the widget for displaying content in different columns
@@ -213,7 +212,39 @@ add_filter('siteorigin_widgets_widget_folders', 'add_custom_widget_collection');
 
 
 // ### HOOKS ### //
+
+add_action( 'um_after_profile_name_inline', 'my_after_profile_name_inline', 10 );
+
+function my_after_profile_name_inline() {
+    echo "<a id=\"new-temporary-prof\" title=\"Choose a document and start transcribing!\" href=\"https://europeana.transcribathon.eu/documents\"><i class=\"far fa-pen-nib\"></i><span class=\"temp-respve\" style=\"padding-left: 10px;\">Transcribe Now</span></a>\n";
+    echo "<a id=\"new-temporary-ques\" class=\"tutorial-model\" title=\"Tutorial\"><i class=\"fal fa-question-circle\"></i></a>";
+    echo do_shortcode( '[tutorial_menu]' );
+    echo "<script>
+    jQuery ( document ).ready(function() {
+                        // When the user clicks the button, open the modal
+                        jQuery('.tutorial-model').click(function() {
+                        jQuery('#tutorial-popup-window-container').css('display', 'block');
+                        jQuery('.tutorial-window-slider').slick('refresh');
+
+                        })
+
+                        // When the user clicks on <span> (x), close the modal
+                        jQuery('.tutorial-window-close').click(function() {
+                        jQuery('#tutorial-popup-window-container').css('display', 'none');
+                        })
+
+                        jQuery('#tutorial-popup-window-container').mousedown(function(event){
+                            if (event.target.id == 'tutorial-popup-window-container') {
+                                jQuery('#tutorial-popup-window-container').css('display', 'none')
+                            }
+                        })
+                    });
+
+</script>";
+}
+
 add_action( 'um_profile_header_cover_area', 'my_profile_header_cover_area', 10, 1 );
+
 function my_profile_header_cover_area( $args ) {
     echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
     $acs = [];

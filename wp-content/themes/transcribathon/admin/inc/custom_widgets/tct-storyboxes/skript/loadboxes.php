@@ -217,6 +217,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 
 	//Rueckgabe 
 	$res = array();
+	// print_r($res);
 	$res['status'] = 'ok';
 	$res['boxes'] = $content;
 	header("Content-Type: text/json; charset=utf-8");

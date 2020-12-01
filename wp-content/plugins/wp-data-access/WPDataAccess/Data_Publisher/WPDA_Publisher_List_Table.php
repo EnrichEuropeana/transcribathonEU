@@ -27,6 +27,9 @@ namespace WPDataAccess\Data_Publisher {
 			$args['column_headers'] = self::column_headers_labels();
 			$args['title']          = __( 'Data Publisher', 'wp-data-access' );
 			$args['subtitle']       = '';
+			if ( wpda_fremius()->is_premium() ) {
+				$args['title'] = __( 'Premium', 'wp-data-access' ) . ' ' . $args['title'];
+			}
 
 			parent::__construct( $args );
 		}
@@ -96,69 +99,30 @@ namespace WPDataAccess\Data_Publisher {
 			$actions['copy'] = sprintf(
 				'<a href="javascript:void(0)" 
 									title="%s"
-                                    class="edit"  
+                                    class="edit wpda_tooltip"  
                                     onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
-                                    %s
+                                    <span style="white-space: nowrap">
+										<span class="material-icons wpda_icon_on_button">content_copy</span>
+										%s
+                                    </span>
                                 </a>
                                 ',
-				__( 'New publication name = old publication name + _ + n', 'wp-data-access' ),
+				__( 'Copy publication: new publication name = old publication name_ + n', 'wp-data-access' ),
 				$copy_warning,
 				"copy_form$form_id",
 				__( 'Copy', 'wp-data-access' )
 			);
 
-			if ( 'rdb:' !== substr( $item['pub_schema_name'], 0, 4) ) {
-				// Check if database exists. If database is not found, a test link is not provided. This might happen
-				// when a user transfers a publication from one repository to another.
-				if ( WPDA_Dictionary_Exist::schema_exists( $item['pub_schema_name'] ) ) {
-					// Show publication directly from Data Publisher main page
-					if ( 'pub_id' === $column_name ) {
-						WPDA_Publisher_Form::show_publication( $item['pub_id'], $item['pub_table_name'] );
-					}
-					$actions['test'] = sprintf(
-						'<a href="javascript:void(0)"
-									title="%s"
-                                    class="view"
-                                    onclick="jQuery(\'#data_publisher_test_container_%s\').toggle()">
-                                    %s
-                                </a>
-                                ',
-						__( 'Test shortcode in popup', 'wp-data-access' ),
-						$item['pub_id'],
-						__( 'Test', 'wp-data-access' )
-					);
-				} else {
-					$actions['test'] = sprintf(
-						'<a href="javascript:void(0)"
-									title="%s"
-                                    class="delete">
-                                    %s
-                                </a>
-                                ',
-						__( 'ERROR: Database not found!', 'wp-data-access' ),
-						__( 'Test', 'wp-data-access' )
-					);
-				}
-			} else {
-				$actions['test'] = sprintf(
-					'<a href="javascript:void(0)"
-									title="%s"
-                                    class="view">
-                                    %s
-                                </a>
-                                ',
-					__( 'Shortcode test not available for remote database connections', 'wp-data-access' ),
-					__( 'Test', 'wp-data-access' )
-				);
-			}
-
 			// Show publication shortcode directly from Data Publisher main page
 			$actions['shortcode'] = sprintf(
 				'<a href="javascript:void(0)" 
 									title="%s"
-                                    class="view"  
+                                    class="view wpda_tooltip"  
                                     onclick=\'prompt("%s", "[wpdataaccess pub_id=\"%s\"]")\'>
-                                    %s
+                                    <span style="white-space: nowrap">
+										<span class="material-icons wpda_icon_on_button">code</span>
+										%s
+                                    </span>
                                 </a>
                                 ',
 				__( 'Show/copy shortcode in popup', 'wp-data-access' ),
@@ -282,6 +246,8 @@ namespace WPDataAccess\Data_Publisher {
 				'pub_table_options_searching'     => __( 'Searching?', 'wp-data-access' ),
 				'pub_table_options_ordering'      => __( 'Ordering?', 'wp-data-access' ),
 				'pub_table_options_paging'        => __( 'Paging?', 'wp-data-access' ),
+				'pub_sort_icons'                  => __( 'Sort icons', 'wp-data-access' ),
+				'pub_table_options_nl2br'         => __( 'NL > BR', 'wp-data-access' ),
 				'pub_table_options_advanced'      => __( 'Advanced Options?', 'wp-data-access' ),
 				'pub_default_where'               => __( 'Default Where', 'wp-data-access' ),
 				'pub_default_orderby'             => __( 'Default Order By', 'wp-data-access' ),

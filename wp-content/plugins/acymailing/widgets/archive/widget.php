@@ -65,7 +65,7 @@ class acym_archive_widget extends WP_Widget
     public function widget($args, $instance)
     {
         require_once rtrim(dirname(dirname(__DIR__)), DS).DS.'back'.DS.'helpers'.DS.'helper.php';
-        if (!acym_isElementorEdition()) acym_loadAssets('front', 'archive', 'listing');
+        if (!acym_isElementorEdition()) acym_loadAssets('archive', 'listing');
 
         echo $args['before_widget'];
 

@@ -76,7 +76,7 @@ $theme_sets = get_theme_mods();
     //$docs = $wpdb->get_results("SELECT crh.*,pst.post_title AS title,SUM(crh.amount) AS menge,MAX(crh.datum) as zeitpunkt FROM ".$wpdb->prefix."user_transcriptionprogress crh LEFT JOIN ".$wpdb->prefix."posts pst ON pst.ID = crh.docid WHERE crh.userid='".um_profile_id()."' GROUP BY crh.docid ORDER BY crh.datum DESC",ARRAY_A);
 		
     /*Set request parameters*/
-    $url = network_home_url()."/tp-api/transcriptionProfile/".um_profile_id();
+     $url = network_home_url()."/tp-api/transcriptionProfile/".um_profile_id();
     $requestType = "GET";
 
     // Execude http request
@@ -165,7 +165,7 @@ $theme_sets = get_theme_mods();
                     echo "</div>\n";	
                 echo "</div>\n";
             echo "</div>\n";
-		echo "</div>\n";
+		echo "</div>\n"; 
 	
 	if(is_user_logged_in() &&  get_current_user_id() === 1){	}
 

@@ -34,6 +34,7 @@ class Responsive_Lightbox_Folders {
 		add_action( 'restrict_manage_posts', array( $this, 'restrict_manage_posts' ) );
 		add_action( 'wp_enqueue_media', array( $this, 'add_library_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_library_scripts' ) );
+		add_action( 'pre-upload-ui', array( $this, 'pre_upload_ui' ) );
 		add_action( 'post-upload-ui', array( $this, 'post_upload_ui' ) );
 		add_action( 'add_attachment', array( $this, 'add_attachment' ) );
 		add_action( 'wp_ajax_save-attachment-compat', array( $this, 'ajax_save_attachment_compat' ), 0 );
@@ -49,6 +50,7 @@ class Responsive_Lightbox_Folders {
 		add_filter( 'parse_query', array( $this, 'parse_query' ) );
 		add_filter( 'ajax_query_attachments_args', array( $this, 'ajax_query_attachments_args' ) );
 		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
+		add_filter( 'rl_count_attachments', array( $this, 'count_attachments' ), 10 );
     }
 
 	/**
@@ -194,6 +196,27 @@ class Responsive_Lightbox_Folders {
 		return wp_dropdown_categories( $args );
 	}
 
+	/**
+     * Add filter to add media folder id to the uploader
+     *
+     * @return void
+     */
+    public function pre_upload_ui() {
+		add_filter( 'upload_post_params', array( $this, 'upload_post_params' ) );
+	}
+
+	/**
+     * Add media folder id param to the uploader
+     *
+	 * @param array $params Plupload parameters
+     * @return array
+     */
+    public function upload_post_params( $params ) {
+		$params['rl_folders_upload_files_term_id'] = 0;
+
+		return $params;
+	}
+
     /**
      * Display dropdown at media upload UI screen.
      *
@@ -254,6 +277,7 @@ class Responsive_Lightbox_Folders {
 			// get taxonomy
 			$taxonomy = Responsive_Lightbox()->options['folders']['media_taxonomy'];
 
+			// valid term?
 			if ( is_array( term_exists( $term_id, $taxonomy ) ) )
 				wp_set_object_terms( $post_id, $term_id, $taxonomy, false );
 		}
@@ -289,7 +313,7 @@ class Responsive_Lightbox_Folders {
 				)
 			);
 
-			echo ( $html === '' ? '<select name="' . $taxonomy . '" id="media-attachment-rl-folders-filters" class="postform"><option>' . __( 'All Files', 'responsive-lightbox' ) . '</option></select>' : $html );
+			echo ( $html === '' ? '<select name="' . $taxonomy . '" id="media-attachment-rl-folders-filters" class="postform"><option>' . __( 'All Files', 'responsive-lightbox' ) . '</option></select> ' : $html );
 		}
     }
 
@@ -773,25 +797,34 @@ class Responsive_Lightbox_Folders {
 		// get taxonomy
 		$taxonomy = Responsive_Lightbox()->options['folders']['media_taxonomy'];
 
+		// set 'all files' folder
+		$term_id = -1;
+		$url_term_id = 0;
+
+		// any matches?
 		if ( ! empty( $matches[1] ) ) {
 			$params = parse_url( html_entity_decode( urldecode( $matches[1] ) ) );
 
 			if ( isset( $params['query'] ) ) {
+				// parse query string
 				parse_str( $params['query'], $atts );
 
 				if ( isset( $atts['term'] ) ) {
+					// get term
 					$term = get_term_by( 'slug', $atts['term'], $taxonomy );
 
+					// valid term?
 					if ( $term !== false ) {
 						$this->term_counters['keys'][] = $term->term_id;
 
-						return 'href="' . esc_url( admin_url( 'upload.php?mode=' . $this->mode . '&' . $taxonomy . '=' . $term->term_id ) ) . '" data-term_id="' . $term->term_id . '"';
+						// set term ID
+						$url_term_id = $term_id = $term->term_id;
 					}
 				}
 			}
 		}
 
-		return 'href="' . admin_url( 'upload.php?mode=' . $this->mode . '&' . $taxonomy . '=0' ) . '" data-term_id="-1"';
+		return 'href="' . esc_url( apply_filters( 'rl_folders_media_folder_url', add_query_arg( array( 'mode' => $this->mode, $taxonomy => $url_term_id ) ), $matches, $this->mode, $url_term_id ) ) . '" data-term_id="' . $term_id . '"';
     }
 
     /**
@@ -860,239 +893,284 @@ class Responsive_Lightbox_Folders {
 		// get main instance
 		$rl = Responsive_Lightbox();
 
-		// include styles
+		// include select2 styles
 		wp_enqueue_style( 'responsive-lightbox-admin-select2', RESPONSIVE_LIGHTBOX_URL . '/assets/select2/select2' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css', array(), $rl->defaults['version'] );
-		wp_enqueue_style( 'responsive-lightbox-folders-admin-css', RESPONSIVE_LIGHTBOX_URL . '/css/admin-folders.css' );
-		wp_enqueue_style( 'responsive-lightbox-folders-perfect-scrollbar', RESPONSIVE_LIGHTBOX_URL . '/assets/perfect-scrollbar/perfect-scrollbar' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
-		// wp_enqueue_style( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/themes/' . $rl->options['folders']['jstree_style'] . '/style' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
-		wp_enqueue_style( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/themes/default/style' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
-
-		// get color scheme global
-		global $_wp_admin_css_colors;
-
-		// set default color;
-		$color = '0,160,210';
-
-		if ( ! empty( $_wp_admin_css_colors ) ) {
-			// get current admin color scheme name
-			$current_color_scheme = get_user_option( 'admin_color' );
-
-			if ( empty( $current_color_scheme ) )
-				$current_color_scheme = 'fresh';
-
-			if ( isset( $_wp_admin_css_colors[$current_color_scheme] ) )
-				$color = implode( ',', $rl->hex2rgb( $_wp_admin_css_colors[$current_color_scheme]->colors[3] ) );
-		}
-
-        wp_add_inline_style(
-			'responsive-lightbox-folders-jstree',
-			'#rl-folders-tree-container .jstree .rl-folders-state-active.rl-folders-state-hover {
-				background: #fff !important;
-			}
-			#rl-folders-tree-container .jstree-container-ul .jstree-wholerow-clicked,
-			#rl-folders-tree-container .jstree-container-ul:not(.jstree-wholerow-ul) .jstree-clicked {
-				background: rgba(' . $color . ', 0.15);
-			}
-			#rl-folders-tree-container .jstree-container-ul .jstree-wholerow-hovered,
-			#rl-folders-tree-container .jstree-container-ul:not(.jstree-wholerow-ul) .jstree-hovered {
-				background: rgba(' . $color . ', 0.05);
-			}'
-		);
-
-		// prepare variables
-		$no_items = '';
-		$childless = false;
 
 		// filterable media folders taxonomy
 		$taxonomy = get_taxonomy( $rl->options['folders']['media_taxonomy'] );
 
-		// list categories parameters
-		$categories = array(
-			'orderby'				=> 'name',
-			'order'					=> 'asc',
-			'show_count'			=> true,
-			'show_option_all'		=> '',
-			'show_option_none'		=> '',
-			'use_desc_for_title'	=> false,
-			'title_li'				=> '',
-			'hide_empty'			=> false,
-			'hierarchical'			=> true,
-			'taxonomy'				=> $taxonomy->name,
-			'hide_title_if_empty'	=> true,
-			'echo'					=> false
-		);
+		// main script dependencies
+		$dependencies = array( 'jquery', 'underscore', 'jquery-ui-draggable', 'jquery-ui-droppable', 'media-models', 'tags-suggest' );
 
-		// get current term id
-		$term_id = isset( $_GET[$taxonomy->name] ) ? (int) $_GET[$taxonomy->name] : 0;
+		// create folder counters
+		$counters = array();
 
-		// list mode?
-		if ( $this->mode === 'list' ) {
-			// get global wp list table instance
-			global $wp_list_table;
+		if ( $page !== 'media' ) {
+			// prepare variables
+			$no_items = '';
+			$childless = false;
 
-			// empty instance?
-			if ( is_null( $wp_list_table ) )
-				$wp_list_table = _get_list_table( 'WP_Media_List_Table' );
+			// include styles
+			wp_enqueue_style( 'responsive-lightbox-folders-admin-css', RESPONSIVE_LIGHTBOX_URL . '/css/admin-folders.css' );
+			wp_enqueue_style( 'responsive-lightbox-folders-perfect-scrollbar', RESPONSIVE_LIGHTBOX_URL . '/assets/perfect-scrollbar/perfect-scrollbar' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
+			// wp_enqueue_style( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/themes/' . $rl->options['folders']['jstree_style'] . '/style' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
+			wp_enqueue_style( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/themes/default/style' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.css' );
 
-			// start buffering
-			ob_start();
+			// get color scheme global
+			global $_wp_admin_css_colors;
 
-			// display "no media" table row
-			echo '<tr class="no-items"><td class="colspanchange" colspan="' . $wp_list_table->get_column_count() . '">';
+			// set default color;
+			$color = '0,160,210';
 
-			$wp_list_table->no_items();
+			if ( ! empty( $_wp_admin_css_colors ) ) {
+				// get current admin color scheme name
+				$current_color_scheme = get_user_option( 'admin_color' );
 
-			echo '</td></tr>';
+				if ( empty( $current_color_scheme ) )
+					$current_color_scheme = 'fresh';
 
-			// save "no media" table row
-			$no_items = ob_get_contents();
-
-			// clear the buffer
-			ob_end_clean();
-
-			// valid term?
-			if ( $term_id > 0 ) {
-				$children = get_term_children( $term_id, $taxonomy->name );
-
-				// found any children?
-				$childless = ! ( ! empty( $children ) && ! is_wp_error( $children ) );
+				if ( isset( $_wp_admin_css_colors[$current_color_scheme] ) )
+					$color = implode( ',', $rl->hex2rgb( $_wp_admin_css_colors[$current_color_scheme]->colors[3] ) );
 			}
-		}
 
-		// set current term id
-		if ( $term_id > 0 )
-			$categories['current_category'] = $term_id;
-
-		// hide filter for grid
-		if ( $page !== 'media' && $this->mode !== 'list' ) {
 			wp_add_inline_style(
-				'responsive-lightbox-folders-admin-css',
-				'#media-attachment-rl-folders-filters { display: none; }
-				.media-modal-content .media-frame select.attachment-filters {
-					max-width: 100%;
-					min-width: auto;
+				'responsive-lightbox-folders-jstree',
+				'#rl-folders-tree-container .jstree .rl-folders-state-active.rl-folders-state-hover {
+					background: #fff !important;
+				}
+				#rl-folders-tree-container .jstree-container-ul .jstree-wholerow-clicked,
+				#rl-folders-tree-container .jstree-container-ul:not(.jstree-wholerow-ul) .jstree-clicked {
+					background: rgba(' . $color . ', 0.15);
+				}
+				#rl-folders-tree-container .jstree-container-ul .jstree-wholerow-hovered,
+				#rl-folders-tree-container .jstree-container-ul:not(.jstree-wholerow-ul) .jstree-hovered {
+					background: rgba(' . $color . ', 0.05);
 				}'
 			);
-		}
 
-		// get taxonomy html output
-		$html = wp_list_categories( $categories );
+						// list categories parameters
+			$categories = array(
+				'orderby'				=> 'name',
+				'order'					=> 'asc',
+				'show_count'			=> true,
+				'show_option_all'		=> '',
+				'show_option_none'		=> '',
+				'use_desc_for_title'	=> false,
+				'title_li'				=> '',
+				'hide_empty'			=> false,
+				'hierarchical'			=> true,
+				'taxonomy'				=> $taxonomy->name,
+				'hide_title_if_empty'	=> true,
+				'echo'					=> false
+			);
 
-		if ( $html !== '' ) {
-			// fix for urls
-			$html = preg_replace_callback( '/href=(?:\'|")(.*?)(?:\'|")/', array( $this, 'replace_folders_href' ), $html );
+			// get current term id
+			$term_id = isset( $_GET[$taxonomy->name] ) ? (int) $_GET[$taxonomy->name] : 0;
 
-			// fix for counters
-			$html = preg_replace_callback( '/<\/a> \(((?:\d+|&nbsp;)+)\)/', array( $this, 'replace_folders_count' ), $html );
+			// list mode?
+			if ( $this->mode === 'list' ) {
+				// get global wp list table instance
+				global $wp_list_table;
 
-			// open all needed folders at start
+				// empty instance?
+				if ( is_null( $wp_list_table ) )
+					$wp_list_table = _get_list_table( 'WP_Media_List_Table' );
+
+				// start buffering
+				ob_start();
+
+				// display "no media" table row
+				echo '<tr class="no-items"><td class="colspanchange" colspan="' . $wp_list_table->get_column_count() . '">';
+
+				$wp_list_table->no_items();
+
+				echo '</td></tr>';
+
+				// save "no media" table row
+				$no_items = ob_get_contents();
+
+				// clear the buffer
+				ob_end_clean();
+
+				// valid term?
+				if ( $term_id > 0 ) {
+					$children = get_term_children( $term_id, $taxonomy->name );
+
+					// found any children?
+					$childless = ! ( ! empty( $children ) && ! is_wp_error( $children ) );
+				}
+			}
+
+			// set current term id
 			if ( $term_id > 0 )
-				$html = preg_replace_callback( '/class="cat-item cat-item-(\d+)(?:[a-z\s0-9-]+)?"/', array( $this, 'open_folders' ), $html );
+				$categories['current_category'] = $term_id;
 
-			$counters = array_combine( $this->term_counters['keys'], $this->term_counters['values'] );
-		}
+			// hide filter for grid
+			if ( $this->mode !== 'list' ) {
+				wp_add_inline_style(
+					'responsive-lightbox-folders-admin-css',
+					'#media-attachment-rl-folders-filters { display: none; }
+					.media-modal-content .media-frame select.attachment-filters {
+						max-width: 100%;
+						min-width: auto;
+					}'
+				);
+			}
 
-		// all attachments query
-		$count = wp_count_posts( 'attachment' );
+			// get taxonomy html output
+			$html = wp_list_categories( $categories );
 
-		// root folder query
-		$root_query = new WP_Query(
-			array(
-				'rl_folders_root'	=> true,
-				'posts_per_page'	=> -1,
-				'post_type'			=> 'attachment',
-				'post_status'		=> 'inherit,private',
-				'fields'			=> 'ids',
-				'no_found_rows'		=> true,
-				'tax_query'			=> array(
+			if ( $html !== '' ) {
+				// fix for urls
+				$html = preg_replace_callback( '/href=(?:\'|")(.*?)(?:\'|")/', array( $this, 'replace_folders_href' ), $html );
+
+				// fix for counters
+				$html = preg_replace_callback( '/<\/a> \(((?:\d+|&nbsp;)+)\)/', array( $this, 'replace_folders_count' ), $html );
+
+				// open all needed folders at start
+				if ( $term_id > 0 )
+					$html = preg_replace_callback( '/class="cat-item cat-item-(\d+)(?:[a-z\s0-9-]+)?"/', array( $this, 'open_folders' ), $html );
+
+				// update folder counters
+				$counters = array_combine( $this->term_counters['keys'], $this->term_counters['values'] );
+			}
+
+			// root folder query
+			$root_query = new WP_Query(
+				apply_filters(
+					'rl_root_folder_query_args',
 					array(
-						'relation' => 'AND',
-						array(
-							'taxonomy'			=> $taxonomy->name,
-							'field'				=> 'id',
-							'terms'				=> 0,
-							'include_children'	=> false,
-							'operator'			=> 'NOT EXISTS'
+						'rl_folders_root'	=> true,
+						'posts_per_page'	=> -1,
+						'post_type'			=> 'attachment',
+						'post_status'		=> 'inherit,private',
+						'fields'			=> 'ids',
+						'no_found_rows'		=> false,
+						'tax_query'			=> array(
+							array(
+								'relation' => 'AND',
+								array(
+									'taxonomy'			=> $taxonomy->name,
+									'field'				=> 'id',
+									'terms'				=> 0,
+									'include_children'	=> false,
+									'operator'			=> 'NOT EXISTS'
+								)
+							)
 						)
 					)
 				)
-			)
-		);
+			);
 
-		$counters[-1] = (int) $count->inherit;
-		$counters[0] = (int) $root_query->post_count;
+			// set number of all attachments
+			$counters[-1] = (int) apply_filters( 'rl_count_attachments', 0 );
 
-		$html = '
+			// set number of root attachments (not categorized)
+			$counters[0] = (int) $root_query->post_count;
+
+
+			$html = '
 			<ul>
 				<li class="cat-item cat-item-all"' . ( $term_id === 0 ? ' data-jstree=\'{ "selected": true }\'' : '' ) . '>
-				<a href="' . admin_url( 'upload.php?mode=' . $this->mode . '&' . $taxonomy->name . '=0' ) . '" data-term_id="all">' . __( 'All Files', 'responsive-lightbox' ) . ' (' . (int) $count->inherit . ')</a>
+					<a href="' . apply_filters( 'rl_folders_media_folder_url', add_query_arg( array( 'mode' => $this->mode, $taxonomy->name => 0 ) ), null, $this->mode, 0 ) . '" data-term_id="all">' . __( 'All Files', 'responsive-lightbox' ) . ' (' . $counters[-1] . ')</a>
 				</li>
 				<li class="cat-item cat-item-0" data-jstree=\'{ "opened": true' . ( $term_id === -1 ? ', "selected": true ' : '' ) . ' }\'>
-				<a href="' . admin_url( 'upload.php?mode=' . $this->mode . '&' . $taxonomy->name . '=-1' ) . '" data-term_id="0">' . __( 'Root Folder', 'responsive-lightbox' ) . ' (' . (int) $root_query->post_count . ')</a>
+					<a href="' . apply_filters( 'rl_folders_media_folder_url', add_query_arg( array( 'mode' => $this->mode, $taxonomy->name => -1 ) ), null, $this->mode, -1 ) . '" data-term_id="0">' . __( 'Root Folder', 'responsive-lightbox' ) . ' (' . $counters[0] . ')</a>
 				<ul>' . $html . '</ul>
 				</li>
 			</ul>';
 
-		// register scripts
-		wp_enqueue_script( 'responsive-lightbox-admin-select2', RESPONSIVE_LIGHTBOX_URL . '/assets/select2/select2.full' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array( 'jquery' ), $rl->defaults['version'] );
-		wp_register_script( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/jstree' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array(), $rl->defaults['version'], false );
-		wp_register_script( 'responsive-lightbox-folders-perfect-scrollbar', RESPONSIVE_LIGHTBOX_URL . '/assets/perfect-scrollbar/perfect-scrollbar' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array(), $rl->defaults['version'], false );
+			// register scripts
+			wp_register_script( 'responsive-lightbox-folders-jstree', RESPONSIVE_LIGHTBOX_URL . '/assets/jstree/jstree' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array(), $rl->defaults['version'], false );
+			wp_register_script( 'responsive-lightbox-folders-perfect-scrollbar', RESPONSIVE_LIGHTBOX_URL . '/assets/perfect-scrollbar/perfect-scrollbar' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array(), $rl->defaults['version'], false );
 
-		wp_enqueue_script( 'responsive-lightbox-folders-admin', RESPONSIVE_LIGHTBOX_URL . '/js/admin-folders.js', array( 'jquery', 'underscore', 'jquery-ui-draggable', 'jquery-ui-droppable', 'media-models', 'responsive-lightbox-folders-jstree', 'responsive-lightbox-folders-perfect-scrollbar', 'tags-suggest' ), $rl->defaults['version'], false );
+			$dependencies[] = 'responsive-lightbox-folders-jstree';
+			$dependencies[] = 'responsive-lightbox-folders-perfect-scrollbar';
+		}
 
-		wp_localize_script(
-			'responsive-lightbox-folders-admin',
-			'rlFoldersArgs',
-			array(
-				'remove_children'	=> (int) $rl->options['folders']['folders_removal'],
-				'wholerow'			=> (int) $rl->options['folders']['jstree_wholerow'],
-				// 'theme'				=> $rl->options['folders']['jstree_style'],
-				'theme'				=> 'default',
-				'counters'			=> $counters,
-				'taxonomy'			=> $taxonomy->name,
-				'page'				=> $page,
-				'no_media_items'	=> $no_items,
-				'all_terms'			=> __( 'All Files', 'responsive-lightbox' ),
-				'root'				=> __( 'Root Folder', 'responsive-lightbox' ),
-				'new_folder'		=> __( 'New Folder', 'responsive-lightbox' ),
-				'delete_term'		=> __( 'Are you sure you want to delete this folder?', 'responsive-lightbox' ),
-				'delete_terms'		=> __( 'Are you sure you want to delete this folder with all subfolders?', 'responsive-lightbox' ),
-				'nonce'				=> wp_create_nonce( 'rl-folders-ajax-library-nonce' ),
-				'terms'				=> wp_dropdown_categories(
-					array(
-						'orderby'			=> 'name',
-						'order'				=> 'asc',
-						'show_option_all'	=> __( 'All Files', 'responsive-lightbox' ),
-						'show_count'		=> false,
-						'hide_empty'		=> false,
-						'hierarchical'		=> true,
-						'selected'			=> ( isset( $_GET[$taxonomy->name] ) ? (int) $_GET[$taxonomy->name] : 0 ),
-						'name'				=> $taxonomy->name,
-						'taxonomy'			=> $taxonomy->name,
-						'hide_if_empty'		=> true,
-						'echo'				=> false
+		wp_enqueue_script( 'responsive-lightbox-admin-select2', RESPONSIVE_LIGHTBOX_URL . '/assets/select2/select2.full' . ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.min' : '' ) . '.js', array( 'jquery' ), $rl->defaults['version'], false );
+
+		wp_enqueue_script( 'responsive-lightbox-folders-admin', RESPONSIVE_LIGHTBOX_URL . '/js/admin-folders.js', $dependencies, $rl->defaults['version'], false );
+
+		if ( $page === 'media' ) {
+			wp_localize_script(
+				'responsive-lightbox-folders-admin',
+				'rlFoldersArgs',
+				array(
+					'taxonomy'			=> $taxonomy->name,
+					'page'				=> $page,
+					'root'				=> __( 'Root Folder', 'responsive-lightbox' ),
+					'terms'				=> wp_dropdown_categories(
+						array(
+							'orderby'			=> 'name',
+							'order'				=> 'asc',
+							'show_option_all'	=> __( 'All Files', 'responsive-lightbox' ),
+							'show_count'		=> false,
+							'hide_empty'		=> false,
+							'hierarchical'		=> true,
+							'selected'			=> ( isset( $_GET[$taxonomy->name] ) ? (int) $_GET[$taxonomy->name] : 0 ),
+							'name'				=> $taxonomy->name,
+							'taxonomy'			=> $taxonomy->name,
+							'hide_if_empty'		=> true,
+							'echo'				=> false
+						)
 					)
-				),
-				'template'			=> '
-					<div id="rl-folders-tree-container">
-						<div class="media-toolbar wp-filter">
-						<div class="view-switch rl-folders-action-links">
-							<a href="#" title="' . $taxonomy->labels->add_new_item . '" class="dashicons dashicons-plus rl-folders-add-new-folder' . ( $this->mode === 'list' && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
-							<a href="#" title="' . sprintf( __( 'Save new %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-yes rl-folders-save-new-folder" style="display: none;"></a>
-							<a href="#" title="' . sprintf( __( 'Cancel adding new %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-no rl-folders-cancel-new-folder" style="display: none;"></a>
-							<a href="#" title="' . $taxonomy->labels->edit_item . '" class="dashicons dashicons-edit rl-folders-rename-folder' . ( $this->mode === 'list' && $term_id > 0 ? '' : ' disabled-link' ) . '"></a>
-							<a href="#" title="' . sprintf( __( 'Save %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-yes rl-folders-save-folder" style="display: none;"></a>
-							<a href="#" title="' . sprintf( __( 'Cancel renaming %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-no rl-folders-cancel-folder" style="display: none;"></a>
-							<a href="#" title="' . sprintf( __( 'Delete %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-trash rl-folders-delete-folder' . ( $this->mode === 'list' && $term_id > 0 ? '' : ' disabled-link' ) . '"></a>
-							<a href="#" title="' . sprintf( __( 'Expand %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-arrow-down-alt2 rl-folders-expand-folder' . ( $this->mode === 'list' && ! $childless && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
-							<a href="#" title="' . sprintf( __( 'Collapse %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-arrow-up-alt2 rl-folders-collapse-folder' . ( $this->mode === 'list' && ! $childless && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
+				)
+			);
+		} else {
+			wp_localize_script(
+				'responsive-lightbox-folders-admin',
+				'rlFoldersArgs',
+				array(
+					'remove_children'	=> (int) $rl->options['folders']['folders_removal'],
+					'wholerow'			=> (int) $rl->options['folders']['jstree_wholerow'],
+					// 'theme'				=> $rl->options['folders']['jstree_style'],
+					'theme'				=> 'default',
+					'counters'			=> $counters,
+					'no_media_items'	=> $no_items,
+					'taxonomy'			=> $taxonomy->name,
+					'page'				=> $page,
+					'root'				=> __( 'Root Folder', 'responsive-lightbox' ),
+					'all_terms'			=> __( 'All Files', 'responsive-lightbox' ),
+					'new_folder'		=> __( 'New Folder', 'responsive-lightbox' ),
+					'delete_term'		=> __( 'Are you sure you want to delete this folder?', 'responsive-lightbox' ),
+					'delete_terms'		=> __( 'Are you sure you want to delete this folder with all subfolders?', 'responsive-lightbox' ),
+					'nonce'				=> wp_create_nonce( 'rl-folders-ajax-library-nonce' ),
+					'terms'				=> wp_dropdown_categories(
+						array(
+							'orderby'			=> 'name',
+							'order'				=> 'asc',
+							'show_option_all'	=> __( 'All Files', 'responsive-lightbox' ),
+							'show_count'		=> false,
+							'hide_empty'		=> false,
+							'hierarchical'		=> true,
+							'selected'			=> ( isset( $_GET[$taxonomy->name] ) ? (int) $_GET[$taxonomy->name] : 0 ),
+							'name'				=> $taxonomy->name,
+							'taxonomy'			=> $taxonomy->name,
+							'hide_if_empty'		=> true,
+							'echo'				=> false
+						)
+					),
+					'template'			=> '
+						<div id="rl-folders-tree-container">
+							<div class="media-toolbar wp-filter">
+								<div class="view-switch rl-folders-action-links">
+									<a href="#" title="' . $taxonomy->labels->add_new_item . '" class="dashicons dashicons-plus rl-folders-add-new-folder' . ( $this->mode === 'list' && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
+									<a href="#" title="' . sprintf( __( 'Save new %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-yes rl-folders-save-new-folder" style="display: none;"></a>
+									<a href="#" title="' . sprintf( __( 'Cancel adding new %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-no rl-folders-cancel-new-folder" style="display: none;"></a>
+									<a href="#" title="' . $taxonomy->labels->edit_item . '" class="dashicons dashicons-edit rl-folders-rename-folder' . ( $this->mode === 'list' && $term_id > 0 ? '' : ' disabled-link' ) . '"></a>
+									<a href="#" title="' . sprintf( __( 'Save %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-yes rl-folders-save-folder" style="display: none;"></a>
+									<a href="#" title="' . sprintf( __( 'Cancel renaming %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-no rl-folders-cancel-folder" style="display: none;"></a>
+									<a href="#" title="' . sprintf( __( 'Delete %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-trash rl-folders-delete-folder' . ( $this->mode === 'list' && $term_id > 0 ? '' : ' disabled-link' ) . '"></a>
+									<a href="#" title="' . sprintf( __( 'Expand %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-arrow-down-alt2 rl-folders-expand-folder' . ( $this->mode === 'list' && ! $childless && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
+									<a href="#" title="' . sprintf( __( 'Collapse %s', 'responsive-lightbox' ), $taxonomy->labels->singular_name ) . '" class="dashicons dashicons-arrow-up-alt2 rl-folders-collapse-folder' . ( $this->mode === 'list' && ! $childless && ( $term_id === -1 || $term_id > 0 ) ? '' : ' disabled-link' ) . '"></a>
+								</div>
 							</div>
-						</div>
-						<div id="rl-folders-tree">' . esc_html( $html ) . '</div>
-						</div>
-					</div>'
-			)
-		);
+							<div id="rl-folders-tree">' . esc_html( $html ) . '</div>
+						</div>'
+				)
+			);
+		}
 
 		add_action( 'admin_print_styles', array( $this, 'admin_print_media_styles' ) );
 	}
@@ -1104,6 +1182,17 @@ class Responsive_Lightbox_Folders {
 	 */
 	public function admin_print_media_styles() {
 		echo '<style>.rl_media_folder li .selectit input[type="checkbox"] { margin: 0 3px; }</style>';
+    }
+
+	/**
+	 * Count attachments.
+	 *
+	 * @return int
+	 */
+	public function count_attachments() {
+		$count = wp_count_posts( 'attachment' );
+
+		return (int) $count->inherit;
     }
 
 	/**

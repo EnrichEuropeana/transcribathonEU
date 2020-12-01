@@ -64,6 +64,10 @@
     padding-bottom: 0;
     margin-bottom: 0;
 }
+.sp-easy-accordion>.sp-ea-single>.sp-collapse>.ea-body p:first-of-type{
+    padding-top: 0;
+    margin-top: 0;
+}
 
 .sp-ea-one.sp-easy-accordion .sp-ea-single .ea-body {
     padding: 15px

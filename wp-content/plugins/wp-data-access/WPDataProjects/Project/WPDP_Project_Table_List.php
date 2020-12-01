@@ -114,10 +114,13 @@ namespace WPDataProjects\Project {
 			>
 				<input type="hidden" name="action" value="reverse_engineering">
 				<div id="no_repository_buttons" style="display:block">
-					<input type="button"
-						   value="<?php echo __( 'Add Table To Repository', 'wp-data-access' ); ?>"
-						   class="page-title-action"
-						   onclick="jQuery('#no_repository_buttons').hide(); jQuery('#add_table_to_repository').show(); return false;">
+					<button type="button"
+						    class="page-title-action wpda_tooltip"
+							title="Add table to repository. The plugin needs to load the structure of a table into the repository to generate list table and data entry forms. If you update a table with another database tool, make sure to reconcile that table to update the repository and prevent the plugin using an old table structure."
+						   	onclick="jQuery('#no_repository_buttons').hide(); jQuery('#add_table_to_repository').show(); return false;">
+						<span class="material-icons wpda_icon_on_button">add_circle</span>
+						<?php echo __( 'Add Table To Repository', 'wp-data-access' ); ?>
+					</button>
 				</div>
 				<div id="add_table_to_repository" style="display:none">
 					<select name="wpda_schema_name" id="wpda_schema_name">
@@ -308,11 +311,15 @@ namespace WPDataProjects\Project {
 			$copy_warning    = __( "Copy table options set?\\n\\'Cancel\\' to stop, \\'OK\\' to copy.", 'wp-data-access' );
 			$actions['copy'] = sprintf(
 				'<a href="javascript:void(0)" 
-                                    class="edit"  
-                                    onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
-                                    %s
-                                </a>
-                                ',
+					class="edit wpda_tooltip"
+					title="Copy option set"
+					onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
+					<span style="white-space:nowrap">
+						<span class="material-icons wpda_icon_on_button">content_copy</span>
+						%s
+					</span>
+				</a>
+				',
 				$copy_warning,
 				"copy_form$form_id",
 				__( 'Copy', 'wp-data-access' )

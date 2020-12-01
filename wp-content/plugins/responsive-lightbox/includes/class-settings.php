@@ -1880,8 +1880,6 @@ class Responsive_Lightbox_Settings {
 		if ( ! empty( $this->tabs[$tab_key]['callback'] ) )
 			call_user_func( $this->tabs[$tab_key]['callback'] );
 		else {
-			wp_nonce_field( 'update-options' );
-
 			settings_fields( $this->tabs[$tab_key]['key'] );
 			do_settings_sections( $this->tabs[$tab_key]['key'] );
 

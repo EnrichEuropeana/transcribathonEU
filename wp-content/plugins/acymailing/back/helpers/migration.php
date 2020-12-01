@@ -356,7 +356,23 @@ class acymmigrationHelper extends acymObject
 
     public function migrateUsers_fields($params = [])
     {
-        $fieldsV5 = acym_loadObjectList('SELECT `namekey`, `type` FROM #__acymailing_fields WHERE `namekey` NOT IN ("name", "email", "html") AND `type` NOT IN ("customtext", "category", "gravatar")', 'namekey');
+        $fieldsV5InDB = acym_loadObjectList(
+            'SELECT `namekey`, `type` 
+            FROM #__acymailing_fields 
+            WHERE `namekey` NOT IN ("name", "email", "html") 
+                AND `type` NOT IN ("customtext", "category", "gravatar")',
+            'namekey'
+        );
+
+        if (empty($fieldsV5InDB)) return true;
+
+        $columnUserTable = acym_getColumns('acymailing_subscriber', false);
+
+        $fieldsV5 = [];
+
+        foreach ($fieldsV5InDB as $key => $field) {
+            if (in_array($key, $columnUserTable)) $fieldsV5[$key] = $field;
+        }
 
         if (empty($fieldsV5)) return true;
 
@@ -1166,13 +1182,16 @@ class acymmigrationHelper extends acymObject
 
         if ('users_fields' == $element) {
             $fields = acym_loadResultArray('SELECT namekey FROM #__acymailing_fields WHERE `namekey` NOT IN ("name", "email", "html") AND `type` NOT IN ("customtext", "category", "gravatar")');
+            $columnUserTable = acym_getColumns('acymailing_subscriber', false);
+
+            $fieldToCkeck = [];
 
             foreach ($fields as $key => $field) {
-                $fields[$key] = '`'.$field.'`';
+                if (in_array($field, $columnUserTable)) $fieldToCkeck[$key] = '`'.$field.'`';
             }
 
-            $connection[$element]['where'] = implode(' IS NOT NULL OR ', $fields);
-            if (!empty($fields)) $connection[$element]['where'] .= ' IS NOT NULL;';
+            $connection[$element]['where'] = implode(' IS NOT NULL OR ', $fieldToCkeck);
+            if (!empty($fieldToCkeck)) $connection[$element]['where'] .= ' IS NOT NULL;';
         }
 
         $where = !empty($connection[$element]['where']) ? 'WHERE '.$connection[$element]['where'] : '';

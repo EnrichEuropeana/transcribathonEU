@@ -1,4 +1,4 @@
-jQuery(function ($) {
+;(function($) {
     (function () {
         function _defineProperties(target, props) {
             for (var i = 0; i < props.length; i++) {
@@ -107,9 +107,9 @@ jQuery(function ($) {
         }
 
         function transitionEndEmulator(duration) {
-            var called = !1
-            $(this).one(TRANSITION_END, function (event) {
-                called = !0
+            var called = false
+            $(this).one(SPCollapse.TRANSITION_END, function (event) {
+                called = true
             });
             setTimeout(function () {
                 if (!called) {
@@ -484,4 +484,4 @@ jQuery(function ($) {
 
         return SPCollapse;
     }());
-});
+})(jQuery);

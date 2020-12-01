@@ -12,6 +12,65 @@ class plgAcymPage extends acymPlugin
         $this->pluginDescription->name = acym_translation('ACYM_PAGE');
         $this->pluginDescription->icon = '<div class="wp-menu-image dashicons-before dashicons-admin-page"></div>';
         $this->pluginDescription->icontype = 'raw';
+
+        if ($this->installed && ACYM_CMS == 'wordpress') {
+            $this->displayOptions = [
+                'title' => ['ACYM_TITLE', true],
+                'image' => ['ACYM_FEATURED_IMAGE', true],
+                'intro' => ['ACYM_INTRO_ONLY', true],
+                'content' => ['ACYM_FULL_TEXT', false],
+                'readmore' => ['ACYM_READ_MORE', false],
+            ];
+
+            $this->initElementOptionsCustomView();
+            $this->initReplaceOptionsCustomView();
+
+            $this->settings = [
+                'custom_view' => [
+                    'type' => 'custom_view',
+                    'tags' => array_merge($this->displayOptions, $this->replaceOptions, $this->elementOptions),
+                ],
+            ];
+        }
+    }
+
+    public function getStandardStructure(&$customView)
+    {
+        $tag = new stdClass();
+        $tag->id = 0;
+
+        $format = new stdClass();
+        $format->tag = $tag;
+        $format->title = '{title}';
+        $format->afterTitle = '';
+        $format->afterArticle = '';
+        $format->imagePath = '{image}';
+        $format->description = '{intro}';
+        $format->link = '{link}';
+        $format->customFields = [];
+        $customView = '<div class="acymailing_content">'.$this->pluginHelper->getStandardDisplay($format).'</div>';
+    }
+
+    public function initReplaceOptionsCustomView()
+    {
+        $this->replaceOptions = [
+            'link' => ['ACYM_LINK'],
+            'picthtml' => ['ACYM_IMAGE'],
+            'readmore' => ['ACYM_READ_MORE'],
+        ];
+    }
+
+    public function initElementOptionsCustomView()
+    {
+        $query = 'SELECT page.*
+                    FROM #__posts AS page
+                    WHERE page.post_type = "page" 
+                        AND page.post_status = "publish"';
+        $element = acym_loadObject($query);
+        if (empty($element)) return;
+        foreach ($element as $key => $value) {
+            $this->elementOptions[$key] = [$key];
+        }
     }
 
     public function getPossibleIntegrations()
@@ -28,11 +87,7 @@ class plgAcymPage extends acymPlugin
                 'title' => 'ACYM_DISPLAY',
                 'type' => 'checkbox',
                 'name' => 'display',
-                'options' => [
-                    'title' => ['ACYM_TITLE', true],
-                    'image' => ['ACYM_FEATURED_IMAGE', true],
-                    'content' => ['ACYM_CONTENT', true],
-                ],
+                'options' => $this->displayOptions,
             ],
             [
                 'title' => 'ACYM_CLICKABLE_TITLE',
@@ -128,28 +183,40 @@ class plgAcymPage extends acymPlugin
         $varFields['{link}'] = $link;
 
         $title = '';
-        if (in_array('title', $tag->display)) $title = $element->post_title;
+        $varFields['{title}'] = $element->post_title;
+        if (in_array('title', $tag->display)) $title = $varFields['{title}'];
 
         $afterTitle = '';
+        $afterArticle = '';
 
         $imagePath = '';
-        if (in_array('image', $tag->display)) {
-            $imageId = get_post_thumbnail_id($tag->id);
-            if (!empty($imageId)) {
-                $imagePath = get_the_post_thumbnail_url($tag->id);
-            }
+        $imageId = get_post_thumbnail_id($tag->id);
+        if (!empty($imageId)) {
+            $imagePath = get_the_post_thumbnail_url($tag->id);
         }
+        $varFields['{image}'] = $imagePath;
+        $varFields['{picthtml}'] = '<img alt="" src="'.$imagePath.'">';
+        if (!in_array('image', $tag->display)) $imagePath = '';
 
         $contentText = '';
-        if (in_array('content', $tag->display)) $contentText .= $element->post_content;
+        $varFields['{content}'] = $element->post_content;
+        $varFields['{intro}'] = $this->getIntro($element->post_content);
+        if (in_array('content', $tag->display)) {
+            $contentText .= $varFields['{content}'];
+        } elseif (in_array('intro', $tag->display)) {
+            $contentText .= $varFields['{intro}'];
+        }
 
         $customFields = [];
+
+        $varFields['{readmore}'] = '<a class="acymailing_readmore_link" style="text-decoration:none;" target="_blank" href="'.$link.'"><span class="acymailing_readmore">'.acym_escape(acym_translation('ACYM_READ_MORE')).'</span></a>';
+        if (in_array('readmore', $tag->display)) $afterArticle .= $varFields['{readmore}'];
 
         $format = new stdClass();
         $format->tag = $tag;
         $format->title = $title;
         $format->afterTitle = $afterTitle;
-        $format->afterArticle = '';
+        $format->afterArticle = $afterArticle;
         $format->imagePath = $imagePath;
         $format->description = $contentText;
         $format->link = empty($tag->clickable) ? '' : $link;

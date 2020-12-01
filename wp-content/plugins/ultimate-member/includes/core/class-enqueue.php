@@ -127,7 +127,7 @@ if ( ! class_exists( 'um\core\Enqueue' ) ) {
 			wp_register_script( 'um_responsive', $this->js_baseurl . 'um-responsive' . $this->suffix . '.js', array( 'jquery', 'um_functions', 'um_crop' ), ultimatemember_version, true );
 
 			wp_register_script( 'um-gdpr', $this->js_baseurl . 'um-gdpr' . $this->suffix . '.js', array( 'jquery' ), ultimatemember_version, false );
-			wp_register_script('um_conditional', $this->js_baseurl . 'um-conditional' . $this->suffix . '.js', array( 'jquery' ), ultimatemember_version, true );
+			wp_register_script('um_conditional', $this->js_baseurl . 'um-conditional' . $this->suffix . '.js', array( 'jquery', 'wp-hooks' ), ultimatemember_version, true );
 			wp_register_script('um_scripts', $this->js_baseurl . 'um-scripts' . $this->suffix . '.js', array( 'jquery', 'wp-util', 'um_conditional', 'um_datetime', 'um_datetime_date', 'um_datetime_time', 'um_datetime_legacy', 'select2' ), ultimatemember_version, true );
 			/**
 			 * UM hook
@@ -158,7 +158,9 @@ if ( ! class_exists( 'um\core\Enqueue' ) ) {
 
 			wp_register_script('um_members', $this->js_baseurl . 'um-members' . $this->suffix . '.js', array( 'jquery', 'wp-util', 'jquery-ui-slider', 'um_dropdown', 'wp-hooks', 'jquery-masonry', 'um_scripts' ), ultimatemember_version, true );
 			wp_register_script('um_profile', $this->js_baseurl . 'um-profile' . $this->suffix . '.js', array( 'jquery', 'wp-util', 'wp-i18n' ), ultimatemember_version, true );
-			wp_register_script('um_account', $this->js_baseurl . 'um-account' . $this->suffix . '.js', array( 'jquery' ), ultimatemember_version, true );
+
+			$account_deps = apply_filters( 'um_account_scripts_dependencies', array( 'jquery', 'wp-hooks' ) );
+			wp_register_script('um_account', $this->js_baseurl . 'um-account' . $this->suffix . '.js', $account_deps, ultimatemember_version, true );
 
 			wp_register_script( 'um_gchart', 'https://www.google.com/jsapi', array(), ultimatemember_version, true );
 		}

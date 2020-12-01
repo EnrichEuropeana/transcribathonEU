@@ -72,14 +72,19 @@ class DisplayPostTypes {
 				});
 				this.masonGrid.init();
 			} else if ( elem.classList.contains('dpt-slider') ) {
-				this.flicKity = new Flickity(elem, {
+				const autotime = parseInt(elem.getAttribute('data-autotime'));
+				const param    = {
 					cellAlign: 'left',
 					contain: true,
 					wrapAround: true,
 					prevNextButtons: true,
 					imagesLoaded: true,
 					cellSelector: '.dpt-entry',
-				});
+				};
+				if (autotime) {
+					param.autoPlay = autotime;
+				}
+				this.flicKity = new Flickity(elem, param);
 			}
 		});
 	}

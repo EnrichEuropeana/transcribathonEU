@@ -58,6 +58,15 @@ namespace WPDataProjects\Parent_Child {
 		protected $where_in = 'in'; // Just to save code! (opposite using in WPDP_Child_List_Table_Selection: not in)
 
 		/**
+		 * Indicates that this is a list table for a child
+		 *
+		 * Parent and stand-alone list tables do not have this property.
+		 *
+		 * @var bool
+		 */
+		public $is_child = true;
+
+		/**
 		 * Overwrites WPDP_Child_List_Table constructor
 		 *
 		 * @param array $args
@@ -306,9 +315,9 @@ namespace WPDataProjects\Parent_Child {
 							$parent_key_value = $this->parent['parent_key_value'][ $this->parent['parent_key'][ $index ] ];
 						} else {
 							if ( isset( $_REQUEST[ 'WPDA_PARENT_KEY*' . $parent_key[ $index ] ] ) ) {
-								$parent_key_value = $_REQUEST[ 'WPDA_PARENT_KEY*' . $parent_key[ $index ] ];
+								$parent_key_value = sanitize_text_field( wp_unslash( $_REQUEST[ 'WPDA_PARENT_KEY*' . $parent_key[ $index ] ] ) ); // input var okay.
 							} elseif ( isset( $_REQUEST[ $parent_key[ $index ] ] ) ) {
-								$parent_key_value = $_REQUEST[ $parent_key[ $index ] ];
+								$parent_key_value = sanitize_text_field( wp_unslash( $_REQUEST[ $parent_key[ $index ] ] ) ); // input var okay.
 							} else  {
 								wp_die( '<p style="clear: both; padding: 10px;">' . __( 'ERROR: No value for parent key found', 'wp-data-access' ) . '</p>' );
 							}
@@ -392,17 +401,24 @@ namespace WPDataProjects\Parent_Child {
 			<?php
 			if ( isset( $this->child['relation_nm'] ) ) {
 				$link_label = __( 'Delete Relationship', 'wp-data-access' );
+				$link_title = __( 'Delete child row (this only affects the relationship table)', 'wp-data-access' );
 			} else {
 				$link_label = __( 'Delete', 'wp-data-access' );
+				$link_title = __( 'Delete child row', 'wp-data-access' );
 			}
 			$warning = __("You are about to permanently delete these items from your site.\\nThis action cannot be undone.\\n\\'Cancel\\' to stop, \\'OK\\' to delete.",'wp-data-access');
 			$actions['delete'] = sprintf(
 				'<a href="javascript:void(0)" 
-                                    class="delete"  
-                                    onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
-                                    %s
-                                </a>
-                                ',
+					class="delete wpda_tooltip"  
+					title="%s"
+					onclick="if (confirm(\'%s\')) jQuery(\'#%s\').submit()">
+						<span style="white-space:nowrap">
+							<span class="material-icons wpda_icon_on_button">delete</span>
+							%s
+						</span>
+				</a>
+				',
+				$link_title,
 				$warning,
 				"delete_form$form_id",
 				$link_label

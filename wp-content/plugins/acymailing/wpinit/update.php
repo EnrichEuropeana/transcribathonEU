@@ -16,8 +16,6 @@ class acyUpdate extends acyHook
         $plugin_slug = plugin_basename(dirname(__DIR__).'/index.php');
         if (!empty($transient->no_update[$plugin_slug])) return $transient;
 
-        $this->loadAcyLibrary();
-
 
         $config = acym_config();
         $downloadURL = $config->get('downloadurl', '');
@@ -98,7 +96,6 @@ class acyUpdate extends acyHook
         $current_plugin_path_name = plugin_basename(dirname(__DIR__).'/index.php');
 
         if (!empty($options['plugin']) && $options['plugin'] == $current_plugin_path_name) {
-            $this->loadAcyLibrary();
             $config = acym_config();
 
             $newConfig = new stdClass();
@@ -108,8 +105,6 @@ class acyUpdate extends acyHook
         } elseif (!empty($options['plugins'])) {
             foreach ($options['plugins'] as $each_plugin) {
                 if ($each_plugin != $current_plugin_path_name) continue;
-
-                $this->loadAcyLibrary();
                 $config = acym_config();
 
                 $downloadURL = $config->get('downloadurl');
@@ -136,8 +131,6 @@ class acyUpdate extends acyHook
     {
         global $pagenow;
         if (!in_array($pagenow, ['update-core.php', 'plugins.php'])) return;
-
-        $this->loadAcyLibrary();
 
         echo '<div class="notice notice-error is-dismissible">
                  <p>'.acym_translation('ACYM_PAID_VERSION_NEED_UPDATE_ERROR_LICENSE_ATTACH').'</p>

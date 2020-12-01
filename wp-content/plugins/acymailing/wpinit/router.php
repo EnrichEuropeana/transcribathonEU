@@ -36,6 +36,10 @@ class acyRouter extends acyHook
     {
         remove_action('admin_print_scripts', 'print_emoji_detection_script');
 
+        remove_action('wp_enqueue_media', '\\Slideshowck\\Tinymce\\register_scripts_styles');
+
+        remove_action('wp_enqueue_media', '\\Sgdg\\Admin\\TinyMCE\\register_scripts_styles');
+
         wp_dequeue_script('select2.js');
         wp_dequeue_script('select2_js');
     }
@@ -43,6 +47,7 @@ class acyRouter extends acyHook
     public function removeCssBreakingPages()
     {
         wp_dequeue_style('saswp-main-css');
+        wp_dequeue_style('WP REST API Controller');
     }
 
     public function frontRouter()
@@ -53,8 +58,6 @@ class acyRouter extends acyHook
     public function router($suffix = '')
     {
         if (empty($suffix)) auth_redirect();
-
-        $this->loadAcyLibrary();
 
         if (is_multisite()) {
             $currentBlog = get_current_blog_id();
@@ -108,17 +111,20 @@ class acyRouter extends acyHook
             return;
         }
 
+        $this->deactivateHookAdminFooter();
+
         $controller = acym_get('controller'.$suffix.'.'.$ctrl);
         if (empty($task)) {
             $task = acym_getVar('cmd', 'defaulttask', $controller->defaulttask);
         }
 
-        if (('frontusers' === $ctrl && 'unsubscribe' === $task) || (!defined('DOING_AJAX') || !DOING_AJAX)) {
-            acym_loadAssets(acym_isAdmin() ? 'back' : 'front', $ctrl, $task);
-            $controller->loadScripts($task);
-        }
-
         $controller->$task();
+    }
+
+    private function deactivateHookAdminFooter()
+    {
+        remove_action('admin_footer', 'Freemius::_enrich_ajax_url');
+        remove_action('admin_footer', 'Freemius::_open_support_forum_in_new_page');
     }
 }
 

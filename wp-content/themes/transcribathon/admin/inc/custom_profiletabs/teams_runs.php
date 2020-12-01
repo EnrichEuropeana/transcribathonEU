@@ -25,7 +25,7 @@ button.tct-vio-but[type=button],input.tct-vio-but[type=button],a.tct-vio-but{min
 // build 'Teams & runs' tab of Profile page
 
 
-$url = home_url()."/tp-api/teams?WP_UserId=".get_current_user_id();
+$url = home_url()."/tp-api/teams?WP_UserId=".um_profile_id();
 $requestType = "GET";
 
 // Execude http request

@@ -145,11 +145,14 @@ namespace WPDataProjects\Parent_Child {
 				// Possible values: "new", "edit" and "view".
 				$action              = sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ); // input var okay.
 				$this->action_posted = $action;
+			} elseif ( isset( $args['action'] ) ) {
+				$action              = $args['action'];
+				$this->action_posted = $action;
 			}
 
 			$this->relations  = $relationship;
 
-			$args['back_to_list_text'] = __( 'Back To Parent List', 'wp-data-access' );
+			$args['back_to_list_text'] = __( 'Parent List', 'wp-data-access' );
 
 			parent::__construct( $schema_name, $table_name, $wpda_list_columns, $args );
 
@@ -162,14 +165,10 @@ namespace WPDataProjects\Parent_Child {
 						} elseif ( isset( $_REQUEST[ $key ] ) ) {
 							array_push( $this->parent_key, $key );
 							$this->parent_key_value[ $key ] = sanitize_text_field( wp_unslash( $_REQUEST[ $key ] ) ); // input var okay.
-						} else {
-							wp_die( __( 'ERROR: Wrong arguments [missing WPDA_PARENT_KEY*?]', 'wp-data-access' ) );
 						}
 
 						if ( is_array( $relationship['children'] ) ) {
 							$this->children = $relationship['children'];
-						} else {
-							wp_die( __( 'ERROR: Wrong arguments [missing relationship]', 'wp-data-access' ) );
 						}
 					}
 				}
@@ -304,7 +303,7 @@ namespace WPDataProjects\Parent_Child {
 						'parent_key_value' => $this->parent_key_value,
 					],
 					'child'             => $child,
-					'back_to_list_text' => __( 'Back To Child List', 'wp-data-access' ),
+					'back_to_list_text' => __( 'Child List', 'wp-data-access' ),
 				]
 			);
 			$wpda_child_form->show();
@@ -360,8 +359,19 @@ namespace WPDataProjects\Parent_Child {
 				foreach ( $this->tabs as $tab => $name ) {
 					$class        = ( $tab === $this->current_tab ) ? ' nav-tab-active' : '';
 					$id_from_name = preg_replace( '/[^a-zA-Z0-9]/', '', $name );
+
+					if ( is_admin() ) {
+						$url = "?page={$this->page}&table_name={$this->table_name}";
+					} else {
+						$url = "?table_name={$this->table_name}";
+					}
+					global $wpdb;
+					if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+						$url .= "&schema_name={$this->schema_name}";
+					}
+
 					?>
-					<form action="?page=<?php echo esc_attr( $this->page ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?>"
+					<form action="<?php echo esc_attr( $url ); ?>"
 						  method="post"
 						  id="form_tab_<?php echo esc_attr( $id_from_name ); ?>"
 					>
@@ -424,11 +434,23 @@ namespace WPDataProjects\Parent_Child {
 		protected function button_add_new( $child, $child_table_name ) {
 			// Check if table has primary key. If not, disable adding a new record.
 			$check_pk = WPDA_List_Columns_Cache::get_list_columns( $this->schema_name, $child_table_name );
+			$title    = "Add new row";
+
+			if ( is_admin() ) {
+				$url = "?page={$this->page}&table_name={$this->table_name}";
+			} else {
+				$url = "?table_name={$this->table_name}";
+			}
+			global $wpdb;
+			if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+				$url .= "&schema_name={$this->schema_name}";
+			}
+
 			if ( ! empty( $check_pk->get_table_primary_key() ) ) {
 				?>
 				<form
 						method="post"
-						action="?page=<?php echo esc_attr( $this->page ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?>"
+						action="<?php echo esc_attr( $url ); ?>"
 						style="padding-top:15px;padding-left:5px;float:left;"
 				>
 					<?php $this->add_parent_keys( 'WPDA_PARENT_KEY*' ); ?>
@@ -437,8 +459,10 @@ namespace WPDataProjects\Parent_Child {
 					<input type="hidden" name="child_request" value="TRUE">
 					<input type="hidden" name="child_tab" value="<?php echo esc_attr( $child_table_name ); ?>">
 					<input type="hidden" name="action" value="new">
-					<input type="submit" class="button"
-						   value="<?php echo __( 'Add New', 'wp-data-access' ); ?>">
+					<button type="submit" class="button wpda_tooltip" title="<?php echo $title; ?>">
+						<span class="material-icons wpda_icon_on_button">add_circle</span>
+						<?php echo __( 'Add New', 'wp-data-access' ); ?>
+					</button>
 				</form>
 				<?php
 			}
@@ -446,7 +470,7 @@ namespace WPDataProjects\Parent_Child {
 				?>
 				<form
 						method="post"
-						action="?page=<?php echo esc_attr( $this->page ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?>"
+						action="<?php echo esc_attr( $url ); ?>"
 						style="padding-top:15px;padding-left:5px;float:left;"
 				>
 					<?php $this->add_parent_keys( 'WPDA_PARENT_KEY*' ); ?>
@@ -455,8 +479,12 @@ namespace WPDataProjects\Parent_Child {
 					<input type="hidden" name="child_request" value="TRUE">
 					<input type="hidden" name="child_tab" value="<?php echo esc_attr( $child_table_name ); ?>">
 					<input type="hidden" name="action" value="add">
-					<input type="submit" class="button"
-						   value="<?php echo __( 'Add Existing', 'wp-data-access' ); ?>">
+					<button type="submit" class="button wpda_tooltip"
+							title="Add existing row"
+					>
+						<span class="material-icons wpda_icon_on_button">add</span>
+						<?php echo __( 'Add Existing', 'wp-data-access' ); ?>
+					</button>
 				</form>
 				<?php
 			}
@@ -484,7 +512,7 @@ namespace WPDataProjects\Parent_Child {
 			if ( 'new' !== $this->action_posted || $this->child_request ) {
 				?>
 				<input type="button"
-					   value="<?php echo __( 'SHOW MORE', 'wp-data-access' ); ?> >>>"
+					   value="<?php echo __( 'show more', 'wp-data-access' ); ?> >>>"
 					   class="button"
 					   id="show_more_less_button"
 					   onclick="show_more_less()"
@@ -492,10 +520,10 @@ namespace WPDataProjects\Parent_Child {
 				<script type='text/javascript'>
 					function show_more_less() {
 						jQuery('.row-show-less-more').toggle();
-						if (jQuery('#show_more_less_button').val() === '<?php echo __( 'SHOW MORE', 'wp-data-access' ); ?> >>>') {
-							jQuery('#show_more_less_button').val('<<< <?php echo __( 'SHOW LESS', 'wp-data-access' ); ?>');
+						if (jQuery('#show_more_less_button').val() === '<?php echo __( 'show more', 'wp-data-access' ); ?> >>>') {
+							jQuery('#show_more_less_button').val('<<< <?php echo __( 'show less', 'wp-data-access' ); ?>');
 						} else {
-							jQuery('#show_more_less_button').val('<?php echo __( 'SHOW MORE', 'wp-data-access' ); ?> >>>');
+							jQuery('#show_more_less_button').val('<?php echo __( 'show more', 'wp-data-access' ); ?> >>>');
 						}
 					}
 

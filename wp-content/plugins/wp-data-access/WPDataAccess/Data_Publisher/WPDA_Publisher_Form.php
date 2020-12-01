@@ -13,6 +13,7 @@ namespace WPDataAccess\Data_Publisher {
 	use WPDataAccess\Data_Tables\WPDA_Data_Tables;
 	use WPDataAccess\Plugin_Table_Models\WPDA_Table_Settings_Model;
 	use WPDataAccess\Simple_Form\WPDA_Simple_Form;
+	use WPDataAccess\Simple_Form\WPDA_Simple_Form_Item_Boolean;
 	use WPDataAccess\Simple_Form\WPDA_Simple_Form_Item_Enum;
 	use WPDataAccess\WPDA;
 
@@ -63,14 +64,19 @@ namespace WPDataAccess\Data_Publisher {
 				'pub_table_options_searching'     => __( 'Allow searching?', 'wp-data-access' ),
 				'pub_table_options_ordering'      => __( 'Allow ordering?', 'wp-data-access' ),
 				'pub_table_options_paging'        => __( 'Allow paging?', 'wp-data-access' ),
+				'pub_table_options_nl2br'         => __( 'NL > BR?', 'wp-data-access' ),
+				'pub_sort_icons'                  => __( 'Sort icons', 'wp-data-access' ),
 				'pub_table_options_advanced'      => __( 'Table options (advanced)', 'wp-data-access' ),
 			];
 
 			$this->check_table_type = false;
+			$this->title            = __( 'Data Publisher', 'wp-data-access' );
+			$args['help_url']       = 'https://wpdataaccess.com/docs/documentation/data-publisher/';
+			if ( wpda_fremius()->is_premium() ) {
+				$this->title = __( 'Premium', 'wp-data-access' ) . ' ' . $this->title;
+			}
 
 			parent::__construct( $schema_name, $table_name, $wpda_list_columns, $args );
-
-			$this->title = __( 'Data Publisher', 'wp-data-access' );
 		}
 
 		/**
@@ -84,12 +90,12 @@ namespace WPDataAccess\Data_Publisher {
 			?>
 			<a href="javascript:void(0)"
 			   onclick="jQuery('#data_publisher_test_container_<?php echo esc_html( $pub_id ); ?>').toggle()"
-			   class="button <?php echo $disabled; ?>"><?php echo __( 'Test Publication', 'wp-data-access' ); ?></a>
+			   class="button <?php echo $disabled; ?>"><span class="material-icons wpda_icon_on_button">bug_report</span><?php echo __( 'Test Publication', 'wp-data-access' ); ?></a>
 			<a href="javascript:void(0)"
 			   onclick='prompt("<?php echo __( 'Publication Shortcode', 'wp-data-access' ); ?>", "[wpdataaccess pub_id=\"<?php echo $pub_id; ?>\"]")'
-			   class="button <?php echo $disabled; ?>"><?php echo __( 'Show Shortcode', 'wp-data-access' ); ?></a>
+			   class="button <?php echo $disabled; ?>"><span class="material-icons wpda_icon_on_button">code</span><?php echo __( 'Show Shortcode', 'wp-data-access' ); ?></a>
 			<a href="javascript:void(0)" id="button-copy-to-clipboard"
-			   class="button <?php echo $disabled; ?>"><?php echo __( 'Copy Shortcode', 'wp-data-access' ); ?></a>
+			   class="button <?php echo $disabled; ?>"><span class="material-icons wpda_icon_on_button">content_copy</span><?php echo __( 'Copy Shortcode', 'wp-data-access' ); ?></a>
 			<script type='text/javascript'>
 				jQuery(document).ready(function () {
 					var text_to_clipboard = new ClipboardJS("#button-copy-to-clipboard", {
@@ -99,10 +105,10 @@ namespace WPDataAccess\Data_Publisher {
 						}
 					});
 					text_to_clipboard.on('success', function (e) {
-						alert('<?php echo __( 'Shortcode successfully copied to clipboard!' ); ?>');
+						jQuery.notify('<?php echo __( 'Shortcode successfully copied to clipboard!' ); ?>','info');
 					});
 					text_to_clipboard.on('error', function (e) {
-						console.log('<?php echo __( 'Could not copy shortcode to clipboard!' ); ?>');
+						jQuery.notify('<?php echo __( 'Could not copy shortcode to clipboard!' ); ?>','error');
 					});
 				});
 			</script>
@@ -195,11 +201,11 @@ namespace WPDataAccess\Data_Publisher {
 					$form_item->set_enum( $tables );
 					$form_item->set_item_js(
 						'jQuery("#pub_table_name").parent().parent().find("td.icon").append(
-							"<a class=\'button\' href=\'javascript:void(0)\' title=\'' .
+							"<span class=\'material-icons pointer wpda_tooltip\' href=\'javascript:void(0)\' title=\'' .
 							__( "No tables listed? Grant access in front-end settings! Click to see how...", "wp-data-access" ) . '\' ' .
 							'onclick=\'window.open(\"https://wpdataaccess.com/docs/documentation/data-publisher/how-to-setup-and-use-the-data-publisher/\", \"_blank\")\'>' .
-							__( '?', 'wp-data-access' ) .
-							'</a>"
+							'help' .
+							'</span>"
 						);'
 					);
 					$this->form_items[ $i ] = new WPDA_Simple_Form_Item_Enum( $form_item );
@@ -218,32 +224,64 @@ namespace WPDataAccess\Data_Publisher {
 
 				// Prepare selection for column pub_column_names
 				if ( $form_item->get_item_name() === 'pub_column_names' ) {
+					$title = __( 'Select columns shown in publication', 'wp-data-access' );
 					$form_item->set_item_hide_icon( true );
 					$form_item->set_item_js(
-						'jQuery("#pub_column_names").parent().parent().find("td.icon").append("<a id=\'select_columns\' class=\'button\' href=\'javascript:void(0)\' onclick=\'select_columns()\'>' .
-						__( 'Select', 'wp-data-access' ) .
+						'jQuery("#pub_column_names").parent().parent().find("td.icon").append("<a id=\'select_columns\' class=\'button wpda_tooltip\' href=\'javascript:void(0)\' title=\'' . $title . '\' onclick=\'select_columns()\'>' .
+						'<span class=\'material-icons wpda_icon_on_button\'>view_list</span>' . __( 'Select', 'wp-data-access' ) .
 						'</a>");'
 					);
 				}
 
 				// Prepare column label settings
 				if ( $form_item->get_item_name() === 'pub_format' ) {
+					$title = __( 'Define columns for publication (not necessary if already defined in Data Explorer table settings)', 'wp-data-access' );
 					$form_item->set_item_hide_icon( true );
 					$form_item->set_item_class( 'hide_item' );
 					$form_item->set_item_js(
-						'jQuery("#pub_format").parent().parent().find("td.data").append("<a id=\'format_columns\' class=\'button\' href=\'javascript:void(0)\' onclick=\'format_columns()\'>' .
-						__( 'Click to define column labels', 'wp-data-access' ) .
+						'jQuery("#pub_format").parent().parent().find("td.data").append("<a id=\'format_columns\' class=\'button wpda_tooltip\' href=\'javascript:void(0)\' title=\'' . $title . '\' onclick=\'format_columns()\'>' .
+						'<span class=\'material-icons wpda_icon_on_button\'>label</span>' . __( 'Click to define column labels', 'wp-data-access' ) .
 						'</a>");'
 					);
 				}
 
-				if ( 'pub_table_options_searching' === $form_item->get_item_name() ||
-				     'pub_table_options_ordering' === $form_item->get_item_name() ||
-				     'pub_table_options_paging' === $form_item->get_item_name()
+				if (
+					'pub_responsive_popup_title' === $form_item->get_item_name() ||
+					'pub_responsive_cols' === $form_item->get_item_name() ||
+					'pub_responsive_type' === $form_item->get_item_name() ||
+					'pub_responsive_modal_hyperlinks' === $form_item->get_item_name() ||
+					'pub_responsive_icon' === $form_item->get_item_name() ||
+					'pub_default_where' === $form_item->get_item_name() ||
+					'pub_default_orderby' === $form_item->get_item_name() ||
+					'pub_table_options_advanced' === $form_item->get_item_name() ||
+					'pub_sort_icons' === $form_item->get_item_name()
 				) {
-					$form_item->set_enum( [ 'Yes', 'No' ] );
-					$form_item->set_enum_options( [ 'on', 'off' ] );
-					$this->form_items[ $i ] = new WPDA_Simple_Form_Item_Enum( $form_item );
+					$form_item->set_hide_item( true );
+				}
+
+				if ( 'pub_table_options_advanced' === $form_item->get_item_name() ) {
+					if ( '' === $form_item->get_item_value() || null === $form_item->get_item_value() ) {
+						$form_item->set_item_value('{}');
+					}
+				}
+
+				if (
+					'pub_table_options_searching' === $form_item->get_item_name() ||
+					'pub_table_options_ordering' === $form_item->get_item_name() ||
+					'pub_table_options_paging' === $form_item->get_item_name()
+				) {
+					$form_item->set_hide_item( true );
+					$form_item->checkbox_value_on = 'on';
+					if ( 'new' === $this->action ) {
+						$form_item->set_item_value( 'on' );
+					}
+					$this->form_items[ $i ] = new WPDA_Simple_Form_Item_Boolean( $form_item );
+				}
+
+				if ( 'pub_table_options_nl2br' === $form_item->get_item_name() ) {
+					$form_item->set_hide_item( true );
+					$form_item->checkbox_value_on = 'on';
+					$this->form_items[ $i ] = new WPDA_Simple_Form_Item_Boolean( $form_item );
 				}
 
 				$i ++;
@@ -337,30 +375,48 @@ namespace WPDataAccess\Data_Publisher {
 						jQuery('#pub_responsive_icon').parent().parent().hide();
 					}
 				}
-				set_responsive_columns();
 
 				function set_advanced_settings() {
-					if (jQuery('[name="pub_show_advanced_settings"]').is(":checked")) {
+					if (jQuery('#pub_show_advanced_settings_chk').is(':checked')) {
 						// Show advanced settings
 						jQuery('#pub_default_where').parent().parent().show();
 						jQuery('#pub_default_orderby').parent().parent().show();
-						jQuery('#pub_table_options_searching').parent().parent().show();
-						jQuery('#pub_table_options_ordering').parent().parent().show();
-						jQuery('#pub_table_options_paging').parent().parent().show();
+						jQuery('#pub_table_options_searching').parent().parent().parent().show();
 						jQuery('#pub_table_options_advanced').parent().parent().show();
+						jQuery('#pub_sort_icons').parent().parent().show();
 					} else {
 						// Hide advanced settings
 						jQuery('#pub_default_where').parent().parent().hide();
 						jQuery('#pub_default_orderby').parent().parent().hide();
-						jQuery('#pub_table_options_searching').parent().parent().hide();
-						jQuery('#pub_table_options_ordering').parent().parent().hide();
-						jQuery('#pub_table_options_paging').parent().parent().hide();
+						jQuery('#pub_table_options_searching').parent().parent().parent().hide();
 						jQuery('#pub_table_options_advanced').parent().parent().hide();
+						jQuery('#pub_sort_icons').parent().parent().hide();
 					}
 				}
-				set_advanced_settings();
 
 				jQuery(document).ready(function () {
+					pub_table_options_searching = jQuery('#pub_table_options_searching').parent().parent();
+					pub_table_options_ordering = jQuery('#pub_table_options_ordering').parent().parent().children();
+					pub_table_options_ordering_tr = jQuery(pub_table_options_ordering).parent().parent();
+					pub_table_options_paging = jQuery('#pub_table_options_paging').parent().parent().children();
+					pub_table_options_paging_tr = jQuery(pub_table_options_paging).parent().parent();
+					pub_table_options_nl2br = jQuery('#pub_table_options_nl2br').parent().parent().children();
+					pub_table_options_nl2br_tr = jQuery(pub_table_options_nl2br).parent().parent();
+
+					jQuery('<span style="width:10px;display:inline-block;"></span>').appendTo(pub_table_options_searching);
+					pub_table_options_ordering.appendTo(pub_table_options_searching);
+					jQuery('<span style="width:10px;display:inline-block;"></span>').appendTo(pub_table_options_searching);
+					pub_table_options_paging.appendTo(pub_table_options_searching);
+					jQuery('<span style="width:10px;display:inline-block;"></span>').appendTo(pub_table_options_searching);
+					pub_table_options_nl2br.appendTo(pub_table_options_searching);
+
+					pub_table_options_ordering_tr.remove();
+					pub_table_options_paging_tr.remove();
+					pub_table_options_nl2br_tr.remove();
+
+					set_responsive_columns();
+					set_advanced_settings();
+
 					<?php if ( WPDA::OPTION_DP_JSON_EDITING[1] === $json_editing ) { ?>
 					var cm = wp.codeEditor.initialize(jQuery('#pub_table_options_advanced'), cm_settings);
 					<?php } ?>
@@ -385,10 +441,14 @@ namespace WPDataAccess\Data_Publisher {
 						table_columns = [];
 					});
 
-					jQuery('#pub_default_where').parent().parent().find('.icon').empty().append('<span title="Enter a valid sql where clause\nExample: name like \'Peter%\'" class="button">?</span>');
-					jQuery('#pub_default_orderby').parent().parent().find('.icon').empty().append('<span title="Format: column number, direction | ...\nExample: 3,desc|5,asc" class="button">?</span>');
-					jQuery('#pub_table_options_advanced').parent().parent().find('.icon').empty().append('<span title=\'Must be valid JSON like: {"option":"value","option2","value2"}\' class="button">?</span>');
-					jQuery('#pub_table_options_advanced').parent().parent().find('.icon').append(' <a href="https://datatables.net/reference/option/" target="_blank" title="Click to check jQuery DataTables website for available\noptions (opens in a new tab or window)" class="dashicons dashicons-external" style="margin-top:5px;"></a>');
+					jQuery('#pub_default_where').parent().parent().find('.icon').empty().append('<span title="Enter a valid sql where clause, for example:\nfirst_name like \'Peter%\'" class="material-icons pointer wpda_tooltip">help</span>');
+					jQuery('#pub_default_orderby').parent().parent().find('.icon').empty().append('<span title="Format: column number, direction | ...\nExample: 3,desc|5,asc" class="material-icons pointer wpda_tooltip">help</span>');
+					jQuery('#pub_table_options_searching').parent().parent().parent().find('.icon').empty().append('<span title="When paging is disabled, all rows are fetch on page load (this implicitly disables server side processing).\n\nEnable NL > BR to automatically convert New Lines to <BR> tags." class="material-icons pointer wpda_tooltip">help</span>');
+					jQuery('#pub_table_options_advanced').parent().parent().find('.icon').empty().append('<span title=\'Must be valid JSON like:\n{"option":"value","option2","value2"}\' class="material-icons pointer wpda_tooltip">help</span>');
+					jQuery('#pub_table_options_advanced').parent().parent().find('.icon').append('<br/><a href="https://datatables.net/reference/option/" target="_blank" title="Click to check jQuery DataTables website for available\noptions (opens in a new tab or window)" class="dashicons dashicons-external wpda_tooltip" style="margin-top:5px;"></a>');
+					jQuery('#pub_sort_icons').parent().parent().find('.icon').empty().append('<span title="default: show default jQuery DataTables sort icons\nplugin: show plugin (material ui) sort icons\nnone: hide sort icons" class="material-icons pointer wpda_tooltip">help</span>');
+
+					jQuery( '.wpda_tooltip' ).tooltip();
 
 					<?php if ( 'view' === $this->action ) { ?>
 					jQuery('#format_columns').prop("readonly", true).prop("disabled", true).addClass("disabled");
@@ -399,7 +459,7 @@ namespace WPDataAccess\Data_Publisher {
 						set_responsive_columns();
 					});
 
-					jQuery('[name="pub_show_advanced_settings"]').on('change', function () {
+					jQuery('#pub_show_advanced_settings_chk').on('change', function () {
 						set_advanced_settings();
 					});
 				});

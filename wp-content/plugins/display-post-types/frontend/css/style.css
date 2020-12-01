@@ -166,7 +166,7 @@
 	   object-position: bottom center;
 }
 
-.display-post-types .sub-entry h2.dpt-title {
+.display-post-types .sub-entry h3.dpt-title {
 	font-weight: bold !important;
 	line-height: 1.5 !important;
 
@@ -174,8 +174,8 @@
 	padding: 0 !important;
 }
 
-.display-post-types .sub-entry h2.dpt-title,
-.display-post-types .sub-entry h2.dpt-title a {
+.display-post-types .sub-entry h3.dpt-title,
+.display-post-types .sub-entry h3.dpt-title a {
 	font-size: 15px;
 }
 
@@ -258,16 +258,17 @@
 	margin-bottom: 5px;
 }
 
-.dpt-author {
-	display: inline-block;
-
-	margin-right: 5px;
-}
-
+.dpt-author,
 .dpt-date {
 	display: inline-block;
+}
 
-	margin-left: 5px;
+.dpt-author + .dpt-date:before {
+	display: inline-block;
+
+	margin: 0 5px;
+
+	content: '\00B7';
 }
 
 .dpt-grid2 .dpt-featured-content,
@@ -356,7 +357,7 @@
 	letter-spacing: 0;
 }
 
-.display-post-types .dpt-list2 h2.dpt-title {
+.display-post-types .dpt-list2 h3.dpt-title {
 	line-height: 1.25 !important;
 }
 
@@ -542,13 +543,16 @@ https://flickity.metafizzy.co
 
 @media only screen and (min-width: 450px) {
 
-	.multi-col .dpt-entry {
+	.multi-col.mob-wrap .dpt-entry,
+	.multi-col.tab-wrap .dpt-entry {
 		width: 50%;
 		max-width: 50%;
 		flex-basis: 50%;
 	}
 
-	.dpt-wrapper.multi-col.col-nr-2 .dpt-entry {
+	.dpt-wrapper.multi-col.col-nr-2.mob-wrap .dpt-entry,
+	.dpt-wrapper.multi-col.col-nr-2.tab-wrap .dpt-entry,
+	.dpt-wrapper.multi-col.col-nr-2.wide-wrap .dpt-entry {
 		width: 50%;
 		max-width: 50%;
 		flex-basis: 50%;
@@ -565,6 +569,38 @@ https://flickity.metafizzy.co
 		padding-right: 10px;
 		padding-left: 10px;
 	}
+
+	.dpt-list1.mob-wrap .dpt-entry-wrapper,
+	.dpt-list1.tab-wrap .dpt-entry-wrapper,
+	.dpt-list1.wide-wrap .dpt-entry-wrapper {
+		display: flex;
+		align-items: flex-start;
+		align-content: flex-start;
+	}
+
+	.dpt-list1.mob-wrap .dpt-featured-content,
+	.dpt-list1.tab-wrap .dpt-featured-content,
+	.dpt-list1.wide-wrap .dpt-featured-content {
+		margin: 0 20px 0 0;
+		flex-basis: 33.33%;
+	}
+
+	.dpt-list1.mob-wrap .sub-entry,
+	.dpt-list1.tab-wrap .sub-entry,
+	.dpt-list1.wide-wrap .sub-entry {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		justify-content: center;
+		align-self: stretch;
+	}
+
+	.dpt-list1.mob-wrap.right-al .dpt-featured-content,
+	.dpt-list1.tab-wrap.right-al .dpt-featured-content,
+	.dpt-list1.wide-wrap.right-al .dpt-featured-content {
+		margin: 0 0 0 20px;
+		order: 2;
+	}
 }
 
 @media only screen and (min-width: 768px) {
@@ -576,36 +612,11 @@ https://flickity.metafizzy.co
 		flex-basis: 33.33%;
 	}
 
-	.dpt-wrapper.multi-col.col-nr-3.mob-wrap .dpt-entry,
 	.dpt-wrapper.multi-col.col-nr-3.tab-wrap .dpt-entry,
 	.dpt-wrapper.multi-col.col-nr-3.wide-wrap .dpt-entry {
 		width: 33.33%;
 		max-width: 33.33%;
 		flex-basis: 33.33%;
-	}
-
-	.dpt-list1 .dpt-entry-wrapper {
-		display: flex;
-		align-items: flex-start;
-		align-content: flex-start;
-	}
-
-	.dpt-list1 .dpt-featured-content {
-		margin: 0 20px 0 0;
-		flex-basis: 33.33%;
-	}
-
-	.dpt-list1 .sub-entry {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		justify-content: center;
-		align-self: stretch;
-	}
-
-	.dpt-list1.right-al .dpt-featured-content {
-		margin: 0 0 0 20px;
-		order: 2;
 	}
 
 	.display-post-types .flickity-button {
@@ -648,8 +659,8 @@ https://flickity.metafizzy.co
 		font-size: 18px;
 	}
 
-	.display-post-types .wide-wrap .sub-entry h2.dpt-title,
-	.display-post-types .wide-wrap .sub-entry h2.dpt-title a {
+	.display-post-types .wide-wrap .sub-entry h3.dpt-title,
+	.display-post-types .wide-wrap .sub-entry h3.dpt-title a {
 		font-size: 16px;
 	}
 }

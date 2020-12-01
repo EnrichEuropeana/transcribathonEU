@@ -33,8 +33,6 @@ class acyMessage extends acyHook
 
         if (empty($output)) return;
 
-        $this->loadAcyLibrary();
-
         echo '<div id="acym__callout__container">'.$output.'</div>';
 
         $script = '

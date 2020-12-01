@@ -94,7 +94,7 @@ if ( ! is_admin() ) {
                                             $i=1; echo "</div>\n<div class=\"section group tab sepgroup\">\n"; 
                                         }
                                         
-                                            echo  '<div class="col span_1_of_4 collection">';
+                                            echo  '<div class="col span_1_of_4 collection" style="padding: 8px;">';
                                                 echo  '<div class="dcholder">';
                                                 
                                                     $image = json_decode($story['PreviewImage'], true);

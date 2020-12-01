@@ -60,6 +60,7 @@ class TCT_Numbers_Widget extends SiteOrigin_Widget {
 					'options' => array(
 						'uploaded-items' => _x('Documents uploaded','numbers-widget: number of uploaded items (back- and frontend)','transcribathon'),
 						'started-items' => _x('Started documents','numbers-widget: number of started items (back- and frontend)','transcribathon'),
+						'total-characters' => _x('Total Characters','numbers-widget items (back- and frontend)','transcribathon'),
 					)
 				),
 				'tct-numbers-campaign' => array(

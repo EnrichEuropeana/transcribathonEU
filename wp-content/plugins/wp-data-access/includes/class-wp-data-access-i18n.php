@@ -7,14 +7,14 @@
  */
 
 /**
- * Class WP_Data_Access_I18n
+ * Class WP_Data_Access_i18n
  *
  * Loads internationalization files
  *
  * @author  Peter Schulz
  * @since   1.0.0
  */
-class WP_Data_Access_I18n {
+class WP_Data_Access_i18n {
 
 	/**
 	 * Load plugin internationalization files

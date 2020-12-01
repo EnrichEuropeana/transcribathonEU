@@ -4,18 +4,20 @@
  */
 ?>
 <metaslider-toolbar inline-template>
-	<div id="ms-toolbar" class="flex flex-col items-center bg-white h-16 shadow-sm lg:sticky z-999" :class="{'shadow-md':scrolling}">
+	<div id="ms-toolbar"
+		class="flex-col items-center bg-white h-16 shadow-sm lg:sticky z-999"
+		:class="{'shadow-md':scrolling, 'flex': !isIE11}">
 		<div class="container h-full px-6">
 			<div class="flex items-center h-full -mx-4">
-				<div class="flex items-center h-full py-2 px-4">
+				<a href="<?php echo admin_url('admin.php?page=metaslider') ?>" class="flex items-center h-full py-2 px-4">
 					<img style="height:2.3rem;width:2.3rem" width=40 height=40 class="mr-2 rtl:mr-0 rtl:ml-2" src="<?php echo METASLIDER_ADMIN_URL ?>images/metaslider_logo_large.png" alt="MetaSlider">
 					<span class="text-2xl font-sans font-thin text-orange leading-none">
 						<span class="font-normal">Meta</span>Slider
 						<span class="block font-semibold text-sm font-mono text-gray tracking-tight">
-							v<?php echo metaslider_pro_is_active() ?  metaslider_pro_version() . '<span class="ml-1">Premium</span>' : $this->version; ?>
+							<?php echo metaslider_pro_is_active() ? metaslider_pro_version() . '<span class="ml-1">' . __('Premium', 'ml-slider') . '</span>' : $this->version; ?>
 						</span>
 					</span>
-				</div>
+				</a>
 				<?php if ($this->slider) : ?>
 				<div class="flex-grow h-full px-4">
 					<div class="-mx-4 items-center flex h-full">

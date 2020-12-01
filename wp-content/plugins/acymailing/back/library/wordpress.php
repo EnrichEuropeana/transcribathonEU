@@ -8,11 +8,24 @@ define('ACYM_COMPONENT', 'acymailing');
 define('ACYM_DEFAULT_LANGUAGE', 'en-US');
 
 define('ACYM_BASE', '');
-define('ACYM_ROOT', rtrim(ABSPATH, DS.'/').DS);
+$acyAbsPath = ABSPATH;
+if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+    $docRoot = $_SERVER['DOCUMENT_ROOT'];
+    $pos = strpos(ABSPATH, $docRoot);
+    if ($pos !== false) {
+        $docRoot .= substr(ABSPATH, $pos + strlen($docRoot));
+    }
+    $docRoot = rtrim($docRoot, DS.'/').DS;
+    if (str_replace($docRoot, '', WP_PLUGIN_DIR.DS) === 'wp-content/plugins/') {
+        $acyAbsPath = $docRoot;
+    }
+}
+define('ACYM_ROOT', rtrim($acyAbsPath, DS.'/').DS);
 define('ACYM_FOLDER', WP_PLUGIN_DIR.DS.ACYM_COMPONENT.DS);
 define('ACYM_FRONT', ACYM_FOLDER.'front'.DS);
 define('ACYM_BACK', ACYM_FOLDER.'back'.DS);
 define('ACYM_VIEW', ACYM_BACK.'views'.DS);
+define('ACYM_PARTIAL', ACYM_BACK.'partial'.DS);
 define('ACYM_VIEW_FRONT', ACYM_FRONT.'views'.DS);
 define('ACYM_HELPER', ACYM_BACK.'helpers'.DS);
 define('ACYM_CLASS', ACYM_BACK.'classes'.DS);
@@ -38,12 +51,13 @@ define('ACYM_IMAGES', ACYM_MEDIA_URL.'images/');
 define('ACYM_CSS', ACYM_MEDIA_URL.'css/');
 define('ACYM_JS', ACYM_MEDIA_URL.'js/');
 define('ACYM_TEMPLATE_THUMBNAILS', ACYM_UPLOADS_URL.'thumbnails/');
+define('ACYM_CORE_DYNAMICS_URL', plugins_url().'/'.ACYM_COMPONENT.'/back/dynamics/');
 define('ACYM_DYNAMICS_URL', ACYM_UPLOADS_URL.'addons/');
 define('ACYM_ADDONS_FOLDER_PATH', ACYM_UPLOADS_PATH.'addons'.DS);
 
-define('ACYM_MEDIA_FOLDER', str_replace(ABSPATH, '', WP_PLUGIN_DIR).'/'.ACYM_COMPONENT.'/media');
+define('ACYM_MEDIA_FOLDER', str_replace([ABSPATH, ACYM_ROOT], '', WP_PLUGIN_DIR).'/'.ACYM_COMPONENT.'/media');
 define('ACYM_UPLOAD_FOLDER_THUMBNAIL', WP_CONTENT_DIR.DS.'uploads'.DS.ACYM_COMPONENT.DS.'thumbnails'.DS);
-define('ACYM_CUSTOM_PLUGIN_LAYOUT', ACYM_WP_UPLOADS.'plugins'.DS);
+define('ACYM_CUSTOM_PLUGIN_LAYOUT', ACYM_UPLOADS_PATH.'plugins'.DS);
 define('ACYM_LOGS_FOLDER', ACYM_WP_UPLOADS.'logs'.DS);
 
 define('ACYM_CMSV', get_bloginfo('version'));
@@ -53,10 +67,44 @@ define('ACYM_ALLOWHTML', 4);
 
 include_once(rtrim(__DIR__, DS).DS.'punycode.php');
 
+global $acyWPLangCodes;
+$acyWPLangCodes = [
+    'af' => 'af-ZA',
+    'ar' => 'ar-AA',
+    'as' => 'as-AS', // Not sure
+    'az' => 'az-AZ', // Not sure
+    'bo' => 'bo-BO', // Not sure
+    'ca' => 'ca-ES',
+    'cy' => 'cy-GB',
+    'el' => 'el-GR',
+    'eo' => 'eo-XX',
+    'et' => 'et-EE',
+    'eu' => 'eu-ES',
+    'fi' => 'fi-FI',
+    'gd' => 'gd-GD', // Not sure
+    'gu' => 'gu-GU', // Not sure
+    'hr' => 'hr-HR',
+    'hy' => 'hy-AM',
+    'ja' => 'ja-JP',
+    'kk' => 'kk-KK', // Not sure
+    'km' => 'km-KH',
+    'lo' => 'lo-LO', // Not sure
+    'lv' => 'lv-LV',
+    'mn' => 'mn-MN', // Not sure
+    'mr' => 'mr-MR', // Not sure
+    'ps' => 'ps-PS', // Not sure
+    'sq' => 'sq-AL',
+    'te' => 'te-TE',
+    'th' => 'th-TH',
+    'tl' => 'tl-TL', // Not sure
+    'uk' => 'uk-UA',
+    'ur' => 'ur-PK', // Not sure
+    'vi' => 'vi-VN',
+];
 
 global $acymLanguages;
 
-function acym_getTime($date)
+function acym_getTimeOffsetCMS()
 {
     static $timeoffset = null;
     if ($timeoffset === null) {
@@ -64,11 +112,11 @@ function acym_getTime($date)
 
         if (!is_numeric($timeoffset)) {
             $timezone = new DateTimeZone($timeoffset);
-            $timeoffset = $timezone->getOffset(new DateTime);
+            $timeoffset = $timezone->getOffset(new DateTime());
         }
     }
 
-    return strtotime($date) - $timeoffset + date('Z');
+    return $timeoffset;
 }
 
 function acym_fileGetContent($url, $timeout = 10)
@@ -137,21 +185,29 @@ function acym_getFormToken()
 
 function acym_translation($key, $jsSafe = false, $interpretBackSlashes = true)
 {
+    $translation = $key;
+
     global $acymLanguages;
-    if (empty($acymLanguages['currentLanguage'])) acym_getLanguageTag();
+    acym_getLanguageTag();
     if (!isset($acymLanguages[$acymLanguages['currentLanguage']])) acym_loadLanguage();
 
-    $translation = $key;
-    foreach ($acymLanguages[$acymLanguages['currentLanguage']] as $fileContent) {
+    $acymailingEnglishText = '';
+    foreach ($acymLanguages[ACYM_DEFAULT_LANGUAGE] as $fileContent) {
         if (isset($fileContent[$key])) {
-            $translation = $fileContent[$key];
+            $acymailingEnglishText = $fileContent[$key];
+            break;
         }
     }
-    if ($translation == $key && $acymLanguages['currentLanguage'] != ACYM_DEFAULT_LANGUAGE && isset($acymLanguages[ACYM_DEFAULT_LANGUAGE])) {
-        foreach ($acymLanguages[ACYM_DEFAULT_LANGUAGE] as $fileContent) {
-            if (isset($fileContent[$key])) {
-                $translation = $fileContent[$key];
-                break;
+
+    if (!empty($acymailingEnglishText)) {
+        $translation = __($acymailingEnglishText, 'acymailing');
+
+        if ($translation === $acymailingEnglishText && $acymLanguages['currentLanguage'] != ACYM_DEFAULT_LANGUAGE) {
+            foreach ($acymLanguages[$acymLanguages['currentLanguage']] as $fileContent) {
+                if (isset($fileContent[$key])) {
+                    $translation = $fileContent[$key];
+                    break;
+                }
             }
         }
     }
@@ -370,54 +426,22 @@ function acym_getGroups()
 
 function acym_getLanguages($installed = false)
 {
-    $WPLikesToDoItTheWeirdWay = [
-        'af' => 'af-ZA',
-        'ar' => 'ar-AA',
-        'as' => 'as-AS', // Not sure
-        'az' => 'az-AZ', // Not sure
-        'bo' => 'bo-BO', // Not sure
-        'ca' => 'ca-ES',
-        'cy' => 'cy-GB',
-        'el' => 'el-GR',
-        'eo' => 'eo-XX',
-        'et' => 'et-EE',
-        'eu' => 'eu-ES',
-        'fi' => 'fi-FI',
-        'gd' => 'gd-GD', // Not sure
-        'gu' => 'gu-GU', // Not sure
-        'hr' => 'hr-HR',
-        'hy' => 'hy-AM',
-        'ja' => 'ja-JP',
-        'kk' => 'kk-KK', // Not sure
-        'km' => 'km-KH',
-        'lo' => 'lo-LO', // Not sure
-        'lv' => 'lv-LV',
-        'mn' => 'mn-MN', // Not sure
-        'mr' => 'mr-MR', // Not sure
-        'ps' => 'ps-PS', // Not sure
-        'sq' => 'sq-AL',
-        'te' => 'te-TE',
-        'th' => 'th-TH',
-        'tl' => 'tl-TL', // Not sure
-        'uk' => 'uk-UA',
-        'ur' => 'ur-PK', // Not sure
-        'vi' => 'vi-VN',
-    ];
+    global $acyWPLangCodes;
 
     $result = [];
 
-    require_once(ABSPATH.'wp-admin/includes/translation-install.php');
+    require_once ABSPATH.'wp-admin/includes/translation-install.php';
     $wplanguages = wp_get_available_translations();
-
     $languages = get_available_languages();
     foreach ($languages as $oneLang) {
-        if (!empty($WPLikesToDoItTheWeirdWay[$oneLang])) $oneLang = $WPLikesToDoItTheWeirdWay[$oneLang];
+        $wpLangCode = $oneLang;
+        if (!empty($acyWPLangCodes[$oneLang])) $oneLang = $acyWPLangCodes[$oneLang];
         $langTag = str_replace('_', '-', $oneLang);
 
         $lang = new stdClass();
         $lang->sef = empty($wplanguages[$oneLang]['iso'][1]) ? null : $wplanguages[$oneLang]['iso'][1];
         $lang->language = strtolower($langTag);
-        $lang->name = empty($wplanguages[$oneLang]) ? $langTag : $wplanguages[$oneLang]['native_name'];
+        $lang->name = empty($wplanguages[$wpLangCode]) ? $langTag : $wplanguages[$wpLangCode]['native_name'];
         $lang->exists = file_exists(ACYM_LANGUAGE.$langTag.'.'.ACYM_LANGUAGE_FILE.'.ini');
         $lang->content = true;
 
@@ -549,17 +573,22 @@ function acym_redirect($url, $msg = '', $msgType = 'message')
     exit;
 }
 
-function acym_getLanguageTag()
+function acym_getLanguageTag($simple = false)
 {
-    global $acymLanguages;
-    if (!isset($acymLanguages['currentLanguage'])) {
-        $acymLanguages['currentLanguage'] = get_bloginfo("language");
-        if (strpos($acymLanguages['currentLanguage'], '-') === false) {
-            $acymLanguages['currentLanguage'] = $acymLanguages['currentLanguage'].'-'.strtoupper($acymLanguages['currentLanguage']);
-        }
+    if (acym_isAdmin()) {
+        $currentLocale = get_user_locale(acym_currentUserId());
+    } else {
+        $currentLocale = get_locale();
     }
 
-    return $acymLanguages['currentLanguage'];
+    $currentLocale = convertWPLocaleToAcyLocale($currentLocale);
+
+    global $acymLanguages;
+    if (!isset($acymLanguages['currentLanguage']) || $acymLanguages['currentLanguage'] !== $currentLocale) {
+        $acymLanguages['currentLanguage'] = $currentLocale;
+    }
+
+    return $simple ? substr($acymLanguages['currentLanguage'], 0, 2) : $acymLanguages['currentLanguage'];
 }
 
 function acym_baseURI($pathonly = false)
@@ -631,16 +660,17 @@ function acym_loadLanguageFile($extension, $basePath = null, $lang = null, $relo
     $data = acym_fileGetContent($base.$language.'.'.$extension.'.ini');
     $data = str_replace('"_QQ_"', '"', $data);
     $separate = explode("\n", $data);
+    $storeExtension = $extension === ACYM_LANGUAGE_FILE.'_custom' ? ACYM_LANGUAGE_FILE : $extension;
     foreach ($separate as $raw) {
         if (strpos($raw, '=') === false) continue;
 
         $keyval = explode('=', $raw);
         $key = array_shift($keyval);
 
-        $acymLanguages[$acymLanguages['currentLanguage']][$extension][$key] = trim(implode('=', $keyval), "\"\r\n\t ");
+        $acymLanguages[$acymLanguages['currentLanguage']][$storeExtension][$key] = trim(implode('=', $keyval), "\"\r\n\t ");
     }
 
-    if ($language == ACYM_DEFAULT_LANGUAGE) return;
+    if (!empty($acymLanguages[ACYM_DEFAULT_LANGUAGE])) return;
 
     $data = acym_fileGetContent($base.ACYM_DEFAULT_LANGUAGE.'.'.$extension.'.ini');
     $data = str_replace('"_QQ_"', '"', $data);
@@ -738,6 +768,8 @@ function acym_date($time = 'now', $format = null, $useTz = true, $gregorian = fa
 
 function acym_loadObject($query)
 {
+    acym_addLimit($query);
+
     global $wpdb;
     $query = acym_prepareQuery($query);
 
@@ -1046,7 +1078,7 @@ function acym_frontendLink($link, $complete = true)
 
 function acym_getMenu()
 {
-    return null;
+    return get_post();
 }
 
 function acym_extractArchive($archive, $destination)
@@ -1404,6 +1436,127 @@ function acym_cmsPermission()
 function acym_languageOption($emailLanguage, $name)
 {
     return '';
+}
+
+function acym_coreAddons()
+{
+    return [
+        (object)[
+            'title' => acym_translation('ACYM_ARTICLE'),
+            'folder_name' => 'post',
+            'version' => '6.14.1',
+            'active' => '1',
+            'category' => 'Content management',
+            'level' => 'starter',
+            'uptodate' => '1',
+            'features' => '["content"]',
+            'description' => '- Insert WordPress posts in your emails<br/>- Insert the latest posts of a category in an automatic email',
+            'latest_version' => '6.14.1',
+            'core' => '1',
+        ],
+        (object)[
+            'title' => acym_translation('ACYM_PAGE'),
+            'folder_name' => 'page',
+            'version' => '6.14.1',
+            'active' => '1',
+            'category' => 'Content management',
+            'level' => 'starter',
+            'uptodate' => '1',
+            'features' => '["content"]',
+            'description' => '- Insert pages in your emails',
+            'latest_version' => '6.14.1',
+            'core' => '1',
+        ],
+    ];
+}
+
+function convertWPLocaleToAcyLocale($locale)
+{
+    if (strpos($locale, '-') !== false) return $locale;
+
+    global $acyWPLangCodes;
+    if (!empty($acyWPLangCodes[$locale])) return $acyWPLangCodes[$locale];
+
+    if (strpos($locale, '_') === false) {
+        return $locale.'-'.strtoupper($locale);
+    } else {
+        return str_replace('_', '-', $locale);
+    }
+}
+
+function acym_getCmsUserLanguage($userId = null)
+{
+    if ($userId === null) $userId = acym_currentUserId();
+    if (empty($userId)) return '';
+
+    return convertWPLocaleToAcyLocale(get_user_locale($userId));
+}
+
+function acym_getAllPages()
+{
+    $allPges = get_pages();
+    if (empty($allPges)) return [];
+
+    $return = [];
+
+    foreach ($allPges as $page) {
+        $return[$page->ID] = $page->post_title;
+    }
+
+    return $return;
+}
+
+function acym_checkVersion($ajax = false)
+{
+    if (acym_level(1)) {
+        ob_start();
+        $config = acym_config();
+        $url = ACYM_UPDATEURL.'loadUserInformation';
+
+        $paramsForLicenseCheck = [
+            'component' => 'acymailing', // Know which product to look at
+            'level' => strtolower($config->get('level', 'starter')), // Know which version to look at
+            'domain' => rtrim(ACYM_LIVE, '/'), // Tell the user if the automatic features are available for the current installation
+            'version' => $config->get('version'), // Tell the user if a newer version is available
+            'cms' => ACYM_CMS, // We may delay some new Acy versions depending on the CMS
+            'cmsv' => ACYM_CMSV, // Acy isn't available for some versions
+        ];
+
+        $paramsForLicenseCheck['php'] = PHP_VERSION; // Return a warning if Acy cannot be installed with this version
+
+        foreach ($paramsForLicenseCheck as $param => $value) {
+            $url .= '&'.$param.'='.urlencode($value);
+        }
+
+        $userInformation = acym_fileGetContent($url, 30);
+        $warnings = ob_get_clean();
+        $result = (!empty($warnings) && acym_isDebug()) ? $warnings : '';
+
+        if (empty($userInformation) || $userInformation === false) {
+            if ($ajax) {
+                echo json_encode(['content' => '<br/><span style="color:#C10000;">'.acym_translation('ACYM_ERROR_LOAD_FROM_ACYBA').'</span><br/>'.$result]);
+                exit;
+            } else {
+                return '';
+            }
+        }
+
+        $decodedInformation = json_decode($userInformation, true);
+
+        $newConfig = new stdClass();
+
+        $newConfig->latestversion = $decodedInformation['latestversion'];
+        $newConfig->expirationdate = $decodedInformation['expiration'];
+        $newConfig->lastlicensecheck = time();
+        $config->save($newConfig);
+
+        acym_checkPluginsVersion();
+
+        return $newConfig->lastlicensecheck;
+    }
+
+
+    return false;
 }
 
 global $acymCmsUserVars;

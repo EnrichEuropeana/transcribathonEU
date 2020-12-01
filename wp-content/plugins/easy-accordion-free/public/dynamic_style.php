@@ -1,5 +1,6 @@
 <?php
-$custom_css          = eap_get_option( 'ea_custom_css' );
+$settings = get_option( 'sp_eap_settings' );
+$custom_css          = $settings['ea_custom_css'];
 $eap_title_font_load = isset( $shortcode_data['eap_title_font_load'] ) ? $shortcode_data['eap_title_font_load'] : '';
 $eap_desc_font_load  = isset( $shortcode_data['eap_desc_font_load'] ) ? $shortcode_data['eap_desc_font_load'] : '';
 $ea_dynamic_css      = '';

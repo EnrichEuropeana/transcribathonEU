@@ -5,7 +5,7 @@
  * Description: The best Responsive and Touch-friendly drag & drop <strong>Accordion FAQ</strong> builder plugin for WordPress.
  * Author:      ShapedPlugin
  * Author URI:  https://shapedplugin.com/
- * Version:     2.0.6
+ * Version:     2.0.10
  * Text Domain: easy-accordion-free
  * Domain Path: /languages/
  *
@@ -16,6 +16,16 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
+
+/**
+ * The code that runs during plugin activation.
+ * This action is documented in includes/class-easy-accordion-free-activator.php
+ */
+function activate_easy_accordion() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-easy-accordion-free-activator.php';
+	Easy_Accordion_Free_Activator::activate();
+}
+register_activation_hook( __FILE__, 'activate_easy_accordion' );
 
 /**
  * The main class.
@@ -37,7 +47,7 @@ class SP_EASY_ACCORDION_FREE {
 	 *
 	 * @var string
 	 */
-	public $version = '2.0.6';
+	public $version = '2.0.10';
 
 	/**
 	 * The name of the plugin.
@@ -194,7 +204,7 @@ class SP_EASY_ACCORDION_FREE {
 		require_once SP_EA_PATH . '/public/views/scripts.php';
 		require_once SP_EA_PATH . '/admin/class-easy-accordion-free-admin.php';
 		require_once SP_EA_PATH . '/admin/views/help.php';
-		require_once SP_EA_PATH . '/admin/views/eafree-metabox/classes/setup.class.php';
+		require_once SP_EA_PATH . '/admin/views/models/classes/setup.class.php';
 		require_once SP_EA_PATH . '/admin/views/metabox-config.php';
 		require_once SP_EA_PATH . '/admin/views/option-config.php';
 		require_once SP_EA_PATH . '/admin/views/notices/review.php';

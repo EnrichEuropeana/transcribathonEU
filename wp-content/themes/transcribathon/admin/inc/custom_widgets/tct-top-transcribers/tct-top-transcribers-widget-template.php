@@ -163,12 +163,12 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					echo "<li class=\"p".$i."\">";
 					echo "<div class=\"tct-user-banner\"></div>\n"; 
 					if($kind === "campaign"){
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s mile per member', '%s miles per member', (int)$team['MilesPerPerson'], 'transcribathon'  ) ), number_format_i18n((int)$team['MilesPerPerson'],2))."</span>\n";
-						$miles2 = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$team['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$team['Miles']))."</span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$team['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$team['TranscriptionCharacters']))."</span>\n";
-						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$team['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$team['Locations']))."</span>\n";
-						$enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$team['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$team['Enrichments']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2>".$team['TeamName']."</h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
+						// $miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s mile per member', '%s miles per member', (int)$team['MilesPerPerson'], 'transcribathon'  ) ), number_format_i18n((int)$team['MilesPerPerson'],2))."</span>\n";
+						// $miles2 = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$team['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$team['Miles']))."</span>\n";
+						// $chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$team['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$team['TranscriptionCharacters']))."</span>\n";
+						// $locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$team['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$team['Locations']))."</span>\n";
+						// $enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$team['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$team['Enrichments']))."</span>\n";
+						// echo "<span class=\"rang\">".$i."</span><h2>".$team['TeamName']."</h2><p>".$miles." | ".$miles2." <br /><span class=\"chars\">"._x('Achievements in this campaign','top-list','transcribathon').":</span><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
 						
 						
 					}else{
@@ -183,7 +183,7 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 				foreach($topusrs as $usr){
 					$aut = get_user_by('ID',$usr['UserId']);
 					um_fetch_user( $usr['UserId']);
-					echo "<li class=\"p".$i."\">";
+					echo "<li class=\"p".$i."\" style=\"background: #eeeeee; border-top: 8px solid #0c7da7; border-radius: 4px;\">";
 					echo "<div class=\"tct-user-banner ".um_user('role')."\">".ucfirst(um_user('role'))."</div>\n"; 
 					/*
 					$acs = $wpdb->get_results("SELECT ac.*,uc.campaign_title,CASE ac.placing WHEN '1' then uc.campaign_badge_1 WHEN '2' then uc.campaign_badge_2 WHEN '3' then uc.campaign_badge_3 END AS badge FROM ".$wpdb->prefix."user_achievments ac LEFT JOIN ".$wpdb->prefix."user_campaigns uc ON uc.id=ac.campaign WHERE ac.userid='".$usr['userid']."'",ARRAY_A);
@@ -196,38 +196,40 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 					}
 					*/
 					if($kind === "campaign"){
-						$miles = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
-						$locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$usr['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Locations']))."</span>\n";
-						$enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$usr['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Enrichments']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
+						// $miles = "<span class=\"chars\">".sprintf( esc_html( _n( '%s mile in this campaign', '%s total miles in this campaign', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+						// $chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s character', '%s characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
+						// $locs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s location', '%s locations', (int)$usr['Locations'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Locations']))."</span>\n";
+						// $enrs = "<span class=\"chars\">".sprintf( esc_html( _n( '%s enrichment', '%s enrichments', (int)$usr['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Enrichments']))."</span>\n";
+						// echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p><br />".$chars." | ".$locs." | ".$enrs."</p></li>\n";
 						
-						/*
-						if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
-						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile in this campaign', '%s Miles in this campaign', (int)$usr['umiles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['umiles']))."</span>\n";
-						$charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['useramnt'], 'transcribathon'  ) ), number_format_i18n((int)$usr['useramnt']))."</strong></span>\n";
-						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['totalchars'], 'transcribathon'  ) ), number_format_i18n((int)$usr['totalchars']))."</span>\n";
-						echo "<span class=\"rang\">".$i."</span><h2><a href=\"/".ICL_LANGUAGE_CODE."/user/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$charsc."</p><p><p>".$miles." | ".$chars."</p></p></li>\n";
-					*/
+						
+				// if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
+				$charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</strong></span>\n";
+				$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile in this campaign', '%s Miles in this campaign', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+				$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Enrichment', '%s Enrichments', (int)$usr['Enrichments'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Enrichments']))."</span>\n";
+				echo "<span class=\"rang\" style=\"background: #ffffff; border-radius: 7px; color: #0c7da7;\">".$i."</span><h2><a style=\"color: #0c7da7 !important;\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles."</p><p><p>".$charsc." | ".$chars."</p></p></li>\n";
+				// if($showshortnames > 0 && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
+				// $miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
+				// $charsc = "<span class=\"chars\"><strong>".sprintf( esc_html( _n( '%s Character in this campaign', '%s Characters in this campaign', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</strong></span>\n";
+				// $chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['totalchars'], 'transcribathon'  ) ), number_format_i18n((int)$usr['totalchars']))."</span>\n";
+				// $content .= "<span class=\"rang\">".$i."</span><h2><a href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$charsc."</p><p><p>".$miles." | ".$chars."</p></p></li>\n";
+						
 					}else{
 						if(isset($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) && trim($instance['tct-top-transcribers-settings-individuals']['tct-top-transcribers-showteams']) == "1" && trim($usr['teams']) != ""){$temm = " (".str_replace(",",", ",$usr['teams']).")";}else{ $temm = "";}
 						$miles = "<span class=\"milage\">".sprintf( esc_html( _n( '%s Mile', '%s Miles', (int)$usr['Miles'], 'transcribathon'  ) ), number_format_i18n((int)$usr['Miles']))."</span>\n";
 						$chars = "<span class=\"chars\">".sprintf( esc_html( _n( '%s Character', '%s Characters', (int)$usr['TranscriptionCharacters'], 'transcribathon'  ) ), number_format_i18n((int)$usr['TranscriptionCharacters']))."</span>\n";
 						if ($aut != null) {
-							echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+							echo "<span class=\"rang\" style=\"background: #ffffff; border-radius: 7px; color: #0c7da7;\">".$i."</span><h2><a target=\"_blank\" href=\"".network_home_url()."profile/".$aut->user_nicename."/\">".um_user('display_name')."</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
 						}
 						else {
-							echo "<span class=\"rang\">".$i."</span><h2><a target=\"_blank\" href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
-						}
+							echo "<span class=\"rang\" style=\"background: #ffffff; border-radius: 7px; color: #0c7da7;\">".$i."</span><h2><a target=\"_blank\" href=\"Placeholder User\">Placeholder User</a><span class=\"teammem\">".$temm."</span></h2><p>".$miles." | ".$chars."</p></li>\n";
+						} 
 					}
 					$i++;
 				}
 			}
 			echo "</ul>\n";
-		}else{
-			echo "<p>".$instance['tct-top-transcribers-nothingtoshow']."</p>";
-			
-		}
+		
 	echo "</div>\n"; // #tu_list...
 	$showttmenu = 0;
 	echo "<div id=\"ttnav_".$myid."\" class=\"ttnav ".$subject."\" style='height:50px'>\n";
@@ -258,7 +260,10 @@ if($instance['tct-top-transcribers-headline'] != ""){ echo "<h1>".str_replace("\
 	//Create loading wheel
 	echo '<div id="top-transcribers-spinner" class="spinner" style="float:right; display:none;"></div>';
 	echo "</div>\n"; // #ttnav_...
-	
+	}else{
+		echo "<p>".$instance['tct-top-transcribers-nothingtoshow']."</p>";
+		
+	}
 	//Show own rank below ranking
 	/*
 	if($subject != "teams"){

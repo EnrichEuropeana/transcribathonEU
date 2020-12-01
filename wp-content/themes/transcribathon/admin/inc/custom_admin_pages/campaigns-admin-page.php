@@ -143,7 +143,9 @@ function _TCT_campaigns_admin_page( $atts ) {
                           data['End'] = endDate[2] + '-' + endDate[1] + '-' + endDate[0];
                           data['End'] += ' '  + jQuery('#admin-campaign-' + campaignId + '-endTime').val();
                         }
-                        data['DatasetId'] = jQuery('#admin-campaign-' + campaignId + '-dataset').val();
+                        if (jQuery('#admin-campaign-' + campaignId + '-dataset').val() != 'null') {
+                            data['DatasetId'] = jQuery('#admin-campaign-' + campaignId + '-dataset').val();
+                        }
                         data['Public'] = 0;
                         if (jQuery('#admin-campaign-' + campaignId + '-public').prop('checked')) {
                             data['Public'] = 1

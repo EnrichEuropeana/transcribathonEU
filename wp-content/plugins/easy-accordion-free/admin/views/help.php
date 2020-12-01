@@ -97,7 +97,7 @@ class Easy_Accordion_Free_Help {
 						<i class="sp-eap-font-icon fa fa-file-text"></i>
 						<h3>' . esc_html__( 'Looking for Documentation?', 'easy-accordion-free' ) . '</h3>
 						<p>' . esc_html__( 'We have detailed documentation on every aspects of Easy Accordion.', 'easy-accordion-free' ) . '</p>
-						<a href="https://shapedplugin.com/docs/docs/easy-accordion/" target="_blank" class="button button-primary">' . esc_html__( 'Documentation', 'easy-accordion-free' ) . '</a>
+						<a href="https://shapedplugin.com/docs/docs/easy-accordion/introduction/" target="_blank" class="button button-primary">' . esc_html__( 'Documentation', 'easy-accordion-free' ) . '</a>
 					</div>
 				</div>
 				<div class="col">

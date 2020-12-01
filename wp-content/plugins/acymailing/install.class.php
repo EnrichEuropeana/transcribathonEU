@@ -6,7 +6,7 @@ class acymInstall
 {
     var $cms = 'WordPress';
     var $level = 'enterprise';
-    var $version = '6.10.3';
+    var $version = '6.14.1';
     var $update = false;
     var $fromLevel = '';
     var $fromVersion = '';
@@ -168,7 +168,7 @@ class acymInstall
             return false;
         }
 
-        if (version_compare($this->fromVersion, '6.10.3', '<')) {
+        if (!empty($this->fromVersion) && version_compare($this->fromVersion, '6.10.3', '<')) {
             $config = acym_config();
             $config->setLicenseKeyByDomain();
         }
@@ -219,8 +219,8 @@ class acymInstall
                 'CREATE TABLE IF NOT EXISTS `#__acym_history` (
                     `user_id` INT NOT NULL,
                     `date` INT NOT NULL,
-                    `ip` varchar(16) DEFAULT NULL,
-                    `action` varchar(50) NOT NULL,
+                    `ip` VARCHAR(16) DEFAULT NULL,
+                    `action` VARCHAR(50) NOT NULL,
                     `data` text,
                     `source` text,
                     `mail_id` MEDIUMINT DEFAULT NULL,
@@ -632,7 +632,101 @@ class acymInstall
         }
 
         if (version_compare($this->fromVersion, '6.10.2', '<')) {
-            $this->updateQuery('ALTER TABLE #__acym_mail ADD COLUMN `links_language` varchar(50) NOT NULL DEFAULT ""');
+            $this->updateQuery('ALTER TABLE #__acym_mail ADD COLUMN `links_language` VARCHAR(10) NOT NULL DEFAULT ""');
+        }
+
+        if (version_compare($this->fromVersion, '6.10.4', '<')) {
+            $columnsUser = acym_getColumns('user');
+            if (!empty($columnsUser)) {
+                foreach ($columnsUser as $i => $oneColumn) {
+                    $columnsUser[$i] = acym_escapeDB($oneColumn);
+                }
+
+                $customFieldsWrongNamekey = acym_loadObjectList('SELECT * FROM #__acym_field WHERE namekey IN ('.implode(', ', $columnsUser).')');
+                $fieldClass = acym_get('class.field');
+
+                foreach ($customFieldsWrongNamekey as $field) {
+                    $field->namekey = $fieldClass->generateNamekey($field->name);
+                    $fieldClass->save($field);
+                }
+            }
+
+            $this->updateQuery('ALTER TABLE #__acym_mail CHANGE `type` `type` VARCHAR(30) NOT NULL');
+            $this->updateQuery('ALTER TABLE #__acym_mail CHANGE `media_folder` `media_folder` VARCHAR(100) NULL');
+            $this->updateQuery('ALTER TABLE #__acym_mail CHANGE `links_language` `links_language` VARCHAR(10) NOT NULL');
+        }
+
+        if (version_compare($this->fromVersion, '6.11.0', '<')) {
+            $splashscreenHelper = acym_get('helper.splashscreen');
+            $splashscreenHelper->setDisplaySplashscreenForViewName('bounces', 1);
+
+            $this->updateQuery('ALTER TABLE #__acym_mail ADD `access` VARCHAR(50) NOT NULL DEFAULT ""');
+            $this->updateQuery('ALTER TABLE #__acym_list ADD `access` VARCHAR(50) NOT NULL DEFAULT ""');
+
+            $sourceMap = [
+                'wordpress_profile' => 'WordPress user profile',
+                'backend_management' => 'Back-end',
+                'frontend_management' => 'Front-end',
+                'auto_on_sending' => 'When sending a test',
+                'menu_' => 'Menu n°',
+                'mod_' => 'Module n°',
+                '_frontregister' => ' registration form',
+                'import_' => 'Import on ',
+            ];
+
+            foreach ($sourceMap as $oldSource => $newSource) {
+                acym_query('UPDATE `#__acym_user` SET `source` = REPLACE(`source`, '.acym_escapeDB($oldSource).', '.acym_escapeDB($newSource).')');
+            }
+
+            $this->updateQuery('ALTER TABLE #__acym_list ADD `description` TEXT NOT NULL DEFAULT ""');
+        }
+
+        if (version_compare($this->fromVersion, '6.12.0', '<')) {
+            $this->updateQuery('ALTER TABLE #__acym_user ADD `tracking` TINYINT(1) NOT NULL DEFAULT 1');
+            $this->updateQuery('ALTER TABLE #__acym_list ADD `tracking` TINYINT(1) NOT NULL DEFAULT 1');
+            $this->updateQuery('ALTER TABLE #__acym_mail ADD `tracking` TINYINT(1) NOT NULL DEFAULT 1');
+            $this->updateQuery('ALTER TABLE #__acym_plugin ADD `settings` LONGTEXT NULL');
+        }
+
+        if (version_compare($this->fromVersion, '6.13.0', '<')) {
+            $this->updateQuery('ALTER TABLE #__acym_plugin ADD `core` TINYINT(1) NOT NULL DEFAULT 0');
+            $this->updateQuery('ALTER TABLE #__acym_plugin CHANGE `latest_version` `latest_version` VARCHAR(10) NOT NULL');
+        }
+
+        if (version_compare($this->fromVersion, '6.14.0', '<')) {
+            $this->updateQuery(
+                'CREATE TABLE IF NOT EXISTS `#__acym_form` (
+                        	`id` INT NOT NULL AUTO_INCREMENT,
+                        	`name` VARCHAR(255) NOT NULL,
+                        	`creation_date` DATETIME NOT NULL,
+                        	`active` TINYINT(1) NOT NULL DEFAULT 1,
+                        	`type` VARCHAR(20) NOT NULL,
+                        	`lists_options` LONGTEXT,
+                        	`fields_options` LONGTEXT,
+                        	`style_options` LONGTEXT,
+                        	`button_options` LONGTEXT,
+                        	`image_options` LONGTEXT,
+                        	`delay` SMALLINT(10),
+                        	`pages` TEXT,
+                        	PRIMARY KEY (`id`)
+                        )
+                        	ENGINE = InnoDB;'
+            );
+
+            if (file_exists(ACYM_ADDONS_FOLDER_PATH.'Volumes')) {
+                $wrongAddons = acym_getFolders(ACYM_ADDONS_FOLDER_PATH.'Volumes'.DS.'workspace'.DS.'acymailing'.DS.'addons'.DS);
+
+                $pluginsController = acym_get('controller.plugins');
+                foreach ($wrongAddons as $oneGoneWrong) {
+                    $pluginsController->downloadUpload($oneGoneWrong, false);
+                }
+
+                acym_deleteFolder(ACYM_ADDONS_FOLDER_PATH.'Volumes');
+            }
+
+            $this->updateQuery('ALTER TABLE #__acym_user ADD `language` VARCHAR(10) NOT NULL');
+            $this->updateQuery('ALTER TABLE #__acym_mail ADD `language` VARCHAR(10) NOT NULL');
+            $this->updateQuery('ALTER TABLE #__acym_mail ADD `parent_id` INT NULL');
         }
     }
 

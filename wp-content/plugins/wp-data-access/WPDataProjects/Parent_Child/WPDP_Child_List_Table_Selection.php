@@ -50,12 +50,28 @@ namespace WPDataProjects\Parent_Child {
 		 */
 		public function show() {
 			parent::show();
+
+			// Prepare url back button
+			if ( is_admin() ) {
+				$url = '?page=' . esc_attr( $this->page );
+			} else {
+				$url = '';
+			}
+			global $wpdb;
+			if ( '' !== $this->schema_name && $wpdb->dbname !== $this->schema_name ) {
+				$url .= $url === '' ? '?' : '&';
+				$url .= 'schema_name=' . esc_attr( $this->schema_name );
+			}
+			$url .= $url === '' ? '?' : '&';
+			$url .= 'table_name=' . esc_attr( $this->table_name ) . esc_attr( $this->add_parent_args_to_back_button() ) . $this->page_number_link;
 			?>
 			<div style="padding-top:5px;padding-left:3px;">
-				<input type="button"
-					   onclick="javascript:location.href='?page=<?php echo esc_attr( $this->page ); ?><?php echo '' === $this->schema_name ? '' : '&schema_name=' . esc_attr( $this->schema_name ); ?>&table_name=<?php echo esc_attr( $this->table_name ); ?><?php echo esc_attr( $this->add_parent_args_to_back_button() ); ?><?php echo $this->page_number_link; ?>'"
-					   class="button button-secondary"
-					   value="<?php echo __( 'Back To Child List', 'wp-data-access' ); ?>">
+				<button type="button"
+					   	onclick="javascript:window.location.href='<?php echo $url; ?>'"
+					   	class="button button-secondary">
+					<span class="material-icons wpda_icon_on_button">arrow_back</span>
+					<?php echo __( 'Child List', 'wp-data-access' ); ?>
+				</button>
 			</div>
 			<?php
 		}

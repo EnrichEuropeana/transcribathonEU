@@ -98,7 +98,7 @@ $storyPage = $_GET['ps'];
  else {
     $url .= "&rows=24&start=0";
  }
- //var_dump($url); 
+ $url .= "&sort=StoryId%20desc";
  $requestType = "GET";
 
  include get_stylesheet_directory() . '/admin/inc/custom_scripts/send_api_request.php';
@@ -170,6 +170,7 @@ $storyPage = $_GET['ps'];
  else {
     $url .= "&rows=24&start=0";
  }
+ $url .= "&sort=Timestamp%20desc";
 
  $requestType = "GET";
 
@@ -192,6 +193,15 @@ $storyPage = $_GET['ps'];
  // #### Item Solr request end ####
  
 
+
+// Get status data
+$url = home_url()."/tp-api/completionStatus";
+$requestType = "GET";
+
+include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+
+// Save status data
+$statusTypes = json_decode($result, true);
 
  $content = "";
 
@@ -229,7 +239,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
     $storyTabContent .= '<section class="temp-back">';
         $storyTabContent .= '<div class="facet-form-search">';
-            $storyTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qs" form="story-facet-form"></div>';
+            $storyTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qs" form="story-facet-form" value='.$_GET['qs'].'></div>';
             $storyTabContent .= '<div><button type="submit" form="story-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
             $storyTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button"><i class="fal fa-globe-europe" style="font-size: 20px;"></i></a></div>';
             $storyTabContent .= '<div style="clear:both;"></div>';
@@ -237,7 +247,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
     $storyTabContent .= '</section>';
 
     $itemTabContent .= '<section class="temp-back">';
-        $itemTabContent .= '<div class="facet-form-search">';;
+        $itemTabContent .= '<div class="facet-form-search">';
             $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form"></div>';
             $itemTabContent .= '<div><button type="submit" form="item-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
             $itemTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button"><i class="fal fa-globe-europe" style="font-size: 20px;"></i></a></div>';
@@ -584,15 +594,6 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
                                 // Progress bar
 
-                                // Get status data
-                                $url = home_url()."/tp-api/completionStatus";
-                                $requestType = "GET";
-
-                                include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
-
-                                // Save status data
-                                $statusTypes = json_decode($result, true);
-
                                 $statusData = array();
                                 foreach ($statusTypes as $statusType) {
                                     $statusObject = new stdClass;
@@ -647,8 +648,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
                                             $status->Amount += (100 - $totalPercent);
                                         }
                                     }
-                                }
-                                                                        
+                                }                         
                                 $storyTabContent .= '<div class="box-progress-bar item-status-chart">';
 
                                     // Status hover info box

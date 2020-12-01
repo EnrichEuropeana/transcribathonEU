@@ -1,7 +1,54 @@
-var WPTB_DropHandle = function (thisElem, e) {
-    
+var WPTB_DropHandle = function (thisElem, e, hide = false) {
+
     let wptbDropHandle,
-        wptbDropBorderMarker;
+        wptbDropBorderMarker,
+        wptbDropBorderMarkerTop,
+        wptbDropBorderMarkerRight,
+        wptbDropBorderMarkerBottom,
+        wptbDropBorderMarkerLeft;
+
+    /**
+     * Add px suffix to a value
+     *
+     * @param {any} val value
+     * @returns {string} string value suffixed with px
+     */
+    function toPx(val){
+        return `${val}px`;
+    }
+
+    if(WPTB_Helper.getDragRelativeType() === 'td_relative'){
+        let cellRelatedDropHandle = document.querySelector('.wptb-cell-related-drop-handle');
+        if(hide && cellRelatedDropHandle ){
+            cellRelatedDropHandle.style.display = 'none';
+            return;
+        }
+       if(cellRelatedDropHandle === null){
+           const range = document.createRange();
+           range.setStart(document.body , 0);
+
+           const shadowRoot = range.createContextualFragment('<div class="wptb-cell-related-drop-handle">Add to cell</div>').children[0];
+
+           document.body.appendChild(shadowRoot);
+           cellRelatedDropHandle = shadowRoot.children[0];
+       }
+
+       const parentTd = WPTB_Helper.getParentOfType('td', thisElem);
+       const {top,left,width,height} = parentTd.getBoundingClientRect();
+
+       if(!cellRelatedDropHandle){
+           return;
+       }
+
+        cellRelatedDropHandle.style.display = 'flex';
+        cellRelatedDropHandle.style.top = toPx(top);
+        cellRelatedDropHandle.style.width = toPx(width);
+        cellRelatedDropHandle.style.height = toPx(height);
+        cellRelatedDropHandle.style.left = toPx(left);
+
+       return;
+    }
+
     if ( document.getElementsByClassName( 'wptb-drop-handle' ).length == 0 ) {
         wptbDropHandle = document.createElement( 'div' );
         wptbDropHandle.classList.add( 'wptb-drop-handle' );
@@ -9,10 +56,10 @@ var WPTB_DropHandle = function (thisElem, e) {
         wptbDropBorderMarker = document.createElement( 'div' );
         wptbDropBorderMarker.classList.add( 'wptb-drop-border-marker' );
         
-        let wptbDropBorderMarkerTop = document.createElement( 'div' ),
-            wptbDropBorderMarkerRight = document.createElement( 'div' ),
-            wptbDropBorderMarkerBottom = document.createElement( 'div' ),
-            wptbDropBorderMarkerLeft = document.createElement( 'div' );
+        wptbDropBorderMarkerTop = document.createElement( 'div' ),
+        wptbDropBorderMarkerRight = document.createElement( 'div' ),
+        wptbDropBorderMarkerBottom = document.createElement( 'div' ),
+        wptbDropBorderMarkerLeft = document.createElement( 'div' );
         
         wptbDropBorderMarkerTop.classList.add( 'wptb-drop-border-marker-top' );
         wptbDropBorderMarkerRight.classList.add( 'wptb-drop-border-marker-right' );
@@ -31,11 +78,14 @@ var WPTB_DropHandle = function (thisElem, e) {
         }
         
         wptbDropHandle.ondragenter = function () {
-
+            if (e.target.classList.contains('wptb-empty')) {
+                e.preventDefault();
+                return false;
+            }
         }
 
         wptbDropHandle.ondragover = function (e) {
-            e.preventDefault();
+            e.preventDefault();            
         }
 
         wptbDropHandle.ondragleave = function () {
@@ -61,6 +111,7 @@ var WPTB_DropHandle = function (thisElem, e) {
                 if ( thisElem.nodeName.toLowerCase() == 'td' ) {
                     td = wptbDropHandle.getDOMParentElement();
                     td.appendChild( element );
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 }
             } else {
                 let innerElement = wptbDropHandle.getDOMParentElement();
@@ -68,9 +119,11 @@ var WPTB_DropHandle = function (thisElem, e) {
                 
                 if( wptbDropHandle.dataset.text == 'Above Element' ) {
                     td.insertBefore( element, innerElement );
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 } else if( wptbDropHandle.dataset.text == 'Below Element' ) {
                     let innerElementNext = innerElement.nextSibling;
                     td.insertBefore( element, innerElementNext );
+                    WPTB_Helper.wptbDocumentEventGenerate('element:mounted:dom', element);
                 }
             }
             
@@ -81,13 +134,6 @@ var WPTB_DropHandle = function (thisElem, e) {
                 if( table.classList.contains( 'wptb-table-preview-head' ) ) {
                     WPTB_Helper.dataTitleColumnSet( table );
                 }
-            }
-            
-            // start item javascript if item is new
-            let infArr = element.className.match(/wptb-element-(.+)-(\d+)/i);
-            let elemKind = infArr[1];
-            if ( e.dataTransfer.getData( 'wptbElement' ) && ( elemKind == 'text' || elemKind == 'button' || elemKind == 'image' || elemKind == 'star_rating' || elemKind == 'list' ) ) {
-                //WPTB_Helper.elementStartScript( element );
             }
             
             wptbDropHandle.style.display = 'none';
@@ -110,7 +156,12 @@ var WPTB_DropHandle = function (thisElem, e) {
         wptbDropBorderMarker = document.getElementsByClassName( 'wptb-drop-border-marker' )[0];
     }
     if( thisElem && thisElem.nodeName.toLowerCase() == 'td' && 
-            thisElem.getElementsByClassName( 'wptb-ph-element' ).length != 0 ) {
+            thisElem.getElementsByClassName( 'wptb-ph-element' ).length != 0) {
+        return;
+    }
+
+    if( thisElem && thisElem.nodeName.toLowerCase() == 'td' && 
+            thisElem.classList.contains('wptb-empty')) {
         return;
     }
     

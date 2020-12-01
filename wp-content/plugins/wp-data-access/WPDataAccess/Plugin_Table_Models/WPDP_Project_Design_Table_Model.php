@@ -422,6 +422,41 @@ namespace WPDataAccess\Plugin_Table_Models {
 				$this->wpda_table_design->tableinfo->default_orderby =
 					sanitize_text_field( wp_unslash( $_REQUEST['default_orderby'] ) );
 			}
+
+			$settings_db = WPDA_Table_Settings_Model::query( $this->wpda_table_name, $this->wpda_schema_name );
+			if ( isset( $settings_db[0]['wpda_table_settings'] ) && '' !== $settings_db[0]['wpda_table_settings'] ) {
+				$settings = json_decode( $settings_db[0]['wpda_table_settings'] );
+				if ( isset( $settings->hyperlinks ) && is_array( $settings->hyperlinks ) ) {
+					$hyperlinks       = [];
+					$hyperlinks_child = [];
+					foreach ( $settings->hyperlinks as $hyperlink ) {
+						if ( isset( $hyperlink->hyperlink_label ) ) {
+							if ( isset( $_REQUEST[ "{$hyperlink->hyperlink_label}_hyperlink" ] ) ) {
+								$hyperlinks[ $hyperlink->hyperlink_label ] = true;
+							} else {
+								$hyperlinks[ $hyperlink->hyperlink_label ] = false;
+							}
+
+							if ( isset( $_REQUEST[ "{$hyperlink->hyperlink_label}_hyperlink_child" ] ) ) {
+								$hyperlinks_child[ $hyperlink->hyperlink_label ] = true;
+							} else {
+								$hyperlinks_child[ $hyperlink->hyperlink_label ] = false;
+							}
+						}
+					}
+					$this->wpda_table_design->tableinfo->hyperlinks_parent = $hyperlinks;
+					$this->wpda_table_design->tableinfo->hyperlinks_child  = $hyperlinks_child;
+				}
+			}
+
+			if ( has_filter('wpda_data_projects_save_table_option') ) {
+				$this->wpda_table_design->tableinfo->custom_table_settings = apply_filters(
+					'wpda_data_projects_save_table_option',
+					'',
+					$this->wpda_schema_name,
+					$this->wpda_table_name
+				);
+			}
 		}
 
 		/**
@@ -435,15 +470,16 @@ namespace WPDataAccess\Plugin_Table_Models {
 				$i                        = 0;
 				foreach ( $_REQUEST['list_item_name'] as $column_name ) {
 					$tableform_column_options[] = [
-						'column_name' => $column_name,
-						'label'       => isset( $_REQUEST[ $column_name ] ) ?
+						'column_name'     => $column_name,
+						'label'           => isset( $_REQUEST[ $column_name ] ) ?
 							sanitize_text_field( wp_unslash( $_REQUEST[ $column_name ] ) ) :
 							ucfirst( str_replace( '_', ' ', $column_name ) ),
-						'less'        => isset( $_REQUEST["{$column_name}_less"] ) ? 'on' : 'off',
-						'show'        => isset( $_REQUEST["{$column_name}_show"] ) ? 'on' : 'off',
-						'lookup'      => isset( $_REQUEST["{$column_name}_lookup"] ) ?
+						'less'            => isset( $_REQUEST["{$column_name}_less"] ) ? 'on' : 'off',
+						'show'            => isset( $_REQUEST["{$column_name}_show"] ) ? 'on' : 'off',
+						'lookup'          => isset( $_REQUEST["{$column_name}_lookup"] ) ?
 							sanitize_text_field( wp_unslash( $_REQUEST["{$column_name}_lookup"] ) ) :
 							false,
+						'hide_lookup_key' => isset( $_REQUEST["{$column_name}_hide_lookup_key"] ) ? 'on' : 'off',
 					];
 					if ( isset( $_REQUEST["{$column_name}_default"] ) && '' !== $_REQUEST["{$column_name}_default"] ) {
 						$tableform_column_options[ $i ]['default'] =
@@ -488,6 +524,7 @@ namespace WPDataAccess\Plugin_Table_Models {
 						"tab_label" => "",
 						"default_where" => "",
 						"default_orderby" => "",
+						"custom_table_settings" => "",
 					];
 				} else {
 					// Remove non existing columns from arrays.
@@ -685,6 +722,7 @@ namespace WPDataAccess\Plugin_Table_Models {
 				"tab_label" => "",
 				"default_where" => "",
 				"default_orderby" => "",
+				"custom_table_settings" => "",
 			];
 
 			$wpda_list_columns    = WPDA_List_Columns_Cache::get_list_columns( $wpda_schema_name, $wpda_table_name );
@@ -758,6 +796,50 @@ namespace WPDataAccess\Plugin_Table_Models {
 			}
 
 			return $result_update;
+		}
+
+		/**
+		 * Get table design from function arguments instead of HTTP arguments
+		 *
+		 * @param $wpda_schema_name
+		 * @param $wpda_table_name
+		 * @param $wpda_set_name
+		 *
+		 * @return mixed|null
+		 */
+		public static function static_query( $wpda_schema_name, $wpda_table_name, $wpda_set_name ) {
+			$wpda_table_design_raw = self::do_static_query( $wpda_schema_name, $wpda_table_name, $wpda_set_name );
+
+			global $wpdb;
+			if ( $wpdb->num_rows === 0 && $wpda_set_name !== 'default' ) {
+				$wpda_table_design_raw = self::do_static_query( $wpda_schema_name, $wpda_table_name, 'default' );
+			}
+
+			if ( $wpdb->num_rows > 0 ) {
+				return json_decode( $wpda_table_design_raw[0]['wpda_table_design'] );
+			} else {
+				return null;
+			}
+		}
+
+		protected static function do_static_query( $wpda_schema_name, $wpda_table_name, $wpda_set_name ) {
+			global $wpdb;
+			$query =
+				$wpdb->prepare( "
+							SELECT wpda_table_design
+							  FROM " . self::get_base_table_name() . "
+							 WHERE wpda_schema_name = %s
+							  AND  wpda_table_name = %s
+							  AND  wpda_table_setname = %s
+						",
+					[
+						$wpda_schema_name,
+						$wpda_table_name,
+						$wpda_set_name,
+					]
+				);
+
+			return $wpdb->get_results( $query, 'ARRAY_A' );
 		}
 
 	}

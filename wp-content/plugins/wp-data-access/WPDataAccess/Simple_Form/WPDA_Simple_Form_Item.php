@@ -356,11 +356,11 @@ namespace WPDataAccess\Simple_Form {
 
 			if ( true === $this->hide_item ) {
 				?>
-				<tr style='visibility:collapse' class='<?php echo esc_attr( $row_class ); ?>'>
+				<tr style='display:none'<?php echo ''===$row_class ? '' : ' class="' . esc_attr( $row_class ) . '"'; ?>>
 				<?php
 			} else {
 				?>
-				<tr class='<?php echo esc_attr( $row_class ); ?>'>
+				<tr <?php echo ''===$row_class ? '' : ' class="' . esc_attr( $row_class ) . '"'; ?>>
 				<?php
 			}
 
@@ -389,6 +389,7 @@ namespace WPDataAccess\Simple_Form {
 			<td class="label" <?php echo $style; ?>>
 				<label for="<?php echo esc_attr( $this->item_name ); ?>"
 					   title="<?php echo $label_title; ?>"
+					   class="wpda_tooltip"
 				>
 					<?php echo 'NO' === $this->is_nullable ? '*' : ''; ?>
 					<?php echo esc_attr( $label_before ); ?>

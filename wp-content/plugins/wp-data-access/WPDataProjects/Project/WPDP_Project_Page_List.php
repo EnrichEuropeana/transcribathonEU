@@ -80,11 +80,14 @@ namespace WPDataProjects\Project {
 		protected function column_default_add_action( $item, $column_name, &$actions ) {
 			$actions['shortcode'] = sprintf(
 				'<a href="javascript:void(0)" 
-                                    class="view"  
-                                    onclick=\'prompt("%s", "[wpdadiehard project_id=\"%s\" page_id=\"%s\"]")\'>
-                                    %s
-                                </a>
-                                ',
+					class="view"  
+					onclick=\'prompt("%s", "[wpdadiehard project_id=\"%s\" page_id=\"%s\"]")\'>
+					<span style="white-space:nowrap">
+						<span class="material-icons wpda_icon_on_button">code</span>
+						%s
+					</span>
+				</a>
+				',
 				__( 'Project Page Shortcode', 'wp-data-access' ),
 				$item['project_id'],
 				$item['page_id'],

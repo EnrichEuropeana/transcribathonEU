@@ -33,6 +33,7 @@ class Easy_Accordion_Free_Updates {
 	 */
 	private static $updates = [
 		'2.0.6' => 'updates/update-2.0.6.php',
+		'2.0.7' => 'updates/update-2.0.7.php',
 	];
 
 	/**
@@ -57,8 +58,8 @@ class Easy_Accordion_Free_Updates {
 		$installed_version = get_option( 'easy_accordion_free_version' );
 
 		if ( false === $installed_version ) {
-			update_option( 'easy_accordion_free_version', '2.0.6' );
-			update_option( 'easy_accordion_free_db_version', '2.0.6' );
+			update_option( 'easy_accordion_free_version', SP_EA_VERSION );
+			update_option( 'easy_accordion_free_db_version', SP_EA_VERSION );
 		}
 
 		if ( version_compare( $installed_version, SP_EA_VERSION, '<' ) ) {

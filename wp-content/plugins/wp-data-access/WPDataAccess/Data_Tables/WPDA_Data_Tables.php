@@ -34,6 +34,7 @@ namespace WPDataAccess\Data_Tables {
 		 * and SQL injection.
 		 *
 		 * @param int    $pub_id Publication ID.
+		 * @param string $pub_name Publication name.
 		 * @param string $database Database name.
 		 * @param string $table_name Database table name.
 		 * @param string $column_names Comma seperated list of column names.
@@ -41,17 +42,20 @@ namespace WPDataAccess\Data_Tables {
 		 * @param int    $responsive_cols Number of columns to be displayd in responsive mode.
 		 * @param string $responsive_type Modal, Collaped or Expanded (only if $responsive = Yes).
 		 * @param string $responsive_icon Yes = show icon, No = do not show icon (only if $responsive = Yes).
-		 * @param string $sql_where SQL default where clause
 		 * @param string $sql_orderby SQL default order by
+		 * @param string $filter_field_name Filter field name (CSV)
+		 * @param string $filter_field_value Filter field value (CSV)
+		 * @param string $nl2br Convert New Line characters to BR tags
 		 *
-		 * @return Shortcode response
+		 * @return string response
 		 *
 		 * @since   1.0.0
 		 *
 		 */
 		public function show(
-			$pub_id, $database, $table_name, $column_names, $responsive, $responsive_cols,
-			$responsive_type, $responsive_icon, $sql_where, $sql_orderby
+			$pub_id, $pub_name, $database, $table_name, $column_names, $responsive, $responsive_cols,
+			$responsive_type, $responsive_icon, $sql_orderby, $filter_field_name = '', $filter_field_value = '',
+			$nl2br = ''
 		) {
 			// Activate scripts and styles
 			wp_enqueue_script( 'jquery_datatables' );
@@ -61,16 +65,20 @@ namespace WPDataAccess\Data_Tables {
 			wp_enqueue_style( 'jquery_datatables' );
 			wp_enqueue_style( 'jquery_datatables_responsive' );
 
-			if ( '' === $pub_id && '' === $table_name ) {
-				return '<p>' . __( 'ERROR: Missing argument [need at least pub_id or table argument]', 'wp-data-access' ) . '</p>';
+			if ( '' === $pub_id && '' === $pub_name && '' === $table_name ) {
+				return '<p>' . __( 'ERROR: Missing argument [need at least pub_id, pub_name or table argument]', 'wp-data-access' ) . '</p>';
 			}
 
-			if ( '' !== $pub_id ) {
+			if ( '' !== $pub_id || '' !== $pub_name ) {
 				// Get publication information
-				$publication = WPDA_Publisher_Model::get_publication( $pub_id );
+				if ( '' !== $pub_id ) {
+					$publication = WPDA_Publisher_Model::get_publication( $pub_id );
+				} else {
+					$publication = WPDA_Publisher_Model::get_publication_by_name( $pub_name );
+				}
 				if ( false === $publication ) {
 					// Querying tables in other schema's is not allowed!
-					return '<p>' . __( 'ERROR: Publication ID not found', 'wp-data-access' ) . '</p>';
+					return '<p>' . __( 'ERROR: Publication not found', 'wp-data-access' ) . '</p>';
 				}
 				$database                        = $publication[0]['pub_schema_name'];
 				$table_name                      = $publication[0]['pub_table_name'];
@@ -81,7 +89,6 @@ namespace WPDataAccess\Data_Tables {
 				$responsive_type                 = strtolower( $publication[0]['pub_responsive_type'] );
 				$responsive_icon                 = strtolower( $publication[0]['pub_responsive_icon'] );
 				$pub_format                      = $publication[0]['pub_format'];
-				$sql_where                       = $publication[0]['pub_default_where'];
 				$sql_orderby                     = $publication[0]['pub_default_orderby'];
 				$pub_table_options_searching     = $publication[0]['pub_table_options_searching'];
 				$pub_table_options_ordering      = $publication[0]['pub_table_options_ordering'];
@@ -89,29 +96,44 @@ namespace WPDataAccess\Data_Tables {
 				$pub_table_options_advanced      = $publication[0]['pub_table_options_advanced'];
 				$pub_table_options_advanced      = str_replace( ["\r\n", "\r", "\n", "\t"], '', $pub_table_options_advanced );
 				$pub_responsive_modal_hyperlinks = $publication[0]['pub_responsive_modal_hyperlinks'];
+				$pub_sort_icons                  = $publication[0]['pub_sort_icons'];
 			} else {
 				$responsive_popup_title           = '';
 				$pub_format                       = '';
-				$pub_table_options_searching      = '';
-				$pub_table_options_ordering       = '';
-				$pub_table_options_paging         = '';
+				$pub_table_options_searching      = 'on';
+				$pub_table_options_ordering       = 'on';
+				$pub_table_options_paging         = 'on';
 				$pub_table_options_advanced       = '';
 				$pub_responsive_modal_hyperlinks  = '';
+				$pub_sort_icons                   = 'default';
 			}
 
-			if ( 'off' === $pub_table_options_searching ) {
+			switch ( $pub_sort_icons ) {
+				case 'plugin':
+					// Use material ui icons
+					wp_enqueue_style( 'wpda_material_icons' );
+					wp_enqueue_style( 'wpda_datatables' );
+				case 'none':
+					// Hide jQuery Datatables sort icons
+					wp_enqueue_style( 'wpda_datatables_hide_sort_icons');
+					break;
+				default:
+					// Show default jQuery Datatables sort icons
+			}
+
+			if ( 'on' !== $pub_table_options_searching || null === $pub_table_options_searching ) {
 				$pub_table_options_searching = 'false';
 			} else {
 				$pub_table_options_searching = 'true';
 			}
 
-			if ( 'off' === $pub_table_options_ordering ) {
+			if ( 'on' !== $pub_table_options_ordering || null === $pub_table_options_ordering ) {
 				$pub_table_options_ordering = 'false';
 			} else {
 				$pub_table_options_ordering = 'true';
 			}
 
-			if ( 'off' === $pub_table_options_paging ) {
+			if ( 'on' !== $pub_table_options_paging || null === $pub_table_options_paging ) {
 				$pub_table_options_paging = 'false';
 			} else {
 				$pub_table_options_paging = 'true';
@@ -216,6 +238,7 @@ namespace WPDataAccess\Data_Tables {
 				"	<tfoot>" . $this->show_header( $columns, $responsive, $responsive_cols, $pub_format, $hyperlinks, true ) . "</tfoot>" .
 				"</table>" .
 				"<script type='text/javascript'>" .
+				"var datatables_i18n_url = '" . plugins_url( '../assets/i18n/', __DIR__ ) . "';" .
 				"var $columnsvar = [" . $wpda_database_columns . "];" .
 				"jQuery(document).ready(function () {" .
 				"	wpda_datatables_ajax_call(" .
@@ -229,7 +252,6 @@ namespace WPDataAccess\Data_Tables {
 				"		\"" . esc_attr( $responsive_icon ) . "\"," .
 				"		\"" . esc_attr( $pub_format ) . "\"," .
 				"		\"" . esc_attr( $language ) . "\"," .
-				"		\"" . htmlentities( $sql_where ) . "\"," .
 				"		\"" . htmlentities( $sql_orderby ) . "\"," .
 				"		" . $pub_table_options_searching . "," .
 				"	    " . $pub_table_options_ordering . "," .
@@ -237,7 +259,10 @@ namespace WPDataAccess\Data_Tables {
 				"		\"" . esc_attr( $pub_table_options_advanced ) . "\"," .
 				"		" . $pub_id . "," .
 				"		\"" . esc_attr( $pub_responsive_modal_hyperlinks ) . "\"," .
-				"		[" . implode( ',', $hyperlink_positions ) . "]" .
+				"		[" . implode( ',', $hyperlink_positions ) . "]," .
+				"		\"" . esc_attr( $filter_field_name ) . "\"," .
+				"		\"" . esc_attr( $filter_field_value ) . "\"," .
+				"		\"" . esc_attr( $nl2br ) . "\"" .
 				"	);" .
 				"});" .
 				"</script>";
@@ -318,32 +343,78 @@ namespace WPDataAccess\Data_Tables {
 				// Database and table name must be set!
 				wp_die();
 			} else {
-				// Set table name.
+				// Set table name
 				$table_name = sanitize_text_field( wp_unslash( $_REQUEST['table_name'] ) ); // input var okay.
 				$database   = sanitize_text_field( wp_unslash( $_REQUEST['database'] ) ); // input var okay.
-				$sql_where  = html_entity_decode( sanitize_text_field( wp_unslash( $_REQUEST['sql_where'] ) ) ); // input var okay.
-
-				$wpdadb = WPDADB::get_db_connection( $database );
+				$pub_id     = sanitize_text_field( wp_unslash( $_REQUEST['pub_id'] ) ); // input var okay.
+				$nl2br      = sanitize_text_field( wp_unslash( $_REQUEST['nl2br'] ) ); // input var okay.
 
 				if ( strpos( $table_name, '.' ) ) {
 					wp_die();
 				}
 
-				// Check if table exists (prevent sql injection).
+				if ( '' !== $pub_id ) {
+					// Add default where
+					$publication = WPDA_Publisher_Model::get_publication( $pub_id );
+					$where       = $publication[0]['pub_default_where'];
+					if (
+						null === $publication[0]['pub_default_where'] ||
+						'' === trim( $where )
+					) {
+						$where = '';
+					}
+				} else {
+					$where = '';
+				}
+
+				if (
+					'' !== $where &&
+					'where' !== strtolower( trim( substr( $where, 0, 5 ) ) )
+				) {
+					$where = "where $where";
+				}
+
+				$wpdadb = WPDADB::get_db_connection( $database );
+
+				// Add field filters from shortcode
+				$filter_field_name  = sanitize_text_field( wp_unslash( $_REQUEST['filter_field_name'] ) ); // input var okay.
+				$filter_field_value = sanitize_text_field( wp_unslash( $_REQUEST['filter_field_value'] ) ); // input var okay.
+				if ( '' !== $filter_field_name && '' !== $filter_field_value ) {
+					$filter_field_name_array = array_map('trim', explode( ',', $filter_field_name ) );
+					$filter_field_value_array = array_map('trim', explode( ',', $filter_field_value ) );
+					if ( sizeof( $filter_field_name_array ) === sizeof( $filter_field_value_array ) ) {
+						// Add filter to where clause
+						for ( $i = 0; $i < sizeof( $filter_field_name_array ); $i++ ) {
+							if ( '' === $where ) {
+								$where =
+									$wpdadb->prepare(
+										" where `{$filter_field_name_array[ $i ]}` like %s ", [ $filter_field_value_array[ $i ] ]
+									);
+							} else {
+								$where .=
+									$wpdadb->prepare(
+										" and `{$filter_field_name_array[ $i ]}` like %s ", [ $filter_field_value_array[ $i ] ]
+									);
+							}
+						}
+					}
+				}
+
+				// Check if table exists (prevent sql injection)
 				$wpda_dictionary_checks = new WPDA_Dictionary_Exist( $database, $table_name );
 				if ( ! $wpda_dictionary_checks->table_exists( ! is_admin(), false ) ) {
 					wp_die(); // Table not found
 				}
 
-				// Get all column names from table (must be comma seperated string).
+				// Get all column names from table (must be comma seperated string)
 				$this->wpda_list_columns = WPDA_List_Columns_Cache::get_list_columns( $database, $table_name );
 				$table_columns           = $this->wpda_list_columns->get_table_columns();
 
-				// Set columns to be queried.
+				// Set columns to be queried
 				$columns = '*';
 				if ( isset( $_REQUEST['columns'] ) ) {
 					// Use columns from shortcode arguments.
-					$columns = str_replace( ' ', '', sanitize_text_field( wp_unslash( $_REQUEST['columns'] ) ) ); // input var okay.
+					$columns = sanitize_text_field( wp_unslash( $_REQUEST['columns'] ) ); // input var okay.
 				}
 
 				if ( '*' === $columns ) {
@@ -399,15 +470,6 @@ namespace WPDataAccess\Data_Tables {
 				}
 
 				// Add search criteria.
-				$where = '';
-				if ( '' !== $sql_where ) {
-					if ( 'where' === strtolower( trim( substr( $sql_where, 0, 5 ) ) ) ) {
-						$where = $sql_where;
-					} else {
-						$where = "where $sql_where";
-					}
-				}
-
 				if ( isset( $_REQUEST['search']['value'] ) ) {
 					$search_value = sanitize_text_field( wp_unslash( $_REQUEST['search']['value'] ) ); // input var okay.
 				} else {
@@ -540,9 +602,24 @@ namespace WPDataAccess\Data_Tables {
 					}
 				}
 
+				if ( 'on' === $nl2br || 'yes' === $nl2br || 'true' === $nl2br ) {
+					$nl2br = 'on';
+				} else {
+					if ( '' !== $pub_id ) {
+						$nl2br = $publication[0]['pub_table_options_nl2br'];
+					}
+				}
+
 				$rows       = $wpdadb->get_results( $query, 'ARRAY_N' ); // WPCS: unprepared SQL OK; db call ok; no-cache ok.
 				$rows_final = [];
 				foreach ( $rows as $row ) {
+					if ( 'on' === $nl2br && null !== $nl2br ) {
+						// Replace NL with BR tags
+						for ( $nl = 0; $nl<sizeof( $row ); $nl++ ) {
+							$row[ $nl ] = nl2br( $row[ $nl ] );
+						}
+					}
+
 					foreach ( $hyperlinks_column_index as $key => $value ) {
 						if ( isset( $hyperlinks[ $value ] ) ) {
 							$hyperlink_html = isset( $hyperlinks[ $value ]['hyperlink_html'] ) ? $hyperlinks[ $value ]['hyperlink_html'] : '';
@@ -577,11 +654,8 @@ namespace WPDataAccess\Data_Tables {
 						foreach ( $image_ids as $image_id ) {
 							$url = wp_get_attachment_url( esc_attr( $image_id ) );
 							if ( false !== $url ) {
-								$image_metadata = wp_get_attachment_metadata( $row[ $images_array[ $i ] ] );
-								$image_src      .= '' !== $image_src ? '<br/>' : '';
-								$image_src      .=
-									'<img src="' . $url . '" style="width:' . $image_metadata['width'] .
-									'px;height:' . $image_metadata['height'] . 'px;">';
+								$image_src .= '' !== $image_src ? '<br/>' : '';
+								$image_src .= '<img src="' . $url . '" width="100%">';
 							}
 						}
 						$row[ $images_array[ $i ] ] = $image_src;
@@ -616,7 +690,11 @@ namespace WPDataAccess\Data_Tables {
 								     isset( $hyperlink['url'] ) &&
 								     isset( $hyperlink['target'] )
 								) {
-									$row[ $hyperlinks_array[ $i ] ] = "<a href='{$hyperlink['url']}' target='{$hyperlink['target']}'>{$hyperlink['label']}</a>";
+									if ( '' === $hyperlink['url'] ) {
+										$row[ $hyperlinks_array[ $i ] ] = $hyperlink['label'];
+									} else {
+										$row[ $hyperlinks_array[ $i ] ] = "<a href='{$hyperlink['url']}' target='{$hyperlink['target']}'>{$hyperlink['label']}</a>";
+									}
 								} else {
 									$row[ $hyperlinks_array[ $i ] ] = '';
 								}
@@ -641,7 +719,7 @@ namespace WPDataAccess\Data_Tables {
 									$title = get_the_title( esc_attr( $media_id ) );
 									if ( false !== $url ) {
 										$media_links .=
-											'<div title="' . $title . '">' .
+											'<div class="wpda_tooltip" title="' . $title . '">' .
 											do_shortcode( '[audio src="' . $url . '"]' ) .
 											'</div>';
 									}

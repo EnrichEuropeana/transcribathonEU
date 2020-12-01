@@ -177,8 +177,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 				$wp_usermeta_option = get_option( 'um_usermeta_fields', array() );
 
 				$count = $wpdb->get_var(
-					"SELECT COUNT(*) 
-					FROM {$wpdb->usermeta} 
+					"SELECT COUNT(*)
+					FROM {$wpdb->usermeta}
 					WHERE meta_key IN ('" . implode( "','", $wp_usermeta_option ) . "')"
 				);
 
@@ -194,8 +194,8 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 
 				global $wpdb;
 				$metadata = $wpdb->get_results( $wpdb->prepare(
-					"SELECT * 
-					FROM {$wpdb->usermeta} 
+					"SELECT *
+					FROM {$wpdb->usermeta}
 					WHERE meta_key IN ('" . implode( "','", $wp_usermeta_option ) . "')
 					LIMIT %d, %d",
 					( absint( $_POST['page'] ) - 1 ) * $per_page,
@@ -209,7 +209,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 
 				if ( ! empty( $values ) ) {
 				$wpdb->query(
-					"INSERT INTO 
+					"INSERT INTO
     				{$wpdb->prefix}um_metadata(user_id, um_key, um_value)
 					VALUES " . implode( ',', $values ) );
 				}
@@ -637,74 +637,83 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 							'title'     => __( 'Account', 'ultimate-member' ),
 							'fields'    => array(
 								array(
-									'id'       		=> 'account_tab_password',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Password Account Tab','ultimate-member' ),
-									'tooltip' 	=> 'Enable/disable the Password account tab in account page',
+									'id'        => 'account_tab_password',
+									'type'      => 'checkbox',
+									'label'     => __( 'Password Account Tab', 'ultimate-member' ),
+									'tooltip'   => __( 'Enable/disable the Password account tab in account page', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'account_tab_privacy',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Privacy Account Tab','ultimate-member' ),
-									'tooltip' 	=> __('Enable/disable the Privacy account tab in account page','ultimate-member'),
+									'id'        => 'account_tab_privacy',
+									'type'      => 'checkbox',
+									'label'     => __( 'Privacy Account Tab', 'ultimate-member' ),
+									'tooltip'   => __( 'Enable/disable the Privacy account tab in account page', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'account_tab_notifications',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Notifications Account Tab','ultimate-member' ),
-									'tooltip' 	=> __('Enable/disable the Notifications account tab in account page','ultimate-member'),
+									'id'        => 'account_tab_notifications',
+									'type'      => 'checkbox',
+									'label'     => __( 'Notifications Account Tab', 'ultimate-member' ),
+									'tooltip'   => __( 'Enable/disable the Notifications account tab in account page', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'account_tab_delete',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Delete Account Tab','ultimate-member' ),
-									'tooltip' 	=> __('Enable/disable the Delete account tab in account page','ultimate-member'),
+									'id'        => 'account_tab_delete',
+									'type'      => 'checkbox',
+									'label'     => __( 'Delete Account Tab', 'ultimate-member' ),
+									'tooltip'   => __( 'Enable/disable the Delete account tab in account page', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'delete_account_text',
-									'type'    		=> 'textarea', // bug with wp 4.4? should be editor
-									'label'    		=> __( 'Account Deletion Custom Text','ultimate-member' ),
-									'tooltip' 	=> __('This is custom text that will be displayed to users before they delete their accounts from your site','ultimate-member'),
-									'args'     		=> array(
+									'id'        => 'delete_account_text',
+									'type'      => 'textarea', // bug with wp 4.4? should be editor
+									'label'     => __( 'Account Deletion Custom Text', 'ultimate-member' ),
+									'tooltip'   => __( 'This is custom text that will be displayed to users before they delete their accounts from your site when password is required.', 'ultimate-member' ),
+									'args'      => array(
 										'textarea_rows'    => 6
 									),
 								),
 								array(
-									'id'       		=> 'account_name',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Add a First & Last Name fields','ultimate-member' ),
-									'tooltip' 	=> __('Whether to enable these fields on the user account page by default or hide them.','ultimate-member'),
+									'id'        => 'delete_account_no_pass_required_text',
+									'type'      => 'textarea',
+									'label'     => __( 'Account Deletion without password Custom Text', 'ultimate-member' ),
+									'tooltip'   => __( 'This is custom text that will be displayed to users before they delete their accounts from your site when password isn\'t required.', 'ultimate-member' ),
+									'args'      => array(
+										'textarea_rows'    => 6
+									),
 								),
 								array(
-									'id'       		=> 'account_name_disable',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Disable First & Last Name fields','ultimate-member' ),
-									'tooltip' 	=> __('Whether to allow users changing their first and last name in account page.','ultimate-member'),
-									'conditional'		=> array( 'account_name', '=', '1' ),
+									'id'        => 'account_name',
+									'type'      => 'checkbox',
+									'label'     => __( 'Add a First & Last Name fields', 'ultimate-member' ),
+									'tooltip'   => __( 'Whether to enable these fields on the user account page by default or hide them.', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'account_name_require',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Require First & Last Name','ultimate-member' ),
-									'tooltip' 	=> __('Require first and last name?','ultimate-member'),
-									'conditional'		=> array( 'account_name', '=', '1' ),
+									'id'            => 'account_name_disable',
+									'type'          => 'checkbox',
+									'label'         => __( 'Disable First & Last Name fields', 'ultimate-member' ),
+									'tooltip'       => __( 'Whether to allow users changing their first and last name in account page.', 'ultimate-member' ),
+									'conditional'   => array( 'account_name', '=', '1' ),
 								),
 								array(
-									'id'       		=> 'account_email',
-									'type'     		=> 'checkbox',
-									'label'   		=> __( 'Allow users to change e-mail','ultimate-member' ),
-									'tooltip' 	=> __( 'Whether to allow users changing their email in account page.', 'ultimate-member' ),
+									'id'            => 'account_name_require',
+									'type'          => 'checkbox',
+									'label'         => __( 'Require First & Last Name', 'ultimate-member' ),
+									'tooltip'       => __( 'Require first and last name?', 'ultimate-member' ),
+									'conditional'   => array( 'account_name', '=', '1' ),
+								),
+								array(
+									'id'        => 'account_email',
+									'type'      => 'checkbox',
+									'label'     => __( 'Allow users to change e-mail', 'ultimate-member' ),
+									'tooltip'   => __( 'Whether to allow users changing their email in account page.', 'ultimate-member' ),
 								),
 								array(
 									'id'        => 'account_general_password',
 									'type'      => 'checkbox',
-									'label'     => __( 'Password is required?','ultimate-member' ),
+									'label'     => __( 'Password is required?', 'ultimate-member' ),
 									'tooltip'   => __( 'Password is required to save account data.', 'ultimate-member' ),
 								),
 								array(
 									'id'        => 'account_require_strongpass',
 									'type'      => 'checkbox',
-									'label'     => __( 'Require a strong password?','ultimate-member' ),
+									'label'     => __( 'Require a strong password?', 'ultimate-member' ),
 									'tooltip'   => __( 'Enable or disable a strong password rules on account page / change password tab', 'ultimate-member' ),
 								),
 								array(
@@ -731,63 +740,69 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 							'title'     => __( 'Uploads', 'ultimate-member' ),
 							'fields'    => array(
 								array(
-									'id'       		=> 'profile_photo_max_size',
-									'type'     		=> 'text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Profile Photo Maximum File Size (bytes)', 'ultimate-member' ),
-									'tooltip' 	   	=> __( 'Sets a maximum size for the uploaded photo', 'ultimate-member' ),
+									'id'        => 'profile_photo_max_size',
+									'type'      => 'text',
+									'size'      => 'small',
+									'label'     => __( 'Profile Photo Maximum File Size (bytes)', 'ultimate-member' ),
+									'tooltip'   => __( 'Sets a maximum size for the uploaded photo', 'ultimate-member' ),
 								),
 
 								array(
-									'id'       		=> 'cover_photo_max_size',
-									'type'     		=> 'text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Cover Photo Maximum File Size (bytes)', 'ultimate-member' ),
-									'tooltip' 	   	=> __( 'Sets a maximum size for the uploaded cover', 'ultimate-member' ),
+									'id'        => 'cover_photo_max_size',
+									'type'      => 'text',
+									'size'      => 'small',
+									'label'     => __( 'Cover Photo Maximum File Size (bytes)', 'ultimate-member' ),
+									'tooltip'   => __( 'Sets a maximum size for the uploaded cover', 'ultimate-member' ),
 								),
 								array(
-									'id'       		=> 'photo_thumb_sizes',
-									'type'     		=> 'multi_text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Profile Photo Thumbnail Sizes (px)','ultimate-member' ),
-									'tooltip' 	=> __( 'Here you can define which thumbnail sizes will be created for each profile photo upload.','ultimate-member' ),
-									'validate' 		=> 'numeric',
-									'add_text'		=> __('Add New Size','ultimate-member'),
-									'show_default_number' => 1,
+									'id'                    => 'photo_thumb_sizes',
+									'type'                  => 'multi_text',
+									'size'                  => 'small',
+									'label'                 => __( 'Profile Photo Thumbnail Sizes (px)', 'ultimate-member' ),
+									'tooltip'               => __( 'Here you can define which thumbnail sizes will be created for each profile photo upload.', 'ultimate-member' ),
+									'validate'              => 'numeric',
+									'add_text'              => __( 'Add New Size', 'ultimate-member' ),
+									'show_default_number'   => 1,
 								),
 								array(
-									'id'       		=> 'cover_thumb_sizes',
-									'type'     		=> 'multi_text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Cover Photo Thumbnail Sizes (px)','ultimate-member' ),
-									'tooltip' 	=> __( 'Here you can define which thumbnail sizes will be created for each cover photo upload.','ultimate-member' ),
-									'validate' 		=> 'numeric',
-									'add_text'		=> __('Add New Size','ultimate-member'),
-									'show_default_number' => 1,
-								),
-
-								array(
-									'id'       		=> 'image_compression',
-									'type'     		=> 'text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Image Quality','ultimate-member'),
-									'tooltip' 	   	=> __( 'Quality is used to determine quality of image uploads, and ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default range is 60.', 'ultimate-member' ),
+									'id'                    => 'cover_thumb_sizes',
+									'type'                  => 'multi_text',
+									'size'                  => 'small',
+									'label'                 => __( 'Cover Photo Thumbnail Sizes (px)', 'ultimate-member' ),
+									'tooltip'               => __( 'Here you can define which thumbnail sizes will be created for each cover photo upload.', 'ultimate-member' ),
+									'validate'              => 'numeric',
+									'add_text'              => __( 'Add New Size', 'ultimate-member' ),
+									'show_default_number'   => 1,
 								),
 
 								array(
-									'id'       		=> 'image_max_width',
-									'type'     		=> 'text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Image Upload Maximum Width (px)', 'ultimate-member' ),
-									'tooltip' 	   	=> __( 'Any image upload above this width will be resized to this limit automatically.', 'ultimate-member' ),
+									'id'        => 'image_orientation_by_exif',
+									'type'      => 'checkbox',
+									'label'     => __( 'Change image orientation', 'ultimate-member' ),
+									'tooltip'   => __( 'Rotate image to and use orientation by the camera EXIF data.', 'ultimate-member' ),
+								),
+								array(
+									'id'        => 'image_compression',
+									'type'      => 'text',
+									'size'      => 'small',
+									'label'     => __( 'Image Quality', 'ultimate-member' ),
+									'tooltip'   => __( 'Quality is used to determine quality of image uploads, and ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default range is 60.', 'ultimate-member' ),
 								),
 
 								array(
-									'id'       		=> 'cover_min_width',
-									'type'     		=> 'text',
-									'size'     		=> 'small',
-									'label'    		=> __( 'Cover Photo Minimum Width (px)', 'ultimate-member' ),
-									'tooltip' 	   	=> __( 'This will be the minimum width for cover photo uploads', 'ultimate-member' ),
+									'id'        => 'image_max_width',
+									'type'      => 'text',
+									'size'      => 'small',
+									'label'     => __( 'Image Upload Maximum Width (px)', 'ultimate-member' ),
+									'tooltip'   => __( 'Any image upload above this width will be resized to this limit automatically.', 'ultimate-member' ),
+								),
+
+								array(
+									'id'        => 'cover_min_width',
+									'type'      => 'text',
+									'size'      => 'small',
+									'label'     => __( 'Cover Photo Minimum Width (px)', 'ultimate-member' ),
+									'tooltip'   => __( 'This will be the minimum width for cover photo uploads', 'ultimate-member' ),
 								),
 							)
 						)
@@ -1894,7 +1909,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 							if ( ! empty( $_POST['um_options']['use_gravatars'] ) ) {
 
 								$results = $wpdb->get_col(
-									"SELECT u.ID FROM {$wpdb->users} AS u 
+									"SELECT u.ID FROM {$wpdb->users} AS u
 									LEFT JOIN {$wpdb->usermeta} AS um ON ( um.user_id = u.ID AND um.meta_key = 'synced_gravatar_hashed_id' )
 									LEFT JOIN {$wpdb->usermeta} AS um2 ON ( um2.user_id = u.ID AND um2.meta_key = 'um_member_directory_data' )
 									WHERE um.meta_value != '' AND um.meta_value IS NOT NULL AND
@@ -1904,7 +1919,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 							} else {
 
 								$results = $wpdb->get_col(
-									"SELECT u.ID FROM {$wpdb->users} AS u 
+									"SELECT u.ID FROM {$wpdb->users} AS u
 									LEFT JOIN {$wpdb->usermeta} AS um ON ( um.user_id = u.ID AND ( um.meta_key = 'synced_profile_photo' || um.meta_key = 'profile_photo' ) )
 									LEFT JOIN {$wpdb->usermeta} AS um2 ON ( um2.user_id = u.ID AND um2.meta_key = 'um_member_directory_data' )
 									WHERE ( um.meta_value IS NULL OR um.meta_value = '' ) AND
@@ -1944,7 +1959,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 					if ( $_POST['um_options']['account_hide_in_directory_default'] == 'No' ) {
 
 						$results = $wpdb->get_col(
-							"SELECT u.ID FROM {$wpdb->users} AS u 
+							"SELECT u.ID FROM {$wpdb->users} AS u
 							LEFT JOIN {$wpdb->usermeta} AS um ON ( um.user_id = u.ID AND um.meta_key = 'hide_in_members' )
 							LEFT JOIN {$wpdb->usermeta} AS um2 ON ( um2.user_id = u.ID AND um2.meta_key = 'um_member_directory_data' )
 							WHERE um.meta_value IS NULL AND
@@ -1954,7 +1969,7 @@ if ( ! class_exists( 'um\admin\core\Admin_Settings' ) ) {
 					} else {
 
 						$results = $wpdb->get_col(
-							"SELECT u.ID FROM {$wpdb->users} AS u 
+							"SELECT u.ID FROM {$wpdb->users} AS u
 							LEFT JOIN {$wpdb->usermeta} AS um ON ( um.user_id = u.ID AND um.meta_key = 'hide_in_members' )
 							LEFT JOIN {$wpdb->usermeta} AS um2 ON ( um2.user_id = u.ID AND um2.meta_key = 'um_member_directory_data' )
 							WHERE um.meta_value IS NULL AND

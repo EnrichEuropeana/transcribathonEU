@@ -215,47 +215,47 @@ namespace WPDataAccess\Utilities {
 						echo '<a id="' . esc_attr( $this->rownum ) . '-sel-1" class="nav-tab nav-tab-active wpda-manage-nav-tab' .
 							 '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'1\');" 
 							style="font-size:inherit;">' .
-							 '<span class="dashicons dashicons-admin-tools"></span>' .
-							 __( 'Actions', 'wp-data-access' ) .
+							 '<span class="dashicons dashicons-admin-tools wpda_settings_icon"></span>' .
+							 '<span class="wpda_settings_label">' . __( 'Actions', 'wp-data-access' ) . '</span>' .
 							 '</a>';
 						if ( 'Table' === $this->dbo_type || 'View' === $this->dbo_type ) {
 							echo '<a id="' . esc_attr( $this->rownum ) . '-sel-6" class="nav-tab wpda-manage-nav-tab' .
 							     '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'6\');" 
 								style="font-size:inherit;">' .
-							     '<span class="dashicons dashicons-admin-generic"></span> ' .
-							     __( 'Settings', 'wp-data-access' ) .
+							     '<span class="dashicons dashicons-admin-generic wpda_settings_icon"></span> ' .
+								 '<span class="wpda_settings_label">' . __( 'Settings', 'wp-data-access' ) . '</span>' .
 							     '</a>';
 						}
 						if ( '' !== $this->dbo_type ) {
 							echo '<a id="' . esc_attr( $this->rownum ) . '-sel-2" class="nav-tab wpda-manage-nav-tab' .
 								 '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'2\');"
 								style="font-size:inherit;">' .
-								 '<span class="dashicons dashicons-editor-code"></span> ' .
-								 __( 'Columns', 'wp-data-access' ) .
+								 '<span class="dashicons dashicons-list-view wpda_settings_icon"></span> ' .
+								 '<span class="wpda_settings_label">' . __( 'Columns', 'wp-data-access' ) . '</span>' .
 								 '</a>';
 						}
 						if ( 'Table' === $this->dbo_type ) {
 							echo '<a id="' . esc_attr( $this->rownum ) . '-sel-3" class="nav-tab wpda-manage-nav-tab' .
 							     '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'3\');" 
 								style="font-size:inherit;">' .
-							     '<span class="dashicons dashicons-editor-code"></span> ' .
-							     __( 'Indexes', 'wp-data-access' ) .
+							     '<span class="dashicons dashicons-controls-forward wpda_settings_icon"></span> ' .
+								 '<span class="wpda_settings_label">' . __( 'Indexes', 'wp-data-access' ) . '</span>' .
 							     '</a>';
 						}
 						if ( 'Table' === $this->dbo_type ) {
 							echo '<a id="' . esc_attr( $this->rownum ) . '-sel-5" class="nav-tab wpda-manage-nav-tab' .
 							     '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'5\');" 
 								style="font-size:inherit;">' .
-							     '<span class="dashicons dashicons-editor-code"></span> ' .
-							     __( 'Foreign Keys', 'wp-data-access' ) .
+							     '<span class="dashicons dashicons-networking wpda_settings_icon"></span> ' .
+								 '<span class="wpda_settings_label">' . __( 'Foreign Keys', 'wp-data-access' ) . '</span>' .
 							     '</a>';
 						}
 						if ( 'Table' === $this->dbo_type || 'View' === $this->dbo_type ) {
 							echo '<a id="' . esc_attr( $this->rownum ) . '-sel-4" class="nav-tab wpda-manage-nav-tab' .
 							     '" href="javascript:void(0)" onclick="settab(\'' . esc_attr( $this->rownum ) . '\', \'4\');" 
 								style="font-size:inherit;">' .
-							     '<span class="dashicons dashicons-editor-code"></span> ' .
-							     __( 'SQL', 'wp-data-access' ) .
+							     '<span class="dashicons dashicons-editor-code wpda_settings_icon"></span> ' .
+								 '<span class="wpda_settings_label">' . __( 'SQL', 'wp-data-access' ) . '</span>' .
 							     '</a>';
 						}
 						?>
@@ -302,10 +302,10 @@ namespace WPDataAccess\Utilities {
 					jQuery(document).ready(function () {
 						var sql_to_clipboard = new ClipboardJS("#button-copy-clipboard-<?php echo esc_attr( $this->rownum ); ?>");
 						sql_to_clipboard.on('success', function (e) {
-							alert('<?php echo __( 'SQL successfully copied to clipboard!', 'wp-data-access' ); ?>');
+							jQuery.notify('<?php echo __( 'SQL successfully copied to clipboard!', 'wp-data-access' ); ?>','info');
 						});
 						sql_to_clipboard.on('error', function (e) {
-							alert('<?php echo __( 'Could not copy SQL to clipboard!', 'wp-data-access' ); ?>');
+							jQuery.notify('<?php echo __( 'Could not copy SQL to clipboard!', 'wp-data-access' ); ?>','error');
 						});
 						jQuery("#rename-table-from-<?php echo esc_attr( $this->rownum ); ?>").on('keyup paste', function () {
 							this.value = this.value.replace(/[^\w\$\_]/g, '');
@@ -387,7 +387,8 @@ namespace WPDataAccess\Utilities {
 						! isset( $add_column['hint'] ) ||
 						! isset( $add_column['name_prefix'] ) ||
 						! isset( $add_column['type'] ) ||
-						! isset( $add_column['default'] )
+						! isset( $add_column['default'] ) ||
+						! isset( $add_column['disable'] )
 					) {
 						$array_valid = false;
 						break;
@@ -475,7 +476,12 @@ namespace WPDataAccess\Utilities {
 							jQuery("#wpda_invisible_container").append("<?php echo $delete_menu_table_form; ?>");
 						</script>
 						<div id="wpda_table_settings_<?php echo esc_attr( $this->rownum ); ?>">
-							<div style="font-weight:bold; padding-bottom:10px;"><?php echo __( 'Please note that these settings only work within in the plugin!', 'wp-data-access' ); ?></div>
+							<div style="font-weight:bold; padding-bottom:10px;">
+								<span class="dashicons dashicons-warning"></span>
+								<span style="vertical-align:middle">
+									<?php echo __( 'Please note that these settings only work within in the plugin!', 'wp-data-access' ); ?>
+								</span>
+							</div>
 							<ul style="margin:0; padding:0;">
 								<?php
 								do_action(
@@ -488,7 +494,7 @@ namespace WPDataAccess\Utilities {
 								<li>
 									<span class="wpda_table_settings_caret"><?php echo __( 'Table Settings', 'wp-data-access' ); ?></span>
 									<a href="https://wpdataaccess.com/docs/documentation/data-explorer/table-settings/" target="_blank">
-										<span class="dashicons dashicons-editor-help"
+										<span class="dashicons dashicons-editor-help wpda_tooltip"
 											  title="<?php echo __( 'Define table settings [help opens in a new tab or window]', 'wp-data-access' ); ?>"
 											  style="cursor:pointer;vertical-align:bottom;"></span>
 									</a>
@@ -498,10 +504,10 @@ namespace WPDataAccess\Utilities {
 										</div>
 										<br/>
 										<div style="font-size:90%;">
-											<label for="table_top_setting_hyperlink_definition_json">
+											<label for="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition_json">
 												<input type="radio"
-													   id="table_top_setting_hyperlink_definition_json"
-													   name="table_top_setting_hyperlink_definition"
+													   id="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition_json"
+													   name="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition"
 													   value="json"
 													   class="wpda_table_top_setting_item wpda_action_font"
 													   <?php
@@ -515,10 +521,10 @@ namespace WPDataAccess\Utilities {
 												<?php echo __( 'Preformatted JSON (allows individual label and target setting)', 'wp-data-access' ); ?>
 											</label>
 											<br/>
-											<label for="table_top_setting_hyperlink_definition_text">
+											<label for="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition_text">
 												<input type="radio"
-													   id="table_top_setting_hyperlink_definition_text"
-													   name="table_top_setting_hyperlink_definition"
+													   id="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition_text"
+													   name="<?php echo esc_attr( $this->table_name ); ?>table_top_setting_hyperlink_definition"
 													   value="text"
 													   class="wpda_table_top_setting_item wpda_action_font"
 													   <?php
@@ -532,25 +538,27 @@ namespace WPDataAccess\Utilities {
 										</div>
 										<br/>
 										<div>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_table_settings"
-												   value="<?php echo __( 'Save Table Settings', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_table_settings"
-												   value="<?php echo __( 'Cancel', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_table_settings"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">check</span>
+												<?php echo __( 'Save Table Settings', 'wp-data-access' ); ?>
+											</button>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_table_settings"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">cancel</span>
+												<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+											</button>
 										</div>
 									</ul>
 								</li>
 								<li>
 									<span class="wpda_table_settings_caret"><?php echo __( 'Column Settings', 'wp-data-access' ); ?></span>
 									<a href="https://wpdataaccess.com/docs/documentation/data-explorer/table-settings/" target="_blank">
-										<span class="dashicons dashicons-editor-help"
+										<span class="dashicons dashicons-editor-help wpda_tooltip"
 											  title="<?php echo __( 'Define column labels and (media) types [help opens in a new tab or window]', 'wp-data-access' ); ?>"
 											  style="cursor:pointer;vertical-align:bottom;"></span>
 									</a>
@@ -561,26 +569,26 @@ namespace WPDataAccess\Utilities {
 												<th>
 													<?php echo __( 'Label on List Table', 'wp-data-access' ); ?>
 													<span
-															class="dashicons dashicons-editor-help"
+															class="dashicons dashicons-editor-help wpda_tooltip"
 															title="<?php echo __( 'Define column labels for list tables', 'wp-data-access' ); ?>"
 															style="cursor:pointer;vertical-align:bottom;"></span>
 												</th>
 												<th>
 													<?php echo __( 'Label on Data Entry Form', 'wp-data-access' ); ?>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Define column labels for data entry forms', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;vertical-align:bottom;"></span>
 												</th>
 												<th>
 													<?php echo __( 'Column Type', 'wp-data-access' ); ?>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Featured plugin column types', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;vertical-align:text-bottom;"></span>
 												</th>
 												<?php foreach ( $column_settings_add_column as $add_column ) { ?>
 													<th>
 														<?php echo $add_column['label']; ?>
-														<span class="dashicons dashicons-editor-help"
+														<span class="dashicons dashicons-editor-help wpda_tooltip"
 															  title="<?php echo $add_column['hint']; ?>"
 															  style="cursor:pointer;vertical-align:text-bottom;"></span>
 													</th>
@@ -655,10 +663,16 @@ namespace WPDataAccess\Utilities {
 													<?php foreach ( $column_settings_add_column as $add_column ) { ?>
 														<td>
 															<input
-																	type="<?php echo $add_column['type']; ?>"
-																	id="<?php echo $add_column['name_prefix'] . esc_attr( $column['Field'] ); ?>"
-																	class="wpda_table_setting_item wpda_action_font"
+																type="<?php echo $add_column['type']; ?>"
+																id="<?php echo $add_column['name_prefix'] . esc_attr( $column['Field'] ); ?>"
+																class="wpda_table_setting_item wpda_action_font wpda_tooltip"
 																<?php
+																if ( 'keys' === $add_column['disable'] ) {
+																	$primary_key = $this->wpda_list_columns->get_table_primary_key();
+																	if ( in_array($column['Field'], $primary_key) ) {
+																		echo 'disabled="disabled" title="Not available for key columns"';
+																	}
+																}
 																if ( 'checkbox' === $add_column['type'] ) {
 																	$column_name = $add_column['name_prefix'] . esc_attr( $column['Field'] );
 																	if ( isset( $settings_db_custom->custom_settings->$column_name ) ) {
@@ -679,25 +693,27 @@ namespace WPDataAccess\Utilities {
 										</table>
 										<br/>
 										<div>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_column_settings"
-												   value="<?php echo __( 'Save Column Settings', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_column_settings"
-												   value="<?php echo __( 'Cancel', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_column_settings"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">check</span>
+												<?php echo __( 'Save Column Settings', 'wp-data-access' ); ?>
+											</button>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_column_settings"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">cancel</span>
+												<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+											</button>
 										</div>
 									</ul>
 								</li>
 								<li>
 									<span class="wpda_table_settings_caret"><?php echo __( 'Dynamic Hyperlinks', 'wp-data-access' ); ?></span>
 									<a href="https://wpdataaccess.com/docs/documentation/data-explorer/table-settings/" target="_blank">
-										<span class="dashicons dashicons-editor-help"
+										<span class="dashicons dashicons-editor-help wpda_tooltip"
 											  title="<?php echo sprintf( __( 'Add dynamic hyperlinks to table `%s` [help opens in a new tab or window]', 'wp-data-access' ), esc_attr( $this->table_name ) ); ?>"
 											  style="cursor:pointer;vertical-align:bottom;"></span>
 									</a>
@@ -709,25 +725,25 @@ namespace WPDataAccess\Utilities {
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( '+List?', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Add hyperlink to list', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( '+Form?', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Add hyperlink to form', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( '+Window?', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Opens URL in a new tab or window', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( 'HTML', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Just the URL! For example:
 														  
 https://yoursite.com/sercives.php?name=$$column_name$$
@@ -873,18 +889,20 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 										</table>
 										<br/>
 										<div>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_hyperlinks"
-												   value="<?php echo __( 'Save Dynamic Hyperlinks', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
-											<input type="button"
-												   id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_hyperlinks"
-												   value="<?php echo __( 'Cancel', 'wp-data-access' ); ?>"
-												   class="button button-primary"
-												   style="font-size: 90%;"
-											/>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_hyperlinks"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">check</span>
+												<?php echo __( 'Save Dynamic Hyperlinks', 'wp-data-access' ); ?>
+											</button>
+											<button type="button"
+												   	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_hyperlinks"
+												   	class="button button-primary"
+												   	style="font-size: 90%;">
+												<span class="material-icons wpda_icon_on_button">cancel</span>
+												<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+											</button>
 											<input id="no_hyperlink_<?php echo esc_attr( $this->rownum ); ?>"
 												   type="hidden" value="<?php echo $no_hyperlinks; ?>">
 										</div>
@@ -893,7 +911,7 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 								<li>
 									<span class="wpda_table_settings_caret"><?php echo __( 'Dashboard Menus', 'wp-data-access' ); ?></span>
 									<a href="https://wpdataaccess.com/docs/documentation/data-explorer/add-table-to-dashboard-menu/" target="_blank">
-										<span class="dashicons dashicons-editor-help"
+										<span class="dashicons dashicons-editor-help wpda_tooltip"
 											  title="<?php echo sprintf( __( 'Add table `%s` to a WordPress dashboard menu [help opens in a new tab or window]', 'wp-data-access' ), esc_attr( $this->table_name ) ); ?>"
 											  style="cursor:pointer;vertical-align:text-bottom;"></span>
 									</a>
@@ -902,19 +920,19 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 											<tr>
 												<th style="padding-left:0;">
 													<span style="vertical-align:bottom;"><?php echo __( 'Menu Name', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Name of your sub menu item', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( 'Menu Slug', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'Menu slug of the main menu to which your sub menu should be added', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
 												<th>
 													<span style="vertical-align:bottom;"><?php echo __( 'Roles Authorized', 'wp-data-access' ); ?></span>
-													<span class="dashicons dashicons-editor-help"
+													<span class="dashicons dashicons-editor-help wpda_tooltip"
 														  title="<?php echo __( 'User roles authorized to see sub menu item', 'wp-data-access' ); ?>"
 														  style="cursor:pointer;"></span>
 												</th>
@@ -1029,18 +1047,22 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 										</table>
 										<br/>
 										<div>
-											<input type="button"
-											       id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_dashboard_menus"
-											       value="<?php echo __( 'Save Dashboard Menus', 'wp-data-access' ); ?>"
-											       class="button button-primary"
-											       style="font-size: 90%;"
-											/>
-											<input type="button"
-											       id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_dashboard_menus"
-											       value="<?php echo __( 'Cancel', 'wp-data-access' ); ?>"
-											       class="button button-primary"
-											       style="font-size: 90%;"
-											/>
+											<button type="button"
+											       	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_save_dashboard_menus"
+											       	class="button button-primary"
+											       	style="font-size: 90%;"
+											>
+												<span class="material-icons wpda_icon_on_button">check</span>
+												<?php echo __( 'Save Dashboard Menus', 'wp-data-access' ); ?>
+											</button>
+											<button type="button"
+											       	id="wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_dashboard_menus"
+											       	class="button button-primary"
+											       	style="font-size: 90%;"
+											>
+												<span class="material-icons wpda_icon_on_button">cancel</span>
+												<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+											</button>
 										</div>
 									</ul>
 								</li>
@@ -1074,7 +1096,8 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 						return submit_table_settings(
 							'<?php echo esc_attr( $this->rownum ); ?>',
 							'<?php echo $settings_table_top_form_settings; ?>',
-							'<?php echo $settings_table_top_form_id; ?>'
+							'<?php echo $settings_table_top_form_id; ?>',
+							'<?php echo esc_attr( $this->table_name ); ?>'
 						);
 					});
 					jQuery('#wpda_<?php echo esc_attr( $this->rownum ); ?>_cancel_table_settings').click( function() {
@@ -1120,6 +1143,7 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 						jQuery('#wpda_admin_menu_actions_<?php echo esc_attr( $this->rownum ); ?>').toggle();
 						wpda_toggle_row_actions('<?php echo esc_attr( $this->rownum ); ?>');
 					});
+					jQuery('.wpda_tooltip').tooltip();
 				});
 
 				var custom_column_settings = [];
@@ -1296,6 +1320,7 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 						   class="button button-primary"
 						   data-clipboard-text="<?php echo $this->create_table_stmt_orig; ?>"
 						>
+							<span class="material-icons wpda_icon_on_button">content_copy</span>
 							<?php echo __( 'Copy to clipboard', 'wp-data-access' ); ?>
 						</a>
 					</td>
@@ -1362,9 +1387,11 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 			?>
 			<tr>
 				<td style="box-sizing:border-box;text-align:center;white-space:nowrap;width:150px;vertical-align:middle;">
-					<a href="javascript:void(0)"
+					<a href="<?php echo esc_attr( $src ); ?>"
+					   id="wpda_export_button_<?php echo esc_attr( $this->rownum ); ?>"
+					   target="_blank"
 					   class="button button-primary"
-					   onclick="if (<?php echo esc_attr( $check_export_access ); ?>) jQuery('#stealth_mode').attr('src','<?php echo esc_attr( $src ); ?>' + jQuery('#format_type_<?php echo esc_attr( $this->rownum ); ?>').val() + '&include_table_settings=' + (jQuery('#include_table_settings_<?php echo esc_attr( $this->rownum ); ?>').prop('checked') ? 'on' : 'off'))"
+					   onclick="if (<?php echo esc_attr( $check_export_access ); ?>) { update_export_button_<?php echo esc_attr( $this->rownum ); ?>(); return true; } else { return false; }"
 					   style="display:block;"
 					>
 						<?php echo __( 'EXPORT', 'wp-data-access' ); ?>
@@ -1389,16 +1416,24 @@ Variable $$column_name$$ will be replaced with the value of column $$column_name
 						<option value="excel">Excel</option>
 						<option value="csv">CSV</option>
 					</select>
-					<?php if ( 'Table' === $this->dbo_type ) { ?>
-						<label style="vertical-align:text-top;">
-							<input id="include_table_settings_<?php echo esc_attr( $this->rownum ); ?>"
-								   type="checkbox"
-								   checked
-								   class="wpda_action_font"
-							>
-							<?php echo __( 'Include table settings (SQL only)', 'wp-data-access' ); ?>&nbsp;
-						</label>
-					<?php } ?>
+					<label style="vertical-align:text-top;">
+						<input id="include_table_settings_<?php echo esc_attr( $this->rownum ); ?>"
+							   type="checkbox"
+							   class="wpda_action_font"
+						>
+						<?php echo __( 'Include table settings (SQL only)', 'wp-data-access' ); ?>&nbsp;
+					</label>
+					<script type="text/javascript">
+						function update_export_button_<?php echo esc_attr( $this->rownum ); ?>() {
+							jQuery('#wpda_export_button_<?php echo esc_attr( $this->rownum ); ?>').attr(
+								'href',
+								'<?php echo str_replace( "&amp;", "&", esc_attr( $src ) ); ?>' +
+								jQuery('#format_type_<?php echo esc_attr( $this->rownum ); ?>').val() +
+								'&include_table_settings=' +
+								(jQuery('#include_table_settings_<?php echo esc_attr( $this->rownum ); ?>').prop('checked') ? 'on' : 'off')
+							);
+						}
+					</script>
 				</td>
 			</tr>
 			<?php

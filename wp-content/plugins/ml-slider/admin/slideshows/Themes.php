@@ -257,13 +257,15 @@ class MetaSlider_Themes {
 	 */
 	public function set($slideshow_id, $theme) {
 
-		// If the theme isn't set, then they attempted to remove the theme
-		if (!isset($theme['folder']) || is_wp_error($theme)) {
-			return update_post_meta($slideshow_id, 'metaslider_slideshow_theme', 'none');
-		}
-
 		// For legacy reasons we have to query the settings
 		$settings = get_post_meta($slideshow_id, 'ml-slider_settings', true);
+
+		// If the theme isn't set, then they attempted to remove the theme
+		if (!isset($theme['folder']) || is_wp_error($theme)) {
+			$settings['theme'] = 'none';
+			update_post_meta($slideshow_id, 'ml-slider_settings', $settings);
+			return update_post_meta($slideshow_id, 'metaslider_slideshow_theme', 'none');
+		}
 
 		// For custom themes, it's easier to use the legacy setting because the pro plugin
 		// already hooks into it.

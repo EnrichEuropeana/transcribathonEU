@@ -56,7 +56,7 @@ namespace WPDataAccess\Backup {
 				echo '<br/>';
 				echo __( 'You need to define and activate at least one storage device in Data Backup Settings to use this feature.', 'wp-data-access' );
 				echo '<br/>';
-				echo '<a href="?page=wpda_settings&tab=databackup">&raquo; ';
+				echo '<a href="?page=wpdataaccess&tab=databackup">&raquo; ';
 				echo __( 'Define and/or activate a storage device', 'wp-data-access' );
 				echo '</a>';
 				wp_die();
@@ -112,7 +112,7 @@ namespace WPDataAccess\Backup {
 				<h1 class="wp-heading-inline">
 					<span><?php echo __( 'Data Backup' ); ?></span>
 					<a href="https://wpdataaccess.com/docs/documentation/data-explorer/data-backup/" target="_blank" title="Plugin Help - open a new tab or window">
-						<span class="dashicons dashicons-editor-help"
+						<span class="dashicons dashicons-editor-help wpda_tooltip"
 							  style="text-decoration:none;vertical-align:top;font-size:30px;">
 						</span></a>
 				</h1>
@@ -223,15 +223,15 @@ namespace WPDataAccess\Backup {
 											<tr>
 												<td></td>
 												<td style="text-align:left;">
-													<input type="submit"
-														   class="button button-primary"
-														   value="<?php echo __( 'Start' ); ?>"
-													>
-													<input type="button"
-														   class="button button-secondary"
-														   value="<?php echo __( 'Cancel' ); ?>"
-														   onclick="location.href=location.href"
-													>
+													<button type="submit" class="button button-primary">
+														<span class="material-icons wpda_icon_on_button">check</span>
+														<?php echo __( 'Start' ); ?>
+													</button>
+													<button type="button" class="button button-secondary"
+														   onclick="window.location.href=window.location.href">
+														<span class="material-icons wpda_icon_on_button">cancel</span>
+														<?php echo __( 'Cancel' ); ?>
+													</button>
 												</td>
 											</tr>
 										</table>
@@ -269,6 +269,7 @@ namespace WPDataAccess\Backup {
 				?>
 				jQuery(document).ready(function () {
 					jQuery("#keep option[value='3']").prop('selected', true);
+					jQuery( '.wpda_tooltip' ).tooltip();
 				});
 				<?php
 				}
@@ -386,16 +387,16 @@ namespace WPDataAccess\Backup {
 			echo '<div class="wrap">';
 			echo '<h1 class="wp-heading-inline">';
 			echo '<span>' . __( 'Data Backup' ) . '</span>&nbsp;';
-			echo '<a href="https://wpdataaccess.com/docs/documentation/data-explorer/data-backup/" target="_blank" title="Plugin Help - open a new tab or window">';
+			echo '<a href="https://wpdataaccess.com/docs/documentation/data-explorer/data-backup/" class="wpda_tooltip" target="_blank" title="Plugin Help - open a new tab or window">';
 			echo '<span class="dashicons dashicons-editor-help "style="text-decoration:none;vertical-align:top;font-size:30px;"></span>';
 			echo '</a>&nbsp;';
 			echo '</h1>&nbsp;';
 			echo '<form method="post" action="?page=wpda&page_action=wpda_backup&schema_name=' . esc_attr( $schema_name ) . '" style="display: inline-block; vertical-align: baseline;">';
-			echo '<input type="submit" class="page-title-action" value="' . __( 'New Data Backup' ) . '" />';
+			echo '<button type="submit" class="page-title-action"><span class="material-icons wpda_icon_on_button">add_circle</span>' . __( 'New Data Backup' ) . '</button>';
 			echo '<input type="hidden" name="action" value="new" />';
 			echo '</form>';
 			echo '<form method="post" action="?page=wpda&schema_name=' . esc_attr( $schema_name ) . '" style="display: inline-block; vertical-align: baseline;">';
-			echo '<input type="submit" class="page-title-action" value="' . __( 'Back to Data Explorer' ) . '" />';
+			echo '<button type="submit" class="page-title-action"><span class="material-icons wpda_icon_on_button">arrow_back</span>' . __( 'Data Explorer' ) . '</button>';
 			echo '</form>';
 
 			if ( $data_backups_found || 'all' === $show_jobs ) {
@@ -554,6 +555,13 @@ namespace WPDataAccess\Backup {
 			echo '</tr>';
 			echo '</table>';
 			echo '</div>';
+			?>
+			<script type="text/javascript">
+				jQuery(document).ready(function () {
+					jQuery( '.wpda_tooltip' ).tooltip();
+				});
+			</script>
+			<?php
 		}
 
 		/**
@@ -848,13 +856,13 @@ namespace WPDataAccess\Backup {
 				<div class="wrap">
 					<h1 class="wp-heading-inline">
 						<span><?php echo __( 'Data Backup' ); ?></span>
-						<a href="https://wpdataaccess.com/docs/documentation/data-explorer/data-backup/" target="_blank" title="Plugin Help - open a new tab or window">
-							<span class="dashicons dashicons-editor-help"
+						<a href="https://wpdataaccess.com/docs/documentation/data-explorer/data-backup/" class="wpda_tooltip" target="_blank" title="Plugin Help - open a new tab or window">
+							<span class="dashicons dashicons-editor-help wpda_tooltip"
 								  style="text-decoration:none;vertical-align:top;font-size:30px;">
 							</span></a>
 					</h1>
 					<p><?php echo __( 'Data backup started. Please check backup location.' ); ?></p>
-					<p><a href="?page=wpda&page_action=wpda_backup" class="button"><?php echo __( 'Back to main page' ); ?></a></p>
+					<p><a href="?page=wpda&page_action=wpda_backup" class="button"><?php echo __( 'List' ); ?></a></p>
 				</div>
 				<?php
 			} else {

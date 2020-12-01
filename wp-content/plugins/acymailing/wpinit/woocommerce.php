@@ -12,8 +12,6 @@ class acyWoocommerce extends acyHook
 
     public function subscribeUserOnCheckoutWC($order_id, $posted_data, $order)
     {
-        if (!$this->loadAcyLibrary()) return;
-
         $config = acym_config();
         if (!$config->get('woocommerce_sub', 0)) return;
 
@@ -46,7 +44,6 @@ class acyWoocommerce extends acyHook
 
     public function addSubsciptionFieldWC($fields)
     {
-        if (!$this->loadAcyLibrary()) return $fields;
         $config = acym_config();
         if (!$config->get('woocommerce_sub', 0)) return $fields;
 

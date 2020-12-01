@@ -19,8 +19,6 @@ class acyActivation extends acyHook
         $queries = fread($handle, filesize($file_name));
         fclose($handle);
 
-        $this->loadAcyLibrary();
-
         if (is_multisite()) {
             $currentBlog = get_current_blog_id();
             $sites = function_exists('get_sites') ? get_sites() : wp_get_sites();
@@ -96,10 +94,11 @@ class acyActivation extends acyHook
         $updateHelper->installList();
         $updateHelper->installNotifications();
         if (!$installClass->update) {
-            $updateHelper->installTemplates();
+            $updateHelper->installTemplates(true);
         }
         $updateHelper->installFields();
         $updateHelper->installAdminNotif();
+        $updateHelper->installAddons();
 
         $newConfig = new stdClass();
         $newConfig->installcomplete = 1;

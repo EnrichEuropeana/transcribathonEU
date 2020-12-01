@@ -35,6 +35,7 @@ namespace WPDataAccess\CSV_Files {
 					<span><?php echo __( 'Import CSV ' ); ?></span>
 					<a href="https://wpdataaccess.com/docs/documentation/data-explorer/import-csv-file/"
 					   target="_blank"
+					   class="wpda_tooltip"
 					   title="Plugin Help - open a new tab or window">
 						<span class="dashicons dashicons-editor-help"
 							  style="text-decoration:none;vertical-align:top;font-size:30px;">
@@ -44,10 +45,10 @@ namespace WPDataAccess\CSV_Files {
 				<form method="post"
 					  action="?page=wpda&page_action=wpda_import_csv&schema_name=<?php echo esc_attr( $this->schema_name ); ?>"
 					  style="display: inline-block; vertical-align: baseline;">
-					<input type="submit"
-						   class="page-title-action"
-						   value="<?php echo __( 'Upload new CSV file' ); ?>"
-					/>
+					<button type="submit" class="page-title-action">
+						<span class="material-icons wpda_icon_on_button">cloud_upload</span>
+						<?php echo __( 'Upload new CSV file' ); ?>
+					</button>
 					<input type="hidden"
 						   name="action"
 						   value="upload"
@@ -59,10 +60,10 @@ namespace WPDataAccess\CSV_Files {
 					<form method="post"
 						  action="?page=wpda&page_action=wpda_import_csv&schema_name=<?php echo esc_attr( $this->schema_name ); ?>"
 						  style="display: inline-block; vertical-align: baseline;">
-						<input type="submit"
-							   class="page-title-action"
-							   value="<?php echo __( 'Back to CSV file list' ); ?>"
-						/>
+						<button type="submit" class="page-title-action">
+							<span class="material-icons wpda_icon_on_button">arrow_back</span>
+							<?php echo __( 'CSV file list' ); ?>
+						</button>
 					</form>
 					<?php
 				}
@@ -70,10 +71,10 @@ namespace WPDataAccess\CSV_Files {
 				<form method="post"
 					  action="?page=wpda&schema_name=<?php echo esc_attr( $this->schema_name ); ?>"
 					  style="display: inline-block; vertical-align: baseline;">
-					<input type="submit"
-						   class="page-title-action"
-						   value="<?php echo __( 'Back to Data Explorer' ); ?>"
-					/>
+					<button type="submit" class="page-title-action">
+						<span class="material-icons wpda_icon_on_button">arrow_back</span>
+						<?php echo __( 'Data Explorer' ); ?>
+					</button>
 				</form>
 				<br/>
 				<?php $this->show_body(); ?>
@@ -152,16 +153,20 @@ namespace WPDataAccess\CSV_Files {
 					</label>
 					<br/><br/>
 					<input type="file" name="filename" id="filename" accept=".csv">
-					<input type="submit"
-						   value="<?php echo __( 'Upload', 'wp-data-access' ); ?>"
-						   class="button button-secondary"
-						   onclick="if (jQuery('#csv_name').val()===''||jQuery('#filename').val()==='') { alert('Please enter an import name and select a file'); return false; }"
-					/>
-					<input type="button"
-						   onclick="location.href='?page=wpda&page_action=wpda_import_csv&schema_name=<?php echo esc_attr( $this->schema_name ); ?>'"
-						   class="button button-secondary"
-						   value="<?php echo __( 'Cancel', 'wp-data-access' ); ?>"
-					/>
+					<button type="submit"
+						   	class="button button-secondary"
+						   	onclick="if (jQuery('#csv_name').val()===''||jQuery('#filename').val()==='') { alert('Please enter an import name and select a file'); return false; }"
+					>
+						<span class="material-icons wpda_icon_on_button">check</span>
+						<?php echo __( 'Upload', 'wp-data-access' ); ?>
+					</button>
+					<button type="button"
+						   	onclick="window.location.href='?page=wpda&page_action=wpda_import_csv&schema_name=<?php echo esc_attr( $this->schema_name ); ?>'"
+						   	class="button button-secondary"
+					>
+						<span class="material-icons wpda_icon_on_button">cancel</span>
+						<?php echo __( 'Cancel', 'wp-data-access' ); ?>
+					</button>
 					<input type="hidden"
 						   name="action"
 						   value="upload"
@@ -425,7 +430,7 @@ namespace WPDataAccess\CSV_Files {
 							<input type="submit"
 								   class="page-title-action"
 								   style="margin-left: 0;"
-								   value="<?php echo __( 'Back to CSV file list' ); ?>"
+								   value="<?php echo __( 'CSV file list' ); ?>"
 							/>
 						</form>
 						<?php

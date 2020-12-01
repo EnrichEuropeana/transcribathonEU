@@ -532,26 +532,26 @@ msgstr ""
 msgid "Editing revision dated %s. Click %sRevert to this revision%s to keep using it."
 msgstr ""
 
-#: tpl/page.php:42
+#: tpl/page.php:45
 msgid "Get The Full Experience"
 msgstr ""
 
-#: tpl/page.php:44
+#: tpl/page.php:47
 msgid "%sSiteOrigin Premium%s adds a <strong>Google Web Font</strong> selector to SiteOrigin CSS so you can easily change any font."
 msgstr ""
 
-#: tpl/page.php:52
+#: tpl/page.php:55
 msgid "Getting Started Video"
 msgstr ""
 
-#: tpl/page.php:53
+#: tpl/page.php:56
 msgid "Dismiss"
 msgstr ""
 
-#: tpl/page.php:62
+#: tpl/page.php:65
 msgid "CSS Revisions"
 msgstr ""
 
-#: tpl/page.php:64
+#: tpl/page.php:67
 msgid "Are you sure you want to load this revision?"
 msgstr ""

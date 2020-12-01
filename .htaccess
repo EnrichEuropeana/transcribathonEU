@@ -5,7 +5,7 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 Redirect 301 /password-reset/ https://transcribathon.eu/wp-login.php?action=lostpassword
-
+Redirect 301 /sachsen-at-work/ https://europeana.transcribathon.eu/runs/sachsen-at-work/
 
 RewriteBase /
 RewriteRule ^index\.php$ - [L]

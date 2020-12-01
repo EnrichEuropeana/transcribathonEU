@@ -33,6 +33,7 @@ function metaslider_pro_is_installed() {
 function metaslider_pro_is_active() {
     return is_plugin_active(metaslider_plugin_is_installed('ml-slider-pro'));
 }
+
 /**
  * Returns true if the user does not have the pro version installed
  *
@@ -40,6 +41,16 @@ function metaslider_pro_is_active() {
  */
 function metaslider_user_sees_upgrade_page() {
     return (bool) apply_filters('metaslider_show_upgrade_page', !metaslider_pro_is_installed());
+}
+
+/**
+ * Returns true if the user does not have the pro version installed
+ *
+ * @return bool
+ */
+function metaslider_user_has_at_least_one_slideshow() {
+	$posts = get_posts(array('posts_per_page' => 1, 'post_type' => 'ml-slider'));
+    return (bool) is_array($posts) && count($posts);
 }
 
 /**

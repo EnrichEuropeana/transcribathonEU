@@ -25,18 +25,19 @@ function _TCT_item_page_test_ad( $atts ) {
 
          // Save image data
          $itemData = json_decode($result, true);
-         $itemData = $itemData[0];
 
-         // Set request parameters for story data
-         $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
-         $requestType = "GET";
-
-         // Execude http request
-         include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
-
-         // Save story data
-         $storyData = json_decode($result, true);
-         $storyData = $storyData[0];
+         if ($itemData['StoryId'] != null) {
+            // Set request parameters for story data
+            $url = home_url()."/tp-api/stories/".$itemData['StoryId'];
+            $requestType = "GET";
+   
+            // Execude http request
+            include dirname(__FILE__)."/../custom_scripts/send_api_request.php";
+   
+            // Save story data
+            $storyData = json_decode($result, true);
+            $storyData = $storyData[0];
+         }
 
          //include theme directory for text hovering
          $theme_sets = get_theme_mods();
@@ -711,42 +712,45 @@ function _TCT_item_page_test_ad( $atts ) {
                 foreach ($fieldMappings as $fieldMapping) {
                     $fields[$fieldMapping['Name']] = $fieldMapping['DisplayName'];
                 }
-                foreach ($storyData as $key => $value) {
-                    if ($fields[$key] != null && $fields[$key] != "") {
-                        $infoTab .= "<p class='item-page-property'>";
-                            $infoTab .= "<span class='item-page-property-key' style='font-weight:bold;'>";
-                                $infoTab .= $fields[$key].": ";
-                            $infoTab .= "</span>";
-                            $infoTab .= "<span class='item-page-property-value'>";
-                            $valueList = explode(" || ", $value);
-                            $valueList = array_unique($valueList);
-                            $i = 0;
-                            foreach ($valueList as $singleValue) {
-                                if ($singleValue != "") {
-                                    if ($i == 0) {
-                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                foreach ($itemData as $key => $value) {
+                    if (substr($key, 0, 5) == "Story") {
+                        $key = substr($key, 5);
+                        if ($fields[$key] != null && $fields[$key] != "") {
+                            $infoTab .= "<p class='item-page-property'>";
+                                $infoTab .= "<span class='item-page-property-key' style='font-weight:bold;'>";
+                                    $infoTab .= $fields[$key].": ";
+                                $infoTab .= "</span>";
+                                $infoTab .= "<span class='item-page-property-value'>";
+                                $valueList = explode(" || ", $value);
+                                $valueList = array_unique($valueList);
+                                $i = 0;
+                                foreach ($valueList as $singleValue) {
+                                    if ($singleValue != "") {
+                                        if ($i == 0) {
+                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                                $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                            }
+                                            else {
+                                                $infoTab .= $singleValue;
+                                            }
                                         }
                                         else {
-                                            $infoTab .= $singleValue;
+                                            if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
+                                                $infoTab .= "</br>";
+                                                $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
+                                            }
+                                            else {
+                                                $infoTab .= "</br>";
+                                                $infoTab .= $singleValue;
+                                            }
                                         }
                                     }
-                                    else {
-                                        if (filter_var($singleValue, FILTER_VALIDATE_URL)) {
-                                            $infoTab .= "</br>";
-                                            $infoTab .= "<a target=\"_blank\" href=\"".$singleValue."\">".$singleValue."</a>";
-                                        }
-                                        else {
-                                            $infoTab .= "</br>";
-                                            $infoTab .= $singleValue;
-                                        }
-                                    }
+                                    $i += 1;
                                 }
-                                $i += 1;
-                            }
-                                
-                            $infoTab .= "</span></br>";
-                        $infoTab .= "</p>";
+                                    
+                                $infoTab .= "</span></br>";
+                            $infoTab .= "</p>";
+                        }
                     }
                 }
                 $location = "";

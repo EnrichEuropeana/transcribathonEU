@@ -63,7 +63,12 @@ function um_after_insert_user( $user_id, $args ) {
 	if ( ! empty( $args['submitted'] ) ) {
 		UM()->user()->set_registration_details( $args['submitted'], $args );
 	}
-    UM()->user()->set_status( um_user( 'status' ) );
+
+	/* save user status */
+	UM()->user()->set_status( um_user( 'status' ) );
+
+	/* create user uploads directory */
+	UM()->uploader()->get_upload_user_base_dir( $user_id, true );
 
 	/**
 	 * UM hook
@@ -172,7 +177,7 @@ function um_check_user_status( $user_id, $args ) {
 
 		// Priority redirect
 		if ( isset( $args['redirect_to'] ) ) {
-			exit( wp_redirect( urldecode( $args['redirect_to'] ) ) );
+			exit( wp_safe_redirect( urldecode( $args['redirect_to'] ) ) );
 		}
 
 		if ( $status == 'approved' ) {

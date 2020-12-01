@@ -37,10 +37,11 @@ class Backend {
 	 * @since 1.0.0
 	 */
 	public static function init() {
+		$inst = self::get_instance();
 		require_once DISPLAY_POST_TYPES_DIR . '/backend/inc/functions.php';
 		require_once DISPLAY_POST_TYPES_DIR . '/backend/inc/class-block.php';
-		add_action( 'widgets_init', [ self::get_instance(), 'register_custom_widget' ] );
-		add_action( 'admin_enqueue_scripts', [ self::get_instance(), 'enqueue_admin_widgets' ] );
+		add_action( 'widgets_init', array( $inst, 'register_custom_widget' ) );
+		add_action( 'admin_enqueue_scripts', array( $inst, 'enqueue_admin_widgets' ) );
 	}
 
 	/**

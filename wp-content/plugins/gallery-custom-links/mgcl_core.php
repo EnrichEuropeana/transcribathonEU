@@ -152,7 +152,6 @@ class Meow_Gallery_Custom_Links
 		$this->isEnabled = apply_filters( 'gallery_custom_links_enabled', true );
 		if ( !$this->isEnabled || !isset( $buffer ) || trim( $buffer ) === '' )
 			return $buffer;
-
 		if ( $this->parsingEngine === 'HtmlDomParser' ) {
 			$html = new KubAT\PhpSimple\HtmlDomParser();
 			$html = $html->str_get_html( $buffer, true, true, DEFAULT_TARGET_CHARSET, false );
@@ -161,9 +160,9 @@ class Meow_Gallery_Custom_Links
 			$html = new DiDom\Document();
 			$html->preserveWhiteSpace();
 			if ( defined( 'LIBXML_HTML_NOIMPLIED' ) && defined( 'LIBXML_HTML_NODEFDTD' ) )
-				$html->loadHtml( $buffer, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+				$html->loadHtml( (string)$buffer, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 			else
-				$html->loadHtml( $buffer, 0 );
+				$html->loadHtml( (string)$buffer, 0 );
 		}
 
 		if ( empty( $html ) || is_bool( $html ) ) {

@@ -36,18 +36,6 @@ namespace WPDataAccess\Plugin_Table_Models {
 		}
 
 		/**
-		 * Get base table name
-		 *
-		 * @return string Base table name
-		 */
-		public static function get_base_table_name() {
-			static::check_base_table_name();
-
-			global $wpdb;
-			return $wpdb->prefix . static::BASE_TABLE_NAME;
-		}
-
-		/**
 		 * Check if base table exists
 		 *
 		 * @return bool TRUE = table found
@@ -57,6 +45,18 @@ namespace WPDataAccess\Plugin_Table_Models {
 
 			$wpda_dictionary_exist = new WPDA_Dictionary_Exist( '', static::get_base_table_name() );
 			return $wpda_dictionary_exist->table_exists( false );
+		}
+
+		/**
+		 * Get base table name
+		 *
+		 * @return string Base table name
+		 */
+		public static function get_base_table_name() {
+			static::check_base_table_name();
+
+			global $wpdb;
+			return $wpdb->prefix . static::BASE_TABLE_NAME;
 		}
 
 		/**

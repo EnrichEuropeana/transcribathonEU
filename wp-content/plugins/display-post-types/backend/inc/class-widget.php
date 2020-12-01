@@ -24,7 +24,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var    array
 	 */
-	protected $post_types = [];
+	protected $post_types = array();
 
 	/**
 	 * Holds sort orderby options.
@@ -33,7 +33,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var    array
 	 */
-	protected $orderby = [];
+	protected $orderby = array();
 
 	/**
 	 * Holds image cropping options.
@@ -42,7 +42,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var    array
 	 */
-	protected $imagecrop = [];
+	protected $imagecrop = array();
 
 	/**
 	 * Holds image aspect ratio options.
@@ -51,7 +51,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var    array
 	 */
-	protected $aspectratio = [];
+	protected $aspectratio = array();
 
 	/**
 	 * Holds widget settings defaults, populated in constructor.
@@ -60,7 +60,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var array
 	 */
-	protected $defaults = [];
+	protected $defaults = array();
 
 	/**
 	 * Holds all display styles.
@@ -69,7 +69,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var array
 	 */
-	protected $styles = [];
+	protected $styles = array();
 
 	/**
 	 * Holds all display contents.
@@ -78,7 +78,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var array
 	 */
-	protected $contents = [];
+	protected $contents = array();
 
 	/**
 	 * Holds all display styles supported items.
@@ -87,7 +87,7 @@ class Widget extends \WP_Widget {
 	 * @access protected
 	 * @var array
 	 */
-	protected $style_supported = [];
+	protected $style_supported = array();
 
 	/**
 	 * Sets up a new Blank widget instance.
@@ -100,24 +100,24 @@ class Widget extends \WP_Widget {
 		$this->defaults['title'] = '';
 
 		// Set the options for orderby.
-		$this->orderby = [
+		$this->orderby = array(
 			'date'          => esc_html__( 'Publish Date', 'display-post-types' ),
 			'modified'      => esc_html__( 'Modified Date', 'display-post-types' ),
 			'title'         => esc_html__( 'Title', 'display-post-types' ),
 			'author'        => esc_html__( 'Author', 'display-post-types' ),
 			'comment_count' => esc_html__( 'Comment Count', 'display-post-types' ),
 			'rand'          => esc_html__( 'Random', 'display-post-types' ),
-		];
+		);
 
-		$this->imagecrop = [
+		$this->imagecrop = array(
 			'topleftcrop'      => esc_html__( 'Top Left Cropping', 'display-post-types' ),
 			'topcentercrop'    => esc_html__( 'Top Center Cropping', 'display-post-types' ),
 			'centercrop'       => esc_html__( 'Center Cropping', 'display-post-types' ),
 			'bottomleftcrop'   => esc_html__( 'Bottom Left Cropping', 'display-post-types' ),
 			'bottomcentercrop' => esc_html__( 'Bottom Center Cropping', 'display-post-types' ),
-		];
+		);
 
-		$this->aspectratio = [
+		$this->aspectratio = array(
 			''       => esc_html__( 'No Cropping', 'display-post-types' ),
 			'land1'  => esc_html__( 'Landscape (4:3)', 'display-post-types' ),
 			'land2'  => esc_html__( 'Landscape (3:2)', 'display-post-types' ),
@@ -125,23 +125,27 @@ class Widget extends \WP_Widget {
 			'port2'  => esc_html__( 'Portrait (2:3)', 'display-post-types' ),
 			'wdscrn' => esc_html__( 'Widescreen (16:9)', 'display-post-types' ),
 			'squr'   => esc_html__( 'Square (1:1)', 'display-post-types' ),
-		];
+		);
 
 		// Get list of all registered supported contents.
-		$this->contents = [
+		$this->contents = array(
 			'thumbnail' => esc_html__( 'Thumbnail', 'display-post-types' ),
 			'title'     => esc_html__( 'Title', 'display-post-types' ),
 			'meta'      => esc_html__( 'Meta info', 'display-post-types' ),
 			'category'  => esc_html__( 'Category', 'display-post-types' ),
 			'excerpt'   => esc_html__( 'Excerpt', 'display-post-types' ),
-		];
+			'date'      => esc_html__( 'Date', 'display-post-types' ),
+			'ago'       => esc_html__( 'Ago', 'display-post-types' ),
+			'author'    => esc_html__( 'Author', 'display-post-types' ),
+			'content'   => esc_html__( 'Content', 'display-post-types' ),
+		);
 
 		// Set the widget options.
-		$widget_ops = [
+		$widget_ops = array(
 			'classname'                   => 'display_posts_types',
 			'description'                 => esc_html__( 'Create a display post types widget.', 'display-post-types' ),
 			'customize_selective_refresh' => true,
-		];
+		);
 		parent::__construct( 'dpt_display_post_types', esc_html__( 'Display Post Types', 'display-post-types' ), $widget_ops );
 	}
 
@@ -196,7 +200,7 @@ class Widget extends \WP_Widget {
 		<p>
 			<?php
 			$post_type = dpt_get_post_types();
-			$post_type = array_merge( [ '' => esc_html__( 'None', 'display-post-types' ) ], $post_type );
+			$post_type = array_merge( array( '' => esc_html__( 'None', 'display-post-types' ) ), $post_type );
 			$this->label( 'post_type', esc_html__( 'Select Post Type', 'display-post-types' ) );
 			$this->select( 'post_type', $post_type, $instance['post_type'] );
 			?>
@@ -223,6 +227,17 @@ class Widget extends \WP_Widget {
 					<?php $this->terms_checklist( $instance['taxonomy'], $instance['terms'] ); ?>
 				</div><!-- .terms-panel -->
 
+				<p class="terms-relation" <?php echo '' === $instance['taxonomy'] ? ' style="display:none;"' : ''; ?>>
+					<?php
+					$this->label( 'relation', esc_html__( 'Terms Relationship', 'display-post-types' ) );
+					$relation = array(
+						'IN'  => esc_html__( 'Show posts belong to any of the terms checked above.', 'display-post-types' ),
+						'AND' => esc_html__( 'Show posts belong to all of the terms checked above.', 'display-post-types' ),
+					);
+					$this->select( 'relation', $relation, $instance['relation'] );
+					?>
+				</p>
+
 				<p class="number-of-posts">
 					<?php $this->label( 'number', esc_html__( 'Number of items to display', 'display-post-types' ) ); ?>
 					<input class="tiny-text" id="<?php echo esc_attr( $this->get_field_id( 'number' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'number' ) ); ?>" type="number" step="1" min="1" value="<?php echo absint( $instance['number'] ); ?>" size="3" />
@@ -243,10 +258,10 @@ class Widget extends \WP_Widget {
 				<p class="order">
 					<?php
 					$this->label( 'order', esc_html__( 'Sort Order', 'display-post-types' ) );
-					$order = [
+					$order = array(
 						'DESC' => esc_html__( 'Descending', 'display-post-types' ),
 						'ASC'  => esc_html__( 'Ascending', 'display-post-types' ),
-					];
+					);
 					$this->select( 'order', $order, $instance['order'] );
 					?>
 				</p>
@@ -298,10 +313,10 @@ class Widget extends \WP_Widget {
 
 				<p class="posts-imgalign" <?php echo ( ! $this->is_style_support( $instance['styles'], 'ialign' ) ) ? ' style="display:none;"' : ''; ?>>
 					<?php
-					$ialign = [
+					$ialign = array(
 						''      => esc_html__( 'Left Aligned', 'display-post-types' ),
 						'right' => esc_html__( 'Right Aligned', 'display-post-types' ),
-					];
+					);
 					$this->label( 'img_align', esc_html__( 'Image Alignment', 'display-post-types' ) );
 					$this->select( 'img_align', $ialign, $instance['img_align'] );
 					?>
@@ -311,6 +326,12 @@ class Widget extends \WP_Widget {
 					<?php $this->label( 'col_narr', esc_html__( 'Number of grid columns', 'display-post-types' ) ); ?>
 					<input class="tiny-text" id="<?php echo esc_attr( $this->get_field_id( 'col_narr' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'col_narr' ) ); ?>" type="number" step="1" min="1" max="8" value="<?php echo absint( $instance['col_narr'] ); ?>" size="1" />
 				</p>
+
+				<p class="autotime" <?php echo ( ! $this->is_style_support( $instance['styles'], 'slider' ) ) ? ' style="display:none;"' : ''; ?>>
+					<?php $this->label( 'autotime', esc_html__( 'Auto slide timer (delay in ms)', 'display-post-types' ) ); ?>
+					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'autotime' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'autotime' ) ); ?>" type="number" step="500" min="0" value="<?php echo absint( $instance['autotime'] ); ?>" size="4" />
+					<span class="dpt-desc" style="font-style: italic;"><?php esc_html_e( 'Setting delay time to 0 will disable auto slide.', 'display-post-type' ); ?>
+				</p>
 			</div>
 		</div>
 
@@ -318,11 +339,11 @@ class Widget extends \WP_Widget {
 		<div class="dpt-style-content dpt-settings-content<?php echo ( 'post' !== $instance['post_type'] ) ? ' not-post' : ''; ?>">
 			<p>
 				<?php
-				$text_align = [
+				$text_align = array(
 					''       => esc_html__( 'Left Align', 'display-post-types' ),
 					'r-text' => esc_html__( 'Right Align', 'display-post-types' ),
 					'c-text' => esc_html__( 'Center Align', 'display-post-types' ),
-				];
+				);
 				$this->label( 'text_align', esc_html__( 'Text Align', 'display-post-types' ) );
 				$this->select( 'text_align', $text_align, $instance['text_align'] );
 				?>
@@ -370,13 +391,13 @@ class Widget extends \WP_Widget {
 
 		if ( 'page' === $instance['post_type'] ) {
 			// Get list of all pages.
-			$pages       = get_pages( [ 'exclude' => get_option( 'page_for_posts' ) ] );
+			$pages       = get_pages( array( 'exclude' => get_option( 'page_for_posts' ) ) );
 			$valid_pages = wp_list_pluck( $pages, 'ID' );
 
 			$instance['pages']    = array_intersect( $new_instance['pages'], $valid_pages );
-			$instance['taxonomy'] = [];
+			$instance['taxonomy'] = array();
 		} else {
-			$instance['pages'] = [];
+			$instance['pages'] = array();
 		}
 
 		if ( $instance['post_type'] && 'page' !== $instance['post_type'] && $new_instance['post_ids'] ) {
@@ -398,18 +419,19 @@ class Widget extends \WP_Widget {
 
 		if ( $instance['taxonomy'] && $new_instance['terms'] ) {
 			// Get list of all terms.
-			$terms       = get_terms( [ 'taxonomy' => $instance['taxonomy'] ] );
+			$terms       = get_terms( array( 'taxonomy' => $instance['taxonomy'] ) );
 			$terms       = wp_list_pluck( $terms, 'name', 'slug' );
 			$valid_terms = array_keys( $terms );
 
 			$instance['terms'] = array_intersect( $new_instance['terms'], $valid_terms );
 		} else {
-			$instance['terms'] = [];
+			$instance['terms'] = array();
 		}
 
-		$instance['number']  = absint( $new_instance['number'] );
-		$instance['offset']  = absint( $new_instance['offset'] );
-		$instance['orderby'] = ( array_key_exists( $new_instance['orderby'], $this->orderby ) ) ? $new_instance['orderby'] : 'date';
+		$instance['relation'] = ( 'IN' === $new_instance['relation'] ) ? 'IN' : 'AND';
+		$instance['number']   = absint( $new_instance['number'] );
+		$instance['offset']   = absint( $new_instance['offset'] );
+		$instance['orderby']  = ( array_key_exists( $new_instance['orderby'], $this->orderby ) ) ? $new_instance['orderby'] : 'date';
 
 		$instance['order'] = ( 'DESC' === $new_instance['order'] ) ? 'DESC' : 'ASC';
 
@@ -427,6 +449,7 @@ class Widget extends \WP_Widget {
 
 		$instance['br_radius'] = absint( $new_instance['br_radius'] );
 		$instance['col_narr']  = absint( $new_instance['col_narr'] );
+		$instance['autotime']  = absint( $new_instance['autotime'] );
 
 		$valid_styles       = $this->get_display_styles();
 		$instance['styles'] = array_key_exists( $new_instance['styles'], $valid_styles ) ? $new_instance['styles'] : '';
@@ -435,7 +458,7 @@ class Widget extends \WP_Widget {
 			$valid_style_sup       = array_keys( $this->contents );
 			$instance['style_sup'] = array_intersect( $new_instance['style_sup'], $valid_style_sup );
 		} else {
-			$instance['style_sup'] = [];
+			$instance['style_sup'] = array();
 		}
 
 		$instance['pl_holder'] = 'yes' === $new_instance['pl_holder'] ? 'yes' : '';
@@ -452,7 +475,7 @@ class Widget extends \WP_Widget {
 	public function pages_checklist( $selected_pages ) {
 
 		// Get list of all pages.
-		$pages = get_pages( [ 'exclude' => get_option( 'page_for_posts' ) ] );
+		$pages = get_pages( array( 'exclude' => get_option( 'page_for_posts' ) ) );
 		$pages = wp_list_pluck( $pages, 'post_title', 'ID' );
 
 		$this->label( 'pages', esc_html__( 'Select Pages', 'display-post-types' ) );
@@ -466,7 +489,7 @@ class Widget extends \WP_Widget {
 	 * @param array $selected_terms Selected Terms.
 	 * @return void
 	 */
-	public function terms_checklist( $taxonomy, $selected_terms = [] ) {
+	public function terms_checklist( $taxonomy, $selected_terms = array() ) {
 
 		// Get list of all registered terms.
 		$terms = get_terms();
@@ -496,9 +519,9 @@ class Widget extends \WP_Widget {
 	 * @param array $selected Selected content.
 	 * @return void
 	 */
-	public function supported_checklist( $style, $selected = [] ) {
+	public function supported_checklist( $style, $selected = array() ) {
 
-		$classes = [];
+		$classes = array();
 
 		foreach ( $this->contents as $slug => $label ) {
 			foreach ( $this->style_supported as $s => $supported ) {
@@ -526,12 +549,12 @@ class Widget extends \WP_Widget {
 	 * @param array $selected  Selected taxonomy in widget form.
 	 * @return void
 	 */
-	public function taxonomies_select( $post_type, $selected = [] ) {
+	public function taxonomies_select( $post_type, $selected = array() ) {
 
 		$options = dpt_get_taxonomies();
 
 		// Get HTML classes for select options.
-		$taxonomies = get_taxonomies( [], 'objects' );
+		$taxonomies = get_taxonomies( array(), 'objects' );
 		$classes    = wp_list_pluck( $taxonomies, 'object_type', 'name' );
 		if ( $post_type && 'page' !== $post_type ) {
 			foreach ( $classes as $name => $type ) {
@@ -576,7 +599,7 @@ class Widget extends \WP_Widget {
 	 * @param bool  $echo     Display or return.
 	 * @return void|string
 	 */
-	public function select( $for, $options, $selected, $classes = [], $echo = true ) {
+	public function select( $for, $options, $selected, $classes = array(), $echo = true ) {
 		$select      = '';
 		$final_class = '';
 		foreach ( $options as $value => $label ) {
@@ -613,7 +636,7 @@ class Widget extends \WP_Widget {
 	 * @param bool  $echo     Display or return.
 	 * @return void|string
 	 */
-	public function mu_checkbox( $for, $options, $selected, $classes = [], $echo = true ) {
+	public function mu_checkbox( $for, $options, $selected, $classes = array(), $echo = true ) {
 
 		$final_class = '';
 
@@ -625,7 +648,7 @@ class Widget extends \WP_Widget {
 		// Moving selected items on top of the array.
 		foreach ( $options as $id => $label ) {
 			if ( in_array( strval( $id ), $selected, true ) ) {
-				$rev_options = [ $id => $label ] + $rev_options;
+				$rev_options = array( $id => $label ) + $rev_options;
 			}
 		}
 
@@ -654,7 +677,7 @@ class Widget extends \WP_Widget {
 			return $this->styles;
 		}
 
-		$styles = apply_filters( 'dpt_styles', [] );
+		$styles = apply_filters( 'dpt_styles', array() );
 		foreach ( $styles as $style => $args ) {
 			$this->styles[ $style ]          = $args['label'];
 			$this->style_supported[ $style ] = $args['support'];

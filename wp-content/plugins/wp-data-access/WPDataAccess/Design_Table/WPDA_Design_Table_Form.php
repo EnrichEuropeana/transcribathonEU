@@ -1197,7 +1197,7 @@ namespace WPDataAccess\Design_Table {
 						'	<input type="hidden" name="row_action[]" value="' + row_action + '">' +
 						'</td>' +
 						'<td class="wpda-table-structure-last-column">' +
-						'	<a href="javascript:void(0)" onclick="rem_row(event)" class="dashicons dashicons-trash wpda_view_table"></a>' +
+						'	<a href="javascript:void(0)" onclick="rem_row(event)" class="dashicons dashicons-trash wpda_view_table wpda_tooltip" title="Remove column from table design"></a>' +
 						'</td>' +
 						'</tr>';
 					if (jQuery("#wpda_table_structure tr").length === 0) {
@@ -1381,7 +1381,7 @@ namespace WPDataAccess\Design_Table {
 						'	<input type="hidden" name="row_action[]" value="' + row_action + '">' +
 						'</td>' +
 						'<td class="wpda-table-structure-last-column" style="width:20px;">' +
-						'		<a href="javascript:void(0)" onclick="rem_index(event)" class="dashicons dashicons-trash wpda_view_index"></a>' +
+						'		<a href="javascript:void(0)" onclick="rem_index(event)" class="dashicons dashicons-trash wpda_view_index wpda_tooltip" title="Remove index from table design"></a>' +
 						'	</td>' +
 						'</tr>';
 					if (jQuery("#wpda_index_structure tr").length === 0) {
@@ -1460,17 +1460,14 @@ namespace WPDataAccess\Design_Table {
 					<a
 							href="?page=<?php echo '' === $this->caller ? esc_attr( $this->page ) : \WP_Data_Access_Admin::PAGE_MAIN; ?>"
 							style="display: inline-block; vertical-align: unset;"
-							class="dashicons dashicons-arrow-left-alt"
-							title="<?php echo __( 'Back to List', 'wp-data-access' ); ?>"
+							class="dashicons dashicons-arrow-left-alt wpda_tooltip"
+							title="<?php echo __( 'List', 'wp-data-access' ); ?>"
 					></a>
 					<span><?php echo __( 'Data Designer', 'wp-data-access' ); ?></span>
-					<a href="https://wpdataaccess.com/docs/documentation/data-designer/" target="_blank" title="Plugin Help - open a new tab or window">
-						<span class="dashicons dashicons-editor-help"
-							  style="text-decoration:none;vertical-align:top;font-size:30px;">
-						</span></a>
-					&nbsp;
-					<a href="javascript:location.href='?page=<?php echo '' === $this->caller ? esc_attr( $this->page ) : \WP_Data_Access_Admin::PAGE_MAIN; ?>'"
-					   class="button"><?php echo __( 'Back To List' ); ?></a>
+					<a href="https://wpdataaccess.com/docs/documentation/data-designer/" target="_blank"
+					   title="Plugin Help - open a new tab or window" class="wpda_tooltip">
+						<span class="material-icons" style="font-size: 26px; vertical-align: sub;">help</span>
+					</a>
 				</h1>
 				<div style="display:none;">
 					<form id="wpda_create_table_form"
@@ -1550,11 +1547,11 @@ namespace WPDataAccess\Design_Table {
 
 					#overlay_show_create_table_text {
 						height: 360px;
-						width: 430px;
+						width: 400px;
 						padding: 10px;
 						position: relative;
 						top: 50%;
-						left: 235px;
+						left: 220px;
 						transform: translate(-50%, -50%);
 						-ms-transform: translate(-50%, -50%);
 						color: black;
@@ -1567,17 +1564,19 @@ namespace WPDataAccess\Design_Table {
 					<div id="overlay_show_create_table_text">
 						<?php echo $this->create_table_statement . $this->create_index_statement; ?>
 					</div>
-					<div style="position: absolute; bottom: 0; right: 0; padding-right: 5px; padding-bottom: 10px;">
+					<div style="position: absolute; bottom: 0; right: 0; padding-right: 10px; padding-bottom: 10px;">
 						<a id="button-copy-clipboard" href="javascript:void(0)" class="button button-secondary"
-						   style="text-align:center;width:120px;"
+						   style="text-align:center;width:150px;"
 						   data-clipboard-text="<?php echo str_replace( self::NEW_LINE, "\n", $this->create_table_statement ) . str_replace( self::NEW_LINE, "\n", $this->create_index_statement ); ?>">
+							<span class="material-icons wpda_icon_on_button">content_copy</span>
 							<?php echo __( 'Copy to clipboard' ); ?>
 						</a>
 						<br/>
 						<div style="height: 5px;"></div>
 						<a href="javascript:void(0)" class="button button-primary"
-						   style="text-align:center;width:120px;"
+						   style="text-align:center;width:150px;"
 						   onclick="jQuery('#overlay_show_create_table').hide()">
+							<span class="material-icons wpda_icon_on_button">cancel</span>
 							<?php echo __( 'Close' ); ?>
 						</a>
 					</div>
@@ -1589,12 +1588,13 @@ namespace WPDataAccess\Design_Table {
 						<?php } ?>
 						var sql_to_clipboard = new ClipboardJS('#button-copy-clipboard');
 						sql_to_clipboard.on('success', function (e) {
-							alert('<?php echo __( 'SQL successfully copied to clipboard!' ); ?>');
+							jQuery.notify('<?php echo __( 'SQL successfully copied to clipboard!' ); ?>','info');
 						});
 						sql_to_clipboard.on('error', function (e) {
-							alert('<?php echo __( 'Could not copy SQL to clipboard!' ); ?>');
+							jQuery.notify('<?php echo __( 'Could not copy SQL to clipboard!' ); ?>','error');
 						});
 						jQuery('#wpda_table_structure').sortable();
+						jQuery( '.wpda_tooltip' ).tooltip();
 					});
 				</script>
 				<?php
@@ -1668,7 +1668,13 @@ namespace WPDataAccess\Design_Table {
 					<?php
 				}
 				?>
-				<br/>
+				<div style="text-align:right">
+					<a href="https://wpdataaccess.com/docs/documentation/data-designer/overview/"
+					   target="_blank" style="text-decoration:none">
+						<span class="material-icons wpda_icon_on_button">help_outline</span>
+						What is the difference between a table design and a database table?
+					</a>
+				</div>
 				<div>
 					<div style="display:none;">
 						<form id="show_create_table_form" action="?page=<?php echo esc_attr( $this->page ); ?>"
@@ -1767,14 +1773,14 @@ namespace WPDataAccess\Design_Table {
 											?>
 											<span style="vertical-align:-webkit-baseline-middle; cursor:pointer;"
 												  title="<?php echo __( 'You cannot use a WordPress table name', 'wp-data-access' ); ?>"
-												  class="dashicons dashicons-flag">
+												  class="dashicons dashicons-flag wpda_tooltip">
 											</span>
 											<?php
 										} else {
 											?>
-											<span style="vertical-align:-webkit-baseline-middle; cursor:pointer;"
-												  title="<?php echo __( 'A table with this name already exists in the database', 'wp-data-access' ); ?>"
-												  class="dashicons dashicons-warning">
+											<span title="<?php echo __( 'A table with this name already exists in the database', 'wp-data-access' ); ?>"
+												  class="material-icons pointer wpda_tooltip" style="padding-top:3px">
+												info
 											</span>
 											<?php
 										}
@@ -1782,7 +1788,9 @@ namespace WPDataAccess\Design_Table {
 										<a href="javascript:void(0)"
 										   	id="reconcile_button"
 											onclick="if (confirm('<?php echo __( 'Reconcile table? Your current modifications will be lost!' ); ?>')) { jQuery('#wpda_reconcile_form').submit(); }"
-											class="button">
+											class="button wpda_tooltip"
+											title="Update table design from database table (overwrites current design)">
+											<span class="material-icons wpda_icon_on_button">history</span>
 											<?php echo __( 'Reconcile' ); ?>
 										</a>
 										<?php
@@ -1795,7 +1803,7 @@ namespace WPDataAccess\Design_Table {
 										?>
 										<span style="vertical-align:-webkit-baseline-middle; cursor:pointer;"
 											  title="<?php echo $title; ?>"
-											  class="dashicons dashicons-warning">
+											  class="dashicons dashicons-warning wpda_tooltip">
 										</span>
 										<?php
 									}
@@ -1809,7 +1817,7 @@ namespace WPDataAccess\Design_Table {
 										?>
 										<a href="javascript:void(0)"
 										   onclick="jQuery('#wpda_reverse_engineering').show()"
-										   class="button wpda_view_table"
+										   class="button wpda_view_table wpda_tooltip"
 										   title="<?php echo __( 'Load table from database' ); ?>"
 										>
 											<?php echo __( 'Reverse engineering' ); ?>
@@ -1854,11 +1862,19 @@ namespace WPDataAccess\Design_Table {
 									<td colspan="8" class="wpda-table-structure-last-column">
 										<span style="float:right;">
 											<a id="button_show_create_table" href="javascript:void(0)"
-											   class="button button-secondary"
-											   onclick="jQuery('#show_create_table_form').submit();"><?php echo __( 'Show CREATE TABLE script' ); ?></a>
+											   class="button button-secondary wpda_tooltip"
+											   title="Generates a create table script from table and index design."
+											   onclick="jQuery('#show_create_table_form').submit();">
+												<span class="material-icons wpda_icon_on_button">code</span>
+												<?php echo __( 'Show CREATE TABLE script' ); ?>
+											</a>
 											<a id="button_show_alter_table" href="javascript:void(0)"
-											   class="button button-secondary"
-											   onclick="jQuery('#show_alter_table_form').submit();"><?php echo __( 'Show ALTER TABLE script' ); ?></a>
+											   class="button button-secondary wpda_tooltip"
+											   title="Generates a alter table script from table and index design."
+											   onclick="jQuery('#show_alter_table_form').submit();">
+												<span class="material-icons wpda_icon_on_button">code</span>
+												<?php echo __( 'Show ALTER TABLE script' ); ?>
+											</a>
 										</span>
 									</td>
 								</tr>
@@ -1924,7 +1940,7 @@ namespace WPDataAccess\Design_Table {
 								</span>
 							</legend>
 						<table class="wpda-table-structure" style="border-collapse: collapse;">
-							<head>
+							<thead>
 								<tr>
 									<th class="wpda-table-structure-first-column-move"></th>
 									<th>
@@ -1960,10 +1976,12 @@ namespace WPDataAccess\Design_Table {
 										<a href="javascript:void(0)"
 										   onclick="add_row('<?php echo esc_attr( $this->design_mode ); ?>')"
 										   style="vertical-align:-webkit-baseline-middle;"
-										   class="dashicons dashicons-plus wpda_view_table"></a>
+										   class="dashicons dashicons-plus wpda_view_table wpda_tooltip"
+										   title="Add new column to table design"
+										></a>
 									</th>
 								</tr>
-							</head>
+							</thead>
 							<tbody id="wpda_table_structure"></tbody>
 							<tfoot>
 							<tr>
@@ -1982,7 +2000,8 @@ namespace WPDataAccess\Design_Table {
 										/>
 									<?php } ?>
 									<a href="javascript:void(0)"
-									   class="button wpda_view<?php if ( $this->table_exists ) {
+									   title="Creates database table from design. Does not create indexes."
+									   class="button wpda_tooltip wpda_view<?php if ( $this->table_exists ) {
 										   echo ' disabled';
 									   } ?>"
 									   onclick="if ( confirm('Create database table `<?php echo $this->wpda_schema_name; ?>`.`<?php echo $this->wpda_table_name; ?>`?\nDoes not create indexes!') ) { jQuery('#wpda_create_table_form').submit(); }"
@@ -1990,15 +2009,19 @@ namespace WPDataAccess\Design_Table {
 											echo ' readonly disabled';
 										} ?>
 									>
+										<span class="material-icons wpda_icon_on_button">check_circle</span>
 										<?php echo __( 'CREATE TABLE', 'wp-data-access' ); ?>
 									</a>
-									<a id="button_alter_table" href="javascript:void(0)" class="button wpda_view"
-									   onclick="if ( confirm('Alter database table `<?php echo $this->wpda_schema_name; ?>`.`<?php echo $this->wpda_table_name; ?>`?\nAlter modified indexes as well!') ) { jQuery('#wpda_alter_table_form').submit(); }"
+									<a id="button_alter_table" href="javascript:void(0)" class="button wpda_view wpda_tooltip"
+									   title="Writes design changes to database table and indexes."
+									   onclick="if ( confirm('Alter database table `<?php echo $this->wpda_schema_name; ?>`.`<?php echo $this->wpda_table_name; ?>`?\nAlters modified indexes as well!') ) { jQuery('#wpda_alter_table_form').submit(); }"
 									>
+										<span class="material-icons wpda_icon_on_button">update</span>
 										<?php echo __( 'ALTER TABLE', 'wp-data-access' ); ?>
 									</a>
 									<a href="javascript:void(0)"
-									   class="button wpda_view<?php if ( ! $this->table_exists ) {
+									   title="This action drops your database table! Not your table design... This cannot be undone."
+									   class="button wpda_tooltip wpda_view<?php if ( ! $this->table_exists ) {
 										   echo ' disabled';
 									   } ?>"
 									   onclick="if ( confirm('Drop database table `<?php echo $this->wpda_schema_name; ?>`.`<?php echo $this->wpda_table_name; ?>`?\nTable design will not be deleted!') ) { jQuery('#wpda_drop_table_form').submit(); }"
@@ -2006,12 +2029,17 @@ namespace WPDataAccess\Design_Table {
 											echo ' readonly disabled';
 										} ?>
 									>
+										<span class="material-icons wpda_icon_on_button">delete</span>
 										<?php echo __( 'DROP TABLE', 'wp-data-access' ); ?>
 									</a>
 									<input type='hidden' name='caller'
 										   value='<?php echo esc_attr( $this->caller ); ?>'/>
-									<input type="submit" value="Save Table Design"
-										   class="button button-primary wpda_view_table"/>
+									<button type="submit" class="button button-primary wpda_view_table wpda_tooltip"
+											title="This does NOT create the table! Is just saves your table design..."
+									>
+										<span class="material-icons wpda_icon_on_button">check</span>
+										Save Table Design
+									</button>
 								</td>
 							</tr>
 							</tfoot>
@@ -2067,7 +2095,9 @@ namespace WPDataAccess\Design_Table {
 								<th class="wpda-table-structure-last-column" style="width:20px;">
 									<a href="javascript:void(0)" onclick="add_index()"
 									   style="vertical-align: -webkit-baseline-middle;"
-									   class="dashicons dashicons-plus wpda_view_index"></a>
+									   class="dashicons dashicons-plus wpda_view_index wpda_tooltip"
+									   title="Add new index to table design"
+									></a>
 								</th>
 							</tr>
 							</thead>
@@ -2089,22 +2119,30 @@ namespace WPDataAccess\Design_Table {
 									<input type="hidden" name="wpda_schema_name_original"
 										   value="<?php echo esc_attr( $this->wpda_schema_name ); ?>"/>
 									<a id="wpda_create_index" href="javascript:void(0)"
-									   class="button wpda_view"
+									   title="Drops all indexes and recreates them."
+									   class="button wpda_view wpda_tooltip"
 									   onclick="if ( confirm('<?php echo __( 'Drop all deleted indexes and recreate all changed indexes for table' . ' `' . $this->wpda_table_name . '`?' ); ?>') ) { jQuery('#wpda_create_index_form').submit(); }"
 									>
+										<span class="material-icons wpda_icon_on_button">check_circle</span>
 										<?php echo __( '(RE)CREATE INDEXES', 'wp-data-access' ); ?>
 									</a>
 									<a id="wpda_drop_index" href="javascript:void(0)"
-									   class="button wpda_view"
+									   title="This action drops your indexes from the database! This cannot be undone."
+									   class="button wpda_view wpda_tooltip"
 									   onclick="if ( confirm('<?php echo __( 'Drop all indexes for table' . ' `' . $this->wpda_table_name . '`?\n' . __( 'Does not drop primary key indexes and index designs!' ) ); ?>'))  { jQuery('#wpda_drop_index_form').submit(); }"
 									>
+										<span class="material-icons wpda_icon_on_button">delete</span>
 										<?php echo __( 'DROP INDEXES', 'wp-data-access' ); ?>
 									</a>
 									<input type='hidden' name='caller'
 										   value='<?php echo esc_attr( $this->caller ); ?>'/>
 									<a id="submit_indexes" href="javascript:void(0)"
+									   title="Does NOT create indexes! It just saves your index design..."
 									   onclick="if (!jQuery(this).attr('disabled')) { jQuery('#design_table_form_indexes').submit(); } else { alert('<?php echo __( 'Save table design changes first!' ); ?>'); }"
-									   class="button button-primary wpda_view_index"><?php echo __( 'Save Indexes' ); ?></a>
+									   class="button button-primary wpda_view_index wpda_tooltip">
+										<span class="material-icons wpda_icon_on_button">check</span>
+										<?php echo __( 'Save Indexes' ); ?>
+									</a>
 								</td>
 							</tr>
 							</tfoot>

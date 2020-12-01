@@ -40,9 +40,11 @@ jQuery( document ).ready(
 function wpda_datatables_ajax_call(
 	columnsvar, database, table_name, columns,
 	responsive, responsive_popup_title, responsive_type, responsive_icon,
-	pub_format, language, sql_where, sql_orderby,
+	pub_format, language, sql_orderby,
 	table_options_searching, table_options_ordering, table_options_paging, table_options_advanced,
-	pub_id, pub_show_advanced_settings, modal_hyperlinks
+	pub_id, pub_show_advanced_settings, modal_hyperlinks,
+	filter_field_name, filter_field_value,
+	nl2br
 ) {
 	pub_format = pub_format || '';
 
@@ -172,25 +174,35 @@ function wpda_datatables_ajax_call(
 				data.table_name = table_name;
 				data.columns = columns;
 				data.pub_format = pub_format;
-				data.sql_where = sql_where;
-					var function_name = 'wpda_' + table_name + '_advanced_' + pub_id;
-					if (typeof window[function_name] === "function") {
-						var return_value = eval(function_name)();
-						if (Array.isArray(return_value)) {
-						 	for (var key in return_value) {
-						 		data[key] = return_value[key];
-						 	}
+				data.pub_id = pub_id;
+				data.filter_field_name = filter_field_name;
+				data.filter_field_value = filter_field_value;
+				data.nl2br = nl2br;
+				jQuery.each(window.location.search.replace('?','').split('&'), function(index, val) {
+					var urlparam = val.split('=');
+					if (urlparam.length===2) {
+						if (urlparam[0].substring(0, 19) === 'wpda_search_column_') {
+							data[urlparam[0]] = urlparam[1];
 						}
 					}
+				});
+				var function_name = 'wpda_' + table_name + '_advanced_' + pub_id;
+				if (typeof window[function_name] === "function") {
+					var return_value = eval(function_name)();
+					if (Array.isArray(return_value)) {
+						for (var key in return_value) {
+							data[key] = return_value[key];
+						}
+					}
+				}
 			}
 		},
 		language: {
-			url: "https://cdn.datatables.net/plug-ins/1.10.20/i18n/" + language + ".json"
+			url: datatables_i18n_url + language + ".json"
 		}
 	};
 
 	if ( typeof Object.assign != 'function' ) {
-		// ?
 		var jQueryDataTablesOptions = jQueryDataTablesDefaultOptions;
 	} else {
 		var jQueryDataTablesOptions = Object.assign(jQueryDataTablesDefaultOptions, jQueryDataTablesUserOptions);

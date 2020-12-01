@@ -29,10 +29,7 @@
 @import "./parts/fonts.css";
 @import "./parts/ie11.css";
 
-/**
- * Here you would add any custom styles you need that don't come out of the
- * box with Tailwind.
- */
+@import "./settings.css";
 @import "./components/wordpress.css";
 @import "./components/forms.css";
 @import "./components/notifications.css";
@@ -43,11 +40,11 @@
 /* TODO: Add responsive styles, for now min-width */
 #metaslider-ui,
 .container {
-	min-width: theme('screens.xl');
+	min-width: theme('screens.lg');
 	@apply mx-auto px-2;
 }
 .container {
-	max-width: theme('screens.xl');
+	max-width: theme('screens.lg');
 }
 
 pre#shortcode::selection,

@@ -82,7 +82,9 @@ namespace WPDataAccess\Simple_Form {
 					jQuery('#<?php echo esc_attr( $this->item_name ); ?>').datetimepicker({
 						format: '<?php echo $this->date_format; ?>',
 						datepicker: <?php echo $this->date_picker; ?>,
-						timepicker: <?php echo $this->time_picker; ?>
+						timepicker: <?php echo $this->time_picker; ?>,
+						scrollMonth: false,
+						scrollInput: false
 					});
 					jQuery('#<?php echo esc_attr( $this->item_name ); ?>').attr('autocomplete', 'off');
 				});

@@ -39,9 +39,10 @@ class SP_EA_Front_Scripts {
 	 * Plugin Scripts and Styles
 	 */
 	public function front_scripts() {
-		$prefix = defined( 'WP_DEBUG' ) && WP_DEBUG ? '' : '.min';
+		$settings = get_option( 'sp_eap_settings' );
+		$prefix   = defined( 'WP_DEBUG' ) && WP_DEBUG ? '' : '.min';
 		// CSS Files.
-		if ( false != eap_get_option( 'eap_dequeue_fa_css' ) ) {
+		if ( false != $settings['eap_dequeue_fa_css'] ) {
 			wp_enqueue_style( 'sp-ea-font-awesome', SP_EA_URL . 'public/assets/css/font-awesome.min.css', array(), SP_EA_VERSION );
 		}
 		wp_register_style( 'sp-ea-style', SP_EA_URL . 'public/assets/css/ea-style.css', array(), SP_EA_VERSION );

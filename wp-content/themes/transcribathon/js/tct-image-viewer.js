@@ -118,25 +118,17 @@ var tct_viewer = (function($, document, window) {
 		jQuery("#openseadragonFS").append(sliderHtml);
 	},
 	getManifestUrl = function() {
-		jQuery.post('/wp-content/themes/transcribathon/admin/inc/custom_scripts/send_ajax_api_request.php', {
-		    'type': 'GET',
-		    'url': home_url + '/tp-api/items/' + getUrlParameter('item')
-			}, function(response) {
-			var response = JSON.parse(response);
-			if (response.code == "200") {
-				imageData = JSON.parse(JSON.parse(response.content)[0]['ImageLink']);
-				imageLink = imageData['service']['@id'];
-                if (imageData['service']['@id'].substr(0, 4) == "http") {
-                    imageLink = imageData['service']['@id'];
-                }
-                else {
-                    imageLink = "http://" + imageData['service']['@id'];
-                }
-				imageHeight = imageData['height'];
-				imageWidth = imageData['width'];
-				initViewers();
-			}
-		});
+		imageData = JSON.parse(jQuery('#image-data-holder').val());
+		imageLink = imageData['service']['@id'];
+		if (imageData['service']['@id'].substr(0, 4) == "http") {
+			imageLink = imageData['service']['@id'];
+		}
+		else {
+			imageLink = "http://" + imageData['service']['@id'];
+		}
+		imageHeight = imageData['height'];
+		imageWidth = imageData['width'];
+		initViewers();
 	},
 	getImageLink = function() {
 		return imageLink;
@@ -163,7 +155,7 @@ var tct_viewer = (function($, document, window) {
 			zoomOutButton: "zoom-out",
 			rotateLeftButton: "rotate-left",
 			rotateRightButton: "rotate-right",
-			prefixUrl: "/wp-content/themes/transcribathon/images/osdImages/",
+			prefixUrl: home_url + "/wp-content/themes/transcribathon/images/osdImages/",
 			tileSources: {
 				"@context": "http://iiif.io/api/image/2/context.json",
 				"@id": imageLink,
@@ -190,7 +182,7 @@ var tct_viewer = (function($, document, window) {
 			zoomOutButton: "zoom-outFS",
 			rotateLeftButton: "rotate-leftFS",
 			rotateRightButton: "rotate-rightFS",
-			prefixUrl: "/wp-content/themes/transcribathon/images/osdImages/",
+			prefixUrl: home_url + "/wp-content/themes/transcribathon/images/osdImages/",
 			tileSources: {
 				"@context": "http://iiif.io/api/image/2/context.json",
 				"@id": imageLink,
@@ -414,7 +406,6 @@ var tct_viewer = (function($, document, window) {
 				var osdDiv = document.getElementById('openseadragon1');
 				var rectnew = document.createElement('div');
 				rectnew.classList.add('rect');
-				console.log(osdViewerFS.viewport.imageToViewportRectangle(rect));
 				osdViewerFS.addOverlay({
 				  element: rectnew,
 				  location: new OpenSeadragon.Rect(imgSize.x, imgSize.y, imgSize.width, imgSize.height)
@@ -423,7 +414,6 @@ var tct_viewer = (function($, document, window) {
 				var img = document.createElement('img');
 				img.src = imageLink + '/' + rect.x + ',' + rect.y + ',' + rect.width + ',' + rect.height + '/250,/0/default.jpg';
 				document.getElementById('selection-tab').appendChild(img);
-				console.log(rect);
 				selection.disable();
 			}, // callback
 			prefixUrl:               null, // overwrites OpenSeadragon's option
@@ -593,7 +583,9 @@ var tct_viewer = (function($, document, window) {
 	  })
 	};
 	$(document).ready(function($) {
-		init();
+		if (jQuery('#image-data-holder').length) {
+			init();
+		}
 	});
 	return {
 		initTinyWithConfig: initTinyWithConfig,

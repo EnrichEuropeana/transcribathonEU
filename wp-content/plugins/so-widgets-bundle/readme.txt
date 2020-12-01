@@ -1,9 +1,10 @@
 === SiteOrigin Widgets Bundle ===
 Tags: bundle, widget, button, slider, image, carousel, price table, google maps, tinymce, social links
 Requires at least: 4.2
-Tested up to: 5.4
-Stable tag: 1.16.1
-Build time: 2020-04-20T15:41:44+02:00
+Tested up to: 5.5
+Requires PHP: 5.6.20
+Stable tag: 1.17.6
+Build time: 2020-08-17T20:42:09+02:00
 License: GPLv3 or later
 Contributors: gpriday, braam-genis
 Donate link: https://siteorigin.com/downloads/premium/
@@ -64,6 +65,71 @@ The SiteOrigin Widgets Bundle is the perfect platform to build widgets for your 
 3. An example of the button widget.
 
 == Changelog ==
+
+== 1.17.6 - 17 August 2020 ==
+* Hero and Layout Sliders: Disabled lazy loading for images added to the slide content area.
+* Slider: Disabled lazy loading in the Block Editor.
+
+== 1.17.5 - 12 August 2020 ==
+* Slider: Disable WordPress 5.5 Lazy Loading.
+
+== 1.17.4 - 06 August 2020 ==
+* Post Carousel: Improved support for multiple carousel widgets on the same page.
+* Post Carousel: Improved mobile support.
+* Sliders: Added `Autoplay` and `Autoplay Pause on Hover` settings to the Slider, Layout Slider and Hero widgets.
+* Features: Allowed shortcodes to be used in the Text field.
+* Contact Form: Fix to ensure the correct fields are passed to Akismet.
+
+== 1.17.3 - 23 July 2020 ==
+* Reverted: Features: Prevented icon overlapping text in edge cases.
+* Social Media Buttons: Added TikTok.
+* Button: Removed `:visited` color targeting.
+* Button: Set hover background color defaults.
+* Carousel: Improved multi-carousel support.
+* Carousel: Triggered click on swipe for mobile devices.
+* Carousel: Contextualized variables as needed.
+* Carousel: Find the `ItemWidth` as needed rather than predefining it.
+
+== 1.17.2 - 21 July 2020 ==
+* Resolved button Less CSS bug.
+
+== 1.17.1 - 20 July 2020 ==
+* Post Carousel: Prevented all posts from outputting. `10` will be output at a time if `Posts per page` isn't set.
+* Post Carousel: Inlined navigation buttons if a title is set.
+* Updated the Google Fonts array.
+* Editor: Added `wp_filter_content_tags` function.
+* Updated [Packery](https://packery.metafizzy.co/) to latest version.
+* Simple Masonry: Added a `Layout origin` setting.
+* Testimonials: Set testimonial text width to `100%`.
+* Updated Font Awesome to latest version.
+* Image: Added `siteorigin_widgets_image_args` filter allowing adjust all of the widget arguments and attributes.
+* Simple Masonry: Added external image support.
+* Code Form Field: Removed HTML sanitization.
+* Tabs: Added smooth scroll to tab when linked to.
+* Added `font-display: block` to all font icons.
+* Widget Block: Added `Additional CSS Classes` output.
+* Button: Added Button hover style settings.
+* Features: Prevented icon overlapping text in edge cases.
+* Post Carousel: Resolved IE 11 JavaScript error.
+* Post Carousel: Vertically align navigation icons and title when title present.
+* Editor: Added `noreferrer` to any target links preventing Layout block failing validation when `target=_blank` link added.
+* Hero: Prevented buttons from loading when buttons shortcode isn't added.
+* Post Carousel: Added a `Link target` setting.
+* Post Carousel: Disable button navigation if number of visible posts is more than total posts.
+* Mobile: Improved admin form field responsive behavior.
+* Updated Font Awesome from `5.13.0` to `5.14.0`.
+
+== 1.17.0 - 22 May 2020 ==
+* Simple Masonry: Added a preloader and related settings.
+* Post Carousel: Migrated to Slick Carousel.
+* Post Carousel: Added RTL support.
+* Icon: Added Title field.
+* Minor admin interface styling fixes.
+* Price Table: Added title for the feature hover text.
+* Testimonials: Added `Equalize testimonial height` setting.
+* Testimonials: Fixed user image alignment.
+* Switched to Wikimedia's fork of less.php.
+* Added error suppression for external Less library.
 
 == 1.16.1 - 20 April 2020 ==
 * Accordion: When hiding panels, only search the current accordion and not nested accordions.
