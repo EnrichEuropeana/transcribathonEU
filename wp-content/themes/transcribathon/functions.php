@@ -45,6 +45,8 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_admin_pages/datasets-admin-pag
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/story_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_ad.php');
+// require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test_iiif.php');
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/item_page_test.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_item_slider.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/tutorial_menu.php');
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_shortcodes/documents_map.php');
@@ -192,6 +194,7 @@ require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-search-documents/t
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-horizontal-line-hr/tct-horizontal-line-widget.php'); // Adds the widget for headline (hr)
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-tutorial-slider/tct-tutorial-slider-widget.php'); // Adds the widget for tutorial slider
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-storyboxes/tct-storyboxes-widget.php'); // Adds the widget for storyboxes
+require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-storyofmonth/tct-storyofmonth-widget.php'); // Adds the widget for storyofmonth
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-itemboxes/tct-itemboxes-widget.php'); // Adds the widget for itemboxes
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-menulist/tct-menulist-widget.php'); // Adds the widget for menulist
 require_once(TCT_THEME_DIR_PATH.'admin/inc/custom_widgets/tct-headline/tct-headline-widget.php'); // Adds the widget for headline
@@ -245,16 +248,111 @@ function my_after_profile_name_inline() {
 
 add_action( 'um_profile_header_cover_area', 'my_profile_header_cover_area', 10, 1 );
 
+// function my_profile_header_cover_area( $args ) {
+//     echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
+//     $acs = [];
+//     if(sizeof($acs)>0){
+//         echo "<div class=\"achievments\">\n";
+//         foreach($acs as $ac){
+//             echo "<div title=\"".$ac['campaign_title']."\"class=\"".$ac['badge']."\"></div>\n";
+//         }
+//         echo "</div>\n";
+//     }
+// }
+
 function my_profile_header_cover_area( $args ) {
-    echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
-    $acs = [];
-    if(sizeof($acs)>0){
-        echo "<div class=\"achievments\">\n";
-        foreach($acs as $ac){
-            echo "<div title=\"".$ac['campaign_title']."\"class=\"".$ac['badge']."\"></div>\n";
-        }
-        echo "</div>\n";
-    }
+    echo "<div class='tct-prof-banner-area'>";
+
+                echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
+                
+                $acs = [];
+                if(sizeof($acs)>0){
+                    echo "<div class=\"achievments\">\n";
+                    foreach($acs as $ac){
+                        echo "<div title=\"".$ac['campaign_title']."\"class=\"".$ac['badge']."\"></div>\n";
+                    }
+                    echo "</div>\n";
+
+                }
+
+                
+                $url = network_home_url()."/tp-api/users/".um_profile_id();
+                $requestType = "GET";
+                // Execude http request
+                include dirname(__FILE__)."/admin/inc/custom_scripts/send_api_request.php";
+
+                // Save image data
+                $user = json_decode($result, true);
+                $user = $user[0];
+
+                    // Set request parameters for image data
+                    $requestData = array(
+                        'key' => 'testKey'
+                    );
+                    $url = network_home_url()."/tp-api/profileStatistics/".um_profile_id();
+                    $requestType = "GET";
+                    // Execude http request
+                    include dirname(__FILE__)."/admin/inc/custom_scripts/send_api_request.php";
+                
+                    // Save image data
+                    $profileStatistics = json_decode($result, true);
+                    $profileStatistics = $profileStatistics[0];
+                
+                    $miles = $profileStatistics['Miles'];
+                        //echo $miles;
+                
+                 // to define role categories
+                    function roles($s) {
+                    echo "<div class='tct-banner-stars'>";
+                    $role = $s < 30 ? '<div class="tct-user-banner trainee"></div>' : ($s < 500 ? '<div class="tct-user-banner runner"></div>' : ($s < 1600 ? '<div class="tct-user-banner sprinter"></div>' : '<div class="tct-user-banner champion"></div>' ) );
+                    return $role;
+                    }       
+                    echo $roleOutput = roles($miles);
+                
+                
+                
+                    function stars($s, $role){
+                    $card = array(
+                        "<div class=\"tct-user-banner trainee\"></div>" => array(0,5,15,30,50),
+                        "<div class=\"tct-user-banner runner\"></div>" => array(50,75,150,300,500),
+                        "<div class=\"tct-user-banner sprinter\"></div>" => array(500,750,1050,1300,1600),
+                        "<div class=\"tct-user-banner champion\"></div>" => array(1600),
+                    );
+                    $result = array(0,1,2,3,3);
+                    $current = $card[$role];
+                    if($current=="<div class=\"tct-user-banner champion\"></div>"){
+                
+                        return 3;
+                    }
+                
+                        else {
+                            for($i = 0;$i < count($current); $i++){
+                            //    echo $current[$i+1];
+                                if($s < $current[$i+1]){
+                                return $result[$i];
+                                break;
+                        }
+                    }
+                    }
+                    }
+                    $rating = stars($miles,$roleOutput); 
+                    $html = '<div class="stars-three">';
+                    for($x=0; $x<$rating; $x++){
+                    $html .= '<div class="tct-user-star"></div>';
+                    } $html .= '</div>';
+                    echo $html;  
+                    echo "</div>";
+                    echo "<div style='clear: both;'></div>\n"; 
+    echo "</div>\n";
+    // echo "<div class='tct-user-banner ".um_user('role')."'>".ucfirst(um_user('role'))."</div>\n";
+    // $acs = [];
+    // if(sizeof($acs)>0){
+    //     echo "<div class=\"achievments\">\n";
+    //     foreach($acs as $ac){
+    //         echo "<div title=\"".$ac['campaign_title']."\"class=\"".$ac['badge']."\"></div>\n";
+    //     }
+    //     echo "</div>\n";
+    // }
 }
 
 add_filter( 'upload_size_limit', 'increase_upload' );

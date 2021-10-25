@@ -13,7 +13,7 @@
 
 		 <!-- Modal content -->
 	   <span id="MyPopupp" class="cookie-confrm">OK</span>
-     <P>This website uses cookies to ensure you get the best experience on our website. By clicking or navigating the site, you agree to allow our collection of information through cookies. <a href='https://transcribathon.eu/terms-of-use/' target="_blank">More info</a>
+     <P>This website uses cookies to ensure you get the best experience on our website. By clicking or navigating the site, you agree to allow our collection of information through cookies. <a href='<?php echo network_home_url(); ?>terms-of-use/' target="_blank">More info</a>
      </p>
    </div>
    
@@ -69,13 +69,13 @@ function showPopup() {
   left: 0;
   right: 0;
   z-index: 501;
-  background: #8A171A;
+  background: #B33E3E;
   padding: 23px 30px 20px 30px;
 }
 
 #MyPopup p {
   color: #ffffff;
-  font-size: 19px;
+  font-size: 17px;
   line-height: 44px;
   /* padding: 0; */
   margin: 0;

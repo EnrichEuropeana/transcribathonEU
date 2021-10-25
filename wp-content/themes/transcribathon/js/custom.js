@@ -958,8 +958,11 @@ function updateItemTranscription(itemId, userId, editStatusColor, statusCount) {
         }
       }
       
-      var newTranscriptionLength = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'}).length
-
+      // var newTranscriptionLength = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'}).length;
+      // var newTranscriptionLength = tinyMCE.editors.get([jQuery('#item-page-transcription-text').attr('id')]).getContent({format : 'text'}).length;
+      if(jQuery('#item-page-transcription-text').text()) {
+        var newTranscriptionLength = tinyMCE.editors[jQuery('#item-page-transcription-text').attr('id')].getContent({format : 'text'}).length;
+      }     
       // Prepare data and send API request
       data = {
           UserId: userId,
@@ -1673,16 +1676,13 @@ function loadPlaceData(itemId, userId) {
                                   '<label>WikiData:</label><br/>';
                                   if (content[i]['WikidataName'] != "NULL" && content[i]['WikidataId'] != "NULL") {
                                     placeHtml +=
-                                      '<input type="text" id="lgns" placeholder="" name="" value="' + escapeHtml(content[i]['WikidataId']) + '; ' + escapeHtml(content[i]['WikidataName']) + '"/>';
+                                      '<input type="text" id="lgns" placeholder="" name="" value="' + escapeHtml(content[i]['WikidataName']) + '; ' + escapeHtml(content[i]['WikidataId']) + '"/>';
                                   }
                                   else {
                                     placeHtml +=
                                       '<input type="text" id="lgns" placeholder="" name=""/>';
                                   }
                                   placeHtml +=
-                                    '<a id="geonames-search-button" href="">' +
-                                      '<i class="far fa-search"></i>' +
-                                  '</a>' +
                                 '</div>' +
                 
                                 "<div class='form-buttons-right'>" +
@@ -2211,11 +2211,15 @@ function editItemLocation(placeId, itemId, userId) {
   }
 
   description = jQuery('#location-data-edit-' + placeId + ' .location-input-description-container textarea').val();
+  wikidata = jQuery('#location-data-edit-' + placeId + '  .location-input-geonames-container input').val().split(";");
+  // alert(wikidata[1]);
   data = {
             Name: locationName,
             Latitude: latitude,
             Longitude: longitude,
-            Comment: description
+            Comment: description,
+            WikidataName: wikidata[0],
+            WikidataId: wikidata[1]
           }
   var dataString= JSON.stringify(data);
 
@@ -3133,6 +3137,7 @@ function saveEnrichment(name, type, wikiData, itemId, id, index) {
 }
 
 function initializeMap() {
+  console.log("1");
   //reinitialising map
   var url_string = window.location.href;
   var url = new URL(url_string);
