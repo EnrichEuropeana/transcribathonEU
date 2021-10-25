@@ -1,129 +1,86 @@
 <?php
 global $wpdb;
-$myid = uniqid(rand()).date('YmdHis');
-$base = 0;
+// $myid = uniqid(rand()).date('YmdHis');
 
 if ( ! is_admin() ) {
 
    
-                if($instance['tct-storyboxes-headline'] != ""){ echo "<h1>".str_replace("\n","<br />",$instance['tct-storyboxes-headline'])."</h1>\n"; }
-                $stories = array();
-                $docs = array();
+                // if($instance['tct-storyofmonth-headline'] != ""){ echo "<h1>".str_replace("\n","<br />",$instance['tct-storyofmonth-headline'])."</h1>\n"; }
 
-                $storyIds = $instance['tct-storyboxes-storybunch'];
-                if(isset($storyIds) && trim($storyIds) != ""){
-                    $limit = 12; 
-                    $requestType = "GET";
-                    $url = home_url()."/tp-api/storiesMinimal?storyId=".str_replace(' ', '', $storyIds);
-                    include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
-                    $storyData = json_decode($result, true);
-                    
-                }else if(isset($instance['tct-storyboxes-datasets']) && is_array($instance['tct-storyboxes-datasets']) 
-                            && sizeof($instance['tct-storyboxes-datasets'])>0 || isset($instance['tct-storyboxes-datasets']) && trim($instance['tct-storyboxes-datasets']) != "" ){
-                    if(!is_array($instance['tct-storyboxes-datasets'])){
-                        $url = home_url()."/tp-api/storiesMinimal?DatasetId=".(int)trim($instance['tct-storyboxes-datasets']);
-                    }else{
-                        $url = home_url()."/tp-api/storiesMinimal?DatasetId=".implode(",",$instance['tct-storyboxes-datasets']);
-                    }
-                    
-                    if(isset($instance['tct-storyboxes-languages']) && is_array($instance['tct-storyboxes-languages']) 
-                            && sizeof($instance['tct-storyboxes-languages'])>0 || isset($instance['tct-storyboxes-languages']) && trim($instance['tct-storyboxes-languages']) != "" ){
-                        if(!is_array($instance['tct-storyboxes-languages'])){
-                            $url .= "&StorydcLanguage=".trim($instance['tct-storyboxes-languages']);
-                        }else{
-                            $url .= "&StorydcLanguage=".implode(",",$instance['tct-storyboxes-languages']);
-                        }
-                    }
-    
-                    $url .= "&AndOr=".$instance['tct-storyboxes-AndOr'];
-                    $requestType = "GET";
-                    include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
-                    $storyData = json_decode($result, true);
-                }else if(isset($instance['tct-storyboxes-languages']) && is_array($instance['tct-storyboxes-languages']) 
-                        && sizeof($instance['tct-storyboxes-languages'])>0 || isset($instance['tct-storyboxes-languages']) && trim($instance['tct-storyboxes-languages']) != "" ){
-                    if(!is_array($instance['tct-storyboxes-languages'])){
-                        $url .= home_url()."/tp-api/storiesMinimal?StorydcLanguage=".trim($instance['tct-storyboxes-languages']);
-                    }else{
-                        $url .= home_url()."/tp-api/storiesMinimal?StorydcLanguage=".implode(",",$instance['tct-storyboxes-languages']);
-                    }
-
-                    $url .= "&AndOr=".$instance['tct-storyboxes-AndOr'];
-                    $requestType = "GET";
-                    include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
-                    $storyData = json_decode($result, true);
-                }
-                if(isset($instance['tct-storyboxes-cols']) && trim($instance['tct-storyboxes-cols']) != ""){ 
-                    $tct_doccols = (int)$instance['tct-storyboxes-cols'];
-                }else{
-                    $tct_doccols = 4;
-                }
                 
-                if(is_array($storyData) && sizeof($storyData) > 0){
-                    
-                    
-                    
-                    
-                    $storyDataRev = array_reverse($storyData);
-
-                    $limit = 12;
-                    $stand = 0;
-                    
-                    $storyIdList = array();
-                    foreach($storyData as $story) {
-                        array_push($storyIdList, $story['StoryId']);
-                    }
-                    
-                    $portions = array_chunk($storyIdList, $limit);
-                    echo "<div id=\"tct_storyboxidholder_".$myid."\" style=\"display:none;\">\n";
-                    $i=0;
-                    foreach($portions as $p){
-                        echo "<div class=\"tct_sry_".$i."\">".implode(',',$p)."</div>\n";
-                        $i++;
-                    }
-                    echo "</div>\n";
-
                     echo "<div id=\"doc-results_".$myid."\">\n";
                         echo "<div class=\"tableholder\">\n";
                             echo "<div class=\"tablegrid\">\n";
-                                echo "<div class=\"section group sepgroup tab\">\n";
-                                    $j = 1;
-                                    $i=0;
-                                    foreach($storyData as $story){
-                                        if($i<$tct_doccols) {
-                                             $i++; 
-                                        } else { 
-                                            $i=1; echo "</div>\n<div class=\"section group tab sepgroup\">\n"; 
-                                        }
-                                        
-                                            echo  '<div class="col span_1_of_4 collection" style="padding: 8px;">';
-                                                echo  '<div class="dcholder">';
+                                echo "<div class=\"section group sepgroup tab\">\n"; 
+                                echo  '<div class="monthly_story col span_1_of_4 collection" style="padding: 8px;">';
+                                
+                                $itemIds = $instance['tct-storyofmonth-itemid'];
+
+                                if(isset($itemIds) && trim($itemIds) != ""){ 
+                                    $requestType = "GET";
+                                    $url = home_url()."/tp-api/itemMinimal?itemId=".str_replace(' ', '', $itemIds);
+                                    include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+                                    $itemData = json_decode($result, true);
+                                    
+                                }
+                                foreach($itemData as $item){
+                                echo  '<div class="dcholder">';
                                                 
-                                                    $image = json_decode($story['PreviewImage'], true);
+                                $image = json_decode($item['ImageLink'], true);
 
-                                                    if (substr($image['service']['@id'], 0, 4) == "http") {
-                                                        $gridImageLink = $image['service']['@id'];
-                                                    }
-                                                    else {
-                                                        $gridImageLink = "http://".$image['service']['@id'];
-                                                    }
+                                    if (substr($image['service']['@id'], 0, 4) == "http") {
+                                        $gridImageLink = $image['service']['@id'];
+                                    }
+                                    else {
+                                        $gridImageLink = "http://".$image['service']['@id'];
+                                    }
 
-                                                    if ($image["width"] != null || $image["height"] != null) {
-                                                        if ($image["width"] <= ($image["height"] * 2)) {
-                                                            $gridImageLink .= "/0,0,".$image["width"].",".($image["width"] / 2);
-                                                        }
-                                                        else {
-                                                            $gridImageLink .= "/".round(($image["width"] - $image["height"]) / 2).",0,".($image["height"] * 2).",".$image["height"];
-                                                        }
-                                                    }
-                                                    else {
-                                                        $gridImageLink .= "/full";
-                                                    }
-                                                    $gridImageLink .= "/280,140/0/default.jpg";
+                                    if ($image["width"] != null || $image["height"] != null) {
+                                        if ($image["width"] <= $image["height"]) {
+                                            $gridImageLink .= "/0,0,".$image["width"].",".$image["width"];
+                                        }
+                                        else {
+                                            $gridImageLink .= "/0,0,".$image["height"].",".$image["height"];
+                                        }
+                                    }
+                                    else {
+                                        $gridImageLink .= "/full";
+                                    }
+                                    $gridImageLink .= "/500,500/0/default.jpg";
 
-                                                    echo  "<a class='grid-view-image' href='".home_url()."/documents/story/?story=".$story['StoryId']."'>";
-                                                        echo  '<img src='.$gridImageLink.'>';
-                                                    echo  "</a>";
+                                    echo  "<a class='grid-view-image' href='".home_url()."/documents/story/?story=".$item['StoryId']."'>";
+                                        echo  '<img src='.$gridImageLink.'>';
+                                    echo  "</a>";
+                                    if($instance['tct-storyofmonth-lng'] != ""){ echo "<div class='story-lng' style=''><h1 class='theme-color'>".str_replace("\n","<br />",$instance['tct-storyofmonth-lng'])."</h1></div>\n"; }
 
+                                echo '</div>';
+                                }
+
+//story
+                                    $storyIds = $instance['tct-storyofmonth-storybunch'];
+
+                                    if(isset($storyIds) && trim($storyIds) != ""){ 
+                                        $requestType = "GET";
+                                        $url = home_url()."/tp-api/storiesMinimal?storyId=".str_replace(' ', '', $storyIds);
+                                        include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
+                                        $storyData = json_decode($result, true);
+                                        
+                                    } 
+                
+                // if(is_array($storyData) && sizeof($storyData) > 0){
+                       
+                    // echo "<div id=\"doc-results_".$myid."\">\n";
+                    //     echo "<div class=\"tableholder\">\n";
+                    //         echo "<div class=\"tablegrid\">\n";
+                    //             echo "<div class=\"section group sepgroup tab\">\n"; 
+                    //             echo  '<div class="monthly_story col span_1_of_4 collection" style="position: relative; padding: 8px;">';
+ 
+                                    foreach($storyData as $story){
+                                       
+                                    
+                                    
+
+                                    
                                                     // Get status data
                                                     $url = home_url()."/tp-api/completionStatus";
                                                     $requestType = "GET";
@@ -240,19 +197,19 @@ if ( ! is_admin() ) {
                                                         if ($NotStartedBar != "") {
                                                             echo $NotStartedBar;
                                                         }
+                                                        if($instance['tct-storyofmonth-month'] != ""){ echo "<div class='storymonth story-date' style=''><h1 class='theme-color'>".str_replace("\n","<br />",$instance['tct-storyofmonth-month'])."</h1></div>\n"; }
                                                     echo '</div>';
-                                                echo '</div>';
-
-                                                echo  '<div class="">';
-                                                    echo  '<h3 class="theme-color">';
-                                                        echo  "<a class='storybox-title' href='".home_url()."/documents/story/?story=".$story['StoryId']."'>";
+                                                
+                                                echo  '<div class="monthStoryContent">';
+                                                    echo  '<h1 class="theme-color">';
+                                                        // echo  "<a class='storybox-title' href='".home_url()."/documents/story/?story=".$story['StoryId']."'>";
                                                             echo  $story['dcTitle'];
-                                                        echo  "</a>";
-                                                    echo  '</h3>';
-                                                    /*
-                                                    echo  '<div class="search-page-single-result-description">';
-                                                        echo  $story['dcDescription'];
-                                                    echo  '</div>';*/
+                                                        // echo  "</a>";
+                                                    echo  '</h1>';
+                                    }
+                                                    if($instance['tct-storyofmonth-subline'] != ""){ echo "<h3 class='storySubline'>".str_replace("\n","<br />",$instance['tct-storyofmonth-subline'])."</h3>\n"; }
+                                                    if($instance['tct-storyofmonth-description'] != ""){ echo "<p class='storyDescrp'>".str_replace("\n","<br />",$instance['tct-storyofmonth-description'])."</p>\n"; }
+
                                                     echo  '<span style="display: none">...</span>';
                                                 echo  '</div>';
                                                 
@@ -260,30 +217,16 @@ if ( ! is_admin() ) {
                                             echo  '</div>';
 
                                         //include(locate_template('document.php'));
-                                        //get_template_part(document);
-                                        if ($j >= $limit) {
-                                            break;
-                                        }
-                                        else if($tct_doccols === 4){
-                                            if($i==2){ echo "<span class=\"sep\"></span>\n";}
-                                        }
-                                        else if($tct_doccols === 3){
-                                            if($i==2){ echo "<span class=\"sep\"></span>\n";}
-                                        }
-                                        $j++;
-                                    }
+                                        //get_template_part(document); 
+                                    
                                     wp_reset_postdata();
                                 echo "</div>\n";	
                             echo "</div>\n";
-                        echo "</div>\n";
-                    if(sizeof($portions) > 1){
-                        echo "<a href=\"\" class=\"tct-vio-but load-more-storyboxes theme-color-background\" id=\"tct_storyboxmore_".$myid."\" onclick=\"tct_storybox_getNextTwelve('".$myid."','".((int)$stand+1)."','".$tct_doccols."'); return false;\">"._x('Load more stories','Story-Box Widget','transcribathon')."</a>\n";
-                    }
-                    echo "</div>\n";
-                    }
+                        echo "</div>\n"; 
+                    echo "</div>\n"; 
+                    
                     echo "<p style=\"display:block; clear:both;\"></p>\n";
                 
-        
     }
     
 

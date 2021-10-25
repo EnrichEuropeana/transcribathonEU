@@ -248,7 +248,7 @@ if (isset($_GET['qs']) || isset($_GET['qi']))  {
 
     $itemTabContent .= '<section class="temp-back">';
         $itemTabContent .= '<div class="facet-form-search">';
-            $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form"></div>';
+            $itemTabContent .= '<div><input class="search-field" type="text" placeholder="Add a search term" name="qi" form="item-facet-form" value='.$_GET['qi'].'></div>';
             $itemTabContent .= '<div><button type="submit" form="item-facet-form" class="theme-color-background document-search-button"><i class="far fa-search" style="font-size: 20px;"></i></button></div>';
             $itemTabContent .= '<div class="map-search-page"><a href="dev/map" target="_blank" form="" class="theme-color-background document-search-button"><i class="fal fa-globe-europe" style="font-size: 20px;"></i></a></div>';
             $itemTabContent .= '<div style="clear:both;"></div>';

@@ -1,6 +1,6 @@
 <?php
 /*
-Shortcode: item_page
+Shortcode: item_page_test_iiif
 Description: Gets item data and builds the item page
 */
 

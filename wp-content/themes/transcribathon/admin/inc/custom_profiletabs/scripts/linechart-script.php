@@ -1,7 +1,8 @@
 <?php include(str_repeat("../",(sizeof(explode("/",substr((string)getcwd(),strrpos((string)getcwd(),"/wp-content"),strlen((string)getcwd()))))-2))."../wp-load.php");
 global $wpdb,$mysql_con;
 $theme_sets = get_theme_mods();
-$theme_link_color = "".$theme_sets['vantage_general_link_color'];
+// $theme_link_color = "".$theme_sets['vantage_general_link_color'];
+$theme_link_color = "#b33e3e";
 
 if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 			$content = "";
@@ -219,7 +220,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -274,7 +275,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -341,7 +342,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -399,7 +400,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -608,7 +609,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -663,7 +664,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -730,7 +731,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 
@@ -788,7 +789,7 @@ if(isset($_POST['q']) && $_POST['q'] === "get-ln-team-chart"):
 							// Ausgabe
 							$content .= $hraster."\n";
 							$content .= $vraster."\n";
-							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";stroke:#daccd9;stroke-width:1\" />\n";
+							$content .= " <polygon points=\"".$polyflaeche."\" style=\"fill:".$theme_link_color.";opacity:0.2;stroke:#daccd9;stroke-width:1\" />\n";
 							$content .= " <polyline points=\"".$poly."\" style=\"fill:none;stroke:".$theme_link_color.";stroke-width:;stroke-opacity:0.6\" />\n";
 							$content .= $polydots;
 						$content .= "</svg>\n"; 

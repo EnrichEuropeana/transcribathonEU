@@ -14,7 +14,7 @@ class _TCT_Itemboxes_Widget extends SiteOrigin_Widget {
 			'tct-itemboxes-widget',
 			_x('Transcribathon - Item Teaser Boxes', 'storyboxes-widget (backend)','transcribathon'),
 			array(
-				'description' => _x('Displays chosen stories as boxes similar to the item overview page', 'itemboxes-widget (backend)','transcribathon'),
+				'description' => _x('Displays chosen items as boxes similar to the item overview page', 'itemboxes-widget (backend)','transcribathon'),
 				'panels_groups' => array('transcribathon'),
 				'panels_icon' => 'tct-storyboxes-icon',
 				'help'        => ''

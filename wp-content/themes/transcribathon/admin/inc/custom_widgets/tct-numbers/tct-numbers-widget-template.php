@@ -37,7 +37,7 @@ if(isset($instance['tct-numbers-kind']) && trim($instance['tct-numbers-kind']) !
 					include dirname(__FILE__)."/../../custom_scripts/send_api_request.php";
 					$data = json_decode($result, true);
 					// if($data != null){
-					echo "<span class='numbers-widget-number'>".$data."</span>\n";
+					echo "<span class='numbers-widget-number'>".strrev(chunk_split(strrev($data) , 3 , ' '))."</span>\n";
 					//echo "<span class='numbers-widget-number'>0</span>\n";
 					// }else{
 					// 	echo "<span class='numbers-widget-number'>0</span>\n";

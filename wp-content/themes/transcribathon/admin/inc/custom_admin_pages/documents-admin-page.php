@@ -162,12 +162,14 @@ function _TCT_documents_admin_page( $atts ) {
                                     '<tr>' +
                                         '<th scope=\"col\">ID</th>' +
                                         '<th scope=\"col\">Title</th>' +
+                                        '<th scope=\"col\">Dataset</th>' +
                                         '<th scope=\"col\">Thumbnail</th>' +
                                     '</tr>' +
                                 '</thead>' +
                                 '<tbody>' +
                                     '<tr>' +
                                         '<th scope=\"row\">' + JSON.parse(response.content)[0]['StoryId'] + '</th>' +
+                                        '<td>' + JSON.parse(response.content)[0]['dcTitle'] + '</td>' +
                                         '<td>' + JSON.parse(response.content)[0]['dcTitle'] + '</td>' +
                                         '<td><img src=' + imageLink + '></td>' +
                                     '</tr>' +

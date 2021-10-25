@@ -790,9 +790,7 @@ function _TCT_item_page( $atts ) {
                     $taggingTab .= '<label>WikiData Reference:
                     <i class="fas fa-question-circle" style="font-size:16px; cursor:pointer; margin-left:4px;" title="Identify this location by searching its name or code on Wikidata"></i></label><br/>';
                     $taggingTab .= '<input type="text" id="lgns" placeholder="" name="">';
-                    //$taggingTab .= '<a id="geonames-search-button" href="">';
-                        //$taggingTab .= '<i class="far fa-search"></i>';
-                    //$taggingTab .= '</a>';
+                    
                 $taggingTab .= '</div>';
 
                 $taggingTab .= "<div class='form-buttons-right'>";
@@ -870,14 +868,11 @@ function _TCT_item_page( $atts ) {
                             $taggingTab .= '<div class="location-input-geonames-container location-input-container location-search-container">';
                                 $taggingTab .= '<label>WikiData:</label><br/>';
                                 if ($place['WikidataName'] != "NULL" && $place['WikidataId'] != "NULL") {
-                                    $taggingTab .= '<input type="text" placeholder="" name="" value="'.htmlspecialchars($place['WikidataId'], ENT_QUOTES, 'UTF-8').'; '.htmlspecialchars($place['WikidataName'], ENT_QUOTES, 'UTF-8').'">';
+                                    $taggingTab .= '<input type="text" placeholder="" name="" value="'.htmlspecialchars($place['WikidataName'], ENT_QUOTES, 'UTF-8').'; '.htmlspecialchars($place['WikidataId'], ENT_QUOTES, 'UTF-8').'">';
                                 }
                                 else {
                                     $taggingTab .= '<input type="text" placeholder="" name="">';
-                                }
-                                //$taggingTab .= '<a id="geonames-search-button" href="">';
-                                //    $taggingTab .= '<i class="far fa-search"></i>';
-                                //$taggingTab .= '</a>';
+                                } 
                             $taggingTab .= '</div>';
             
                             $taggingTab .= "<div class='form-buttons-right'>";

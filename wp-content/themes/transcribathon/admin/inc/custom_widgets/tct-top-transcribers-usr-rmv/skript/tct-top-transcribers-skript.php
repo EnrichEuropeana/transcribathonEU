@@ -295,7 +295,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 				$i=((int)$base+1);	
 				foreach($topusrs as $usr){
 					$aut = get_user_by('ID',$usr['UserId']);
-					// if($usr['UserId'] != 3341) {
+					if($usr['UserId'] != 3341) {
 					um_fetch_user( $usr['UserId']);
 					$content .= "<li class=\"p".(int)$i."\" style=\"background: #eeeeee; border-top: 8px solid #0c7da7; border-radius: 4px;\">";
 					// $content .= "<div class=\"tct-user-banner ".um_user('role')."\">".ucfirst(um_user('role'))."</div>\n"; 
@@ -325,7 +325,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gtttrs"):
 						}
 					}
 					$i++;
-				// }
+				}
 			}
 			}
 			$content .= "</ul>\n";

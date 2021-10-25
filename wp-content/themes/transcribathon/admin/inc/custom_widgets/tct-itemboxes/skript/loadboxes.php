@@ -21,13 +21,13 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 	include dirname(__FILE__)."/../../../custom_scripts/send_api_request.php";
 
 	// Save image data
-	$storyData = json_decode($result, true);
+	$itemData = json_decode($result, true);
 	
 	$content .= "<div class=\"section group sepgroup tab\">\n";
 	global $post;
 	$j = 1;
 	$i=0;
-	foreach($storyData as $story){
+	foreach($itemData as $item){
 		if($i<$tct_doccols) {
 				$i++; 
 		} else { 
@@ -37,7 +37,7 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 			$content .=   '<div class="col span_1_of_4 collection">';
 				$content .=   '<div class="dcholder">';
 				
-					$image = json_decode($story['ImageLink'], true);
+					$image = json_decode($item['ImageLink'], true);
 
 					if (substr($image['service']['@id'], 0, 4) == "http") {
 						$gridImageLink = $image['service']['@id'];
@@ -47,23 +47,19 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 					}
 
 					if ($image["width"] != null || $image["height"] != null) {
-						// if ($image["width"] <= ($image["height"] * 2)) {
-							if ($image["width"] <= $image["height"]) {
-							// $gridImageLink .= "/0,0,".$image["width"].",".($image["width"] / 2);
+						if ($image["width"] <= $image["height"]) {
 							$gridImageLink .= "/0,0,".$image["width"].",".$image["width"];
 						}
 						else {
-							// $gridImageLink .= "/".round(($image["width"] - $image["height"]) / 2).",0,".($image["height"] * 2).",".$image["height"];
 							$gridImageLink .= "/0,0,".$image["height"].",".$image["height"];
 						}
 					}
 					else {
 						$gridImageLink .= "/full";
 					}
-					// $gridImageLink .= "/280,140/0/default.jpg";
 					$gridImageLink .= "/500,500/0/default.jpg";
 
-					$content .=   "<a class='grid-view-image' href='".home_url()."/documents/story/item/?story=".$story['StoryId']."&item=".$story['ItemId']."'>";
+					$content .=   "<a class='grid-view-image' href='".home_url()."/documents/story/item/?story=".$item['StoryId']."&item=".$item['ItemId']."'>";
 						$content .=   '<img src='.$gridImageLink.'>';
 					$content .=   "</a>";
 
@@ -76,120 +72,129 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 					// Save status data
 					$statusTypes = json_decode($result, true);
 
-					// $statusData = array();
-					// foreach ($statusTypes as $statusType) {
-					// 	$statusObject = new stdClass;
-					// 	$statusObject->Name = $statusType['Name'];
-					// 	$statusObject->ColorCode = $statusType['ColorCode'];
-					// 	$statusObject->ColorCodeGradient = $statusType['ColorCodeGradient'];
-					// 	$statusObject->Amount = 0;
-					// 	$statusObject->Percentage = 0;
-					// 	$statusData[$statusType['Name']] = $statusObject;
-					// }
+					$statusData = array();
+					foreach ($statusTypes as $statusType) {
+						$statusObject = new stdClass;
+						$statusObject->Id = $statusType['CompletionStatusId'];
+						$statusObject->Name = $statusType['Name'];
+						$statusObject->ColorCode = $statusType['ColorCode'];
+						$statusObject->ColorCodeGradient = $statusType['ColorCodeGradient'];
+						$statusObject->Amount = 0;
+						$statusObject->Percentage = 0;
+						$statusData[$statusType['Id']] = $statusObject;
+					}
 					// $itemAmount = 0;
 					// foreach($story['CompletionStatus'] as $status) {
-					// 	$itemAmount += $status['Amount'];
+					//     $itemAmount += $status['Amount'];
 					// }
+					$statusCompletionId = $item['CompletionStatusId'];
 					
-					// $totalPercent = 0;
-
-					// Create status objects for each status
-					// foreach($story['CompletionStatus'] as $status) {
-					// 	$statusObject = new stdClass;
-					// 	$statusObject->Name = $status['Name'];
-					// 	$statusObject->ColorCode = $status['ColorCode'];
-					// 	$statusObject->ColorCodeGradient = $status['ColorCodeGradient'];
-					// 	$statusObject->Amount = $status['Amount'];
-					// 	$statusObject->Percentage = (round($status['Amount'] / $itemAmount, 2) * 100);
-
-					// 	$statusData[$status['Name']] = $statusObject;
-					// 	$totalPercent += $statusObject->Percentage;
-					// }
+					$totalPercent = 0;
 
 					// Make sure that percent total is 100
-					// foreach ($statusData as $status) {
-					// 	if ($status->Name == "Not Started") {
-					// 		if ($totalPercent != 100) {
-					// 			$status->Percentage += (100 - $totalPercent);
-					// 		}
-					// 	}
-					// }
-																				
-					// $content .=  '<div class="box-progress-bar item-status-chart">';
-					// 	$content .=  '<div class="item-status-info-box box-status-bar-info-box">';
-					// 		$content .=  '<ul class="item-status-info-box-list">';
-					// 			foreach ($statusData as $status) {
-					// 				$percentage = $status->Percentage;
-					// 				$content .=  '<li>';
-					// 					$content .=  '<span class="status-info-box-color-indicator" style="background-color:'.$status->ColorCode.';
-					// 									background-image: -webkit-gradient(linear, left top, left bottom,
-					// 									color-stop(0, '.$status->ColorCode.'), color-stop(1, '.$status->ColorCodeGradient.'));">';
-					// 					$content .=  '</span>';
-					// 					$content .=  '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status->Name).'-section" class="status-info-box-percentage">';
-					// 						$content .=  $percentage.'% | '.$status->Amount;
-					// 					$content .=  '</span>';
-					// 					$content .=  '<span class="status-info-box-text">';
-					// 						$content .=  $status->Name;
-					// 					$content .=  '</span>';
-					// 				$content .=  '</li>';
-					// 			}
-					// 		$content .=  '</ul>';
-					// 	$content .=  '</div>';
+					foreach ($statusData as $status) {
+						if ($status->Name == "Not Started") {
+							if ($totalPercent != 100) {
+								$status->Percentage += (100 - $totalPercent);
+							}
+						}
+					}
+					$progressData = array(
+						$item['TranscriptionStatusId'],
+						$item['DescriptionStatusId'],
+						$item['LocationStatusId'],
+						$item['TaggingStatusId'],
+						//$itemData['AutomaticEnrichmentStatusName'],
+					);
+					$progressCount = array (
+									'1' => 0,
+									'2' => 0,
+									'3' => 0,
+									'4' => 0
+								);
+					foreach ($progressData as $status) {
+						$progressCount[$status] += 1;
+					}                        
+					$content .=  '<div class="box-progress-bar item-status-chart">';
+						$content .=  '<div class="item-status-info-box box-status-bar-info-box">';
+							$content .=  '<ul class="item-status-info-box-list">';
+								
+								foreach ($statusTypes as $status) {
+									$percentage = ($progressCount[$status['CompletionStatusId']] / sizeof($progressData)) * 100;
+									$content .=  '<li>';
+										$content .=  '<span class="status-info-box-color-indicator" style="background-color:'.$status['ColorCode'].';
+														background-image: -webkit-gradient(linear, left top, left bottom,
+														color-stop(0, '.$status['ColorCode'].'), color-stop(1, '.$status['ColorCodeGradient'].'));">';
+									$content .=  '</span>';
+										$content .=  '<span id="progress-bar-overlay-'.str_replace(' ', '-', $status['Name']).'-section" class="status-info-box-percentage" style="width: 20%;">';
+											$content .=  $percentage.'%';
+										$content .=  '</span>';
+										$content .=  '<span class="status-info-box-text">';
+											$content .=  $status['Name'];
+										$content .=  '</span>';
+									$content .=  '</li>';
+								}                                                          
 
-					// 	$CompletedBar = "";
-					// 	$ReviewBar = "";
-					// 	$EditBar = "";
-					// 	$NotStartedBar = "";
-					// 	foreach ($statusData as $status) {
-					// 		$percentage = $status->Percentage;
+							$content .= '</ul>';
+						$content .= '</div>';
 
-					// 		switch ($status->Name) {
-					// 			case "Completed":
-					// 				$CompletedBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status->Name).'-section" class="progress-bar progress-bar-section"
-					// 									style="width: '.$percentage.'%; background-color:'.$status->ColorCode.';
-					// 									">';
-					// 					$CompletedBar .= $percentage.'%';
-					// 				$CompletedBar .= '</div>';
-					// 				break;
-					// 			case "Review":
-					// 				$ReviewBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status->Name).'-section" class="progress-bar progress-bar-section"
-					// 									style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
-					// 					$ReviewBar .= $percentage.'%';
-					// 				$ReviewBar .= '</div>';
-					// 				break;
-					// 			case "Edit":
-					// 				$EditBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status->Name).'-section" class="progress-bar progress-bar-section"
-					// 									style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
-					// 					$EditBar .= $percentage.'%';
-					// 				$EditBar .= '</div>';
-					// 				break;
-					// 			case "Not Started":
-					// 				$NotStartedBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status->Name).'-section" class="progress-bar progress-bar-section"
-					// 									style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
-					// 					$NotStartedBar .= $percentage.'%';
-					// 				$NotStartedBar .= '</div>';
-					// 				break;
-					// 		}
-					// 	}
-					// 	if ($CompletedBar != "") {
-					// 		$content .=  $CompletedBar;
-					// 	}
-					// 	if ($ReviewBar != "") {
-					// 		$content .=  $ReviewBar;
-					// 	}
-					// 	if ($EditBar != "") {
-					// 		$content .=  $EditBar;
-					// 	}
-					// 	if ($NotStartedBar != "") {
-					// 		$content .=  $NotStartedBar;
-					// 	}
-					// $content .=  '</div>';
+						$CompletedBar = "";
+						$ReviewBar = "";
+						$EditBar = "";
+						$NotStartedBar = "";
+						// Add each status section to progress bar
+						foreach ($statusTypes as $status) {
+							$percentage = ($progressCount[$status['CompletionStatusId']] / sizeof($progressData)) * 100;
+
+							switch ($status['Name']) {
+								case "Completed":
+									$CompletedBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status['Name']).'-section" class="progress-bar progress-bar-section"
+														style="width: '.$percentage.'%; background-color:'.$status->ColorCode.';
+														">';
+										$CompletedBar .= $percentage.'%';
+									$CompletedBar .= '</div>';
+									break;
+								case "Review":
+									$ReviewBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status['Name']).'-section" class="progress-bar progress-bar-section"
+														style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
+										$ReviewBar .= $percentage.'%';
+									$ReviewBar .= '</div>';
+									break;
+								case "Edit":
+									$EditBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status['Name']).'-section" class="progress-bar progress-bar-section"
+														style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
+										$EditBar .= $percentage.'%';
+									$EditBar .= '</div>';
+									break;
+								case "Not Started":
+									$NotStartedBar .= '<div id="progress-bar-'.str_replace(' ', '-', $status['Name']).'-section" class="progress-bar progress-bar-section"
+														style="width: '.$percentage.'%; background-color:'.$status->ColorCode.'">';
+										$NotStartedBar .= $percentage.'%';
+									$NotStartedBar .= '</div>';
+									break;
+							}
+						}
+						
+						if ($CompletedBar != "") {
+							$content .= $CompletedBar;
+						}
+						if ($ReviewBar != "") {
+							$content .= $ReviewBar;
+						}
+						if ($EditBar != "") {
+							$content .= $EditBar;
+						}
+						if ($NotStartedBar != "") {
+							$content .= $NotStartedBar;
+						}
+					$content .= '</div>';
+					
 				$content .=  '</div>';
 
 				$content .=   '<div class="">';
 					$content .=   '<h3 class="theme-color">';
-						$content .=   "<a href='".home_url()."/documents/story/item/?story=".$story['StoryId']."&item=".$story['ItemId']."'>";
-							$content .=   $story['Title'];
+						$content .=   "<a class='storybox-title' href='".home_url()."/documents/story/item/?story=".$item['StoryId']."&item=".$item['ItemId']."'>";
+							$content .=   $item['Title'];
 						$content .=   "</a>";
 					$content .=   '</h3>';
 					/*

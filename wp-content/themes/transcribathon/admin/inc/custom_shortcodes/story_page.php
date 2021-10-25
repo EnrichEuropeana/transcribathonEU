@@ -397,7 +397,7 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                                     });
                                     // add story location to the map
 
-                                    if (places[0].PlaceLongitude != 0 || places[0].PlaceLongitude != 0) {
+                                    if (places[0].PlaceLongitude != 0 || places[0].PlaceLatitude != 0) {
                                         var el = document.createElement('div');
                                         el.className = 'marker savedMarker storyMarker';
                                         var popup = new mapboxgl.Popup({offset: 25, closeButton: false})
@@ -412,6 +412,12 @@ $content .= "<div id='total-storypg' class='storypg-container'>";
                                         map.fitBounds(bounds, {padding: {top: 50, bottom:20, left: 20, right: 20}});
                                     }
                                 }
+                                if(places && places.length === 1) {
+                                    map.flyTo({ 
+                                        zoom: 4, 
+                                        essential: true
+                                    });
+                                } 
                             });
 							  
 						});

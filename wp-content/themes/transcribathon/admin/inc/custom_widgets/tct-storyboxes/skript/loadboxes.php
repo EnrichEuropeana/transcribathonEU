@@ -22,7 +22,8 @@ if(isset($_POST['q']) && $_POST['q'] === "gmbxs"):
 
 	// Save image data
 	$storyData = json_decode($result, true);
-	
+	$storyDataRev = array_reverse($storyData);
+
 	$content .= "<div class=\"section group sepgroup tab\">\n";
 	global $post;
 	$j = 1;
